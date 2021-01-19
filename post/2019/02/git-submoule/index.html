@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Git Submodule - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="1.1 背景 在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。
+ 如何获取第三方库更新？ 如何在 clone 主项目的时候导入第三方库的代码？ 修改了第三方库代码又想继续跟踪第三库的更新怎么办？ " /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2019/02/git-submoule/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Git Submodule" />
+<meta property="og:description" content="1.1 背景
+在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。
+
+如何获取第三方库更新？
+如何在 clone 主项目的时候导入第三方库的代码？
+修改了第三方库代码又想继续跟踪第三库的更新怎么办？
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2019/02/git-submoule/" />
+<meta property="article:published_time" content="2019-02-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-02-16T00:00:00+00:00" />
+<meta itemprop="name" content="Git Submodule">
+<meta itemprop="description" content="1.1 背景
+在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。
+
+如何获取第三方库更新？
+如何在 clone 主项目的时候导入第三方库的代码？
+修改了第三方库代码又想继续跟踪第三库的更新怎么办？
+">
+<meta itemprop="datePublished" content="2019-02-16T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-02-16T00:00:00+00:00" />
+<meta itemprop="wordCount" content="625">
+
+
+
+<meta itemprop="keywords" content="git,submodule," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Git Submodule"/>
+<meta name="twitter:description" content="1.1 背景
+在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。
+
+如何获取第三方库更新？
+如何在 clone 主项目的时候导入第三方库的代码？
+修改了第三方库代码又想继续跟踪第三库的更新怎么办？
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Git Submodule</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-02-16 </span>
+        <div class="post-category">
+            <a href="/categories/git/"> git </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#11-背景">1.1 背景</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-git-submodule-介绍">2. git submodule 介绍</a>
+      <ul>
+        <li><a href="#21-add-submodule">2.1 add submodule</a></li>
+        <li><a href="#22-clone-main-project">2.2 clone main project</a></li>
+        <li><a href="#23-delete-submodule">2.3 delete submodule</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-使用案例">3. 使用案例</a>
+      <ul>
+        <li><a href="#31-跟踪-next-更新">3.1 跟踪 next 更新</a></li>
+        <li><a href="#32-修改-next-配置">3.2 修改 next 配置</a></li>
+        <li><a href="#33-解决方法">3.3 解决方法</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="11-背景">1.1 背景</h2>
+<p>在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。</p>
+<ol>
+<li>如何获取第三方库更新？</li>
+<li>如何在 clone 主项目的时候导入第三方库的代码？</li>
+<li>修改了第三方库代码又想继续跟踪第三库的更新怎么办？</li>
+</ol>
+<h1 id="2-git-submodule-介绍">2. git submodule 介绍</h1>
+<p>参考<a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">Git Tools Submodules</a></p>
+<p>如下对常用命令做一个记录。</p>
+<h2 id="21-add-submodule">2.1 add submodule</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  <span class="nb">cd</span> /path/to/main/project
+  git submodule add https://github.com/chaconinc/DbConnector /path/to/submodule
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="22-clone-main-project">2.2 clone main project</h2>
+<p>普通 clone 不会将 submodule 的代码下载到本地，可以使用如下方法。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  <span class="c1"># 不加--recurse-submodules 会导致 clone 到本地的 submodule 目录是空目录</span>
+  git clone --recurse-submodules https://github.com/chaconinc/MainProject
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="23-delete-submodule">2.3 delete submodule</h2>
+<p>删除 submodule 可以在 cached 中删除，如果要变成主项目代码，再将 submodule 目录下的.git 删除即可。
+如果要整个删除 submodule 采用如下方法，在主项目 git 里和文件系统都删除。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  git rm --cached /path/to/submodule
+  rm -rf /path/to/submodule
+  <span class="c1"># 如果有多个 submodule 需要手动在.gitmodules 文件删除相应条目</span>
+  rm .gitmodules
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="3-使用案例">3. 使用案例</h1>
+<p>blog 项目使用了 hexo 和 next，我需要在多台电脑使用，因此将 blog 项目 push 到仓库，遇到如下问题。</p>
+<h2 id="31-跟踪-next-更新">3.1 跟踪 next 更新</h2>
+<p>要跟踪更新，需要使用 git fetch 来获取更新。</p>
+<h2 id="32-修改-next-配置">3.2 修改 next 配置</h2>
+<p>修改了 next 配置，需要保存到远程仓库，在不同电脑使用。</p>
+<h2 id="33-解决方法">3.3 解决方法</h2>
+<p>第一个问题，clone next 主题后，保留.git 即可，但是要 push 到远程仓库，涉及到 git submodule 使用。
+第二个问题，我修改了_config.yml，需要将变化保存下来，push 到远程仓库，在另一台电脑 clone 使用，这里将 submodule 项目的 push url 修改即可。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">  <span class="nb">cd</span> /path/to/theme/next
+  git remote set-url --push origin git@github.com:user/theme-next.git
+</code></pre></td></tr></table>
+</div>
+</div><p>这样，既可以将修改保存下来，也可以在另一台电脑 clone 到修改后的代码，需要更新 next 的时候执行下 git fetch 即可，解决了问题。</p>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2019-02-16
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/git/">git</a>
+          <a href="/tags/submodule/">submodule</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2019/02/selection-sort/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Selection Sort</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2019/02/mail-server/">
+            <span class="next-text nav-default">邮件服务原理</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2019-02-16 00:00:00 \u002b0000 UTC',
+        title: 'Git Submodule',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

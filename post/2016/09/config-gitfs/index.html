@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>saltstack学习16-生产配置gitfs - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="如下操作在master/syndic节点执行。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/09/config-gitfs/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="saltstack学习16-生产配置gitfs" />
+<meta property="og:description" content="如下操作在master/syndic节点执行。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/09/config-gitfs/" />
+<meta property="article:published_time" content="2016-09-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-09-04T00:00:00+00:00" />
+<meta itemprop="name" content="saltstack学习16-生产配置gitfs">
+<meta itemprop="description" content="如下操作在master/syndic节点执行。">
+<meta itemprop="datePublished" content="2016-09-04T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-09-04T00:00:00+00:00" />
+<meta itemprop="wordCount" content="381">
+
+
+
+<meta itemprop="keywords" content="saltstack,salt," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="saltstack学习16-生产配置gitfs"/>
+<meta name="twitter:description" content="如下操作在master/syndic节点执行。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">saltstack学习16-生产配置gitfs</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-09-04 </span>
+        <div class="post-category">
+            <a href="/categories/saltstack/"> saltstack </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#1-安装依赖">1. 安装依赖</a></li>
+        <li><a href="#2-配置-saltstack">2. 配置 saltstack</a></li>
+        <li><a href="#3-添加-public-key">3. 添加 public key</a></li>
+        <li><a href="#4-重启-salt-master">4. 重启 salt-master</a></li>
+        <li><a href="#5-验证">5. 验证</a></li>
+        <li><a href="#6-异常处理">6. 异常处理</a>
+          <ul>
+            <li><a href="#61-host-key-verification-failed">6.1 Host key verification failed</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>如下操作在master/syndic节点执行。</p>
+<h2 id="1-安装依赖">1. 安装依赖</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">unzip</span> <span class="nx">GitPython</span>.<span class="nx">zip</span> <span class="err">
+</span><span class="err"></span><span class="nx">cd</span> <span class="nx">GitPython</span>;<span class="nx">yum</span> <span class="p">-</span><span class="nx">y</span> <span class="nx">install</span> *.<span class="nx">rpm</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="2-配置-saltstack">2. 配置 saltstack</h2>
+<p>修改 /etc/salt/master 添加如下配置。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">fileserver_backend</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">git</span><span class="w">
+</span><span class="w">  </span>- <span class="l">roots</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">gitfs_remotes</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">git@30.16.226.110:salt/salt-formula.git</span><span class="w">
+</span><span class="w">  </span>- <span class="l">git@30.4.226.57:salt/salt-formula.git</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-添加-public-key">3. 添加 public key</h2>
+<p>在主 gitlab 页面添加 master/syndic 的 public key。
+如果不存在 public key ，按照如下步骤生成 public key。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">CNLF041518</span> <span class="p">~</span>]# <span class="nx">ssh</span><span class="p">-</span><span class="nx">keygen</span> <span class="err">
+</span><span class="err"></span><span class="nx">Generating</span> <span class="nx">public</span>/<span class="nx">private</span> <span class="nx">rsa</span> <span class="nx">key</span> <span class="nx">pair</span>.<span class="err">
+</span><span class="err"></span><span class="nx">Enter</span> <span class="nx">file</span> <span class="nx">in</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">save</span> <span class="nx">the</span> <span class="nx">key</span> <span class="p">(</span><span class="sr">/root/</span>.<span class="nx">ssh</span>/<span class="nx">id_rsa</span><span class="p">)</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Enter</span> <span class="nx">passphrase</span> <span class="p">(</span><span class="nx">empty</span> <span class="nx">for</span> <span class="nx">no</span> <span class="nx">passphrase</span><span class="p">)</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Enter</span> <span class="nx">same</span> <span class="nx">passphrase</span> <span class="nx">again</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Your</span> <span class="nx">identification</span> <span class="nx">has</span> <span class="nx">been</span> <span class="nx">saved</span> <span class="nx">in</span> <span class="sr">/root/</span>.<span class="nx">ssh</span>/<span class="nx">id_rsa</span>.<span class="err">
+</span><span class="err"></span><span class="nx">Your</span> <span class="nx">public</span> <span class="nx">key</span> <span class="nx">has</span> <span class="nx">been</span> <span class="nx">saved</span> <span class="nx">in</span> <span class="sr">/root/</span>.<span class="nx">ssh</span>/<span class="nx">id_rsa</span>.<span class="nx">pub</span>.<span class="err">
+</span><span class="err"></span><span class="nx">The</span> <span class="nx">key</span> <span class="nx">fingerprint</span> <span class="nx">is</span>:<span class="err">
+</span><span class="err"></span><span class="m">78</span>:<span class="nx">f5</span>:<span class="m">3</span>c:<span class="m">1</span>d:<span class="m">82</span>:<span class="m">18</span>:<span class="m">59</span>:<span class="nx">a3</span>:<span class="m">4</span>a:<span class="m">99</span>:<span class="m">21</span>:<span class="nx">e0</span>:<span class="nx">e5</span>:<span class="m">64</span>:<span class="m">6</span>b:<span class="m">6</span>c <span class="nx">root</span>@<span class="nx">CNLF041518</span><span class="err">
+</span><span class="err"></span><span class="nx">The</span> <span class="nx">key</span>&#39;<span class="nx">s</span> <span class="nx">randomart</span> <span class="nx">image</span> <span class="nx">is</span>:<span class="err">
+</span><span class="err"></span><span class="p">+--</span>[ <span class="nx">RSA</span> <span class="m">2048</span>]<span class="p">----+</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>  ..<span class="p">=</span> . .<span class="nx">oo</span>      <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span> . * <span class="nx">o</span> <span class="p">+</span>.<span class="p">+</span> <span class="nx">o</span>     <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>  . <span class="nx">E</span> <span class="p">+</span> <span class="nx">o</span> <span class="nx">o</span> . .  <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>   <span class="nx">o</span> . <span class="nx">o</span> . <span class="nx">o</span> <span class="nx">o</span> . <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>      <span class="nx">o</span> <span class="nx">S</span>   <span class="p">+</span> .  <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>       .     .   <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>                 <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>                 <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">|</span>                 <span class="p">|</span><span class="err">
+</span><span class="err"></span><span class="p">+-----------------+</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">CNLF041518</span> <span class="p">~</span>]# <span class="nx">cat</span> .<span class="nx">ssh</span>/<span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="err">
+</span><span class="err"></span><span class="nx">ssh</span><span class="p">-</span><span class="nx">rsa</span> <span class="nx">AAAAB3NzaC1yc2EAAAABIwAAAQEAnRuiz0OUa25nGry4DQu2vx9z2O8adb32Gu0l9WbW9TMWyejo9lpto12ijPnEF</span><span class="p">+</span><span class="nx">gMq1bWJs6mKumRO57sprbdnAifnrto95rk5C2n</span><span class="sr">/LMmbn7xSyFRxt57lUeI+CAiMKyKKUg7IR0mYaEmm/</span><span class="nx">QJb8KnQ9a7DIASXyTE3qVHvyLy2g4heqQ3S9rOVntaN5GiuziOd4pUqYd7URdWngOgduyfisq562BUEGboPPiph13EwVx</span>/<span class="nx">yvBZ16YZ2rdNLleiTHGHzGYSla2WFdo4yarYtgOsvLyeCIMfx6R1vFb1XPzpOtxXbshsFqSTkVeyRb3MHEbQEps9lmNJNGLjvmp9nT6bFw</span><span class="p">==</span> <span class="nx">root</span>@<span class="nx">CNLF041518</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">CNLF041518</span> <span class="p">~</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-重启-salt-master">4. 重启 salt-master</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">service</span> <span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">restart</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-验证">5. 验证</h2>
+<p>在 master/syndic 节点执行如下命令，如果结果显示远程仓库的文件则 gitfs 配置成功。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">salt</span><span class="p">-</span><span class="nx">run</span> <span class="nx">fileserver</span>.<span class="nx">file_list</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="6-异常处理">6. 异常处理</h2>
+<h3 id="61-host-key-verification-failed">6.1 Host key verification failed</h3>
+<h4 id="现象">【现象】</h4>
+<p>/var/log/salt/master 日志中出现如下信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="m">2016-11-04</span> <span class="m">17</span>:<span class="m">01</span>:<span class="m">30</span><span class="p">,</span><span class="m">857</span> [<span class="nx">salt</span>.<span class="nx">utils</span>.<span class="nx">gitfs</span>][<span class="nx">ERROR</span>][<span class="m">113884</span>] <span class="nx">Exception</span> <span class="s1">&#39;len([]) != len([&#39;</span><span class="nx">Host</span> <span class="nx">key</span> <span class="nx">verification</span> <span class="nx">failed</span>.<span class="s1">&#39;, &#39;&#39;])&#39;</span> <span class="nx">caught</span> <span class="nx">while</span> <span class="nx">fetching</span> <span class="nx">gitfs</span> <span class="nx">remote</span> <span class="s1">&#39;git@30.16.226.110:salt/salt-formula.git&#39;</span><span class="err">
+</span><span class="err"></span><span class="m">2016-11-04</span> <span class="m">17</span>:<span class="m">01</span>:<span class="m">31</span><span class="p">,</span><span class="m">186</span> [<span class="nx">salt</span>.<span class="nx">utils</span>.<span class="nx">gitfs</span>][<span class="nx">ERROR</span>][<span class="m">113884</span>] <span class="nx">Exception</span> <span class="s1">&#39;len([]) != len([&#39;</span><span class="nx">Host</span> <span class="nx">key</span> <span class="nx">verification</span> <span class="nx">failed</span>.<span class="s1">&#39;, &#39;&#39;])&#39;</span> <span class="nx">caught</span> <span class="nx">while</span> <span class="nx">fetching</span> <span class="nx">gitfs</span> <span class="nx">remote</span> <span class="s1">&#39;git@30.4.226.57:salt/salt-formula.git&#39;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="解决方法">【解决方法】</h4>
+<p>把日志出现的异常 repository 都手动 clone 一次，使 git 访问正常就可以了。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">cd</span> <span class="sr">/tmp/</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span># <span class="nx">输入</span> <span class="nx">yes</span><span class="err">
+</span><span class="err"></span><span class="nx">git</span> <span class="nx">clone</span> <span class="nx">git</span>@<span class="m">30</span>.<span class="m">16</span>.<span class="m">226</span>.<span class="m">110</span>:<span class="nx">salt</span>/<span class="nx">salt</span><span class="p">-</span><span class="nx">formula</span>.<span class="nx">git</span><span class="err">
+</span><span class="err"></span><span class="nx">rm</span> <span class="p">-</span><span class="nx">rf</span> <span class="nx">salt</span><span class="p">-</span><span class="nx">formula</span>/<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">git</span> <span class="nx">clone</span> <span class="nx">git</span>@<span class="m">30</span>.<span class="m">4</span>.<span class="m">226</span>.<span class="m">57</span>:<span class="nx">salt</span>/<span class="nx">salt</span><span class="p">-</span><span class="nx">formula</span>.<span class="nx">git</span> <span class="err">
+</span><span class="err"></span><span class="nx">rm</span> <span class="p">-</span><span class="nx">rf</span> <span class="nx">salt</span><span class="p">-</span><span class="nx">formula</span>/<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-09-04
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/saltstack/">saltstack</a>
+          <a href="/tags/salt/">salt</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016/09/sed/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">sed使用总结</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016/09/install-gitlab/">
+            <span class="next-text nav-default">saltstack学习15-生产部署主备gitlab</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-09-04 00:00:00 \u002b0000 UTC',
+        title: 'saltstack学习16-生产配置gitfs',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

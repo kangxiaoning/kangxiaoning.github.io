@@ -9,85 +9,85 @@
     <lastBuildDate>Tue, 19 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang Empty Struct</title>
-      <link>https://kangxiaoning.github.io/post/2021-01-19-empty-struct/</link>
+      <link>https://kangxiaoning.github.io/post/2021/01/empty-struct/</link>
       <pubDate>Tue, 19 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2021-01-19-empty-struct/</guid>
+      <guid>https://kangxiaoning.github.io/post/2021/01/empty-struct/</guid>
       <description>&lt;p&gt;理解&lt;code&gt;empty struct&lt;/code&gt; 的行为，以及使用场景。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>编写custom controller</title>
-      <link>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</link>
+      <link>https://kangxiaoning.github.io/post/2020/12/write-custom-controller/</link>
       <pubDate>Wed, 09 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</guid>
+      <guid>https://kangxiaoning.github.io/post/2020/12/write-custom-controller/</guid>
       <description>&lt;p&gt;上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>通过code-generator生成kubernetes CRD代码</title>
-      <link>https://kangxiaoning.github.io/post/2020-12-07-learn-kubernetes-crd/</link>
+      <link>https://kangxiaoning.github.io/post/2020/12/learn-kubernetes-crd/</link>
       <pubDate>Mon, 07 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2020-12-07-learn-kubernetes-crd/</guid>
+      <guid>https://kangxiaoning.github.io/post/2020/12/learn-kubernetes-crd/</guid>
       <description>&lt;p&gt;这里以添加一个 kind 为 &lt;code&gt;Machine&lt;/code&gt; ，group 为 &lt;code&gt;crd.alpha.io&lt;/code&gt; ，类型为 &lt;code&gt;v1&lt;/code&gt; 的 CRD 为例。&lt;/p&gt;
 &lt;p&gt;该 CRD 的定义如下。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>TCP 3次握手的理解</title>
-      <link>https://kangxiaoning.github.io/post/2020-10-15-tcp-3-way-handshake/</link>
+      <link>https://kangxiaoning.github.io/post/2020/10/tcp-3-way-handshake/</link>
       <pubDate>Thu, 15 Oct 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2020-10-15-tcp-3-way-handshake/</guid>
+      <guid>https://kangxiaoning.github.io/post/2020/10/tcp-3-way-handshake/</guid>
       <description>&lt;p&gt;前两天一个人散步，独坐下来没啥事，顺手在手机日记上写了点对TCP 3次握手的理解，大概是之前做应届生面试的时候，发现不少的回答基本都是背网上的博客内容，很少有自己的理解。这里围绕“为什么建立TCP连接需要3次握手”，从设计者角度谈下自己的理解。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Rust 开发环境配置</title>
-      <link>https://kangxiaoning.github.io/post/2019-04-20-rust-config/</link>
+      <link>https://kangxiaoning.github.io/post/2019/04/rust-config/</link>
       <pubDate>Sat, 20 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-04-20-rust-config/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/04/rust-config/</guid>
       <description>&lt;p&gt;在 mac 上安装 rust 的过程。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Quick Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019-04-07-quick-sort/</link>
+      <link>https://kangxiaoning.github.io/post/2019/04/quick-sort/</link>
       <pubDate>Sun, 07 Apr 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-04-07-quick-sort/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/04/quick-sort/</guid>
       <description>&lt;p&gt;快速排序被称为二十世纪对世界影响最大的算法之一。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Merge Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019-03-10-merge-sort/</link>
+      <link>https://kangxiaoning.github.io/post/2019/03/merge-sort/</link>
       <pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-03-10-merge-sort/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/03/merge-sort/</guid>
       <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
 &lt;p&gt;如下通过伪代码和实际实现来理解 &lt;code&gt;merge sort&lt;/code&gt;。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Bubble Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019-03-07-bubble-sort/</link>
+      <link>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</link>
       <pubDate>Thu, 07 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-03-07-bubble-sort/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</guid>
       <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
 &lt;p&gt;重复遍历待排序的列表，比较相邻两个元素，如果顺序错误则交换，直到没有相邻的元素需要交换则说明已经是顺序的。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Insertion Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-28-insertion-sort/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/insertion-sort/</link>
       <pubDate>Thu, 28 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-28-insertion-sort/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/insertion-sort/</guid>
       <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
 &lt;p&gt;假设从小到大排序。
 和整理扑克牌原理一样，除了第一张牌之外，后面每张牌在前面寻找合适的插入位置。
@@ -96,10 +96,10 @@
     
     <item>
       <title>Selection Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-27-selection-sort/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/selection-sort/</link>
       <pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-27-selection-sort/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/selection-sort/</guid>
       <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
 &lt;p&gt;假设从小到大排序。&lt;/p&gt;
 &lt;ol&gt;
@@ -112,10 +112,10 @@
     
     <item>
       <title>Git Submodule</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-16-git-submoule/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/git-submoule/</link>
       <pubDate>Sat, 16 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-16-git-submoule/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/git-submoule/</guid>
       <description>&lt;h2 id=&#34;11-背景&#34;&gt;1.1 背景&lt;/h2&gt;
 &lt;p&gt;在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。&lt;/p&gt;
 &lt;ol&gt;
@@ -127,10 +127,10 @@
     
     <item>
       <title>邮件服务原理</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/mail-server/</link>
       <pubDate>Fri, 15 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/mail-server/</guid>
       <description>&lt;h1 id=&#34;术语&#34;&gt;术语&lt;/h1&gt;
 &lt;h2 id=&#34;smtp-simple-mail-transfer-protocol&#34;&gt;SMTP (Simple Mail Transfer Protocol)&lt;/h2&gt;
 &lt;p&gt;发送电子邮件，需要遵循一定的通讯规则，SMTP 协议就是用来定义这种通讯规则的。&lt;/p&gt;
@@ -142,19 +142,19 @@
     
     <item>
       <title>spacemacs 快捷键</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-14-spacemacs-commands/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/spacemacs-commands/</link>
       <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-14-spacemacs-commands/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/spacemacs-commands/</guid>
       <description>&lt;p&gt;记录 spacemacs 常用快捷键，持续更新。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>python subprocess.Popen执行powershell脚本获取exit code</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-25-subprocess-get-powershell-exit-code/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/subprocess-get-powershell-exit-code/</link>
       <pubDate>Sun, 25 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-25-subprocess-get-powershell-exit-code/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/subprocess-get-powershell-exit-code/</guid>
       <description>&lt;h1 id=&#34;1-现象&#34;&gt;1. 现象&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -179,10 +179,10 @@
     
     <item>
       <title>saltstack源码分析-publisher</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-17-master-publisher/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/master-publisher/</link>
       <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-17-master-publisher/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/master-publisher/</guid>
       <description>&lt;h1 id=&#34;1-原理&#34;&gt;1. 原理&lt;/h1&gt;
 &lt;p&gt;saltstack默认利用zeromq进行消息传递。&lt;/p&gt;
 &lt;p&gt;salt-master启动时会执行如下操作&lt;/p&gt;
@@ -196,39 +196,39 @@
     
     <item>
       <title>ansible管理windows</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-12-ansible-manage-windows/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/ansible-manage-windows/</link>
       <pubDate>Mon, 12 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-12-ansible-manage-windows/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/ansible-manage-windows/</guid>
       <description>&lt;p&gt;crontl端是Centos 7.2，被管理端是windows 2008R2。&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;http://www.cnblogs.com/kingleft/p/6391652.html&#34;&gt;参考文章&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ansible tower动手实战营</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-08-ansible-tower/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/ansible-tower/</link>
       <pubDate>Thu, 08 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-08-ansible-tower/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/ansible-tower/</guid>
       <description>&lt;p&gt;参加redhat为期半天的ansible tower实践营，虽然有ansible使用经验，也收获了一些东西。&lt;/p&gt;
 &lt;p&gt;培训速度比较快，没来的及做一些笔记，重点信息记录如下。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>classmethod和staticmethod</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-03-static-and-class-method/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/static-and-class-method/</link>
       <pubDate>Sat, 03 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-03-static-and-class-method/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/static-and-class-method/</guid>
       <description>&lt;p&gt;总结下python中classmethod和staticmethod。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ubuntu 16.04安装jekyll</title>
-      <link>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-jekyll/</link>
+      <link>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-jekyll/</link>
       <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-jekyll/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-jekyll/</guid>
       <description>&lt;h1 id=&#34;安装jekyll&#34;&gt;安装jekyll&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -260,20 +260,20 @@
     
     <item>
       <title>ubuntu 16.04安装有道词典</title>
-      <link>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-youdao/</link>
+      <link>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-youdao/</link>
       <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-youdao/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-youdao/</guid>
       <description>&lt;p&gt;有道官方Ubuntu版本的的deb包由于gstreamer0.10-plugins-ugly依赖，无法成功安装，实际在
 16.04版本并不需要该依赖，所以只需要把该依赖检查删除再安装就可以了。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>golang验证IP是否有效</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-15-parse-ip/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/parse-ip/</link>
       <pubDate>Sat, 15 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-15-parse-ip/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/parse-ip/</guid>
       <description>&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -331,10 +331,10 @@
     
     <item>
       <title>pyinstaller打包</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-14-pyinstaller-example/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/pyinstaller-example/</link>
       <pubDate>Fri, 14 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-14-pyinstaller-example/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/pyinstaller-example/</guid>
       <description>&lt;h1 id=&#34;1-pyinstall-示例&#34;&gt;1. pyinstall 示例&lt;/h1&gt;
 &lt;h2 id=&#34;11-__import__-处理&#34;&gt;1.1 &lt;strong&gt;import&lt;/strong&gt; 处理&lt;/h2&gt;
 &lt;p&gt;如果代码里使用了动态import，pyinstaller无法找到对应的依赖，需要明确指出，下面示例通过hiddenimports来指出需要显示引入的依赖。&lt;/p&gt;
@@ -343,10 +343,10 @@
     
     <item>
       <title>python2.6转到python3.5记录</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-12-python2-to-python3-note/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/python2-to-python3-note/</link>
       <pubDate>Wed, 12 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-12-python2-to-python3-note/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/python2-to-python3-note/</guid>
       <description>&lt;h1 id=&#34;1-string&#34;&gt;1. String&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;python2.6&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -359,10 +359,10 @@
     
     <item>
       <title>extending-saltstack读书笔记</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-07-extending-saltstack-notes/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/extending-saltstack-notes/</link>
       <pubDate>Fri, 07 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-07-extending-saltstack-notes/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/extending-saltstack-notes/</guid>
       <description>&lt;h1 id=&#34;1-双下划线开始和结尾的object&#34;&gt;1. 双下划线开始和结尾的object&lt;/h1&gt;
 &lt;p&gt;在python，双下划线开始和结尾的object称为&lt;strong&gt;dunder&lt;/strong&gt;，意思是double underscore.&lt;/p&gt;
 &lt;p&gt;salt里也有一些这种特殊的object。&lt;/p&gt;</description>
@@ -370,10 +370,10 @@
     
     <item>
       <title>监控agent及定时自动升级</title>
-      <link>https://kangxiaoning.github.io/post/2017-03-18-monitor-agent/</link>
+      <link>https://kangxiaoning.github.io/post/2017/03/monitor-agent/</link>
       <pubDate>Sat, 18 Mar 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-03-18-monitor-agent/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/03/monitor-agent/</guid>
       <description>&lt;h1 id=&#34;1-功能&#34;&gt;1. 功能&lt;/h1&gt;
 &lt;p&gt;监控主机上的agent，检测版本及升级功能，包括升级自身，兼容linux和windows。&lt;/p&gt;
 &lt;p&gt;通过配置crontab或者windows上的定时任务触发，为了均衡server端压力，会随机sleep一段时间后向server请求需要的文件 。&lt;/p&gt;</description>
@@ -381,20 +381,20 @@
     
     <item>
       <title>saltstack使用-根据OS版本同步目录</title>
-      <link>https://kangxiaoning.github.io/post/2017-03-04-file-recurse/</link>
+      <link>https://kangxiaoning.github.io/post/2017/03/file-recurse/</link>
       <pubDate>Sat, 04 Mar 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-03-04-file-recurse/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/03/file-recurse/</guid>
       <description>&lt;h1 id=&#34;根据os版本同步目录&#34;&gt;根据OS版本同步目录&lt;/h1&gt;
 &lt;h2 id=&#34;1-ensure-that-some-text-appears-at-the-end-of-a-file&#34;&gt;1. Ensure that some text appears at the end of a file&lt;/h2&gt;</description>
     </item>
     
     <item>
       <title>趣味题-水仙花数</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-26-armstrong-number/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/armstrong-number/</link>
       <pubDate>Sun, 26 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-26-armstrong-number/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/armstrong-number/</guid>
       <description>&lt;h1 id=&#34;1-水仙花数&#34;&gt;1. 水仙花数&lt;/h1&gt;
 &lt;p&gt;水仙花数（Narcissistic number）也被称为超完全数字不变数（pluperfect
 digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯特朗数
@@ -404,20 +404,20 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>趣味题-尾数前移</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-25-weishuqianyi/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/weishuqianyi/</link>
       <pubDate>Sat, 25 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-25-weishuqianyi/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/weishuqianyi/</guid>
       <description>&lt;h1 id=&#34;1-问题&#34;&gt;1. 问题&lt;/h1&gt;
 &lt;p&gt;求一个自然数N，个位数是6，将6提到最前面所得数是N的4倍。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之trackback</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-22-traceback/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/traceback/</link>
       <pubDate>Wed, 22 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-22-traceback/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/traceback/</guid>
       <description>&lt;p&gt;traceback.print_exc()函数只是traceback.print_exception()函数的一个简写
 形式，而它们获取异常相关的数据都是通过sys.exc_info()函数得到的。&lt;/p&gt;
 &lt;p&gt;sys.exc_info()返回的值是一个元组，其中第一个元素，exc_type是异常的对象类
@@ -427,19 +427,19 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>python unicode编码</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-19-unicode/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/unicode/</link>
       <pubDate>Sun, 19 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-19-unicode/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/unicode/</guid>
       <description>&lt;p&gt;遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>KVM虚拟化实验-两台VM互相通信</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-14-kvm-qemu-fundation-3/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-3/</link>
       <pubDate>Tue, 14 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-14-kvm-qemu-fundation-3/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-3/</guid>
       <description>&lt;h1 id=&#34;1-实验环境&#34;&gt;1. 实验环境&lt;/h1&gt;
 &lt;p&gt;通过在vmware workstation上启动centos 7的虚拟机，以该虚拟机作为HOST进行KVM
 实验，以一个精简的linux作为guest的OS镜像启动KVM虚拟机。&lt;/p&gt;
@@ -450,10 +450,10 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>KVM虚拟化基础二</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-13-kvm-qemu-fundation-2/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/</link>
       <pubDate>Mon, 13 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-13-kvm-qemu-fundation-2/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/</guid>
       <description>&lt;h1 id=&#34;1-命令使用帮助&#34;&gt;1. 命令使用帮助&lt;/h1&gt;
 &lt;h2 id=&#34;11-qemu-img&#34;&gt;1.1 qemu-img&lt;/h2&gt;
 &lt;p&gt;不同格式支持的选项不一样，通过如下方式查看支持的选项。&lt;/p&gt;</description>
@@ -461,20 +461,20 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>KVM虚拟化基础一</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-12-kvm-qemu-fundation-1/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/</link>
       <pubDate>Sun, 12 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-12-kvm-qemu-fundation-1/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/</guid>
       <description>&lt;h1 id=&#34;1-kvm组件&#34;&gt;1. KVM组件&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;KVM主要两类组件组成&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Xen虚拟化基础二</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-08-xen-fundation-2/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/xen-fundation-2/</link>
       <pubDate>Wed, 08 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-08-xen-fundation-2/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/xen-fundation-2/</guid>
       <description>&lt;h1 id=&#34;xen虚拟状态&#34;&gt;xen虚拟状态&lt;/h1&gt;
 &lt;pre&gt;&lt;code&gt;r: 
 b: 阻塞
@@ -487,10 +487,10 @@ d: dying, 正在关闭的过程中
     
     <item>
       <title>Xen虚拟化基础一</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-07-xen-fundation/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/xen-fundation/</link>
       <pubDate>Tue, 07 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-07-xen-fundation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/xen-fundation/</guid>
       <description>&lt;h1 id=&#34;xen组成部分&#34;&gt;Xen组成部分&lt;/h1&gt;
 &lt;h2 id=&#34;1-xen-hypervisor&#34;&gt;(1) Xen Hypervisor&lt;/h2&gt;
 &lt;pre&gt;&lt;code&gt;分配CPU、Memory、Interrupt
@@ -499,10 +499,10 @@ d: dying, 正在关闭的过程中
     
     <item>
       <title>虚拟化基础</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-06-virtualization-fundation/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/virtualization-fundation/</link>
       <pubDate>Mon, 06 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-06-virtualization-fundation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/virtualization-fundation/</guid>
       <description>&lt;h1 id=&#34;cpu虚拟化&#34;&gt;cpu虚拟化&lt;/h1&gt;
 &lt;h2 id=&#34;模拟emulation&#34;&gt;模拟：emulation&lt;/h2&gt;
 &lt;h2 id=&#34;虚拟virtulization&#34;&gt;虚拟：virtulization&lt;/h2&gt;</description>
@@ -510,19 +510,19 @@ d: dying, 正在关闭的过程中
     
     <item>
       <title>elementaryOS体验</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-10-elementaryos-install/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/elementaryos-install/</link>
       <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-10-elementaryos-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/elementaryos-install/</guid>
       <description>&lt;p&gt;突然想体验下号称最漂亮的Linux - elementaryOS，安装过程很简单，主要记录下一些常用软件的安装过程。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之string</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-10-lib-string/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/lib-string/</link>
       <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-10-lib-string/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/lib-string/</guid>
       <description>&lt;h1 id=&#34;1-介绍&#34;&gt;1. 介绍&lt;/h1&gt;
 &lt;p&gt;string模块包含一些有用的常量和类。&lt;/p&gt;
 &lt;p&gt;常量主要是一些数字，大小写字母，标点符号和可打印字符。&lt;/p&gt;
@@ -532,10 +532,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>Ubuntu安装notepadqq</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-09-xubuntu-install-notepad&#43;&#43;/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/xubuntu-install-notepad&#43;&#43;/</link>
       <pubDate>Fri, 09 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-09-xubuntu-install-notepad&#43;&#43;/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/xubuntu-install-notepad&#43;&#43;/</guid>
       <description>&lt;h1 id=&#34;1-install&#34;&gt;1. install&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -554,10 +554,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>模块使用之subprocess</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-30-subprocess/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/subprocess/</link>
       <pubDate>Wed, 30 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-30-subprocess/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/subprocess/</guid>
       <description>&lt;h1 id=&#34;1-subprocess介绍&#34;&gt;1. subprocess介绍&lt;/h1&gt;
 &lt;p&gt;使用subprocess模块可以产生新的进程，然后连接它们的 input/output/error pipes，
 并获取返回值。本模块意在替换下面几个老的模块和函数：&lt;/p&gt;</description>
@@ -565,10 +565,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>git配置多个仓库</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-git-multi-repo/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-git-multi-repo/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</guid>
       <description>&lt;h1 id=&#34;配置&#34;&gt;配置&lt;/h1&gt;
 &lt;p&gt;电脑先用了git.oschina的仓库，再去clone github上的项目时失败，因为用户不一样。
 这时候需要先把全局配置取消，然后对每个仓库单独设置。&lt;/p&gt;</description>
@@ -576,10 +576,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>Ubuntu安装jekyll</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-ubuntu-install-jekyll/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/ubuntu-install-jekyll/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-ubuntu-install-jekyll/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/ubuntu-install-jekyll/</guid>
       <description>&lt;h1 id=&#34;1-安装ruby&#34;&gt;1. 安装ruby&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -594,60 +594,60 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>模块使用之collections</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-collections/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/collections/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-collections/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/collections/</guid>
       <description>&lt;p&gt;collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
 使用起来更方便。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之argparse</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-25-argparse/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/argparse/</link>
       <pubDate>Tue, 25 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-25-argparse/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/argparse/</guid>
       <description>&lt;p&gt;练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
 令行参数数据类型进行约束。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之weakref</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-24-weakref/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/weakref/</link>
       <pubDate>Mon, 24 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-24-weakref/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/weakref/</guid>
       <description>&lt;p&gt;练习 weakref 使用，掌握 weakref 使用场景和目的。&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;http://sleepd.blog.51cto.com/3034090/1073044&#34;&gt;示例参考&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Ubuntu安装lantern</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-22-ubuntu-install-lantern/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/ubuntu-install-lantern/</link>
       <pubDate>Sat, 22 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-22-ubuntu-install-lantern/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/ubuntu-install-lantern/</guid>
       <description>&lt;h1 id=&#34;1-下载deb包&#34;&gt;1. 下载deb包&lt;/h1&gt;
 &lt;p&gt;网址：https://github.com/getlantern/lantern&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>6.x和7.x开机启动脚本</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-30-upstart-and-systemd/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/upstart-and-systemd/</link>
       <pubDate>Fri, 30 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-30-upstart-and-systemd/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/upstart-and-systemd/</guid>
       <description>&lt;h1 id=&#34;1-linux-6x-upstart-方式&#34;&gt;1. Linux 6.x upstart 方式&lt;/h1&gt;
 &lt;p&gt;如下是为 RHEL Linux 6.x 平台的 open-falcon agent 编写的开机启动脚本。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack使用-archive</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-30-salt-state-archive-extracted/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/salt-state-archive-extracted/</link>
       <pubDate>Fri, 30 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-30-salt-state-archive-extracted/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/salt-state-archive-extracted/</guid>
       <description>&lt;h1 id=&#34;1-archiveextracted解压文件&#34;&gt;1. archive.extracted解压文件&lt;/h1&gt;
 &lt;p&gt;利用archive.extracted解压文件，指定目录不存在会默认创建。&lt;/p&gt;
 &lt;p&gt;在日志上传到github后，发现jinja2语法部分不显示，解决方法是用 {&lt;code&gt;% raw %&lt;/code&gt;} 和 {&lt;code&gt;% endraw %&lt;/code&gt;} 包
@@ -656,10 +656,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>saltstack批量启用lldpd</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-22-enable-lldp/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/enable-lldp/</link>
       <pubDate>Thu, 22 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-22-enable-lldp/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/enable-lldp/</guid>
       <description>&lt;h1 id=&#34;1-sls-脚本&#34;&gt;1. sls 脚本&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -692,10 +692,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>awk使用总结</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-19-awk/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/awk/</link>
       <pubDate>Mon, 19 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-19-awk/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/awk/</guid>
       <description>&lt;h1 id=&#34;1-概念&#34;&gt;1. 概念&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;文本处理三工具&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;grep, sed, awk&lt;/p&gt;
@@ -711,10 +711,10 @@ GNU awk, gawk
     
     <item>
       <title>sed使用总结</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-15-sed/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/sed/</link>
       <pubDate>Thu, 15 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-15-sed/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/sed/</guid>
       <description>&lt;h1 id=&#34;1-sed-用法&#34;&gt;1. sed 用法&lt;/h1&gt;
 &lt;p&gt;是个文本编辑器，对文本进行逐行处理。&lt;/p&gt;
 &lt;p&gt;默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
@@ -723,19 +723,19 @@ GNU awk, gawk
     
     <item>
       <title>saltstack学习16-生产配置gitfs</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-04-config-gitfs/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/config-gitfs/</link>
       <pubDate>Sun, 04 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-04-config-gitfs/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/config-gitfs/</guid>
       <description>&lt;p&gt;如下操作在master/syndic节点执行。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack学习15-生产部署主备gitlab</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-01-install-gitlab/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/install-gitlab/</link>
       <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-01-install-gitlab/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/install-gitlab/</guid>
       <description>&lt;h1 id=&#34;备注&#34;&gt;备注&lt;/h1&gt;
 &lt;p&gt;gitlab-ce-8.9.9-ce.0.el7.x86_64.rpm 这个版本从backups文件restore后，在页面看不到Repository菜单。
 升级到 gitlab-ce-8.9.11-ce.0.el7.x86_64.rpm 正常，升级步骤如下。&lt;/p&gt;</description>
@@ -743,30 +743,30 @@ GNU awk, gawk
     
     <item>
       <title>saltstack使用-Client API</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-01-client-api-2/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/client-api-2/</link>
       <pubDate>Wed, 17 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-01-client-api-2/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/client-api-2/</guid>
       <description>&lt;h1 id=&#34;1-说明&#34;&gt;1. 说明&lt;/h1&gt;
 &lt;p&gt;在master执行，如果脚本传递的target是所有minion，根据实际情况修改。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack使用-file和service</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-17-using-file-service/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/using-file-service/</link>
       <pubDate>Wed, 17 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-17-using-file-service/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/using-file-service/</guid>
       <description>&lt;h1 id=&#34;1-sls-文件&#34;&gt;1. sls 文件&lt;/h1&gt;
 &lt;p&gt;用到file和service模块，用于确保文件满足要求，服务处于运行状态。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>安装IPA</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-11-ipa-installation/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/ipa-installation/</link>
       <pubDate>Thu, 11 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-11-ipa-installation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/ipa-installation/</guid>
       <description>&lt;h1 id=&#34;1-ipa-安装脚本&#34;&gt;1. IPA 安装脚本&lt;/h1&gt;
 &lt;p&gt;IPA安装过程会修改主机名，因此脚本中有修复主机名的步骤，还有些参数指明了不使用DNS、不修改NTP等，否则一些默认选项会修改DNS、NTP配置，需要注意。&lt;/p&gt;
 &lt;p&gt;如下脚本主要用于批量执行，因此封闭成了脚本，比如用saltstack批量执行的场景。&lt;/p&gt;</description>
@@ -774,20 +774,20 @@ GNU awk, gawk
     
     <item>
       <title>磁盘readonly修复</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-02-readonly-fsck/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/readonly-fsck/</link>
       <pubDate>Tue, 02 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-02-readonly-fsck/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/readonly-fsck/</guid>
       <description>&lt;h1 id=&#34;1-说明&#34;&gt;1. 说明&lt;/h1&gt;
 &lt;p&gt;Linux磁盘出现readonly，message会有相关报错日志，如下脚本修复时会kill掉磁盘上的读写进程。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ansible学习6-条件判断</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-29-ansible-when/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-when/</link>
       <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-29-ansible-when/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-when/</guid>
       <description>&lt;h1 id=&#34;六-条件判断&#34;&gt;六、 条件判断&lt;/h1&gt;
 &lt;h2 id=&#34;一-when&#34;&gt;(一) when&lt;/h2&gt;
 &lt;p&gt;可用于task，role和include，在满足条件时task才会被执行。&lt;/p&gt;</description>
@@ -795,40 +795,40 @@ GNU awk, gawk
     
     <item>
       <title>ansible学习7-循环</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-loop/</link>
       <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-loop/</guid>
       <description>&lt;h1 id=&#34;七-循环&#34;&gt;七、 循环&lt;/h1&gt;
 &lt;p&gt;循环语法有多种，最常用的是 with_items ，如下练习了两种语法。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ansible学习8-API</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-31-ansible-api/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-api/</link>
       <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-31-ansible-api/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-api/</guid>
       <description>&lt;h1 id=&#34;八-api&#34;&gt;八、 API&lt;/h1&gt;
 &lt;p&gt;有时候需要编写 python 代码调用 ansible 的 API，如下是个 ping 的示例。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ansible学习5-变量</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-28-ansible-variable/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-variable/</link>
       <pubDate>Thu, 28 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-28-ansible-variable/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-variable/</guid>
       <description>&lt;h1 id=&#34;五-变量&#34;&gt;五、 变量&lt;/h1&gt;
 &lt;p&gt;所有变量都可以在playbook或者jinja2模板中通过{{ varname }}使用。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>ansible学习4-roles</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-27-ansible-role/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-role/</link>
       <pubDate>Wed, 27 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-27-ansible-role/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-role/</guid>
       <description>&lt;h1 id=&#34;四-roles&#34;&gt;四、 roles&lt;/h1&gt;
 &lt;h2 id=&#34;一-roles介绍&#34;&gt;(一) roles介绍&lt;/h2&gt;
 &lt;p&gt;roles基于已定义的文件结构，自动加载vars_files、tasks、handlers等，
@@ -837,10 +837,10 @@ GNU awk, gawk
     
     <item>
       <title>ansible学习3-playbook</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-26-ansible-playbook/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-playbook/</link>
       <pubDate>Tue, 26 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-26-ansible-playbook/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-playbook/</guid>
       <description>&lt;h1 id=&#34;三-playbooks&#34;&gt;三、 playbooks&lt;/h1&gt;
 &lt;h2 id=&#34;一-playbook&#34;&gt;(一) playbook&lt;/h2&gt;
 &lt;p&gt;template的src参数可以写相对路径，也可以写绝对路径。&lt;/p&gt;</description>
@@ -848,10 +848,10 @@ GNU awk, gawk
     
     <item>
       <title>ansible学习2-ad-hoc</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-25-ansible-ad-hoc/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-ad-hoc/</link>
       <pubDate>Mon, 25 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-25-ansible-ad-hoc/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-ad-hoc/</guid>
       <description>&lt;h1 id=&#34;二命令行方式&#34;&gt;二、命令行方式&lt;/h1&gt;
 &lt;p&gt;ansible默认使用SSH对设备进行管理，所以远程控制可以基于密码或者SSH信任登陆主机。&lt;/p&gt;
 &lt;p&gt;如下都是指定了 -k 选项，表示希望输入密码，如果要实现无密码访问使用 ssh-keygen 和
@@ -860,10 +860,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>ansible学习1-实验环境</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-24-ansible-env/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/ansible-env/</link>
       <pubDate>Sun, 24 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-24-ansible-env/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/ansible-env/</guid>
       <description>&lt;h1 id=&#34;一-实验环境&#34;&gt;一、 实验环境&lt;/h1&gt;
 &lt;h2 id=&#34;一-架构&#34;&gt;(一) 架构&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&#34;https://kangxiaoning.github.io/images/ansible/ansible-arch.png&#34; alt=&#34;Ansible Architecture&#34;&gt;&lt;/p&gt;
@@ -902,20 +902,20 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>saltstack使用-file.append</title>
-      <link>https://kangxiaoning.github.io/post/2016-07-03-salt-state-append-line/</link>
+      <link>https://kangxiaoning.github.io/post/2016/07/salt-state-append-line/</link>
       <pubDate>Sun, 03 Jul 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-07-03-salt-state-append-line/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/07/salt-state-append-line/</guid>
       <description>&lt;h3 id=&#34;1-fileappend多行&#34;&gt;1. file.append多行&lt;/h3&gt;
 &lt;p&gt;注意对一些特殊符号要转义，特别是python语法里的一些符号，否则会被当成python处理。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack学习14-使用gitfs</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-21-test-gitfs/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/test-gitfs/</link>
       <pubDate>Tue, 21 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-21-test-gitfs/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/test-gitfs/</guid>
       <description>&lt;h1 id=&#34;九-gitfs&#34;&gt;九、 gitfs&lt;/h1&gt;
 &lt;h2 id=&#34;一-使用gitfs&#34;&gt;(一) 使用gitfs&lt;/h2&gt;
 &lt;h3 id=&#34;1-安装依赖包&#34;&gt;1. 安装依赖包&lt;/h3&gt;
@@ -933,10 +933,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>rpm常用查询</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-20-rpm-command/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/rpm-command/</link>
       <pubDate>Mon, 20 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-20-rpm-command/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/rpm-command/</guid>
       <description>&lt;h1 id=&#34;1-指定的文件由哪个程序包安装生成&#34;&gt;1. 指定的文件由哪个程序包安装生成&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -955,10 +955,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>saltstack学习13-使用beacons</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-20-test-beacons/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/test-beacons/</link>
       <pubDate>Mon, 20 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-20-test-beacons/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/test-beacons/</guid>
       <description>&lt;h1 id=&#34;八-beacons&#34;&gt;八、 beacons&lt;/h1&gt;
 &lt;h2 id=&#34;一-监控文件示例&#34;&gt;(一) 监控文件示例&lt;/h2&gt;
 &lt;h3 id=&#34;1-配置master&#34;&gt;1. 配置master&lt;/h3&gt;
@@ -1003,10 +1003,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>saltstack学习12-使用Client API</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-19-client-api-1/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/client-api-1/</link>
       <pubDate>Sun, 19 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-19-client-api-1/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/client-api-1/</guid>
       <description>&lt;h2 id=&#34;二-使用client-api&#34;&gt;(二) 使用Client API&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;https://user.github.io/blog/2016/08/17/salt-command.html&#34;&gt;使用案例&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&#34;1-kvm内存报表&#34;&gt;1. KVM内存报表&lt;/h3&gt;</description>
@@ -1014,10 +1014,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>saltstack学习11-自定义state</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-18-custom-state/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/custom-state/</link>
       <pubDate>Sat, 18 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-18-custom-state/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/custom-state/</guid>
       <description>&lt;h1 id=&#34;七-扩展&#34;&gt;七、 扩展&lt;/h1&gt;
 &lt;h2 id=&#34;一-自定义state&#34;&gt;(一) 自定义state&lt;/h2&gt;
 &lt;p&gt;支持自定义state，放在指定目录并同步到minion即可使用。&lt;/p&gt;</description>
@@ -1025,10 +1025,10 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>saltstack学习10-include和highstate</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-17-include-and-high-state/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/include-and-high-state/</link>
       <pubDate>Fri, 17 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-17-include-and-high-state/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/include-and-high-state/</guid>
       <description>&lt;h2 id=&#34;六-include&#34;&gt;(六) include&lt;/h2&gt;
 &lt;h3 id=&#34;1-include作用&#34;&gt;1. include作用&lt;/h3&gt;
 &lt;p&gt;&lt;img src=&#34;https://kangxiaoning.github.io/images/saltstack/include-declaration.png&#34; alt=&#34;include declaration&#34;&gt;&lt;/p&gt;
@@ -1038,20 +1038,20 @@ ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;<
     
     <item>
       <title>模块使用之xlwt</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-17-python-excel-xlwt/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/python-excel-xlwt/</link>
       <pubDate>Fri, 17 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-17-python-excel-xlwt/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/python-excel-xlwt/</guid>
       <description>&lt;p&gt;python 中可以使用 xlwt 生成 excel 文件，对应的还有 xlrd 来读取
 excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack学习9-nginx配置管理</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-16-install-nginx/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/install-nginx/</link>
       <pubDate>Thu, 16 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-16-install-nginx/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/install-nginx/</guid>
       <description>&lt;h2 id=&#34;五-源码安装nginx及服务管理&#34;&gt;(五) 源码安装nginx及服务管理&lt;/h2&gt;
 &lt;h3 id=&#34;1-任务目标&#34;&gt;1. 任务目标&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;目标：&lt;/strong&gt; 源码安装nginx。&lt;/p&gt;
@@ -1060,10 +1060,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习8-Requisite Ordering</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-15-requisite-ordering/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/requisite-ordering/</link>
       <pubDate>Wed, 15 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-15-requisite-ordering/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/requisite-ordering/</guid>
       <description>&lt;h2 id=&#34;四-状态依赖&#34;&gt;(四) 状态依赖&lt;/h2&gt;
 &lt;h3 id=&#34;1-require&#34;&gt;1. require&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;添加require前&lt;/strong&gt;&lt;/p&gt;
@@ -1096,10 +1096,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习7-Configuration Management</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-14-configuration-management/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/configuration-management/</link>
       <pubDate>Tue, 14 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-14-configuration-management/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/configuration-management/</guid>
       <description>&lt;h2 id=&#34;三-状态管理&#34;&gt;(三) 状态管理&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&#34;https://kangxiaoning.github.io/images/saltstack/state-syntax.png&#34; alt=&#34;state syntax&#34;&gt;&lt;/p&gt;
 &lt;h3 id=&#34;1-内核参数&#34;&gt;1. 内核参数&lt;/h3&gt;
@@ -1108,10 +1108,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习6-YAML和Jinja2</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-13-yaml-jinja2/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/yaml-jinja2/</link>
       <pubDate>Mon, 13 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-13-yaml-jinja2/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/yaml-jinja2/</guid>
       <description>&lt;h1 id=&#34;六-state&#34;&gt;六、 State&lt;/h1&gt;
 &lt;h2 id=&#34;一-yaml&#34;&gt;(一) YAML&lt;/h2&gt;
 &lt;h3 id=&#34;1-简介&#34;&gt;1. 简介&lt;/h3&gt;
@@ -1121,10 +1121,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习5-job管理</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-12-saltstack-job/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/saltstack-job/</link>
       <pubDate>Sun, 12 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-12-saltstack-job/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/saltstack-job/</guid>
       <description>&lt;h1 id=&#34;五-job管理&#34;&gt;五、 Job管理&lt;/h1&gt;
 &lt;h2 id=&#34;一-当前运行job管理&#34;&gt;(一) 当前运行job管理&lt;/h2&gt;
 &lt;h3 id=&#34;1-常用function&#34;&gt;1. 常用function&lt;/h3&gt;
@@ -1145,10 +1145,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习4-Remote Execution</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-10-remote-execution/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/remote-execution/</link>
       <pubDate>Fri, 10 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-10-remote-execution/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/remote-execution/</guid>
       <description>&lt;h1 id=&#34;四-远程执行&#34;&gt;四、 远程执行&lt;/h1&gt;
 &lt;h2 id=&#34;一-salt命令格式&#34;&gt;(一) salt命令格式&lt;/h2&gt;
 &lt;p&gt;目的：通过一定条件过滤出target，在指定target执行命令。&lt;/p&gt;
@@ -1158,10 +1158,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习3-Grains和Pillar</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-08-saltstack-grains-pillar/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/saltstack-grains-pillar/</link>
       <pubDate>Wed, 08 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-08-saltstack-grains-pillar/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/saltstack-grains-pillar/</guid>
       <description>&lt;h1 id=&#34;三-grains和pillar数据系统&#34;&gt;三、 Grains和Pillar数据系统&lt;/h1&gt;
 &lt;h2 id=&#34;一-grains&#34;&gt;(一) Grains&lt;/h2&gt;
 &lt;p&gt;Grains 是静态信息，存储在minion端，在minion启动时收集 operating system, domain name, IP address, kernel, OS type, memory, and many other system properties等信息。如果 Grains 信息变化，需要重启 minion 收集，例如 IP 变化等。&lt;/p&gt;
@@ -1171,10 +1171,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习2-认证管理</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-07-saltstack-auth/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/saltstack-auth/</link>
       <pubDate>Tue, 07 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-07-saltstack-auth/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/saltstack-auth/</guid>
       <description>&lt;h1 id=&#34;二-认证管理&#34;&gt;二、 认证管理&lt;/h1&gt;
 &lt;h2 id=&#34;一-添加删除key&#34;&gt;(一) 添加/删除key&lt;/h2&gt;
 &lt;p&gt;第一次使用需要在master端添加受管理的minion，通过salt-key完成，可添加单个minion，也可一次添加所有minion，通过salt-key –h查看帮助获取添加、删除、拒绝等使用方法。&lt;/p&gt;</description>
@@ -1182,10 +1182,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>saltstack学习1-实验环境</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-06-saltstack-env/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/saltstack-env/</link>
       <pubDate>Mon, 06 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-06-saltstack-env/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/saltstack-env/</guid>
       <description>&lt;h1 id=&#34;一-实验环境&#34;&gt;一、 实验环境&lt;/h1&gt;
 &lt;h2 id=&#34;一-资源规划&#34;&gt;(一) 资源规划&lt;/h2&gt;
 &lt;table&gt;
@@ -1222,29 +1222,29 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>统计字符串出现的次数</title>
-      <link>https://kangxiaoning.github.io/post/2016-04-07-count-word/</link>
+      <link>https://kangxiaoning.github.io/post/2016/04/count-word/</link>
       <pubDate>Thu, 07 Apr 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-04-07-count-word/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/04/count-word/</guid>
       <description>1. 示例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 #_*_coding:utf-8_*_ import operator f = open(&amp;#34;monitor_down.log&amp;#34;) # 初始化空字典，key为行内容，value为该行出现的次数 result = {} for line in f: line = line.strip() # setdefault(key[, default]):</description>
     </item>
     
     <item>
       <title>递归的应用</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-18-recursive-functions/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/recursive-functions/</link>
       <pubDate>Thu, 07 Apr 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-18-recursive-functions/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/recursive-functions/</guid>
       <description>&lt;h1 id=&#34;1-解析多层dict示例&#34;&gt;1. 解析多层dict示例&lt;/h1&gt;
 &lt;p&gt;根据规则解析多层级的字典。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pip代理设置</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-10-pip-proxy/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/pip-proxy/</link>
       <pubDate>Sun, 10 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-10-pip-proxy/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/pip-proxy/</guid>
       <description>&lt;h1 id=&#34;1-windows-7&#34;&gt;1. Windows 7&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -1269,19 +1269,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>python打包</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-21-python-setup-rpm-tar/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/python-setup-rpm-tar/</link>
       <pubDate>Sun, 10 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-21-python-setup-rpm-tar/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/python-setup-rpm-tar/</guid>
       <description>&lt;p&gt;打包练习。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>windows安装celery和tornado</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-03-windows-install-celery/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/windows-install-celery/</link>
       <pubDate>Sun, 03 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-03-windows-install-celery/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/windows-install-celery/</guid>
       <description>&lt;p&gt;由于公司电脑不能上 Internet ，也没有 pip 仓库，因此安装 celery 需要
 按原始方式安装，有些依赖包必须先安装才能成功安装上 celery。&lt;/p&gt;
 &lt;p&gt;下载相关包及包里requests.txt中提到的依赖包。&lt;/p&gt;</description>
@@ -1289,19 +1289,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>celery简单使用</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-01-celery-learn/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/celery-learn/</link>
       <pubDate>Fri, 01 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-01-celery-learn/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/celery-learn/</guid>
       <description>&lt;h1 id=&#34;1-环境&#34;&gt;1. 环境&lt;/h1&gt;</description>
     </item>
     
     <item>
       <title>__init__.py和__all__</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-29-init-all/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/init-all/</link>
       <pubDate>Tue, 29 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-29-init-all/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/init-all/</guid>
       <description>&lt;h1 id=&#34;1-知识点&#34;&gt;1. 知识点&lt;/h1&gt;
 &lt;ol&gt;
 &lt;li&gt;from pkg import * 只能导入__init__.py 里 __all__ 指定的变量&lt;/li&gt;
@@ -1312,10 +1312,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>absolute_import</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-26-absolute_import/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/absolute_import/</link>
       <pubDate>Sat, 26 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-26-absolute_import/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/absolute_import/</guid>
       <description>&lt;h1 id=&#34;1-模块导入规则&#34;&gt;1. 模块导入规则&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;import xxx 时搜索文件的优先级如下&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -1329,19 +1329,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>模块使用之multiprocessing</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-13-multiprocessing-http-request/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/multiprocessing-http-request/</link>
       <pubDate>Sun, 13 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-13-multiprocessing-http-request/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/multiprocessing-http-request/</guid>
       <description>&lt;p&gt;利用multiprocessing模块的pool类实现并发 http 请求。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之paramiko</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-09-paramiko/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/paramiko/</link>
       <pubDate>Wed, 09 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-09-paramiko/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/paramiko/</guid>
       <description>&lt;p&gt;paramiko 是基于 python 实现的 SSH2 远程安全连接，支持认证及密钥方式，
 平时写远程执行脚本、文件批量传输等功能很有用。&lt;/p&gt;
 &lt;p&gt;multiprocessing 是多线程/多进程的一个模块，和 paramiko 结合可以大大提高效率，写一些自动化小脚本很实用。&lt;/p&gt;
@@ -1350,20 +1350,20 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>创建私有CA及签发证书</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-15-private-ca/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/private-ca/</link>
       <pubDate>Sun, 15 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-15-private-ca/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/private-ca/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;p&gt;本文通过使用 openssl 创建私有 CA 和签发证书，加深对证书原理的理解。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>python模拟死锁</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/python-deadlock/</link>
       <pubDate>Thu, 29 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/python-deadlock/</guid>
       <description>&lt;h1 id=&#34;1-死锁原因&#34;&gt;1. 死锁原因&lt;/h1&gt;
 &lt;p&gt;在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;当出现如下情况时发生死锁&lt;/strong&gt;&lt;/p&gt;
@@ -1375,10 +1375,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>修改命令行提示符 PS1</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-15-linux-ps-prompt/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/linux-ps-prompt/</link>
       <pubDate>Thu, 15 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-15-linux-ps-prompt/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/linux-ps-prompt/</guid>
       <description>&lt;h1 id=&#34;1-修改环境变量&#34;&gt;1. 修改环境变量&lt;/h1&gt;
 &lt;p&gt;命令行提示符是以 PS1 这个变更定义的，在用户 profile 文件修改即可。&lt;/p&gt;
 &lt;p&gt;修改用户 home 目录下的 profile 文件，添加 export PS1 这一行，如下。&lt;/p&gt;</description>
@@ -1386,37 +1386,37 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>django views和urls练习</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-10-django-views-urls/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/django-views-urls/</link>
       <pubDate>Sat, 10 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-10-django-views-urls/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/django-views-urls/</guid>
       <description>&lt;p&gt;注：参考自强学堂教程练习&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Django初步使用</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-04-learning-django/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/learning-django/</link>
       <pubDate>Sun, 04 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-04-learning-django/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/learning-django/</guid>
       <description>&lt;p&gt;在线中文文档：http://djangobook.py3k.cn/&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>安装Python 2.7.10和 3.5.0</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-04-linux-install-python/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/linux-install-python/</link>
       <pubDate>Sun, 04 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-04-linux-install-python/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/linux-install-python/</guid>
       <description>&lt;p&gt;同一个系统安装多个 python 版本，不影响系统自带版本。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>安装pip</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-02-install-pip/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/install-pip/</link>
       <pubDate>Fri, 02 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-02-install-pip/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/install-pip/</guid>
       <description>&lt;h1 id=&#34;1-下载并安装-setuptools&#34;&gt;1. 下载并安装 setuptools&lt;/h1&gt;
 &lt;p&gt;&lt;a href=&#34;https://pypi.python.org/pypi/setuptools#downloads&#34;&gt;https://pypi.python.org/pypi/setuptools#downloads&lt;/a&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -1436,10 +1436,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>InsecurePlatformWarning解决</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-30-insecureplatformwarning/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/insecureplatformwarning/</link>
       <pubDate>Wed, 30 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-30-insecureplatformwarning/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/insecureplatformwarning/</guid>
       <description>&lt;h1 id=&#34;用户指南&#34;&gt;用户指南&lt;/h1&gt;
 &lt;pre&gt;&lt;code&gt;http://cn.python-requests.org/zh_CN/latest/
 &lt;/code&gt;&lt;/pre&gt;
@@ -1453,10 +1453,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>python中的with语法</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-28-with/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/with/</link>
       <pubDate>Mon, 28 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-28-with/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/with/</guid>
       <description>&lt;h1 id=&#34;1-with-简介&#34;&gt;1. with 简介&lt;/h1&gt;
 &lt;p&gt;python 中的 with 语法简化了 try&amp;hellip;except&amp;hellip;finally 的使用，通过 with 语法从代码中把 try，except，finally关键字和资源分配释放相关的代码去掉。&lt;/p&gt;
 &lt;p&gt;它仅仅能工作于支持 context management 协议的对象。&lt;/p&gt;</description>
@@ -1464,10 +1464,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>python函数的可变参数</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-26-arguments/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/arguments/</link>
       <pubDate>Sat, 26 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-26-arguments/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/arguments/</guid>
       <description>&lt;p&gt;除了常见的位置参数、关键字参数、默认参数，python还有可变参数，支持任意多的参数。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -1486,67 +1486,67 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>模块使用之os</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-25-os/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/os/</link>
       <pubDate>Fri, 25 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-25-os/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/os/</guid>
       <description>&lt;p&gt;练习 os 模块，需要的时候可以查询官方文档获取需要的函数。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>/etc/rc.local开机启动失效</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-22-sed-rc.local/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/sed-rc.local/</link>
       <pubDate>Tue, 22 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-22-sed-rc.local/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/sed-rc.local/</guid>
       <description>&lt;h1 id=&#34;1-背景&#34;&gt;1. 背景&lt;/h1&gt;
 &lt;p&gt;我们的生产应用主机配置了 LVS 做负载均衡，并且在 RealServer 配置了开机运行的脚本，但是机器重启后，发现脚本没有运行，导致 RealServer无法接收请求，应用异常。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>threadPool与multiprocessing.Pool</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-22-multiprocessing/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/multiprocessing/</link>
       <pubDate>Tue, 22 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-22-multiprocessing/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/multiprocessing/</guid>
       <description>&lt;p&gt;为了和官方文档保持一致 ，这里把线程沲叫做 ThreadPool ，进程沲叫 multiprocessing.Pool。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>/etc/rc.local</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-21-rc.local/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/rc.local/</link>
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-21-rc.local/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/rc.local/</guid>
       <description>&lt;h1 id=&#34;1-etcrcd&#34;&gt;1. /etc/rc.d&lt;/h1&gt;
 &lt;p&gt;里面存放了rc.local、rc.sysinit、init.d,、rcX.d （X包括0-6对应相对runlevel）。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>python迭代器</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-20-iterator/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/iterator/</link>
       <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-20-iterator/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/iterator/</guid>
       <description>&lt;h1 id=&#34;1-可迭代对象&#34;&gt;1. 可迭代对象&lt;/h1&gt;
 &lt;p&gt;指的是支持 iter 的一个对象。如果对象是实际保存的序列，或者可以在迭代工具环境中（如，for 循环）一次产生一个结果的对象，就看做是可迭代的。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>zip和enumerate</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-20-enumerate/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/enumerate/</link>
       <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-20-enumerate/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/enumerate/</guid>
       <description>&lt;h1 id=&#34;1-构造字典&#34;&gt;1. 构造字典&lt;/h1&gt;</description>
     </item>
     
     <item>
       <title>Hadoop学习8-Ganglia监控</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-08-ganglia/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/ganglia/</link>
       <pubDate>Sun, 08 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-08-ganglia/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/ganglia/</guid>
       <description>&lt;h1 id=&#34;四-部署监控&#34;&gt;四、 部署监控&lt;/h1&gt;
 &lt;h2 id=&#34;一-ganglia-架构&#34;&gt;(一) Ganglia 架构&lt;/h2&gt;
 &lt;p&gt;Ganglia 由如下三部分组成，每个组件需要一些依赖包实现其功能。&lt;/p&gt;
@@ -1559,10 +1559,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习7-异常处理</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-07-error-fix/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/error-fix/</link>
       <pubDate>Sat, 07 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-07-error-fix/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/error-fix/</guid>
       <description>&lt;h1 id=&#34;三-异常处理&#34;&gt;三、 异常处理&lt;/h1&gt;
 &lt;p&gt;如下所有异常已经在安装步骤规避了，按照本文档搭建环境，不应该出现如下异常，如果不幸遇到如下异常也可以参考处理。&lt;/p&gt;
 &lt;p&gt;必须先根据报错现象找到发生问题的根本原因，然后才能有针对性的解决，找根本原因最好的办法是查看日志，hadoop日志默认在安装目录下的logs文件夹下面，可以根据修改时间判断需要查看哪个日志。找不到根本原因就盲目的在网上寻找解决方法是效率低下并且没有把握的处理方法。&lt;/p&gt;</description>
@@ -1570,10 +1570,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习6-Federation &#43; HA &#43; Hbase搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-06-fedration-ha-hbase/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/fedration-ha-hbase/</link>
       <pubDate>Fri, 06 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-06-fedration-ha-hbase/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/fedration-ha-hbase/</guid>
       <description>&lt;h2 id=&#34;五-federation--ha--hbase搭建&#34;&gt;(五) Federation + HA + Hbase搭建&lt;/h2&gt;
 &lt;h3 id=&#34;步骤一-资源规划&#34;&gt;步骤一、 资源规划&lt;/h3&gt;
 &lt;p&gt;Federation架构实现如下。&lt;/p&gt;</description>
@@ -1581,10 +1581,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习5-运行map-reduce任务</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-05-hadoop-map-reduce-task/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/</link>
       <pubDate>Thu, 05 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-05-hadoop-map-reduce-task/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/</guid>
       <description>&lt;h2 id=&#34;四-运行map-reduce任务&#34;&gt;(四) 运行map-reduce任务&lt;/h2&gt;
 &lt;p&gt;Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。&lt;/p&gt;
 &lt;p&gt;前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。&lt;/p&gt;</description>
@@ -1592,10 +1592,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习4-Hbase双Hmaster集群搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-04-hbase-install/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hbase-install/</link>
       <pubDate>Wed, 04 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-04-hbase-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hbase-install/</guid>
       <description>&lt;h2 id=&#34;三-hbase双hmaster集群搭建&#34;&gt;(三) Hbase双Hmaster集群搭建&lt;/h2&gt;
 &lt;h3 id=&#34;步骤一-资源规划&#34;&gt;步骤一、 资源规划&lt;/h3&gt;
 &lt;p&gt;这里以前面搭建好的Hadoop为基础，搭建Hbase集群。&lt;/p&gt;</description>
@@ -1603,20 +1603,20 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习3-NameNode自动failover</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-03-hadoop-namenode-auto-failover/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/</link>
       <pubDate>Tue, 03 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-03-hadoop-namenode-auto-failover/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/</guid>
       <description>&lt;h2 id=&#34;二-namenode自动failover&#34;&gt;(二) NameNode自动failover&lt;/h2&gt;
 &lt;p&gt;工作原理参照&lt;a href=&#34;http://user.github.io/blog/2015/03/01/hadoop-foundation.html#qjmfailover&#34;&gt;QJM自动failover原理&lt;/a&gt;。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Hadoop学习2-集群搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-install/</link>
       <pubDate>Mon, 02 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-install/</guid>
       <description>&lt;h1 id=&#34;二环境搭建&#34;&gt;二、环境搭建&lt;/h1&gt;
 &lt;h2 id=&#34;一-hadoop集群搭建&#34;&gt;(一) Hadoop集群搭建&lt;/h2&gt;
 &lt;p&gt;hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。&lt;/p&gt;
@@ -1625,20 +1625,20 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>Hadoop学习1-基础理论</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-01-hadoop-foundation/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-foundation/</link>
       <pubDate>Sun, 01 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-01-hadoop-foundation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-foundation/</guid>
       <description>&lt;h1 id=&#34;一基础理论&#34;&gt;一、基础理论&lt;/h1&gt;
 &lt;h2 id=&#34;1-what-is-apache-hadoop&#34;&gt;1. What Is Apache Hadoop?&lt;/h2&gt;</description>
     </item>
     
     <item>
       <title>DataGrard异常-DG异常导致日志备份失败</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-05/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-05/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;def库dg异常导致日志备份失败&#34;&gt;DEF库DG异常导致日志备份失败&lt;/h2&gt;
 &lt;p&gt;先了解下DEF的DG环境：
@@ -1647,10 +1647,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-DG端缺少文件导致MRP无法启动</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-08/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-08/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;dg端缺少文件导致mrp无法启动&#34;&gt;DG端缺少文件导致MRP无法启动&lt;/h2&gt;
 &lt;h3 id=&#34;环境信息&#34;&gt;环境信息&lt;/h3&gt;</description>
@@ -1658,10 +1658,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-FAL参数设置错误导致DG无法自动处理gap</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-04/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-04/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;fal参数设置错误导致dg无法自动处理gap&#34;&gt;FAL参数设置错误导致DG无法自动处理gap&lt;/h2&gt;
 &lt;p&gt;由于主机异常重启，导致DG出现GAP，在主机正常后，启动standby库，发现无法自动处理gap.&lt;/p&gt;</description>
@@ -1669,10 +1669,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-No standby redo logfiles of size 2048000 blocks available</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-06/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-06/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;no-standby-redo-logfiles-of-size-2048000-blocks-available&#34;&gt;No standby redo logfiles of size 2048000 blocks available&lt;/h2&gt;
 &lt;p&gt;DG报错，本次现象可以看到，此错误一旦出现，DG同步将变的非常慢。&lt;/p&gt;</description>
@@ -1680,20 +1680,20 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-ORA-01111 offline drop</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-07/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-07/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;ora-01111-offline-drop&#34;&gt;ORA-01111 offline drop&lt;/h2&gt;</description>
     </item>
     
     <item>
       <title>DataGrard异常-ORA-01157/ORA-01110/ORA-27037</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-02/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-02/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;ora-01157ora-01110ora-27037&#34;&gt;ORA-01157/ORA-01110/ORA-27037&lt;/h2&gt;
 &lt;p&gt;这个报错导致数据库MRP进程无法启动，同步无法进行。&lt;/p&gt;</description>
@@ -1701,10 +1701,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-ORA-38868</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-01/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-01/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;ora-38868&#34;&gt;ORA-38868&lt;/h2&gt;
 &lt;p&gt;数据库alert报错，并且MRP进程无法启动，数据库同步发生了异常。&lt;/p&gt;</description>
@@ -1712,10 +1712,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>DataGrard异常-不传输日志</title>
-      <link>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-03/</link>
+      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</link>
       <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-09-23-dg-exception-03/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;dg不传输日志&#34;&gt;DG不传输日志&lt;/h2&gt;
 &lt;p&gt;ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。&lt;/p&gt;</description>
@@ -1723,10 +1723,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>GoldenGate-概念解释</title>
-      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-01/</link>
+      <link>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-01/</link>
       <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-01/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-01/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h1 id=&#34;概念解释&#34;&gt;概念解释&lt;/h1&gt;
 &lt;p&gt;对一些基本术语做出解释，部分概念摘自官方文档或者MOS，未作翻译，目的是保持概念的准确性。&lt;/p&gt;</description>
@@ -1734,10 +1734,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>GoldenGate-版本下发异常</title>
-      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-02/</link>
+      <link>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-02/</link>
       <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-02/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-02/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h1 id=&#34;案例整理&#34;&gt;案例整理&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;目的&lt;/strong&gt;&lt;/p&gt;
@@ -1746,10 +1746,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>GoldenGate-突发异常</title>
-      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-03/</link>
+      <link>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-03/</link>
       <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-03/</guid>
+      <guid>https://kangxiaoning.github.io/post/2012/07/goldengate-exception-03/</guid>
       <description>&lt;!-- toc --&gt;
 &lt;h2 id=&#34;突发异常&#34;&gt;突发异常&lt;/h2&gt;
 &lt;p&gt;这部分总结GoldenGate正常运行过程中，突然发生的异常问题。&lt;/p&gt;</description>

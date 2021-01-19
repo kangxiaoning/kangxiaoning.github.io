@@ -9,10 +9,10 @@
     <lastBuildDate>Fri, 15 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/mail/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>邮件服务原理</title>
-      <link>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</link>
+      <link>https://kangxiaoning.github.io/post/2019/02/mail-server/</link>
       <pubDate>Fri, 15 Feb 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</guid>
+      <guid>https://kangxiaoning.github.io/post/2019/02/mail-server/</guid>
       <description>&lt;h1 id=&#34;术语&#34;&gt;术语&lt;/h1&gt;
 &lt;h2 id=&#34;smtp-simple-mail-transfer-protocol&#34;&gt;SMTP (Simple Mail Transfer Protocol)&lt;/h2&gt;
 &lt;p&gt;发送电子邮件，需要遵循一定的通讯规则，SMTP 协议就是用来定义这种通讯规则的。&lt;/p&gt;

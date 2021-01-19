@@ -9,10 +9,10 @@
     <lastBuildDate>Thu, 15 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/tcp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>TCP 3次握手的理解</title>
-      <link>https://kangxiaoning.github.io/post/2020-10-15-tcp-3-way-handshake/</link>
+      <link>https://kangxiaoning.github.io/post/2020/10/tcp-3-way-handshake/</link>
       <pubDate>Thu, 15 Oct 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2020-10-15-tcp-3-way-handshake/</guid>
+      <guid>https://kangxiaoning.github.io/post/2020/10/tcp-3-way-handshake/</guid>
       <description>&lt;p&gt;前两天一个人散步，独坐下来没啥事，顺手在手机日记上写了点对TCP 3次握手的理解，大概是之前做应届生面试的时候，发现不少的回答基本都是背网上的博客内容，很少有自己的理解。这里围绕“为什么建立TCP连接需要3次握手”，从设计者角度谈下自己的理解。&lt;/p&gt;</description>
     </item>
     

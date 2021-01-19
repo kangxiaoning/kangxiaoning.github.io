@@ -9,10 +9,10 @@
     <lastBuildDate>Thu, 04 May 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ubuntu 16.04安装jekyll</title>
-      <link>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-jekyll/</link>
+      <link>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-jekyll/</link>
       <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-jekyll/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-jekyll/</guid>
       <description>&lt;h1 id=&#34;安装jekyll&#34;&gt;安装jekyll&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -44,29 +44,29 @@
     
     <item>
       <title>ubuntu 16.04安装有道词典</title>
-      <link>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-youdao/</link>
+      <link>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-youdao/</link>
       <pubDate>Thu, 04 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-youdao/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/05/ubuntu-install-youdao/</guid>
       <description>&lt;p&gt;有道官方Ubuntu版本的的deb包由于gstreamer0.10-plugins-ugly依赖，无法成功安装，实际在
 16.04版本并不需要该依赖，所以只需要把该依赖检查删除再安装就可以了。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>elementaryOS体验</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-10-elementaryos-install/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/elementaryos-install/</link>
       <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-10-elementaryos-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/elementaryos-install/</guid>
       <description>&lt;p&gt;突然想体验下号称最漂亮的Linux - elementaryOS，安装过程很简单，主要记录下一些常用软件的安装过程。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Ubuntu安装notepadqq</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-09-xubuntu-install-notepad&#43;&#43;/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/xubuntu-install-notepad&#43;&#43;/</link>
       <pubDate>Fri, 09 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-09-xubuntu-install-notepad&#43;&#43;/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/xubuntu-install-notepad&#43;&#43;/</guid>
       <description>&lt;h1 id=&#34;1-install&#34;&gt;1. install&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -85,10 +85,10 @@
     
     <item>
       <title>git配置多个仓库</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-git-multi-repo/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-git-multi-repo/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</guid>
       <description>&lt;h1 id=&#34;配置&#34;&gt;配置&lt;/h1&gt;
 &lt;p&gt;电脑先用了git.oschina的仓库，再去clone github上的项目时失败，因为用户不一样。
 这时候需要先把全局配置取消，然后对每个仓库单独设置。&lt;/p&gt;</description>
@@ -96,10 +96,10 @@
     
     <item>
       <title>Ubuntu安装jekyll</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-ubuntu-install-jekyll/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/ubuntu-install-jekyll/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-ubuntu-install-jekyll/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/ubuntu-install-jekyll/</guid>
       <description>&lt;h1 id=&#34;1-安装ruby&#34;&gt;1. 安装ruby&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -114,30 +114,30 @@
     
     <item>
       <title>Ubuntu安装lantern</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-22-ubuntu-install-lantern/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/ubuntu-install-lantern/</link>
       <pubDate>Sat, 22 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-22-ubuntu-install-lantern/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/ubuntu-install-lantern/</guid>
       <description>&lt;h1 id=&#34;1-下载deb包&#34;&gt;1. 下载deb包&lt;/h1&gt;
 &lt;p&gt;网址：https://github.com/getlantern/lantern&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>6.x和7.x开机启动脚本</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-30-upstart-and-systemd/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/upstart-and-systemd/</link>
       <pubDate>Fri, 30 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-30-upstart-and-systemd/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/upstart-and-systemd/</guid>
       <description>&lt;h1 id=&#34;1-linux-6x-upstart-方式&#34;&gt;1. Linux 6.x upstart 方式&lt;/h1&gt;
 &lt;p&gt;如下是为 RHEL Linux 6.x 平台的 open-falcon agent 编写的开机启动脚本。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>saltstack批量启用lldpd</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-22-enable-lldp/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/enable-lldp/</link>
       <pubDate>Thu, 22 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-22-enable-lldp/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/enable-lldp/</guid>
       <description>&lt;h1 id=&#34;1-sls-脚本&#34;&gt;1. sls 脚本&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -170,10 +170,10 @@
     
     <item>
       <title>awk使用总结</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-19-awk/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/awk/</link>
       <pubDate>Mon, 19 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-19-awk/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/awk/</guid>
       <description>&lt;h1 id=&#34;1-概念&#34;&gt;1. 概念&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;文本处理三工具&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;grep, sed, awk&lt;/p&gt;
@@ -189,10 +189,10 @@ GNU awk, gawk
     
     <item>
       <title>sed使用总结</title>
-      <link>https://kangxiaoning.github.io/post/2016-09-15-sed/</link>
+      <link>https://kangxiaoning.github.io/post/2016/09/sed/</link>
       <pubDate>Thu, 15 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-09-15-sed/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/09/sed/</guid>
       <description>&lt;h1 id=&#34;1-sed-用法&#34;&gt;1. sed 用法&lt;/h1&gt;
 &lt;p&gt;是个文本编辑器，对文本进行逐行处理。&lt;/p&gt;
 &lt;p&gt;默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
@@ -201,10 +201,10 @@ GNU awk, gawk
     
     <item>
       <title>安装IPA</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-11-ipa-installation/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/ipa-installation/</link>
       <pubDate>Thu, 11 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-11-ipa-installation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/ipa-installation/</guid>
       <description>&lt;h1 id=&#34;1-ipa-安装脚本&#34;&gt;1. IPA 安装脚本&lt;/h1&gt;
 &lt;p&gt;IPA安装过程会修改主机名，因此脚本中有修复主机名的步骤，还有些参数指明了不使用DNS、不修改NTP等，否则一些默认选项会修改DNS、NTP配置，需要注意。&lt;/p&gt;
 &lt;p&gt;如下脚本主要用于批量执行，因此封闭成了脚本，比如用saltstack批量执行的场景。&lt;/p&gt;</description>
@@ -212,20 +212,20 @@ GNU awk, gawk
     
     <item>
       <title>磁盘readonly修复</title>
-      <link>https://kangxiaoning.github.io/post/2016-08-02-readonly-fsck/</link>
+      <link>https://kangxiaoning.github.io/post/2016/08/readonly-fsck/</link>
       <pubDate>Tue, 02 Aug 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-08-02-readonly-fsck/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/08/readonly-fsck/</guid>
       <description>&lt;h1 id=&#34;1-说明&#34;&gt;1. 说明&lt;/h1&gt;
 &lt;p&gt;Linux磁盘出现readonly，message会有相关报错日志，如下脚本修复时会kill掉磁盘上的读写进程。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>rpm常用查询</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-20-rpm-command/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/rpm-command/</link>
       <pubDate>Mon, 20 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-20-rpm-command/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/rpm-command/</guid>
       <description>&lt;h1 id=&#34;1-指定的文件由哪个程序包安装生成&#34;&gt;1. 指定的文件由哪个程序包安装生成&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -244,10 +244,10 @@ GNU awk, gawk
     
     <item>
       <title>修改命令行提示符 PS1</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-15-linux-ps-prompt/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/linux-ps-prompt/</link>
       <pubDate>Thu, 15 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-15-linux-ps-prompt/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/linux-ps-prompt/</guid>
       <description>&lt;h1 id=&#34;1-修改环境变量&#34;&gt;1. 修改环境变量&lt;/h1&gt;
 &lt;p&gt;命令行提示符是以 PS1 这个变更定义的，在用户 profile 文件修改即可。&lt;/p&gt;
 &lt;p&gt;修改用户 home 目录下的 profile 文件，添加 export PS1 这一行，如下。&lt;/p&gt;</description>
@@ -255,20 +255,20 @@ GNU awk, gawk
     
     <item>
       <title>/etc/rc.local开机启动失效</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-22-sed-rc.local/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/sed-rc.local/</link>
       <pubDate>Tue, 22 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-22-sed-rc.local/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/sed-rc.local/</guid>
       <description>&lt;h1 id=&#34;1-背景&#34;&gt;1. 背景&lt;/h1&gt;
 &lt;p&gt;我们的生产应用主机配置了 LVS 做负载均衡，并且在 RealServer 配置了开机运行的脚本，但是机器重启后，发现脚本没有运行，导致 RealServer无法接收请求，应用异常。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>/etc/rc.local</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-21-rc.local/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/rc.local/</link>
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-21-rc.local/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/rc.local/</guid>
       <description>&lt;h1 id=&#34;1-etcrcd&#34;&gt;1. /etc/rc.d&lt;/h1&gt;
 &lt;p&gt;里面存放了rc.local、rc.sysinit、init.d,、rcX.d （X包括0-6对应相对runlevel）。&lt;/p&gt;</description>
     </item>

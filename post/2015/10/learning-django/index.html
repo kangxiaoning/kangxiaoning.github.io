@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Django初步使用 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="在线中文文档：http://djangobook.py3k.cn/
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/10/learning-django/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Django初步使用" />
+<meta property="og:description" content="在线中文文档：http://djangobook.py3k.cn/" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/10/learning-django/" />
+<meta property="article:published_time" content="2015-10-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2015-10-04T00:00:00+00:00" />
+<meta itemprop="name" content="Django初步使用">
+<meta itemprop="description" content="在线中文文档：http://djangobook.py3k.cn/">
+<meta itemprop="datePublished" content="2015-10-04T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2015-10-04T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1227">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Django初步使用"/>
+<meta name="twitter:description" content="在线中文文档：http://djangobook.py3k.cn/"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Django初步使用</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-10-04 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-pip-方式安装">1. pip 方式安装</a></li>
+    <li><a href="#2-django-admin-命令">2. django-admin 命令</a></li>
+    <li><a href="#3-创建项目">3. 创建项目</a></li>
+    <li><a href="#4-创建-app">4. 创建 app</a>
+      <ul>
+        <li><a href="#41-解决办法">4.1 解决办法</a></li>
+        <li><a href="#42-再次创建-app-成功">4.2 再次创建 app 成功</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-添加-app-信息">5. 添加 app 信息</a></li>
+    <li><a href="#6-设置新建-app-的-model">6. 设置新建 APP 的 model</a></li>
+    <li><a href="#7-设置数据库">7. 设置数据库</a></li>
+    <li><a href="#8-创建表">8. 创建表</a></li>
+    <li><a href="#9-修改-modle-后再次初始化数据库">9. 修改 modle 后再次初始化数据库</a></li>
+    <li><a href="#10-启动-server">10. 启动 server</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>在线中文文档：http://djangobook.py3k.cn/</p>
+<h1 id="1-pip-方式安装">1. pip 方式安装</h1>
+<p>一条命令搞定安装，前提是主机要能上 Internet。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">bin</span>]# <span class="nx">pip27</span> <span class="nx">install</span> <span class="nx">Django</span><span class="err">
+</span><span class="err"></span><span class="nx">Collecting</span> <span class="nx">Django</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Using</span> <span class="nx">cached</span> <span class="nx">Django</span><span class="m">-1</span>.<span class="m">8</span>.<span class="m">5</span><span class="p">-</span><span class="nx">py2</span>.<span class="nx">py3</span><span class="p">-</span><span class="nx">none</span><span class="p">-</span><span class="nx">any</span>.<span class="nx">whl</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">collected</span> <span class="nx">packages</span>: <span class="nx">Django</span><span class="err">
+</span><span class="err"></span><span class="nx">Successfully</span> <span class="nx">installed</span> <span class="nx">Django</span><span class="m">-1</span>.<span class="m">8</span>.<span class="m">5</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">bin</span>]# <span class="nx">ln</span> <span class="p">-</span><span class="nx">s</span> <span class="sr">/usr/</span><span class="nx">local</span><span class="sr">/python27/</span><span class="nx">bin</span><span class="sr">/django-admin /</span><span class="nx">usr</span><span class="sr">/bin/</span><span class="nx">django</span><span class="p">-</span><span class="nx">admin27</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">bin</span>]# <span class="nx">python27</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">7</span>.<span class="m">10</span> <span class="p">(</span><span class="nx">default</span><span class="p">,</span> <span class="nx">Oct</span>  <span class="m">4</span> <span class="m">2015</span><span class="p">,</span> <span class="m">17</span>:<span class="m">50</span>:<span class="m">54</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">django</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">django</span>.<span class="nx">VERSION</span><span class="err">
+</span><span class="err"></span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">5</span><span class="p">,</span> <span class="s1">&#39;final&#39;</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="2-django-admin-命令">2. django-admin 命令</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="p">~</span>]# <span class="nx">django</span><span class="p">-</span><span class="nx">admin27</span> <span class="p">-</span><span class="nx">h</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s1">&#39;django-admin27 help &lt;subcommand&gt;&#39;</span> <span class="nx">for</span> <span class="nx">help</span> <span class="nx">on</span> <span class="nx">a</span> <span class="nx">specific</span> <span class="nx">subcommand</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Available</span> <span class="nx">subcommands</span>:<span class="err">
+</span><span class="err">
+</span><span class="err"></span>[<span class="nx">django</span>]<span class="err">
+</span><span class="err"></span>    <span class="nx">check</span><span class="err">
+</span><span class="err"></span>    <span class="nx">compilemessages</span><span class="err">
+</span><span class="err"></span>    <span class="nx">createcachetable</span><span class="err">
+</span><span class="err"></span>    <span class="nx">dbshell</span><span class="err">
+</span><span class="err"></span>    <span class="nx">diffsettings</span><span class="err">
+</span><span class="err"></span>    <span class="nx">dumpdata</span><span class="err">
+</span><span class="err"></span>    <span class="nx">flush</span><span class="err">
+</span><span class="err"></span>    <span class="nx">inspectdb</span><span class="err">
+</span><span class="err"></span>    <span class="nx">loaddata</span><span class="err">
+</span><span class="err"></span>    <span class="nx">makemessages</span><span class="err">
+</span><span class="err"></span>    <span class="nx">makemigrations</span><span class="err">
+</span><span class="err"></span>    <span class="nx">migrate</span><span class="err">
+</span><span class="err"></span>    <span class="nx">runfcgi</span><span class="err">
+</span><span class="err"></span>    <span class="nx">runserver</span><span class="err">
+</span><span class="err"></span>    <span class="nx">shell</span><span class="err">
+</span><span class="err"></span>    <span class="nx">showmigrations</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sql</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlall</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlclear</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlcustom</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqldropindexes</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlflush</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlindexes</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlmigrate</span><span class="err">
+</span><span class="err"></span>    <span class="nx">sqlsequencereset</span><span class="err">
+</span><span class="err"></span>    <span class="nx">squashmigrations</span><span class="err">
+</span><span class="err"></span>    <span class="nx">startapp</span><span class="err">
+</span><span class="err"></span>    <span class="nx">startproject</span><span class="err">
+</span><span class="err"></span>    <span class="nx">syncdb</span><span class="err">
+</span><span class="err"></span>    <span class="nx">test</span><span class="err">
+</span><span class="err"></span>    <span class="nx">testserver</span><span class="err">
+</span><span class="err"></span>    <span class="nx">validate</span><span class="err">
+</span><span class="err"></span><span class="nx">Note</span> <span class="nx">that</span> <span class="nx">only</span> <span class="nx">Django</span> <span class="nx">core</span> <span class="nx">commands</span> <span class="nx">are</span> <span class="nx">listed</span> <span class="nx">as</span> <span class="nx">settings</span> <span class="nx">are</span> <span class="nx">not</span> <span class="nx">properly</span> <span class="nx">configured</span> <span class="p">(</span><span class="nx">error</span>: <span class="nx">Requested</span> <span class="nx">setting</span> <span class="nx">INSTALLED_APPS</span><span class="p">,</span> <span class="nx">but</span> <span class="nx">settings</span> <span class="nx">are</span> <span class="nx">not</span> <span class="nx">configured</span>. <span class="nx">You</span> <span class="nx">must</span> <span class="nx">either</span> <span class="nx">define</span> <span class="nx">the</span> <span class="nx">environment</span> <span class="nx">variable</span> <span class="nx">DJANGO_SETTINGS_MODULE</span> <span class="nx">or</span> <span class="nx">call</span> <span class="nx">settings</span>.<span class="nx">configure</span><span class="p">()</span> <span class="nx">before</span> <span class="nx">accessing</span> <span class="nx">settings</span>.<span class="p">)</span>.<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="p">~</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="3-创建项目">3. 创建项目</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">webproject</span>]# <span class="nx">django</span><span class="p">-</span><span class="nx">admin27</span> <span class="nx">startproject</span> <span class="nx">dbosite</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">webproject</span>]# <span class="nx">ls</span> <span class="p">-</span><span class="nx">l</span><span class="err">
+</span><span class="err"></span><span class="nx">total</span> <span class="m">4</span><span class="err">
+</span><span class="err"></span><span class="nx">drwxr</span><span class="p">-</span><span class="nx">xr</span><span class="p">-</span><span class="nx">x</span> <span class="m">3</span> <span class="nx">root</span> <span class="nx">root</span> <span class="m">4096</span> <span class="nx">Oct</span>  <span class="m">7</span> <span class="m">14</span>:<span class="m">54</span> <span class="nx">dbosite</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">webproject</span>]# <span class="nx">tree</span> <span class="nx">dbosite</span>/<span class="err">
+</span><span class="err"></span><span class="nx">dbosite</span>/<span class="err">
+</span><span class="err"></span>├── <span class="nx">dbosite</span><span class="err">
+</span><span class="err"></span>│   ├── <span class="nx">__init__</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>│   ├── <span class="nx">settings</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>│   ├── <span class="nx">urls</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>│   └── <span class="nx">wsgi</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>└── <span class="nx">manage</span>.<span class="nx">py</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="m">1</span> <span class="nx">directory</span><span class="p">,</span> <span class="m">5</span> <span class="nx">files</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">webproject</span>]# <span class="nx">cd</span> <span class="nx">dbosite</span>/<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">runserver</span> <span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">8080</span><span class="err">
+</span><span class="err"></span><span class="nx">Performing</span> <span class="nx">system</span> <span class="nx">checks</span>...<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">System</span> <span class="nx">check</span> <span class="nx">identified</span> <span class="nx">no</span> <span class="nx">issues</span> <span class="p">(</span><span class="m">0</span> <span class="nx">silenced</span><span class="p">)</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">You</span> <span class="nx">have</span> <span class="nx">unapplied</span> <span class="nx">migrations</span>; <span class="nx">your</span> <span class="nx">app</span> <span class="nx">may</span> <span class="nx">not</span> <span class="nx">work</span> <span class="nx">properly</span> <span class="nx">until</span> <span class="nx">they</span> <span class="nx">are</span> <span class="nx">applied</span>.<span class="err">
+</span><span class="err"></span><span class="nx">Run</span> <span class="s1">&#39;python manage.py migrate&#39;</span> <span class="nx">to</span> <span class="nx">apply</span> <span class="nx">them</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">October</span> <span class="m">07</span><span class="p">,</span> <span class="m">2015</span> <span class="p">-</span> <span class="m">07</span>:<span class="m">00</span>:<span class="m">58</span><span class="err">
+</span><span class="err"></span><span class="nx">Django</span> <span class="nx">version</span> <span class="m">1</span>.<span class="m">8</span>.<span class="m">5</span><span class="p">,</span> <span class="nx">using</span> <span class="nx">settings</span> <span class="s1">&#39;dbosite.settings&#39;</span><span class="err">
+</span><span class="err"></span><span class="nx">Starting</span> <span class="nx">development</span> <span class="nx">server</span> <span class="nx">at</span> <span class="nx">http</span>:<span class="sr">//</span><span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">8080</span>/<span class="err">
+</span><span class="err"></span><span class="nx">Quit</span> <span class="nx">the</span> <span class="nx">server</span> <span class="nx">with</span> <span class="nx">CONTROL</span><span class="p">-</span><span class="nx">C</span>.<span class="err">
+</span><span class="err"></span>[<span class="m">07</span><span class="sr">/Oct/</span><span class="m">2015</span> <span class="m">07</span>:<span class="m">01</span>:<span class="m">16</span>] <span class="s2">&#34;GET / HTTP/1.1&#34;</span> <span class="m">200</span> <span class="m">1767</span><span class="err">
+</span><span class="err"></span>[<span class="m">07</span><span class="sr">/Oct/</span><span class="m">2015</span> <span class="m">07</span>:<span class="m">01</span>:<span class="m">17</span>] <span class="s2">&#34;GET /favicon.ico HTTP/1.1&#34;</span> <span class="m">404</span> <span class="m">1940</span><span class="err">
+</span><span class="err"></span>[<span class="m">07</span><span class="sr">/Oct/</span><span class="m">2015</span> <span class="m">07</span>:<span class="m">01</span>:<span class="m">17</span>] <span class="s2">&#34;GET /favicon.ico HTTP/1.1&#34;</span> <span class="m">404</span> <span class="m">1940</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="4-创建-app">4. 创建 app</h1>
+<p>创建 app 时报错：No module named _sqlite3</p>
+<pre><code>python27 manage.py startapp learn
+</code></pre>
+<h2 id="41-解决办法">4.1 解决办法</h2>
+<p>安装 sqlite-devel 后重新编译安装 python。
+经验证，重新安装 python 后，之前基于 python 2.7.10 安装的 pip、requests 等都可以正常使用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">yum</span> <span class="nx">install</span> <span class="nx">sqlite</span><span class="p">-</span><span class="nx">devel</span><span class="err">
+</span><span class="err"></span><span class="nx">cd</span> <span class="nx">Python</span><span class="m">-2</span>.<span class="m">7</span>.<span class="m">10</span><span class="err">
+</span><span class="err"></span>.<span class="sr">/configure --prefix=/</span><span class="nx">usr</span><span class="sr">/local/</span><span class="nx">python27</span><span class="err">
+</span><span class="err"></span><span class="nx">make</span><span class="err">
+</span><span class="err"></span><span class="nx">make</span> <span class="nx">install</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="42-再次创建-app-成功">4.2 再次创建 app 成功</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">startapp</span> <span class="nx">blog</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">ls</span><span class="err">
+</span><span class="err"></span><span class="nx">blog</span>  <span class="nx">dbosite</span>  <span class="nx">db</span>.<span class="nx">sqlite3</span>  <span class="nx">manage</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">tree</span> <span class="nx">blog</span>/<span class="err">
+</span><span class="err"></span><span class="nx">blog</span>/<span class="err">
+</span><span class="err"></span>├── <span class="nx">admin</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">__init__</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">migrations</span><span class="err">
+</span><span class="err"></span>│   └── <span class="nx">__init__</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">models</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">tests</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>└── <span class="nx">views</span>.<span class="nx">py</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="m">1</span> <span class="nx">directory</span><span class="p">,</span> <span class="m">6</span> <span class="nx">files</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="5-添加-app-信息">5. 添加 app 信息</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">vi</span> <span class="nx">settings</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span># <span class="nx">添加新创建的</span> <span class="nx">app</span> <span class="nx">信息</span><span class="err">
+</span><span class="err"></span><span class="nx">INSTALLED_APPS</span> <span class="p">=</span> <span class="p">(</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.admin&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.auth&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.sessions&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.messages&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>    # <span class="nx">add</span> <span class="nx">by</span> <span class="nx">kxn</span><span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;blog&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span><span class="p">)</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="6-设置新建-app-的-model">6. 设置新建 APP 的 model</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">more</span> <span class="nx">blog</span>/<span class="nx">models</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span><span class="nx">from</span> <span class="nx">django</span>.<span class="nx">db</span> <span class="nx">import</span> <span class="nx">models</span><span class="err">
+</span><span class="err"></span><span class="nx">from</span> <span class="nx">django</span>.<span class="nx">contrib</span> <span class="nx">import</span> <span class="nx">admin</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span># <span class="nx">Create</span> <span class="nx">your</span> <span class="nx">models</span> <span class="nx">here</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">class</span> <span class="nx">BlogPost</span><span class="p">(</span><span class="nx">models</span>.<span class="nx">Model</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>    <span class="nx">title</span> <span class="p">=</span> <span class="nx">models</span>.<span class="nx">CharField</span><span class="p">(</span><span class="nx">max_length</span><span class="p">=</span><span class="m">150</span><span class="p">)</span><span class="err">
+</span><span class="err"></span>    <span class="nx">body</span> <span class="p">=</span> <span class="nx">models</span>.<span class="nx">TextField</span><span class="p">()</span><span class="err">
+</span><span class="err"></span>    <span class="nx">timestamp</span> <span class="p">=</span> <span class="nx">models</span>.<span class="nx">DateTimeField</span><span class="p">()</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>#<span class="nx">以列表的形式显示BlogPost的标题和时间</span> <span class="err">
+</span><span class="err"></span><span class="nx">class</span> <span class="nx">BlogPostAdmin</span><span class="p">(</span><span class="nx">admin</span>.<span class="nx">ModelAdmin</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>    <span class="nx">list_display</span> <span class="p">=</span> <span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span><span class="s1">&#39;timestamp&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span># <span class="nx">注册到</span> <span class="nx">admin</span> <span class="nx">站点以代编辑</span>    <span class="err">
+</span><span class="err"></span><span class="nx">admin</span>.<span class="nx">site</span>.<span class="nx">register</span><span class="p">(</span><span class="nx">BlogsPost</span><span class="p">,</span><span class="nx">BlogPostAdmin</span><span class="p">)</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="7-设置数据库">7. 设置数据库</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">修改数据库设置</span><span class="err">
+</span><span class="err"></span>#<span class="p">--</span><span class="nx">dbosite</span>/<span class="nx">settings</span>.<span class="nx">py</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span># <span class="nx">Database</span><span class="err">
+</span><span class="err"></span># <span class="nx">https</span>:<span class="sr">//</span><span class="nx">docs</span>.<span class="nx">djangoproject</span>.<span class="nx">com</span><span class="sr">/en/</span><span class="m">1</span>.<span class="m">8</span><span class="sr">/ref/</span><span class="nx">settings</span>/#<span class="nx">databases</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">DATABASES</span> <span class="p">=</span> {<span class="err">
+</span><span class="err"></span>    <span class="s1">&#39;default&#39;</span>: {<span class="err">
+</span><span class="err"></span>        <span class="s1">&#39;ENGINE&#39;</span>: <span class="s1">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>        <span class="s1">&#39;NAME&#39;</span>: <span class="s1">&#39;/wls/webproject/dbosite/dbosite.db&#39;</span><span class="p">,</span><span class="err">
+</span><span class="err"></span>    }<span class="err">
+</span><span class="err"></span>}<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="8-创建表">8. 创建表</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">syncdb</span><span class="err">
+</span><span class="err"></span><span class="sr">/usr/</span><span class="nx">local</span><span class="sr">/python27/</span><span class="nx">lib</span><span class="sr">/python2.7/</span><span class="nx">site</span><span class="p">-</span><span class="nx">packages</span><span class="sr">/django/</span><span class="nx">core</span><span class="sr">/management/</span><span class="nx">commands</span>/<span class="nx">syncdb</span>.<span class="nx">py</span>:<span class="m">24</span>: <span class="nx">RemovedInDjango19Warning</span>: <span class="nx">The</span> <span class="nx">syncdb</span> <span class="nx">command</span> <span class="nx">will</span> <span class="nx">be</span> <span class="nx">removed</span> <span class="nx">in</span> <span class="nx">Django</span> <span class="m">1</span>.<span class="m">9</span><span class="err">
+</span><span class="err"></span>  <span class="nx">warnings</span>.<span class="nx">warn</span><span class="p">(</span><span class="s2">&#34;The syncdb command will be removed in Django 1.9&#34;</span><span class="p">,</span> <span class="nx">RemovedInDjango19Warning</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Operations</span> <span class="nx">to</span> <span class="nx">perform</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Synchronize</span> <span class="nx">unmigrated</span> <span class="nx">apps</span>: <span class="nx">staticfiles</span><span class="p">,</span> <span class="nx">messages</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Apply</span> <span class="nx">all</span> <span class="nx">migrations</span>: <span class="nx">admin</span><span class="p">,</span> <span class="nx">contenttypes</span><span class="p">,</span> <span class="nx">auth</span><span class="p">,</span> <span class="nx">sessions</span><span class="err">
+</span><span class="err"></span><span class="nx">Synchronizing</span> <span class="nx">apps</span> <span class="nx">without</span> <span class="nx">migrations</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Creating</span> <span class="nx">tables</span>...<span class="err">
+</span><span class="err"></span>    <span class="nx">Running</span> <span class="nx">deferred</span> <span class="nx">SQL</span>...<span class="err">
+</span><span class="err"></span>  <span class="nx">Installing</span> <span class="nx">custom</span> <span class="nx">SQL</span>...<span class="err">
+</span><span class="err"></span><span class="nx">Running</span> <span class="nx">migrations</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Rendering</span> <span class="nx">model</span> <span class="nx">states</span>... <span class="nx">DONE</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">contenttypes</span>.<span class="m">0001</span>_initial... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0001</span>_initial... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">admin</span>.<span class="m">0001</span>_initial... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">contenttypes</span>.<span class="m">0002</span>_remove_content_type_name... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0002</span>_alter_permission_name_max_length... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0003</span>_alter_user_email_max_length... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0004</span>_alter_user_username_opts... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0005</span>_alter_user_last_login_null... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">auth</span>.<span class="m">0006</span>_require_contenttypes_<span class="m">0002</span>... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">sessions</span>.<span class="m">0001</span>_initial... <span class="nx">OK</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">You</span> <span class="nx">have</span> <span class="nx">installed</span> <span class="nx">Django</span><span class="s1">&#39;s auth system, and don&#39;</span><span class="nx">t</span> <span class="nx">have</span> <span class="nx">any</span> <span class="nx">superusers</span> <span class="nx">defined</span>.<span class="err">
+</span><span class="err"></span><span class="nx">Would</span> <span class="nx">you</span> <span class="nx">like</span> <span class="nx">to</span> <span class="nx">create</span> <span class="nx">one</span> <span class="nx">now</span>? <span class="p">(</span><span class="nx">yes</span>/<span class="nx">no</span><span class="p">)</span>: <span class="nx">yes</span><span class="err">
+</span><span class="err"></span><span class="nx">Username</span> <span class="p">(</span><span class="nx">leave</span> <span class="nx">blank</span> <span class="nx">to</span> <span class="nx">use</span> <span class="s1">&#39;root&#39;</span><span class="p">)</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Email</span> <span class="nx">address</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Password</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Password</span> <span class="p">(</span><span class="nx">again</span><span class="p">)</span>: <span class="err">
+</span><span class="err"></span><span class="nx">Superuser</span> <span class="nx">created</span> <span class="nx">successfully</span>.<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="9-修改-modle-后再次初始化数据库">9. 修改 modle 后再次初始化数据库</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">makemigrations</span> <span class="nx">blog</span><span class="err">
+</span><span class="err"></span><span class="nx">Migrations</span> <span class="nx">for</span> <span class="s1">&#39;blog&#39;</span>:<span class="err">
+</span><span class="err"></span>  <span class="m">0001</span>_initial.<span class="nx">py</span>:<span class="err">
+</span><span class="err"></span>    <span class="p">-</span> <span class="nx">Create</span> <span class="nx">model</span> <span class="nx">BlogPost</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">syncdb</span><span class="err">
+</span><span class="err"></span><span class="sr">/usr/</span><span class="nx">local</span><span class="sr">/python27/</span><span class="nx">lib</span><span class="sr">/python2.7/</span><span class="nx">site</span><span class="p">-</span><span class="nx">packages</span><span class="sr">/django/</span><span class="nx">core</span><span class="sr">/management/</span><span class="nx">commands</span>/<span class="nx">syncdb</span>.<span class="nx">py</span>:<span class="m">24</span>: <span class="nx">RemovedInDjango19Warning</span>: <span class="nx">The</span> <span class="nx">syncdb</span> <span class="nx">command</span> <span class="nx">will</span> <span class="nx">be</span> <span class="nx">removed</span> <span class="nx">in</span> <span class="nx">Django</span> <span class="m">1</span>.<span class="m">9</span><span class="err">
+</span><span class="err"></span>  <span class="nx">warnings</span>.<span class="nx">warn</span><span class="p">(</span><span class="s2">&#34;The syncdb command will be removed in Django 1.9&#34;</span><span class="p">,</span> <span class="nx">RemovedInDjango19Warning</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Operations</span> <span class="nx">to</span> <span class="nx">perform</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Synchronize</span> <span class="nx">unmigrated</span> <span class="nx">apps</span>: <span class="nx">staticfiles</span><span class="p">,</span> <span class="nx">messages</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Apply</span> <span class="nx">all</span> <span class="nx">migrations</span>: <span class="nx">admin</span><span class="p">,</span> <span class="nx">blog</span><span class="p">,</span> <span class="nx">contenttypes</span><span class="p">,</span> <span class="nx">auth</span><span class="p">,</span> <span class="nx">sessions</span><span class="err">
+</span><span class="err"></span><span class="nx">Synchronizing</span> <span class="nx">apps</span> <span class="nx">without</span> <span class="nx">migrations</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Creating</span> <span class="nx">tables</span>...<span class="err">
+</span><span class="err"></span>    <span class="nx">Running</span> <span class="nx">deferred</span> <span class="nx">SQL</span>...<span class="err">
+</span><span class="err"></span>  <span class="nx">Installing</span> <span class="nx">custom</span> <span class="nx">SQL</span>...<span class="err">
+</span><span class="err"></span><span class="nx">Running</span> <span class="nx">migrations</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Rendering</span> <span class="nx">model</span> <span class="nx">states</span>... <span class="nx">DONE</span><span class="err">
+</span><span class="err"></span>  <span class="nx">Applying</span> <span class="nx">blog</span>.<span class="m">0001</span>_initial... <span class="nx">OK</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">payun</span> <span class="nx">dbosite</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="10-启动-server">10. 启动 server</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009074</span> <span class="nx">dbosite</span>]# <span class="nx">python27</span> <span class="nx">manage</span>.<span class="nx">py</span> <span class="nx">runserver</span> <span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">8080</span><span class="err">
+</span><span class="err"></span><span class="nx">Performing</span> <span class="nx">system</span> <span class="nx">checks</span>...<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">System</span> <span class="nx">check</span> <span class="nx">identified</span> <span class="nx">no</span> <span class="nx">issues</span> <span class="p">(</span><span class="m">0</span> <span class="nx">silenced</span><span class="p">)</span>.<span class="err">
+</span><span class="err"></span><span class="nx">October</span> <span class="m">07</span><span class="p">,</span> <span class="m">2015</span> <span class="p">-</span> <span class="m">08</span>:<span class="m">15</span>:<span class="m">35</span><span class="err">
+</span><span class="err"></span><span class="nx">Django</span> <span class="nx">version</span> <span class="m">1</span>.<span class="m">8</span>.<span class="m">5</span><span class="p">,</span> <span class="nx">using</span> <span class="nx">settings</span> <span class="s1">&#39;dbosite.settings&#39;</span><span class="err">
+</span><span class="err"></span><span class="nx">Starting</span> <span class="nx">development</span> <span class="nx">server</span> <span class="nx">at</span> <span class="nx">http</span>:<span class="sr">//</span><span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">8080</span>/<span class="err">
+</span><span class="err"></span><span class="nx">Quit</span> <span class="nx">the</span> <span class="nx">server</span> <span class="nx">with</span> <span class="nx">CONTROL</span><span class="p">-</span><span class="nx">C</span>.<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2015-10-04
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2015/10/django-views-urls/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">django views和urls练习</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2015/10/linux-install-python/">
+            <span class="next-text nav-default">安装Python 2.7.10和 3.5.0</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2015-10-04 00:00:00 \u002b0000 UTC',
+        title: 'Django初步使用',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>KVM虚拟化基础二 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="1. 命令使用帮助 1.1 qemu-img 不同格式支持的选项不一样，通过如下方式查看支持的选项。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="KVM虚拟化基础二" />
+<meta property="og:description" content="1. 命令使用帮助
+1.1 qemu-img
+不同格式支持的选项不一样，通过如下方式查看支持的选项。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/" />
+<meta property="article:published_time" content="2017-02-13T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-02-13T00:00:00+00:00" />
+<meta itemprop="name" content="KVM虚拟化基础二">
+<meta itemprop="description" content="1. 命令使用帮助
+1.1 qemu-img
+不同格式支持的选项不一样，通过如下方式查看支持的选项。">
+<meta itemprop="datePublished" content="2017-02-13T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-02-13T00:00:00+00:00" />
+<meta itemprop="wordCount" content="9474">
+
+
+
+<meta itemprop="keywords" content="虚拟化,kvm,xen," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="KVM虚拟化基础二"/>
+<meta name="twitter:description" content="1. 命令使用帮助
+1.1 qemu-img
+不同格式支持的选项不一样，通过如下方式查看支持的选项。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">KVM虚拟化基础二</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-02-13 </span>
+        <div class="post-category">
+            <a href="/categories/virtualization/"> virtualization </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-命令使用帮助">1. 命令使用帮助</a>
+      <ul>
+        <li><a href="#11-qemu-img">1.1 qemu-img</a></li>
+        <li><a href="#12-qemu-kvm">1.2 qemu-kvm</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-qemu-kvm的标准选项">2. qemu-kvm的标准选项</a></li>
+    <li><a href="#3-qemu-kvm的显示选项">3. qemu-kvm的显示选项</a></li>
+    <li><a href="#4-网络">4. 网络</a>
+      <ul>
+        <li><a href="#41-网络模型">4.1 网络模型</a>
+          <ul>
+            <li><a href="#隔离模型">隔离模型</a></li>
+            <li><a href="#路由模型">路由模型</a></li>
+            <li><a href="#nat模型">NAT模型</a></li>
+            <li><a href="#桥接模型">桥接模型</a></li>
+          </ul>
+        </li>
+        <li><a href="#42-网络属性相关选项">4.2 网络属性相关选项</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-使用示例">5. 使用示例</a>
+      <ul>
+        <li><a href="#51-示例一">5.1 示例一</a></li>
+        <li><a href="#52-以网络接口启动">5.2 以网络接口启动</a></li>
+        <li><a href="#53-以deamon方式运行">5.3 以deamon方式运行</a></li>
+        <li><a href="#54-鼠标轨迹不同步">5.4 鼠标轨迹不同步</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-vmware-workstation上的kvm实验">6. vmware-workstation上的kvm实验</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="1-命令使用帮助">1. 命令使用帮助</h1>
+<h2 id="11-qemu-img">1.1 qemu-img</h2>
+<p>不同格式支持的选项不一样，通过如下方式查看支持的选项。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">qemu</span><span class="p">-</span><span class="nx">img</span> <span class="nx">create</span> <span class="p">-</span><span class="nx">o</span> ? <span class="p">-</span><span class="nx">f</span> <span class="nx">qcow2</span> <span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
+</span><span class="err"></span><span class="nx">Supported</span> <span class="nx">options</span>:<span class="err">
+</span><span class="err"></span><span class="nx">size</span>             <span class="nx">Virtual</span> <span class="nx">disk</span> <span class="nx">size</span><span class="err">
+</span><span class="err"></span><span class="nx">compat</span>           <span class="nx">Compatibility</span> <span class="nx">level</span> <span class="p">(</span><span class="m">0</span>.<span class="m">10</span> <span class="nx">or</span> <span class="m">1</span>.<span class="m">1</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">backing_file</span>     <span class="nx">File</span> <span class="nx">name</span> <span class="nx">of</span> <span class="nx">a</span> <span class="nx">base</span> <span class="nx">image</span><span class="err">
+</span><span class="err"></span><span class="nx">backing_fmt</span>      <span class="nx">Image</span> <span class="nx">format</span> <span class="nx">of</span> <span class="nx">the</span> <span class="nx">base</span> <span class="nx">image</span><span class="err">
+</span><span class="err"></span><span class="nx">encryption</span>       <span class="nx">Encrypt</span> <span class="nx">the</span> <span class="nx">image</span><span class="err">
+</span><span class="err"></span><span class="nx">cluster_size</span>     <span class="nx">qcow2</span> <span class="nx">cluster</span> <span class="nx">size</span><span class="err">
+</span><span class="err"></span><span class="nx">preallocation</span>    <span class="nx">Preallocation</span> <span class="nx">mode</span> <span class="p">(</span><span class="nx">allowed</span> <span class="nx">values</span>: <span class="nx">off</span><span class="p">,</span> <span class="nx">metadata</span><span class="p">,</span> <span class="nx">falloc</span><span class="p">,</span> <span class="nx">full</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">lazy_refcounts</span>   <span class="nx">Postpone</span> <span class="nx">refcount</span> <span class="nx">updates</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]#<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">qemu</span><span class="p">-</span><span class="nx">img</span> <span class="nx">create</span> <span class="p">-</span><span class="nx">o</span> <span class="nx">size</span><span class="p">=</span><span class="m">20</span>G<span class="p">,</span><span class="nx">preallocation</span><span class="p">=</span><span class="nx">metadata</span> <span class="p">-</span><span class="nx">f</span> <span class="nx">qcow2</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
+</span><span class="err"></span><span class="nx">Formatting</span> <span class="s1">&#39;/images/kvm/centos6.qcow2&#39;</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">=</span><span class="nx">qcow2</span> <span class="nx">size</span><span class="p">=</span><span class="m">21474836480</span> <span class="nx">encryption</span><span class="p">=</span><span class="nx">off</span> <span class="nx">cluster_size</span><span class="p">=</span><span class="m">65536</span> <span class="nx">preallocation</span><span class="p">=</span><span class="s1">&#39;metadata&#39;</span> <span class="nx">lazy_refcounts</span><span class="p">=</span><span class="nx">off</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">ls</span> <span class="p">-</span><span class="nx">lh</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span> <span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span>. <span class="m">1</span> <span class="nx">root</span> <span class="nx">root</span> <span class="m">21</span>G <span class="nx">Feb</span> <span class="m">14</span> <span class="m">00</span>:<span class="m">06</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">du</span> <span class="p">-</span><span class="nx">sh</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
+</span><span class="err"></span><span class="m">4</span>.<span class="m">1</span>M    <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="12-qemu-kvm">1.2 qemu-kvm</h2>
+<p>查看qemu-kvm支持的网卡类型。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# qemu-kvm -net nic,model=?
+qemu: Supported NIC models: ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet,virtio
+[root@localhost ~]# 
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="2-qemu-kvm的标准选项">2. qemu-kvm的标准选项</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm的标准选项主要涉及指定主机类型</span>、<span class="nx">CPU模式</span>、<span class="nx">NUMA</span>、<span class="nx">软驱设备</span>、<span class="nx">光驱设备及硬件设备等</span>。<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">name</span> <span class="nx">name</span>：<span class="nx">设定虚拟机名称</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">M</span> <span class="nx">machine</span>：<span class="nx">指定要模拟的主机类型</span>，<span class="nx">如Standard</span> <span class="nx">PC</span>、<span class="nx">ISA</span><span class="p">-</span><span class="nx">only</span> <span class="nx">PC或Intel</span><span class="p">-</span><span class="nx">Mac等</span>，<span class="nx">可以使用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">M</span> ?”<span class="nx">获取所支持的所有类型</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">m</span> <span class="nx">megs</span>：<span class="nx">设定虚拟机的RAM大小</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">cpu</span> <span class="nx">model</span>：<span class="nx">设定CPU模型</span>，<span class="nx">如coreduo</span>、<span class="nx">qemu64等</span>，<span class="nx">可以使用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">cpu</span> ?”<span class="nx">获取所支持的所有模型</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="nx">n</span>[<span class="p">,</span><span class="nx">cores</span><span class="p">=</span><span class="nx">cores</span>][<span class="p">,</span><span class="nx">threads</span><span class="p">=</span><span class="nx">threads</span>][<span class="p">,</span><span class="nx">sockets</span><span class="p">=</span><span class="nx">sockets</span>][<span class="p">,</span><span class="nx">maxcpus</span><span class="p">=</span><span class="nx">maxcpus</span>]：<span class="nx">设定模拟的SMP架构中CPU的个数等</span>、<span class="nx">每个CPU的核心数及CPU的socket数目等</span>；<span class="nx">PC机上最多可以模拟255颗CPU</span>；<span class="nx">maxcpus用于指定热插入的CPU个数上限</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">numa</span> <span class="nx">opts</span>：<span class="nx">指定模拟多节点的numa设备</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">fda</span> <span class="nx">file</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">fdb</span> <span class="nx">file</span>：<span class="nx">使用指定文件</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span><span class="nx">作为软盘镜像</span>，<span class="nx">file为</span><span class="sr">/dev/</span><span class="nx">fd0表示使用物理软驱</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">hda</span> <span class="nx">file</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">hdb</span> <span class="nx">file</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">hdc</span> <span class="nx">file</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">hdd</span> <span class="nx">file</span>：<span class="nx">使用指定file作为硬盘镜像</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">cdrom</span> <span class="nx">file</span>：<span class="nx">使用指定file作为CD</span><span class="p">-</span><span class="nx">ROM镜像</span>，<span class="nx">需要注意的是</span><span class="p">-</span><span class="nx">cdrom和</span><span class="p">-</span><span class="nx">hdc不能同时使用</span>；<span class="nx">将file指定为</span><span class="sr">/dev/</span><span class="nx">cdrom可以直接使用物理光驱</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]]：<span class="nx">定义一个硬盘设备</span>；<span class="nx">可用子选项有很多</span>。<span class="err">
+</span><span class="err"></span>    <span class="nx">file</span><span class="p">=</span><span class="sr">/path/</span><span class="nx">to</span>/<span class="nx">somefile</span>：<span class="nx">硬件映像文件路径</span>；<span class="err">
+</span><span class="err"></span>    <span class="k">if</span><span class="p">=</span><span class="nx">interface</span>：<span class="nx">指定硬盘设备所连接的接口类型</span>，<span class="nx">即控制器类型</span>，<span class="nx">如ide</span>、<span class="nx">scsi</span>、<span class="nx">sd</span>、<span class="nx">mtd</span>、<span class="nx">floppy</span>、<span class="nx">pflash及virtio等</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">index</span><span class="p">=</span><span class="nx">index</span>：<span class="nx">设定同一种控制器类型中不同设备的索引号</span>，<span class="nx">即标识号</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">media</span><span class="p">=</span><span class="nx">media</span>：<span class="nx">定义介质类型为硬盘</span><span class="p">(</span><span class="nx">disk</span><span class="p">)</span><span class="nx">还是光盘</span><span class="p">(</span><span class="nx">cdrom</span><span class="p">)</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">snapshot</span><span class="p">=</span><span class="nx">snapshot</span>：<span class="nx">指定当前硬盘设备是否支持快照功能</span>：<span class="nx">on或off</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">cache</span><span class="p">=</span><span class="nx">cache</span>：<span class="nx">定义如何使用物理机缓存来访问块数据</span>，<span class="nx">其可用值有none</span>、<span class="nx">writeback</span>、<span class="nx">unsafe和writethrough四个</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">format</span><span class="p">=</span><span class="nx">format</span>：<span class="nx">指定映像文件的格式</span>，<span class="nx">具体格式可参见qemu</span><span class="p">-</span><span class="nx">img命令</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">boot</span> [<span class="nx">order</span><span class="p">=</span><span class="nx">drives</span>][<span class="p">,</span><span class="nx">once</span><span class="p">=</span><span class="nx">drives</span>][<span class="p">,</span><span class="nx">menu</span><span class="p">=</span><span class="nx">on</span><span class="p">|</span><span class="nx">off</span>]：<span class="nx">定义启动设备的引导次序</span>，<span class="nx">每种设备使用一个字符表示</span>；<span class="nx">不同的架构所支持的设备及其表示字符不尽相同</span>，<span class="nx">在x86</span> <span class="nx">PC架构上</span>，<span class="nx">a</span>、<span class="nx">b表示软驱</span>、<span class="nx">c表示第一块硬盘</span>，<span class="nx">d表示第一个光驱设备</span>，<span class="nx">n</span><span class="p">-</span><span class="nx">p表示网络适配器</span>；<span class="nx">默认为硬盘设备</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">boot</span> <span class="nx">order</span><span class="p">=</span><span class="nx">dc</span><span class="p">,</span><span class="nx">once</span><span class="p">=</span><span class="nx">d</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="3-qemu-kvm的显示选项">3. qemu-kvm的显示选项</h1>
+<p>显示选项用于定义虚拟机启动后的显示接口相关类型及属性等。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">-</span><span class="nx">nographic</span>：<span class="nx">默认情况下</span>，<span class="nx">qemu使用SDL来显示VGA输出</span>；<span class="nx">而此选项用于禁止图形接口</span>，<span class="nx">此时</span><span class="p">,</span><span class="nx">qemu类似一个简单的命令行程序</span>，<span class="nx">其仿真串口设备将被重定向到控制台</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">curses</span>：<span class="nx">禁止图形接口</span>，<span class="nx">并使用curses</span>/<span class="nx">ncurses作为交互接口</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">alt</span><span class="p">-</span><span class="nx">grab</span>：<span class="nx">使用Ctrl</span><span class="p">+</span><span class="nx">Alt</span><span class="p">+</span><span class="nx">Shift组合键释放鼠标</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">ctrl</span><span class="p">-</span><span class="nx">grab</span>：<span class="nx">使用右Ctrl键释放鼠标</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">sdl</span>：<span class="nx">启用SDL</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">Simple</span> <span class="nx">Directmedia</span> <span class="nx">Layer</span>，<span class="nx">C语言开发</span>，<span class="nx">实现跨平台的开源多媒体程序库文件</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">spice</span> <span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]：<span class="nx">启用spice远程桌面协议</span>；<span class="nx">其有许多子选项</span>，<span class="nx">具体请参照qemu</span><span class="p">-</span><span class="nx">kvm的手册</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">type</span>：<span class="nx">指定要仿真的VGA接口类型</span>，<span class="nx">常见类型有</span>：<span class="err">
+</span><span class="err"></span>    <span class="nx">cirrus</span>：<span class="nx">Cirrus</span> <span class="nx">Logic</span> <span class="nx">GD5446显示卡</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">std</span>：<span class="nx">带有Bochs</span> <span class="nx">VBI扩展的标准VGA显示卡</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">vmware</span>：<span class="nx">VMWare</span> <span class="nx">SVGA</span><span class="p">-</span><span class="nx">II兼容的显示适配器</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">qxl</span>：<span class="nx">QXL半虚拟化显示卡</span>；<span class="nx">与VGA兼容</span>；<span class="nx">在Guest中安装qxl驱动后能以很好的方式工作</span>，<span class="nx">在使用spice协议时推荐使用此类型</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">none</span>：<span class="nx">禁用VGA卡</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">vnc</span> <span class="nx">display</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]]：<span class="nx">默认情况下</span>，<span class="nx">qemu使用SDL显示VGA输</span><span class="err">
+</span><span class="err"></span>    <span class="nx">出</span>；<span class="nx">使用</span><span class="p">-</span><span class="nx">vnc选项</span>，<span class="nx">可以让qemu监听在VNC上</span>，<span class="nx">并将VGA输出重定向至VNC会话</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">使用此选项时</span>，<span class="nx">必须使用</span><span class="p">-</span><span class="nx">k选项指定键盘布局类型</span>；<span class="nx">其有许多子选项</span>，<span class="nx">具体请参</span><span class="err">
+</span><span class="err"></span>    <span class="nx">照qemu</span><span class="p">-</span><span class="nx">kvm的手册</span>；<span class="err">
+</span><span class="err"></span>    <span class="err">
+</span><span class="err"></span>    <span class="nx">VNC</span>: <span class="nx">Virtual</span> <span class="nx">Network</span> <span class="nx">Computing</span>，<span class="nx">基于RFB</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>    <span class="nx">display</span>:<span class="err">
+</span><span class="err"></span>    	<span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="nx">host</span>:<span class="nx">N</span>，<span class="nx">N是桌面号</span>，<span class="nx">转换成监听的端口</span><span class="p">=</span><span class="m">5900</span><span class="p">+</span><span class="nx">N</span><span class="err">
+</span><span class="err"></span>    		<span class="m">172</span>.<span class="m">16</span>.<span class="m">100</span>.<span class="m">7</span>:<span class="m">1</span><span class="p">,</span> <span class="nx">监听于172</span>.<span class="m">16</span>.<span class="m">100</span>.<span class="m">7</span>主的<span class="m">5900</span><span class="p">+</span><span class="nx">N的端口上</span><span class="err">
+</span><span class="err"></span>    	<span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="nx">unix</span>:<span class="sr">/path/</span><span class="nx">to</span>/<span class="nx">socket_file</span><span class="err">
+</span><span class="err"></span>    	<span class="p">(</span><span class="m">3</span><span class="p">)</span> <span class="nx">none</span><span class="err">
+</span><span class="err"></span>    <span class="nx">options</span>:<span class="err">
+</span><span class="err"></span>    	<span class="nx">password</span>: <span class="nx">连接时需要验正密码</span>；<span class="nx">设定密码通过monitor接口使用change</span><span class="err">
+</span><span class="err"></span>    	<span class="nx">reverse</span>: “<span class="nx">反向</span>”<span class="nx">连接至某处于监听状态的vncview上</span>；<span class="err">
+</span><span class="err"></span>    <span class="p">-</span><span class="nx">monitor</span> <span class="nx">stdio</span>：<span class="nx">表示在标准输入输出上显示monitor界面</span><span class="err">
+</span><span class="err"></span>    <span class="p">-</span><span class="nx">nographic</span><span class="err">
+</span><span class="err"></span>    	<span class="nx">Ctrl</span><span class="p">-</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span>: <span class="nx">在console和monitor之间切换</span><span class="err">
+</span><span class="err"></span>    	<span class="nx">Ctrl</span><span class="p">-</span><span class="nx">a</span><span class="p">,</span> <span class="nx">h</span>: <span class="nx">显示帮助信息</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="4-网络">4. 网络</h1>
+<h2 id="41-网络模型">4.1 网络模型</h2>
+<h3 id="隔离模型">隔离模型</h3>
+<p>同一HOST上的虚拟机可以通信，不能和外部通信。</p>
+<p>每一个虚拟机的网络接口都有前半段和后半段，前半段在虚拟机内部，后半段在物理
+机上，关联到bridge上，相当于接入到了一个交换机，因此两个虚拟机之间可以通信。</p>
+<p><img src="/images/virtualization/kvm-net-isolation.jpg" alt="隔离模型"></p>
+<h3 id="路由模型">路由模型</h3>
+<p>如何让虚拟和外部通信呢？在物理机上再添加一块虚拟网卡，让该虚拟网卡接到bridge
+上，如果物理机上的虚拟网卡和虚拟机在一个网段中，则物理机可以和虚拟机通信。
+每个虚拟机把网关都指向物理机上的虚拟网卡的地址，并在物理机上打开<strong>核心转发</strong>功能，
+这即所谓的路由模型，在外部主机上添加路由，保证回来的包可以到达虚拟机，这样
+虚拟机就可以和外部通信了。</p>
+<p><img src="/images/virtualization/kvm-net-route.jpg" alt="路由模型"></p>
+<h3 id="nat模型">NAT模型</h3>
+<p>上述在每台被通信的物理机加路由，比较麻烦，尽管能够与外部主机通信，仍然不能
+作为通信目标，如果作一个<strong>NAT Server</strong>就可以解决这个问题，即所谓的NAT模型。</p>
+<p><img src="/images/virtualization/kvm-net-nat.jpg" alt="NAT模型"></p>
+<h3 id="桥接模型">桥接模型</h3>
+<p>在物理机上创建bridge设备，把物理网卡关联到bridge上，这样guest OS通过vnet0发送
+的数据包就到了bridge，bridge通过物理网卡就出去了。</p>
+<p>物理机一旦把一个物理网卡当bridge用以后，这个物理网卡就相当于交换机了，二层
+通信依靠MAC地址，通过给物理机再添加一个虚拟网卡，把原物理网卡的MAC地址放在
+虚拟网卡上，在物理网卡上打开混杂模式，不管MAC地址是什么都接收，物理网卡接收
+到数据包后，如果MAC是物理机的则转发到虚拟网卡，如果是虚拟机的则转交给虚拟机
+的虚拟网卡。</p>
+<p><img src="/images/virtualization/kvm-net-bridge.jpg" alt="桥接模型"></p>
+<h2 id="42-网络属性相关选项">4.2 网络属性相关选项</h2>
+<p>网络属性相关选项用于定义网络设备接口类型及其相关的各属性等信息。这里只介绍nic、tap和user三种类型网络接口的属性，其它类型请参照qemu-kvm手册。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span>[<span class="p">,</span><span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>][<span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="nx">mac</span>][<span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">type</span>][<span class="p">,</span><span class="nx">name</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">addr</span><span class="p">=</span><span class="nx">addr</span>][<span class="p">,</span><span class="nx">vectors</span><span class="p">=</span><span class="nx">v</span>]<span class="err">
+</span><span class="err"></span>    <span class="nx">创建一个新的网卡设备并连接至vlan</span> <span class="nx">n中</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">PC架构上默认的NIC为e1000</span>，<span class="err">
+</span><span class="err"></span>    <span class="nx">macaddr用于为其指定MAC地址</span>，<span class="err">
+</span><span class="err"></span>    <span class="nx">name用于指定一个在监控时显示的网上设备名称</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">emu可以模拟多个类型的网卡设备</span>，<span class="nx">如virtio</span>、<span class="nx">i82551</span>、<span class="nx">i82557b</span>、<span class="nx">i82559er</span>、<span class="err">
+</span><span class="err"></span>    <span class="nx">ne2k_isa</span>、<span class="nx">pcnet</span>、<span class="nx">rtl8139</span>、<span class="nx">e1000</span>、<span class="nx">smc91c111</span>、<span class="nx">lance及mcf_fec等</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">不过</span>，<span class="nx">不同平台架构上</span>，<span class="nx">其支持的类型可能只包含前述列表的一部分</span>，<span class="nx">可以使</span><span class="err">
+</span><span class="err"></span>    <span class="nx">用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span>?”<span class="nx">来获取当前平台支持的类型</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">tap</span>[<span class="p">,</span><span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>][<span class="p">,</span><span class="nx">name</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">fd</span><span class="p">=</span><span class="nx">h</span>][<span class="p">,</span><span class="nx">ifname</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">script</span><span class="p">=</span><span class="nx">file</span>][<span class="p">,</span><span class="nx">downscript</span><span class="p">=</span><span class="nx">dfile</span>]<span class="err">
+</span><span class="err"></span>    <span class="nx">通过物理机的TAP网络接口连接至vlan</span> <span class="nx">n中</span>，<span class="nx">使用script</span><span class="p">=</span><span class="nx">file指定的脚本</span><span class="p">(</span><span class="nx">默</span><span class="err">
+</span><span class="err"></span>    <span class="nx">认为</span><span class="sr">/etc/</span><span class="nx">qemu</span><span class="p">-</span><span class="nx">ifup</span><span class="p">)</span><span class="nx">来配置当前网络接口</span>，<span class="nx">并使用downscript</span><span class="p">=</span><span class="nx">file指定的</span><span class="err">
+</span><span class="err"></span>    <span class="nx">脚本</span><span class="p">(</span><span class="nx">默认为</span><span class="sr">/etc/</span><span class="nx">qemu</span><span class="p">-</span><span class="nx">ifdown</span><span class="p">)</span><span class="nx">来撤消接口配置</span>；<span class="nx">使用script</span><span class="p">=</span><span class="nx">no和</span><span class="err">
+</span><span class="err"></span>    <span class="nx">downscript</span><span class="p">=</span><span class="nx">no可分别用来禁止执行脚本</span>；<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">user</span>[<span class="p">,</span><span class="nx">option</span>][<span class="p">,</span><span class="nx">option</span>][<span class="p">,</span>...]：<span class="err">
+</span><span class="err"></span>    <span class="nx">在用户模式配置网络栈</span>，<span class="nx">其不依赖于管理权限</span>；<span class="nx">有效选项有</span><span class="err">
+</span><span class="err"></span>    <span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>：<span class="nx">连接至vlan</span> <span class="nx">n</span>，<span class="nx">默认n</span><span class="p">=</span><span class="m">0</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">name</span><span class="p">=</span><span class="nx">name</span>：<span class="nx">指定接口的显示名称</span>，<span class="nx">常用于监控模式中</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">net</span><span class="p">=</span><span class="nx">addr</span>[<span class="sr">/mask]：设定GuestOS可见的IP网络，掩码可选，默认为10.0.2.0/</span><span class="m">8</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">host</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定GuestOS中看到的物理机的IP地址</span>，<span class="nx">默认为指定网络中的第二个</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">2</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">dhcpstart</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定DHCP服务地址池中16个地址的起始IP</span>，<span class="nx">默认为第16个至第31个</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">16</span><span class="p">-</span><span class="nx">x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">31</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">dns</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定GuestOS可见的dns服务器地址</span>；<span class="nx">默认为GuestOS网络中的第三个地址</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">3</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">tftp</span><span class="p">=</span><span class="nx">dir</span>：<span class="nx">激活内置的tftp服务器</span>，<span class="nx">并使用指定的dir作为tftp服务器的默认根目录</span>；<span class="err">
+</span><span class="err"></span>    <span class="nx">bootfile</span><span class="p">=</span><span class="nx">file</span>：<span class="nx">BOOTP文件名称</span>，<span class="nx">用于实现网络引导GuestOS</span>；<span class="nx">如</span>：<span class="nx">qemu</span> <span class="p">-</span><span class="nx">hda</span> <span class="nx">linux</span>.<span class="nx">img</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">n</span> <span class="p">-</span><span class="nx">net</span> <span class="nx">user</span><span class="p">,</span><span class="nx">tftp</span><span class="p">=</span><span class="sr">/tftpserver/</span><span class="nx">pub</span><span class="p">,</span><span class="nx">bootfile</span><span class="p">=</span>/<span class="nx">pxelinux</span>.<span class="m">0</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="5-使用示例">5. 使用示例</h1>
+<h2 id="51-示例一">5.1 示例一</h2>
+<p>下面的命令创建了一个名为rhel5.8的虚拟机，其RAM大小为512MB，有两颗CPU的SMP架构，默认引导设备为硬盘，有一个硬盘设备和一个光驱设备，网络接口类型为virtio，VGA模式为cirrus，并启用了balloon功能。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">name</span> <span class="s2">&#34;rhel5.8&#34;</span> <span class="p">-</span><span class="nx">m</span> <span class="m">512</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="m">2</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">d</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/VM/</span><span class="nx">images</span><span class="sr">/rhel5.8/</span><span class="nx">hda</span><span class="p">,</span><span class="k">if</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">0</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">disk</span><span class="p">,</span><span class="nx">format</span><span class="p">=</span><span class="nx">qcow2</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/isos/</span><span class="nx">rhel</span><span class="m">-5</span>.<span class="m">8</span>.<span class="nx">iso</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">1</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">cdrom</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="m">52</span>:<span class="m">54</span>:<span class="m">00</span>:<span class="nx">A5</span>:<span class="m">41</span>:<span class="m">1</span>E \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">cirrus</span> <span class="p">-</span><span class="nx">balloon</span> <span class="nx">virtio</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意的是，上述命令中使用的硬盘映像文件/VM/images/rhel5.8/hda需要事先使用qemu-img命令创建。</p>
+<p>在虚拟机创建并安装GuestOS完成之后，可以免去光驱设备直接启动之。命令如下所示。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">name</span> <span class="s2">&#34;rhel5.8&#34;</span> <span class="p">-</span><span class="nx">m</span> <span class="m">512</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="m">2</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">d</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/VM/</span><span class="nx">images</span><span class="sr">/rhel5.8/</span><span class="nx">hda</span><span class="p">,</span><span class="k">if</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">0</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">disk</span><span class="p">,</span><span class="nx">format</span><span class="p">=</span><span class="nx">qcow2</span> \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="m">52</span>:<span class="m">54</span>:<span class="m">00</span>:<span class="nx">A5</span>:<span class="m">41</span>:<span class="m">1</span>E \<span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">cirrus</span> <span class="p">-</span><span class="nx">balloon</span> <span class="nx">virtio</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="52-以网络接口启动">5.2 以网络接口启动</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">qemu-kvm -m 512 -smp 2 -name centos \
+-drive file=/images/centos/centos6.img,media=disk,if=virtio \
+-net nic,model=virtio,macaddr=52:54:00:12:34:88 \
+-net tap,ifname=vnet1,script=/etc/qemu-ifup \
+-boot order=nc,once=n
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="53-以deamon方式运行">5.3 以deamon方式运行</h2>
+<p>指定 -deamonize即可在后台运行。</p>
+<h2 id="54-鼠标轨迹不同步">5.4 鼠标轨迹不同步</h2>
+<p>指定 -usedevice tablet，内外鼠标轨迹就可以同步。</p>
+<h1 id="6-vmware-workstation上的kvm实验">6. vmware-workstation上的kvm实验</h1>
+<p>经过实验发现CPU要如下设置，如果不打开“虚拟化CPU性能计数器”，在启动kvm的vm时会导致host（vmw虚拟的）
+死机，卡在CPU计数器那里。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# brctl addbr br0
+[root@localhost ~]# ip link set dev br0 up
+[root@localhost ~]# ip link show
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eno16777736: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
+    link/ether 00:0c:29:54:52:e4 brd ff:ff:ff:ff:ff:ff
+3: br0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT 
+    link/ether c2:07:ba:fe:8f:3e brd ff:ff:ff:ff:ff:ff
+[root@localhost ~]# qemu-kvm -m 128 -cpu host -smp 2 -name &#34;test&#34; -drive file=/images/kvm/cirros-0.3.3-i386-disk.img,if=virtio,media=disk,format=qcow2,cache=writeback -nographic -net nic -net tap,name=vif0.0,script=/etc/qemu-ifup
+[    0.000000] Initializing cgroup subsys cpuset
+[    0.000000] Initializing cgroup subsys cpu
+[    0.000000] Linux version 3.2.0-68-virtual (buildd@lamiak) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #102-Ubuntu SMP Tue Aug 12 22:44:35 UTC 2014 (Ubuntu 3.2.0-68.102-virtual 3.2.62)
+[    0.000000] KERNEL supported cpus:
+[    0.000000]   Intel GenuineIntel
+[    0.000000]   AMD AuthenticAMD
+[    0.000000]   NSC Geode by NSC
+[    0.000000]   Cyrix CyrixInstead
+[    0.000000]   Centaur CentaurHauls
+[    0.000000]   Transmeta GenuineTMx86
+[    0.000000]   Transmeta TransmetaCPU
+[    0.000000]   UMC UMC UMC UMC
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000]  BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+[    0.000000]  BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+[    0.000000]  BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved)
+[    0.000000]  BIOS-e820: 0000000000100000 - 0000000007ffc000 (usable)
+[    0.000000]  BIOS-e820: 0000000007ffc000 - 0000000008000000 (reserved)
+[    0.000000]  BIOS-e820: 00000000feffc000 - 00000000ff000000 (reserved)
+[    0.000000]  BIOS-e820: 00000000fffc0000 - 0000000100000000 (reserved)
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] SMBIOS 2.4 present.
+[    0.000000] last_pfn = 0x7ffc max_arch_pfn = 0x1000000
+[    0.000000] x86 PAT enabled: cpu 0, old 0x7040600070406, new 0x7010600070106
+[    0.000000] found SMP MP-table at [c00f73d0] f73d0
+[    0.000000] init_memory_mapping: 0000000000000000-0000000007ffc000
+[    0.000000] RAMDISK: 07ce1000 - 07fec000
+[    0.000000] ACPI: RSDP 000f7200 00014 (v00 BOCHS )
+[    0.000000] ACPI: RSDT 07fffb04 00030 (v01 BOCHS  BXPCRSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: FACP 07fff177 00074 (v01 BOCHS  BXPCFACP 00000001 BXPC 00000001)
+[    0.000000] ACPI: DSDT 07ffe040 01137 (v01 BOCHS  BXPCDSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: FACS 07ffe000 00040
+[    0.000000] ACPI: SSDT 07fff1eb 00899 (v01 BOCHS  BXPCSSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: APIC 07fffa84 00080 (v01 BOCHS  BXPCAPIC 00000001 BXPC 00000001)
+[    0.000000] 0MB HIGHMEM available.
+[    0.000000] 127MB LOWMEM available.
+[    0.000000]   mapped low ram: 0 - 07ffc000
+[    0.000000]   low ram: 0 - 07ffc000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000000] kvm-clock: cpu 0, msr 0:a39d81, boot clock
+[    0.000000] Zone PFN ranges:
+[    0.000000]   DMA      0x00000010 -&gt; 0x00001000
+[    0.000000]   Normal   0x00001000 -&gt; 0x00007ffc
+[    0.000000]   HighMem  empty
+[    0.000000] Movable zone start PFN for each node
+[    0.000000] early_node_map[2] active PFN ranges
+[    0.000000]     0: 0x00000010 -&gt; 0x0000009f
+[    0.000000]     0: 0x00000100 -&gt; 0x00007ffc
+[    0.000000] Using APIC driver default
+[    0.000000] ACPI: PM-Timer IO Port: 0x608
+[    0.000000] ACPI: LAPIC (acpi_id[0x00] lapic_id[0x00] enabled)
+[    0.000000] ACPI: LAPIC (acpi_id[0x01] lapic_id[0x01] enabled)
+[    0.000000] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.000000] ACPI: IOAPIC (id[0x00] address[0xfec00000] gsi_base[0])
+[    0.000000] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.000000] Using ACPI (MADT) for SMP configuration information
+[    0.000000] SMP: Allowing 2 CPUs, 0 hotplug CPUs
+[    0.000000] PM: Registered nosave memory: 000000000009f000 - 00000000000a0000
+[    0.000000] PM: Registered nosave memory: 00000000000a0000 - 00000000000f0000
+[    0.000000] PM: Registered nosave memory: 00000000000f0000 - 0000000000100000
+[    0.000000] Allocating PCI resources starting at 8000000 (gap: 8000000:f6ffc000)
+[    0.000000] Booting paravirtualized kernel on KVM
+[    0.000000] setup_percpu: NR_CPUS:8 nr_cpumask_bits:8 nr_cpu_ids:2 nr_node_ids:1
+[    0.000000] PERCPU: Embedded 14 pages/cpu @c7bc5000 s34240 r0 d23104 u57344
+[    0.000000] kvm-clock: cpu 0, msr 0:7bccd81, primary cpu clock
+[    0.000000] KVM setup async PF for cpu 0
+[    0.000000] kvm-stealtime: cpu 0, msr 7bc8180
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32395
+[    0.000000] Kernel command line: LABEL=cirros-rootfs ro console=tty1 console=ttyS0
+[    0.000000] PID hash table entries: 512 (order: -1, 2048 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.000000] Initializing CPU#0
+[    0.000000] xsave/xrstor: enabled xstate_bv 0x7, cntxt size 0x340
+[    0.000000] allocated 523968 bytes of page_cgroup
+[    0.000000] please try &#39;cgroup_disable=memory&#39; option if you don&#39;t want memory cgroups
+[    0.000000] Initializing HighMem for node 0 (00000000:00000000)
+[    0.000000] Memory: 115328k/131056k available (5849k kernel code, 15276k reserved, 2856k data, 744k init, 0k highmem)
+[    0.000000]     fixmap  : 0xfff16000 - 0xfffff000   ( 932 kB)
+[    0.000000]     pkmap   : 0xffc00000 - 0xffe00000   (2048 kB)
+[    0.000000]     vmalloc : 0xc87fc000 - 0xffbfe000   ( 884 MB)
+[    0.000000]     lowmem  : 0xc0000000 - 0xc7ffc000   ( 127 MB)
+[    0.000000]       .init : 0xc0981000 - 0xc0a3b000   ( 744 kB)
+[    0.000000]       .data : 0xc06b65bc - 0xc0980900   (2856 kB)
+[    0.000000]       .text : 0xc0100000 - 0xc06b65bc   (5849 kB)
+[    0.000000] Checking if this processor honours the WP bit even in supervisor mode...Ok.
+[    0.000000] SLUB: Genslabs=15, HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.000000] Hierarchical RCU implementation.
+[    0.000000]  RCU dyntick-idle grace-period acceleration is enabled.
+[    0.000000] NR_IRQS:2304 nr_irqs:512 16
+[    0.000000] Console: colour VGA+ 80x25
+[    0.000000] console [tty1] enabled
+[    0.000000] console [ttyS0] enabled
+[    0.000000] Detected 3601.000 MHz processor.
+[    0.008000] Calibrating delay loop (skipped) preset value.. 7202.00 BogoMIPS (lpj=14404000)
+[    0.012012] pid_max: default: 32768 minimum: 301
+[    0.014866] Security Framework initialized
+[    0.016036] AppArmor: AppArmor initialized
+[    0.020012] Yama: becoming mindful.
+[    0.022604] Mount-cache hash table entries: 512
+[    0.024001] Initializing cgroup subsys cpuacct
+[    0.024001] Initializing cgroup subsys memory
+[    0.028016] Initializing cgroup subsys devices
+[    0.031426] Initializing cgroup subsys freezer
+[    0.032012] Initializing cgroup subsys blkio
+[    0.036056] Initializing cgroup subsys perf_event
+[    0.040468] mce: CPU supports 10 MCE banks
+[    0.076004] ACPI: Core revision 20110623
+[    0.080493] ftrace: allocating 26151 entries in 52 pages
+[    0.092238] Enabling APIC mode:  Flat.  Using 1 I/O APICs
+[    0.104266] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.108017] CPU0: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz stepping 03
+[    0.116006] Performance Events: generic architected perfmon v1, core PMU driver.
+[    0.116022] ... version:                1
+[    0.120010] ... bit width:              48
+[    0.124009] ... generic registers:      4
+[    0.128010] ... value mask:             0000ffffffffffff
+[    0.132010] ... max period:             000000007fffffff
+[    0.136010] ... fixed-purpose events:   0
+[    0.140010] ... event mask:             000000000000000f
+[    0.144098] NMI watchdog enabled, takes one hw-pmu counter.
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/images/virtualization/vmware-config-for-kvm.jpg" alt="vmware设置"></p>
+<p>设置CPU计数器后，启动正常，如下。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span><span class="lnt">252
+</span><span class="lnt">253
+</span><span class="lnt">254
+</span><span class="lnt">255
+</span><span class="lnt">256
+</span><span class="lnt">257
+</span><span class="lnt">258
+</span><span class="lnt">259
+</span><span class="lnt">260
+</span><span class="lnt">261
+</span><span class="lnt">262
+</span><span class="lnt">263
+</span><span class="lnt">264
+</span><span class="lnt">265
+</span><span class="lnt">266
+</span><span class="lnt">267
+</span><span class="lnt">268
+</span><span class="lnt">269
+</span><span class="lnt">270
+</span><span class="lnt">271
+</span><span class="lnt">272
+</span><span class="lnt">273
+</span><span class="lnt">274
+</span><span class="lnt">275
+</span><span class="lnt">276
+</span><span class="lnt">277
+</span><span class="lnt">278
+</span><span class="lnt">279
+</span><span class="lnt">280
+</span><span class="lnt">281
+</span><span class="lnt">282
+</span><span class="lnt">283
+</span><span class="lnt">284
+</span><span class="lnt">285
+</span><span class="lnt">286
+</span><span class="lnt">287
+</span><span class="lnt">288
+</span><span class="lnt">289
+</span><span class="lnt">290
+</span><span class="lnt">291
+</span><span class="lnt">292
+</span><span class="lnt">293
+</span><span class="lnt">294
+</span><span class="lnt">295
+</span><span class="lnt">296
+</span><span class="lnt">297
+</span><span class="lnt">298
+</span><span class="lnt">299
+</span><span class="lnt">300
+</span><span class="lnt">301
+</span><span class="lnt">302
+</span><span class="lnt">303
+</span><span class="lnt">304
+</span><span class="lnt">305
+</span><span class="lnt">306
+</span><span class="lnt">307
+</span><span class="lnt">308
+</span><span class="lnt">309
+</span><span class="lnt">310
+</span><span class="lnt">311
+</span><span class="lnt">312
+</span><span class="lnt">313
+</span><span class="lnt">314
+</span><span class="lnt">315
+</span><span class="lnt">316
+</span><span class="lnt">317
+</span><span class="lnt">318
+</span><span class="lnt">319
+</span><span class="lnt">320
+</span><span class="lnt">321
+</span><span class="lnt">322
+</span><span class="lnt">323
+</span><span class="lnt">324
+</span><span class="lnt">325
+</span><span class="lnt">326
+</span><span class="lnt">327
+</span><span class="lnt">328
+</span><span class="lnt">329
+</span><span class="lnt">330
+</span><span class="lnt">331
+</span><span class="lnt">332
+</span><span class="lnt">333
+</span><span class="lnt">334
+</span><span class="lnt">335
+</span><span class="lnt">336
+</span><span class="lnt">337
+</span><span class="lnt">338
+</span><span class="lnt">339
+</span><span class="lnt">340
+</span><span class="lnt">341
+</span><span class="lnt">342
+</span><span class="lnt">343
+</span><span class="lnt">344
+</span><span class="lnt">345
+</span><span class="lnt">346
+</span><span class="lnt">347
+</span><span class="lnt">348
+</span><span class="lnt">349
+</span><span class="lnt">350
+</span><span class="lnt">351
+</span><span class="lnt">352
+</span><span class="lnt">353
+</span><span class="lnt">354
+</span><span class="lnt">355
+</span><span class="lnt">356
+</span><span class="lnt">357
+</span><span class="lnt">358
+</span><span class="lnt">359
+</span><span class="lnt">360
+</span><span class="lnt">361
+</span><span class="lnt">362
+</span><span class="lnt">363
+</span><span class="lnt">364
+</span><span class="lnt">365
+</span><span class="lnt">366
+</span><span class="lnt">367
+</span><span class="lnt">368
+</span><span class="lnt">369
+</span><span class="lnt">370
+</span><span class="lnt">371
+</span><span class="lnt">372
+</span><span class="lnt">373
+</span><span class="lnt">374
+</span><span class="lnt">375
+</span><span class="lnt">376
+</span><span class="lnt">377
+</span><span class="lnt">378
+</span><span class="lnt">379
+</span><span class="lnt">380
+</span><span class="lnt">381
+</span><span class="lnt">382
+</span><span class="lnt">383
+</span><span class="lnt">384
+</span><span class="lnt">385
+</span><span class="lnt">386
+</span><span class="lnt">387
+</span><span class="lnt">388
+</span><span class="lnt">389
+</span><span class="lnt">390
+</span><span class="lnt">391
+</span><span class="lnt">392
+</span><span class="lnt">393
+</span><span class="lnt">394
+</span><span class="lnt">395
+</span><span class="lnt">396
+</span><span class="lnt">397
+</span><span class="lnt">398
+</span><span class="lnt">399
+</span><span class="lnt">400
+</span><span class="lnt">401
+</span><span class="lnt">402
+</span><span class="lnt">403
+</span><span class="lnt">404
+</span><span class="lnt">405
+</span><span class="lnt">406
+</span><span class="lnt">407
+</span><span class="lnt">408
+</span><span class="lnt">409
+</span><span class="lnt">410
+</span><span class="lnt">411
+</span><span class="lnt">412
+</span><span class="lnt">413
+</span><span class="lnt">414
+</span><span class="lnt">415
+</span><span class="lnt">416
+</span><span class="lnt">417
+</span><span class="lnt">418
+</span><span class="lnt">419
+</span><span class="lnt">420
+</span><span class="lnt">421
+</span><span class="lnt">422
+</span><span class="lnt">423
+</span><span class="lnt">424
+</span><span class="lnt">425
+</span><span class="lnt">426
+</span><span class="lnt">427
+</span><span class="lnt">428
+</span><span class="lnt">429
+</span><span class="lnt">430
+</span><span class="lnt">431
+</span><span class="lnt">432
+</span><span class="lnt">433
+</span><span class="lnt">434
+</span><span class="lnt">435
+</span><span class="lnt">436
+</span><span class="lnt">437
+</span><span class="lnt">438
+</span><span class="lnt">439
+</span><span class="lnt">440
+</span><span class="lnt">441
+</span><span class="lnt">442
+</span><span class="lnt">443
+</span><span class="lnt">444
+</span><span class="lnt">445
+</span><span class="lnt">446
+</span><span class="lnt">447
+</span><span class="lnt">448
+</span><span class="lnt">449
+</span><span class="lnt">450
+</span><span class="lnt">451
+</span><span class="lnt">452
+</span><span class="lnt">453
+</span><span class="lnt">454
+</span><span class="lnt">455
+</span><span class="lnt">456
+</span><span class="lnt">457
+</span><span class="lnt">458
+</span><span class="lnt">459
+</span><span class="lnt">460
+</span><span class="lnt">461
+</span><span class="lnt">462
+</span><span class="lnt">463
+</span><span class="lnt">464
+</span><span class="lnt">465
+</span><span class="lnt">466
+</span><span class="lnt">467
+</span><span class="lnt">468
+</span><span class="lnt">469
+</span><span class="lnt">470
+</span><span class="lnt">471
+</span><span class="lnt">472
+</span><span class="lnt">473
+</span><span class="lnt">474
+</span><span class="lnt">475
+</span><span class="lnt">476
+</span><span class="lnt">477
+</span><span class="lnt">478
+</span><span class="lnt">479
+</span><span class="lnt">480
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# brctl addbr br0
+[root@localhost ~]# ip link set dev br0 up
+[root@localhost ~]# qemu-kvm -m 128 -cpu host -smp 1 -name &#34;test&#34; -drive file=/images/kvm/cirros-0.3.3-i386-disk.img,if=virtio,media=disk,format=qcow2,cache=writeback -nographic -net nic -net tap,name=ifvif0.0,script=/etc/qemu-ifup
+[    0.000000] Initializing cgroup subsys cpuset
+[    0.000000] Initializing cgroup subsys cpu
+[    0.000000] Linux version 3.2.0-68-virtual (buildd@lamiak) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #102-Ubuntu SMP Tue Aug 12 22:44:35 UTC 2014 (Ubuntu 3.2.0-68.102-virtual 3.2.62)
+[    0.000000] KERNEL supported cpus:
+[    0.000000]   Intel GenuineIntel
+[    0.000000]   AMD AuthenticAMD
+[    0.000000]   NSC Geode by NSC
+[    0.000000]   Cyrix CyrixInstead
+[    0.000000]   Centaur CentaurHauls
+[    0.000000]   Transmeta GenuineTMx86
+[    0.000000]   Transmeta TransmetaCPU
+[    0.000000]   UMC UMC UMC UMC
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000]  BIOS-e820: 0000000000000000 - 000000000009fc00 (usable)
+[    0.000000]  BIOS-e820: 000000000009fc00 - 00000000000a0000 (reserved)
+[    0.000000]  BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved)
+[    0.000000]  BIOS-e820: 0000000000100000 - 0000000007ffc000 (usable)
+[    0.000000]  BIOS-e820: 0000000007ffc000 - 0000000008000000 (reserved)
+[    0.000000]  BIOS-e820: 00000000feffc000 - 00000000ff000000 (reserved)
+[    0.000000]  BIOS-e820: 00000000fffc0000 - 0000000100000000 (reserved)
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] SMBIOS 2.4 present.
+[    0.000000] last_pfn = 0x7ffc max_arch_pfn = 0x1000000
+[    0.000000] x86 PAT enabled: cpu 0, old 0x7040600070406, new 0x7010600070106
+[    0.000000] found SMP MP-table at [c00f73e0] f73e0
+[    0.000000] init_memory_mapping: 0000000000000000-0000000007ffc000
+[    0.000000] RAMDISK: 07ce1000 - 07fec000
+[    0.000000] ACPI: RSDP 000f7240 00014 (v00 BOCHS )
+[    0.000000] ACPI: RSDT 07fffa9b 00030 (v01 BOCHS  BXPCRSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: FACP 07fff177 00074 (v01 BOCHS  BXPCFACP 00000001 BXPC 00000001)
+[    0.000000] ACPI: DSDT 07ffe040 01137 (v01 BOCHS  BXPCDSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: FACS 07ffe000 00040
+[    0.000000] ACPI: SSDT 07fff1eb 00838 (v01 BOCHS  BXPCSSDT 00000001 BXPC 00000001)
+[    0.000000] ACPI: APIC 07fffa23 00078 (v01 BOCHS  BXPCAPIC 00000001 BXPC 00000001)
+[    0.000000] 0MB HIGHMEM available.
+[    0.000000] 127MB LOWMEM available.
+[    0.000000]   mapped low ram: 0 - 07ffc000
+[    0.000000]   low ram: 0 - 07ffc000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000000] kvm-clock: cpu 0, msr 0:a39d81, boot clock
+[    0.000000] Zone PFN ranges:
+[    0.000000]   DMA      0x00000010 -&gt; 0x00001000
+[    0.000000]   Normal   0x00001000 -&gt; 0x00007ffc
+[    0.000000]   HighMem  empty
+[    0.000000] Movable zone start PFN for each node
+[    0.000000] early_node_map[2] active PFN ranges
+[    0.000000]     0: 0x00000010 -&gt; 0x0000009f
+[    0.000000]     0: 0x00000100 -&gt; 0x00007ffc
+[    0.000000] Using APIC driver default
+[    0.000000] ACPI: PM-Timer IO Port: 0x608
+[    0.000000] ACPI: LAPIC (acpi_id[0x00] lapic_id[0x00] enabled)
+[    0.000000] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.000000] ACPI: IOAPIC (id[0x00] address[0xfec00000] gsi_base[0])
+[    0.000000] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.000000] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.000000] Using ACPI (MADT) for SMP configuration information
+[    0.000000] SMP: Allowing 1 CPUs, 0 hotplug CPUs
+[    0.000000] PM: Registered nosave memory: 000000000009f000 - 00000000000a0000
+[    0.000000] PM: Registered nosave memory: 00000000000a0000 - 00000000000f0000
+[    0.000000] PM: Registered nosave memory: 00000000000f0000 - 0000000000100000
+[    0.000000] Allocating PCI resources starting at 8000000 (gap: 8000000:f6ffc000)
+[    0.000000] Booting paravirtualized kernel on KVM
+[    0.000000] setup_percpu: NR_CPUS:8 nr_cpumask_bits:8 nr_cpu_ids:1 nr_node_ids:1
+[    0.000000] PERCPU: Embedded 14 pages/cpu @c7bd3000 s34240 r0 d23104 u57344
+[    0.000000] kvm-clock: cpu 0, msr 0:7bdad81, primary cpu clock
+[    0.000000] KVM setup async PF for cpu 0
+[    0.000000] kvm-stealtime: cpu 0, msr 7bd6180
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32395
+[    0.000000] Kernel command line: LABEL=cirros-rootfs ro console=tty1 console=ttyS0
+[    0.000000] PID hash table entries: 512 (order: -1, 2048 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.000000] Initializing CPU#0
+[    0.000000] xsave/xrstor: enabled xstate_bv 0x7, cntxt size 0x340
+[    0.000000] allocated 523968 bytes of page_cgroup
+[    0.000000] please try &#39;cgroup_disable=memory&#39; option if you don&#39;t want memory cgroups
+[    0.000000] Initializing HighMem for node 0 (00000000:00000000)
+[    0.000000] Memory: 115384k/131056k available (5849k kernel code, 15220k reserved, 2856k data, 744k init, 0k highmem)
+[    0.000000]     fixmap  : 0xfff16000 - 0xfffff000   ( 932 kB)
+[    0.000000]     pkmap   : 0xffc00000 - 0xffe00000   (2048 kB)
+[    0.000000]     vmalloc : 0xc87fc000 - 0xffbfe000   ( 884 MB)
+[    0.000000]     lowmem  : 0xc0000000 - 0xc7ffc000   ( 127 MB)
+[    0.000000]       .init : 0xc0981000 - 0xc0a3b000   ( 744 kB)
+[    0.000000]       .data : 0xc06b65bc - 0xc0980900   (2856 kB)
+[    0.000000]       .text : 0xc0100000 - 0xc06b65bc   (5849 kB)
+[    0.000000] Checking if this processor honours the WP bit even in supervisor mode...Ok.
+[    0.000000] SLUB: Genslabs=15, HWalign=64, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] Hierarchical RCU implementation.
+[    0.000000]  RCU dyntick-idle grace-period acceleration is enabled.
+[    0.000000] NR_IRQS:2304 nr_irqs:256 16
+[    0.000000] Console: colour VGA+ 80x25
+[    0.000000] console [tty1] enabled
+[    0.000000] console [ttyS0] enabled
+[    0.000000] Detected 3601.000 MHz processor.
+[    0.008000] Calibrating delay loop (skipped) preset value.. 7202.00 BogoMIPS (lpj=14404000)
+[    0.012014] pid_max: default: 32768 minimum: 301
+[    0.016027] Security Framework initialized
+[    0.019397] AppArmor: AppArmor initialized
+[    0.020014] Yama: becoming mindful.
+[    0.024067] Mount-cache hash table entries: 512
+[    0.028114] Initializing cgroup subsys cpuacct
+[    0.030973] Initializing cgroup subsys memory
+[    0.032021] Initializing cgroup subsys devices
+[    0.036018] Initializing cgroup subsys freezer
+[    0.040017] Initializing cgroup subsys blkio
+[    0.044030] Initializing cgroup subsys perf_event
+[    0.048002] mce: CPU supports 10 MCE banks
+[    0.060497] SMP alternatives: switching to UP code
+[    0.152239] Freeing SMP alternatives: 24k freed
+[    0.155365] ACPI: Core revision 20110623
+[    0.156585] ftrace: allocating 26151 entries in 52 pages
+[    0.168279] Enabling APIC mode:  Flat.  Using 1 I/O APICs
+[    0.177760] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.180017] CPU0: Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz stepping 03
+[    0.188011] Performance Events: generic architected perfmon, Intel PMU driver.
+[    0.188027] ... version:                2
+[    0.192015] ... bit width:              48
+[    0.196013] ... generic registers:      4
+[    0.198731] ... value mask:             0000ffffffffffff
+[    0.200014] ... max period:             000000007fffffff
+[    0.204016] ... fixed-purpose events:   3
+[    0.208017] ... event mask:             000000070000000f
+[    0.212142] NMI watchdog enabled, takes one hw-pmu counter.
+[    0.216122] Brought up 1 CPUs
+[    0.218806] Total of 1 processors activated (7202.00 BogoMIPS).
+[    0.221455] devtmpfs: initialized
+[    0.224137] EVM: security.selinux
+[    0.226909] EVM: security.SMACK64
+[    0.228105] EVM: security.capability
+[    0.232750] print_constraints: dummy: 
+[    0.236271] RTC time: 22:42:02, date: 02/14/17
+tags: [虚拟化, kvm ,xen]
+[    0.240104] NET: Registered protocol family 16
+[    0.244158] EISA bus registered
+[    0.246693] ACPI: bus type pci registered
+[    0.248361] PCI : PCI BIOS aera is rw and x. Use pci=nobios if you want it NX.
+[    0.252068] PCI: PCI BIOS revision 2.10 entry at 0xfd463, last bus=0
+[    0.256064] PCI: Using configuration type 1 for base access
+[    0.260204] bio: create slab &lt;bio-0&gt; at 0
+[    0.264169] ACPI: Added _OSI(Module Device)
+[    0.267240] ACPI: Added _OSI(Processor Device)
+[    0.268072] ACPI: Added _OSI(3.0 _SCP Extensions)
+[    0.272070] ACPI: Added _OSI(Processor Aggregator Device)
+[    0.280259] ACPI: Interpreter enabled
+[    0.283127] ACPI: (supports S0 S5)
+[    0.286000] ACPI: Using IOAPIC for interrupt routing
+[    0.293064] ACPI: No dock devices found.
+[    0.296063] HEST: Table not found.
+[    0.298694] PCI: Using host bridge windows from ACPI; if necessary, use &#34;pci=nocrs&#34; and report a bug
+[    0.300150] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    0.304159] pci_root PNP0A03:00: host bridge window [io  0x0000-0x0cf7]
+[    0.308069] pci_root PNP0A03:00: host bridge window [io  0x0d00-0xffff]
+[    0.312064] pci_root PNP0A03:00: host bridge window [mem 0x000a0000-0x000bffff]
+[    0.316098] pci_root PNP0A03:00: host bridge window [mem 0x08000000-0xfebfffff]
+[    0.332245] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    0.336166] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+[    0.375940]  pci0000:00: Unable to request _OSC control (_OSC support mask: 0x1e)
+[    0.377512] ACPI: PCI Interrupt Link [LNKA] (IRQs 5 *10 11)
+[    0.384229] ACPI: PCI Interrupt Link [LNKB] (IRQs 5 *10 11)
+[    0.390393] ACPI: PCI Interrupt Link [LNKC] (IRQs 5 10 *11)
+[    0.396209] ACPI: PCI Interrupt Link [LNKD] (IRQs 5 10 *11)
+[    0.402814] ACPI: PCI Interrupt Link [LNKS] (IRQs *9)
+[    0.406764] vgaarb: device added: PCI:0000:00:02.0,decodes=io+mem,owns=io+mem,locks=none
+[    0.408086] vgaarb: loaded
+[    0.412086] vgaarb: bridge control possible 0000:00:02.0
+[    0.416191] i2c-core: driver [aat2870] using legacy suspend method
+[    0.420105] i2c-core: driver [aat2870] using legacy resume method
+[    0.424320] SCSI subsystem initialized
+[    0.428587] usbcore: registered new interface driver usbfs
+[    0.432118] usbcore: registered new interface driver hub
+[    0.436092] usbcore: registered new device driver usb
+[    0.440269] PCI: Using ACPI for IRQ routing
+[    0.443877] NetLabel: Initializing
+[    0.444092] NetLabel:  domain hash size = 128
+[    0.448062] NetLabel:  protocols = UNLABELED CIPSOv4
+[    0.452089] NetLabel:  unlabeled traffic allowed by default
+[    0.456186] Switching to clocksource kvm-clock
+[    0.473428] AppArmor: AppArmor Filesystem Enabled
+[    0.476834] pnp: PnP ACPI init
+[    0.479329] ACPI: bus type pnp registered
+[    0.483423] pnp: PnP ACPI: found 6 devices
+[    0.486415] ACPI: ACPI bus type pnp unregistered
+[    0.489769] PnPBIOS: Disabled
+[    0.528225] NET: Registered protocol family 2
+[    0.531407] IP route cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.535871] TCP established hash table entries: 4096 (order: 3, 32768 bytes)
+[    0.540758] TCP bind hash table entries: 4096 (order: 3, 32768 bytes)
+[    0.545667] TCP: Hash tables configured (established 4096 bind 4096)
+[    0.549808] TCP reno registered
+[    0.552685] UDP hash table entries: 128 (order: 0, 4096 bytes)
+[    0.556619] UDP-Lite hash table entries: 128 (order: 0, 4096 bytes)
+[    0.562035] NET: Registered protocol family 1
+[    0.566842] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    0.572498] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    0.578564] pci 0000:00:01.0: Activating ISA DMA hang workarounds
+[    0.583867] audit: initializing netlink socket (disabled)
+[    0.588208] Trying to unpack rootfs image as initramfs...
+[    0.602353] type=2000 audit(1487112121.600:1): initialized
+[    0.640131] HugeTLB registered 2 MB page size, pre-allocated 0 pages
+[    0.645079] VFS: Disk quotas dquot_6.5.2
+[    0.648849] Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+[    0.660472] fuse init (API version 7.17)
+[    0.663467] msgmni has been set to 225
+[    0.680467] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 253)
+[    0.692462] io scheduler noop registered
+[    0.695606] io scheduler deadline registered
+[    0.698766] io scheduler cfq registered (default)
+[    0.711484] pci_hotplug: PCI Hot Plug PCI Core version: 0.5
+[    0.715969] pciehp: PCI Express Hot Plug Controller Driver version: 0.4
+[    0.724603] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    0.736513] ACPI: Power Button [PWRF]
+[    0.751867] ERST: Table is not found!
+[    0.754934] GHES: HEST is not enabled!
+[    0.758704] ACPI: PCI Interrupt Link [LNKD] enabled at IRQ 11
+[    0.763080] Freeing initrd memory: 3116k freed
+[    0.766885] isapnp: Scanning for PnP cards...
+[    0.777000] virtio-pci 0000:00:04.0: PCI INT A -&gt; Link[LNKD] -&gt; GSI 11 (level, high) -&gt; IRQ 11
+[    0.831882] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    0.862122] serial8250: ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A
+[    0.892717] 00:05: ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A
+[    0.945703] Linux agpgart interface v0.103
+[    0.949784] brd: module loaded
+[    0.952811] loop: module loaded
+[    1.007308]  vda: vda1
+[    1.108299] scsi0 : ata_piix
+[    1.110947] scsi1 : ata_piix
+[    1.113509] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc080 irq 14
+[    1.118081] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc088 irq 15
+[    1.123170] Fixed MDIO Bus: probed
+[    1.127125] tun: Universal TUN/TAP device driver, 1.6
+[    1.131603] tun: (C) 1999-2004 Max Krasnyansky &lt;maxk@qualcomm.com&gt;
+[    1.135971] PPP generic driver version 2.4.2
+[    1.139343] ehci_hcd: USB 2.0 &#39;Enhanced&#39; Host Controller (EHCI) Driver
+[    1.144028] ohci_hcd: USB 1.1 &#39;Open&#39; Host Controller (OHCI) Driver
+[    1.148187] uhci_hcd: USB Universal Host Controller Interface driver
+[    1.152161] usbcore: registered new interface driver libusual
+[    1.155775] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    1.211222] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    1.214933] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    1.218680] mousedev: PS/2 mouse device common for all mice
+[    1.223332] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    1.229866] rtc_cmos 00:01: RTC can wake from S4
+[    1.234260] rtc_cmos 00:01: rtc core: registered rtc_cmos as rtc0
+[    1.238786] rtc0: alarms up to one day, 114 bytes nvram
+[    1.242533] device-mapper: uevent: version 1.0.3
+[    1.246107] device-mapper: ioctl: 4.22.0-ioctl (2011-10-19) initialised: dm-devel@redhat.com
+[    1.252419] EISA: Probing bus 0 at eisa.0
+[    1.255723] EISA: Cannot allocate resource for mainboard
+[    1.259424] Cannot allocate resource for EISA slot 1
+[    1.313092] ata2.00: ATAPI: QEMU DVD-ROM, 1.5.3, max UDMA/100
+[    1.317727] Cannot allocate resource for EISA slot 2
+[    1.321740] ata2.00: configured for MWDMA2
+[    1.325531] Cannot allocate resource for EISA slot 3
+[    1.329273] Cannot allocate resource for EISA slot 4
+[    1.332642] Cannot allocate resource for EISA slot 5
+[    1.335960] Cannot allocate resource for EISA slot 6
+[    1.386989] isapnp: No Plug &amp; Play device found
+[    1.391038] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     1.5. PQ: 0 ANSI: 5
+[    1.397059] Cannot allocate resource for EISA slot 7
+[    1.402756] Cannot allocate resource for EISA slot 8
+[    1.406297] EISA: Detected 0 cards.
+[    1.409378] sr0: scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    1.413221] cdrom: Uniform CD-ROM driver Revision: 3.20
+[    1.417119] cpufreq-nforce2: No nForce2 chipset.
+[    1.420858] sr 1:0:0:0: Attached scsi generic sg0 type 5
+[    1.424990] cpuidle: using governor ladder
+[    1.428574] cpuidle: using governor menu
+[    1.431609] EFI Variables Facility v0.08 2004-May-17
+[    1.435595] TCP cubic registered
+[    1.438500] NET: Registered protocol family 10
+[    1.442945] NET: Registered protocol family 17
+[    1.446228] Registering the dns_resolver key type
+[    1.450197] Using IPI No-Shortcut mode
+[    1.453308] registered taskstats version 1
+[    1.458249]   Magic number: 5:47:755
+[    1.461377] tty ttyS6: hash matches
+[    1.464572] rtc_cmos 00:01: setting system clock to 2017-02-14 22:42:03 UTC (1487112123)
+[    1.470399] BIOS EDD facility v0.16 2004-Jun-25, 0 devices found
+[    1.475003] EDD information not available.
+[    1.481316] Freeing unused kernel memory: 744k freed
+[    1.486915] Write protecting the kernel text: 5852k
+[    1.490921] Write protecting the kernel read-only data: 2388k
+[    1.495532] NX-protecting the kernel data: 5412k
+
+info: initramfs: up at 1.50
+NOCHANGE: partition 1 is size 64260. it cannot be grown
+info: initramfs loading root from /dev/vda1
+info: /etc/init.d/rc.sysinit: up at 1.67
+info: container: none
+Starting logging: OK
+[    1.724606] ACPI: PCI Interrupt Link [LNKC] enabled at IRQ 10
+Initializing random number generator... done.
+Starting acpid: OK
+cirros-ds &#39;local&#39; up at 2.23
+no results found for mode=local. up 2.27. searched: nocloud configdrive ec2
+Starting network...
+udhcpc (v1.20.1) started
+Sending discover...
+ Sending discover...
+ Sending discover...
+ Usage: /sbin/cirros-dhcpc &lt;up|down&gt;
+No lease, failing
+WARN: /etc/rc3.d/S40-network failed
+cirros-ds &#39;net&#39; up at 182.49
+checking http://169.254.169.254/2009-04-04/instance-id
+failed 1/20: up 182.50. request failed
+failed 2/20: up 184.56. request failed
+failed 3/20: up 186.56. request failed
+failed 4/20: up 188.59. request failed
+failed 5/20: up 190.59. request failed
+failed 6/20: up 192.60. request failed
+failed 7/20: up 194.62. request failed
+failed 8/20: up 196.63. request failed
+failed 9/20: up 198.63. request failed
+failed 10/20: up 200.63. request failed
+ failed 11/20: up 202.64. request failed
+failed 12/20: up 204.65. request failed
+failed 13/20: up 206.65. request failed
+failed 14/20: up 208.66. request failed
+failed 15/20: up 210.66. request failed
+failed 16/20: up 212.67. request failed
+failed 17/20: up 214.69. request failed
+failed 18/20: up 216.70. request failed
+failed 19/20: up 218.71. request failed
+failed 20/20: up 220.71. request failed
+failed to read iid from metadata. tried 20
+no results found for mode=net. up 222.72. searched: nocloud configdrive ec2
+failed to get instance-id of datasource
+Starting dropbear sshd: OK
+=== system information ===
+Platform: Red Hat KVM
+Container: none
+Arch: i686
+CPU(s): 1 @ 3601.000 MHz
+Cores/Sockets/Threads: 1/1/1
+Virt-type: 
+RAM Size: 116MB
+Disks:
+NAME MAJ:MIN       SIZE LABEL         MOUNTPOINT
+vda  253:0     41126400               
+vda1 253:1     32901120 cirros-rootfs /
+sr0   11:0   1073741312               
+=== sshd host keys ===
+-----BEGIN SSH HOST KEY KEYS-----
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgnoaxb9fOJ2m6cG3/N1Jh3bziafgt342GIwWGO2zQv4xL9Vefydn2TQx3lGIZ8g6PUbhwicVtApdv8yKmSeDiepeRCp8wdkEFYjNojHNZ4IWOQFr3onGBlJOBp8DwKRUtdIb3oHAiFq2PXxJiWhCga0B02/6mea3k0dKhrfxREE+1uc= root@cirros
+ssh-dss AAAAB3NzaC1kc3MAAACBAIbzeLlfzpPhyDnOApsOQfX4wlK9RcRSYeK1LB7YhEgHzjNIlopttzSGhuhz97btPdAJ6mA3AbohmV2+yNNGF9d2o3ZY4uJd2OmJ4zxbicGv9eQLdzuxMybAlxwjZntsIuNxj4N86Nm9LIAVMPY8ImOM2ekdwXbPOGtsZTm6q4eBAAAAFQDRixh0gga+f3mPzVkghswxRLXjKwAAAIEAgLjw+rub6fuHLcNFo1bnIZie8iMqeLvAxiQ5iijasSqveaocHJtnHRQWxWSg1gkikV3sXmXOBDdMkmLEZcrYyiLC8o2bGBUse1jzJgp+o51WnFBMVsJC/mH/npCx9QiUfKn8sPLRIaa4GmtHSpwFRN4guuvM1I3S7iunZjgWwUAAAACBAIbifHKqrlWyK/GqhOPTgPNCxb6f2RFB/KGKbpZAcFTXA8SAXH+UwVUmrhFy9cQ12ry8YEMXQas7W0gGsSht82Q0S5uycAVuGXCDAmdH1kJhzL/J2zTPx0P/5jdmS9pXleuMvrre16xQvVxh5fHr3lBX3EWsMzcNBNkg8X2OlDvT root@cirros
+-----END SSH HOST KEY KEYS-----
+=== network info ===
+if-info: lo,up,127.0.0.1,8,::1
+if-info: eth0,up,,8,fe80::5054:ff:fe12:3456
+=== datasource: None None ===
+=== cirros: current=0.3.3 uptime=222.84 ===
+route: fscanf
+=== pinging gateway failed, debugging connection ===
+############ debug start ##############
+### /etc/init.d/sshd start
+Starting dropbear sshd: OK
+route: fscanf
+### ifconfig -a
+eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56  
+          inet6 addr: fe80::5054:ff:fe12:3456/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:1132 (1.1 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+### route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+route: fscanf
+### cat /etc/resolv.conf
+cat: can&#39;t open &#39;/etc/resolv.conf&#39;: No such file or directory
+### gateway not found
+/sbin/cirros-status: line 1: can&#39;t open /etc/resolv.conf: no such file
+### pinging nameservers
+### uname -a
+Linux cirros 3.2.0-68-virtual #102-Ubuntu SMP Tue Aug 12 22:44:35 UTC 2014 i686 GNU/Linux
+### lsmod
+Module                  Size  Used by    Not tainted
+nls_iso8859_1          12617  0 
+nls_cp437              12751  0 
+vfat                   17308  0 
+fat                    55605  1 vfat
+isofs                  39553  0 
+ip_tables              18106  0 
+x_tables               22011  1 ip_tables
+pcnet32                41110  0 
+8139cp                 26718  0 
+ne2k_pci               13389  0 
+8390                   18400  1 ne2k_pci
+e1000                 101795  0 
+acpiphp                23535  0 
+### dmesg | tail
+[    2.204647] e1000 0000:00:03.0: eth0: (PCI:33MHz:32-bit) 52:54:00:12:34:56
+[    2.204656] e1000 0000:00:03.0: eth0: Intel(R) PRO/1000 Network Connection
+[    2.206640] ne2k-pci.c:v1.03 9/22/2003 D. Becker/P. Gortmaker
+[    2.208651] 8139cp: 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
+[    2.211018] pcnet32: pcnet32.c:v1.35 21.Apr.2008 tsbogend@alpha.franken.de
+[    2.214058] ip_tables: (C) 2000-2006 Netfilter Core Team
+[    2.293472] ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    4.293386] e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+[    4.294626] ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[   15.056323] eth0: no IPv6 routers present
+### tail -n 25 /var/log/messages
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718582] acpiphp: Slot [4] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718590] acpiphp: Slot [5] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718597] acpiphp: Slot [6] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718604] acpiphp: Slot [7] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718610] acpiphp: Slot [8] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718617] acpiphp: Slot [9] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718624] acpiphp: Slot [10] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718631] acpiphp: Slot [11] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.718640] acpiphp: Slot [12] registered
+Feb 14 15:42:03 cirros kern.info kernel: [    1.724384] e1000: Intel(R) PRO/1000 Network Driver - version 7.3.21-k8-NAPI
+Feb 14 15:42:03 cirros kern.info kernel: [    1.724386] e1000: Copyright (c) 1999-2006 Intel Corporation.
+Feb 14 15:42:03 cirros kern.warn kernel: [    1.724606] ACPI: PCI Interrupt Link [LNKC] enabled at IRQ 10
+Feb 14 15:42:03 cirros kern.info kernel: [    1.729036] e1000 0000:00:03.0: PCI INT A -&gt; Link[LNKC] -&gt; GSI 10 (level, high) -&gt; IRQ 10
+Feb 14 15:42:03 cirros kern.debug kernel: [    1.729871] e1000 0000:00:03.0: setting latency timer to 64
+Feb 14 15:42:04 cirros kern.info kernel: [    2.204647] e1000 0000:00:03.0: eth0: (PCI:33MHz:32-bit) 52:54:00:12:34:56
+Feb 14 15:42:04 cirros kern.info kernel: [    2.204656] e1000 0000:00:03.0: eth0: Intel(R) PRO/1000 Network Connection
+Feb 14 15:42:04 cirros kern.info kernel: [    2.206640] ne2k-pci.c:v1.03 9/22/2003 D. Becker/P. Gortmaker
+Feb 14 15:42:04 cirros kern.info kernel: [    2.208651] 8139cp: 8139cp: 10/100 PCI Ethernet driver v1.3 (Mar 22, 2004)
+Feb 14 15:42:04 cirros kern.info kernel: [    2.211018] pcnet32: pcnet32.c:v1.35 21.Apr.2008 tsbogend@alpha.franken.de
+Feb 14 15:42:04 cirros kern.info kernel: [    2.214058] ip_tables: (C) 2000-2006 Netfilter Core Team
+Feb 14 15:42:04 cirros kern.info kernel: [    2.293472] ADDRCONF(NETDEV_UP): eth0: link is not ready
+Feb 14 15:42:06 cirros kern.info kernel: [    4.293386] e1000: eth0 NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
+Feb 14 15:42:06 cirros kern.info kernel: [    4.294626] ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+Feb 14 15:42:17 cirros kern.debug kernel: [   15.056323] eth0: no IPv6 routers present
+Feb 14 15:45:44 cirros authpriv.info dropbear[292]: Running in background
+############ debug end   ##############
+  ____               ____  ____
+ / __/ __ ____ ____ / __ \/ __/
+/ /__ / // __// __// /_/ /\ \ 
+\___//_//_/  /_/   \____/___/ 
+   http://cirros-cloud.net
+
+
+login as &#39;cirros&#39; user. default password: &#39;cubswin:)&#39;. use &#39;sudo&#39; for root.
+cirros login:       cirros
+Password: 
+Login incorrect
+cirros login: cirros
+Password: 
+$ sudo su -
+# ifconfig
+eth0      Link encap:Ethernet  HWaddr 52:54:00:12:34:56  
+          inet6 addr: fe80::5054:ff:fe12:3456/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:1132 (1.1 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+#
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2017-02-13
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/">虚拟化</a>
+          <a href="/tags/kvm/">kvm</a>
+          <a href="/tags/xen/">xen</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2017/02/kvm-qemu-fundation-3/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">KVM虚拟化实验-两台VM互相通信</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2017/02/kvm-qemu-fundation-1/">
+            <span class="next-text nav-default">KVM虚拟化基础一</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2017-02-13 00:00:00 \u002b0000 UTC',
+        title: 'KVM虚拟化基础二',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

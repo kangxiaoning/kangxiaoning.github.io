@@ -9,10 +9,10 @@
     <lastBuildDate>Sun, 08 Mar 2015 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/categories/hadoop/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hadoop学习8-Ganglia监控</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-08-ganglia/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/ganglia/</link>
       <pubDate>Sun, 08 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-08-ganglia/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/ganglia/</guid>
       <description>&lt;h1 id=&#34;四-部署监控&#34;&gt;四、 部署监控&lt;/h1&gt;
 &lt;h2 id=&#34;一-ganglia-架构&#34;&gt;(一) Ganglia 架构&lt;/h2&gt;
 &lt;p&gt;Ganglia 由如下三部分组成，每个组件需要一些依赖包实现其功能。&lt;/p&gt;
@@ -25,10 +25,10 @@
     
     <item>
       <title>Hadoop学习7-异常处理</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-07-error-fix/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/error-fix/</link>
       <pubDate>Sat, 07 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-07-error-fix/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/error-fix/</guid>
       <description>&lt;h1 id=&#34;三-异常处理&#34;&gt;三、 异常处理&lt;/h1&gt;
 &lt;p&gt;如下所有异常已经在安装步骤规避了，按照本文档搭建环境，不应该出现如下异常，如果不幸遇到如下异常也可以参考处理。&lt;/p&gt;
 &lt;p&gt;必须先根据报错现象找到发生问题的根本原因，然后才能有针对性的解决，找根本原因最好的办法是查看日志，hadoop日志默认在安装目录下的logs文件夹下面，可以根据修改时间判断需要查看哪个日志。找不到根本原因就盲目的在网上寻找解决方法是效率低下并且没有把握的处理方法。&lt;/p&gt;</description>
@@ -36,10 +36,10 @@
     
     <item>
       <title>Hadoop学习6-Federation &#43; HA &#43; Hbase搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-06-fedration-ha-hbase/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/fedration-ha-hbase/</link>
       <pubDate>Fri, 06 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-06-fedration-ha-hbase/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/fedration-ha-hbase/</guid>
       <description>&lt;h2 id=&#34;五-federation--ha--hbase搭建&#34;&gt;(五) Federation + HA + Hbase搭建&lt;/h2&gt;
 &lt;h3 id=&#34;步骤一-资源规划&#34;&gt;步骤一、 资源规划&lt;/h3&gt;
 &lt;p&gt;Federation架构实现如下。&lt;/p&gt;</description>
@@ -47,10 +47,10 @@
     
     <item>
       <title>Hadoop学习5-运行map-reduce任务</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-05-hadoop-map-reduce-task/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/</link>
       <pubDate>Thu, 05 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-05-hadoop-map-reduce-task/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/</guid>
       <description>&lt;h2 id=&#34;四-运行map-reduce任务&#34;&gt;(四) 运行map-reduce任务&lt;/h2&gt;
 &lt;p&gt;Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。&lt;/p&gt;
 &lt;p&gt;前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。&lt;/p&gt;</description>
@@ -58,10 +58,10 @@
     
     <item>
       <title>Hadoop学习4-Hbase双Hmaster集群搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-04-hbase-install/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hbase-install/</link>
       <pubDate>Wed, 04 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-04-hbase-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hbase-install/</guid>
       <description>&lt;h2 id=&#34;三-hbase双hmaster集群搭建&#34;&gt;(三) Hbase双Hmaster集群搭建&lt;/h2&gt;
 &lt;h3 id=&#34;步骤一-资源规划&#34;&gt;步骤一、 资源规划&lt;/h3&gt;
 &lt;p&gt;这里以前面搭建好的Hadoop为基础，搭建Hbase集群。&lt;/p&gt;</description>
@@ -69,20 +69,20 @@
     
     <item>
       <title>Hadoop学习3-NameNode自动failover</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-03-hadoop-namenode-auto-failover/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/</link>
       <pubDate>Tue, 03 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-03-hadoop-namenode-auto-failover/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/</guid>
       <description>&lt;h2 id=&#34;二-namenode自动failover&#34;&gt;(二) NameNode自动failover&lt;/h2&gt;
 &lt;p&gt;工作原理参照&lt;a href=&#34;http://user.github.io/blog/2015/03/01/hadoop-foundation.html#qjmfailover&#34;&gt;QJM自动failover原理&lt;/a&gt;。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Hadoop学习2-集群搭建</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-install/</link>
       <pubDate>Mon, 02 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-install/</guid>
       <description>&lt;h1 id=&#34;二环境搭建&#34;&gt;二、环境搭建&lt;/h1&gt;
 &lt;h2 id=&#34;一-hadoop集群搭建&#34;&gt;(一) Hadoop集群搭建&lt;/h2&gt;
 &lt;p&gt;hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。&lt;/p&gt;
@@ -91,10 +91,10 @@
     
     <item>
       <title>Hadoop学习1-基础理论</title>
-      <link>https://kangxiaoning.github.io/post/2015-03-01-hadoop-foundation/</link>
+      <link>https://kangxiaoning.github.io/post/2015/03/hadoop-foundation/</link>
       <pubDate>Sun, 01 Mar 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-03-01-hadoop-foundation/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/03/hadoop-foundation/</guid>
       <description>&lt;h1 id=&#34;一基础理论&#34;&gt;一、基础理论&lt;/h1&gt;
 &lt;h2 id=&#34;1-what-is-apache-hadoop&#34;&gt;1. What Is Apache Hadoop?&lt;/h2&gt;</description>
     </item>

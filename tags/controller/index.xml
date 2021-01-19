@@ -9,10 +9,10 @@
     <lastBuildDate>Wed, 09 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/controller/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>编写custom controller</title>
-      <link>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</link>
+      <link>https://kangxiaoning.github.io/post/2020/12/write-custom-controller/</link>
       <pubDate>Wed, 09 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</guid>
+      <guid>https://kangxiaoning.github.io/post/2020/12/write-custom-controller/</guid>
       <description>&lt;p&gt;上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。&lt;/p&gt;</description>
     </item>
     

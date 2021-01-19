@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Xen虚拟化基础一 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="Xen组成部分 (1) Xen Hypervisor 分配CPU、Memory、Interrupt " /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2017/02/xen-fundation/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Xen虚拟化基础一" />
+<meta property="og:description" content="Xen组成部分
+(1) Xen Hypervisor
+分配CPU、Memory、Interrupt
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/xen-fundation/" />
+<meta property="article:published_time" content="2017-02-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-02-07T00:00:00+00:00" />
+<meta itemprop="name" content="Xen虚拟化基础一">
+<meta itemprop="description" content="Xen组成部分
+(1) Xen Hypervisor
+分配CPU、Memory、Interrupt
+">
+<meta itemprop="datePublished" content="2017-02-07T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-02-07T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1885">
+
+
+
+<meta itemprop="keywords" content="虚拟化,kvm,xen," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Xen虚拟化基础一"/>
+<meta name="twitter:description" content="Xen组成部分
+(1) Xen Hypervisor
+分配CPU、Memory、Interrupt
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Xen虚拟化基础一</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-02-07 </span>
+        <div class="post-category">
+            <a href="/categories/virtualization/"> virtualization </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#xen组成部分">Xen组成部分</a>
+      <ul>
+        <li><a href="#1-xen-hypervisor">(1) Xen Hypervisor</a></li>
+        <li><a href="#2-dom0">(2) Dom0</a></li>
+        <li><a href="#3-domu">(3) DomU</a>
+          <ul>
+            <li><a href="#pv">PV</a></li>
+            <li><a href="#hvm">HVM</a></li>
+            <li><a href="#pv-on-hvm">PV on HVM</a></li>
+            <li><a href="#pvh">PVH</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#xen工具栈">Xen工具栈</a>
+      <ul>
+        <li><a href="#default--xend">Default / XEND</a></li>
+        <li><a href="#default--xl">Default / XL</a></li>
+        <li><a href="#xapi--xe">XAPI / XE</a></li>
+      </ul>
+    </li>
+    <li><a href="#在centos-6x上使用xen">在CentOS 6.x上使用Xen</a>
+      <ul>
+        <li><a href="#要求">要求</a></li>
+        <li><a href="#制作好相关程序包的项目">制作好相关程序包的项目</a></li>
+      </ul>
+    </li>
+    <li><a href="#在vmware-workstation上使用xen">在VMware Workstation上使用xen</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="xen组成部分">Xen组成部分</h1>
+<h2 id="1-xen-hypervisor">(1) Xen Hypervisor</h2>
+<pre><code>分配CPU、Memory、Interrupt
+</code></pre>
+<h2 id="2-dom0">(2) Dom0</h2>
+<pre><code>特权域，I/O分配
+    网络设备
+        net-front(GuestOS), net-backend
+    块设备
+        block-front(GuestOS), block-backend
+Linux Kernel
+    2.6.37: 开始支持运行Dom0
+    3.0: 对关键特性进行了优化
+提供管理DomU工具栈
+    用于实现对虚拟机进行添加、启动、快照、停止、删除等操作
+</code></pre>
+<h2 id="3-domu">(3) DomU</h2>
+<pre><code>非特权域，根据其虚拟化方式实现，有多种类型
+PV
+HVM
+PV on HVM
+</code></pre>
+<h3 id="pv">PV</h3>
+<p><strong>Xen Paravirtualization (PV)</strong></p>
+<p><img src="/images/virtualization/pv-arch.jpg" alt="PV-ARCH"></p>
+<p>不依赖于CPU的HVM特性，但要求GuestOS的内核作出修改，以知晓自己运行于PV环境</p>
+<p>运行于DomU中的OS: Linux(2.6.24+), NetBSD, FreeBSD, OpenSolaris</p>
+<p>半虚拟化是由Xen引入的高效和轻量的虚拟化技术，随后被其他虚拟化平台采用。
+半虚拟化技术不需要物理机CPU含有虚拟化扩展。但是，要使虚拟机能够高效的
+运行在没有仿真或者虚拟仿真的硬件上，半虚拟化技术需要一个Xen-PV-enabled
+内核和PV驱动。可喜的是，Linux、NetBSD、FreeBSD和OpenSolaris都提供了
+Xen-PV-enabled内核。Linux内核从2.6.24版本起就使用了Linux pvops框架
+来支持Xen。这意味着半虚拟化技术可以在绝大多数的Liunx发行版上工作(除了
+那么内核很古老的发行版)。</p>
+<h3 id="hvm">HVM</h3>
+<p><strong>Xen Full Virtualization (HVM)</strong></p>
+<p><img src="/images/virtualization/hvm-arch.jpg" alt="HVM-ARCH"></p>
+<p>依赖于Inel VT或者AMD AMD-V，还依赖QEMU模拟I/O设备。</p>
+<p>全虚拟化或者叫硬件协助的虚拟化技术使用物理机CPU的虚拟化扩展来虚拟出虚拟机。
+全虚拟化技术需要Intel VT或者AMD-V硬件扩展。Xen使用Qemu来仿真PC硬件，包括
+BIOS、IDE硬盘控制器、VGA图形适配器(显卡)、USB控制器、网络适配器(网卡)等。
+虚拟机硬件扩展被用来提高仿真的性能。全虚拟化虚拟机不需要任何的内核支持。这
+意味着，Windows操作系统可以作为Xen的全虚拟化虚拟机使用(众所周知，除了微软
+没有谁可以修改Windows内核)。由于使用了仿真技术，通常来说全虚拟化虚拟机运行
+效果要逊于半虚拟化虚拟机。</p>
+<h3 id="pv-on-hvm">PV on HVM</h3>
+<p>为了提高性能，全虚拟化虚拟机也可以使用一些特殊的半虚拟化设备驱动(PVHVM 或
+者 PV-on-HVM驱动)。这些半虚拟化驱动针对全虚拟化环境进行了优化并对磁盘和网
+络IO仿真进行分流，从而得到一个类似于或优于半虚拟化虚拟机性能的全虚拟化虚拟
+机。这意味着，你可以对只支持全虚拟化技术的操作系统进行优化，比如Windows。
+Xen半虚拟化虚拟机自动使用PV驱动-因此不需要提供这些驱动，你已经在使用这些优
+化过的驱动了。另外，只有Xen全虚拟化虚拟机才需要PVHVM驱动。</p>
+<h3 id="pvh">PVH</h3>
+<p><strong>PV in an HVM Container (PVH) - New in Xen 4.4</strong></p>
+<p>Xen 4.4会带来一个被称作PVH的新的虚拟化模式。实质上，它是一个使用了针对启动
+和I/O的半虚拟化驱动的半虚拟化模式。与全虚拟化不同的是，它使用了硬件虚拟化扩
+展，但是不需要进行仿真。在Xen 4.3发布后，xen-unstable会加入对此模式的补丁，
+Xen 4.4中将可以预览到这个功能。PVH拥有结合和权衡所以虚拟化模式优点的潜力，
+与此同时简化Xen的架构。</p>
+<h1 id="xen工具栈">Xen工具栈</h1>
+<h2 id="default--xend">Default / XEND</h2>
+<p>Xen 4.0及之前的版本中默认使用的工具栈，Xen 4.1提供了新的轻量级工具栈xl，
+但仍然保留了对Xend/xm的支持，但Xen 4.2及之后的版本已弃用。但xl在很大程度
+上保持了与xm的兼容。</p>
+<h2 id="default--xl">Default / XL</h2>
+<p>xl是基于libxenlight创建的轻量级命令行工具栈，并从Xen 4.1起成为默认的工具
+栈。xl与Xend的功能对比请参照http://wiki.xen.org/wiki/XL_vs_Xend_Feature_Comparison。</p>
+<h2 id="xapi--xe">XAPI / XE</h2>
+<p>XAPI即Xen管理API(The Xen management API)，它是Citrix XenServer和XCP默认使用的工具栈。目前，其移植向libxenlight的工作正进行中。XAPI是目前功能最通用且功能最完备的Xen工具栈，CloudStack、OpenNebula和OpenStack等云计算解决方案都基于此API管理Xen虚拟机。</p>
+<h1 id="在centos-6x上使用xen">在CentOS 6.x上使用Xen</h1>
+<p>RHEL 6+仅支持KVM，对Xen的支持仅支持运行DomU，不支持Dom0</p>
+<h2 id="要求">要求</h2>
+<ol>
+<li>编译3.0以上的内核以启用对Dom0的支持</li>
+<li>编译Xen程序</li>
+</ol>
+<h2 id="制作好相关程序包的项目">制作好相关程序包的项目</h2>
+<ol>
+<li>xen4centos(xen 官方专门为centos这个发行版额外提供的能够让xen跑在centso的项目)</li>
+<li>xen made easy</li>
+</ol>
+<h1 id="在vmware-workstation上使用xen">在VMware Workstation上使用xen</h1>
+<p>使用如下步骤在虚拟机上模拟xen的虚拟化学习环境。</p>
+<ol>
+<li>VMware Workstation上创建虚拟机，虚拟机的CPU启用虚拟化支持（第2项）</li>
+<li>配置xen4centos的yum源，yum install xen(会更新kernel及安装xen相关的程序包)</li>
+<li>修改/etc/grub.conf，启用对Dom0的支持</li>
+<li>shutdown -r now</li>
+</ol>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2017-02-07
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/">虚拟化</a>
+          <a href="/tags/kvm/">kvm</a>
+          <a href="/tags/xen/">xen</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2017/02/xen-fundation-2/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Xen虚拟化基础二</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2017/02/virtualization-fundation/">
+            <span class="next-text nav-default">虚拟化基础</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2017-02-07 00:00:00 \u002b0000 UTC',
+        title: 'Xen虚拟化基础一',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

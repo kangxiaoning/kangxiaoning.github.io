@@ -9,10 +9,10 @@
     <lastBuildDate>Sun, 25 Jun 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/categories/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>python subprocess.Popen执行powershell脚本获取exit code</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-25-subprocess-get-powershell-exit-code/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/subprocess-get-powershell-exit-code/</link>
       <pubDate>Sun, 25 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-25-subprocess-get-powershell-exit-code/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/subprocess-get-powershell-exit-code/</guid>
       <description>&lt;h1 id=&#34;1-现象&#34;&gt;1. 现象&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -37,19 +37,19 @@
     
     <item>
       <title>classmethod和staticmethod</title>
-      <link>https://kangxiaoning.github.io/post/2017-06-03-static-and-class-method/</link>
+      <link>https://kangxiaoning.github.io/post/2017/06/static-and-class-method/</link>
       <pubDate>Sat, 03 Jun 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-06-03-static-and-class-method/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/06/static-and-class-method/</guid>
       <description>&lt;p&gt;总结下python中classmethod和staticmethod。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pyinstaller打包</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-14-pyinstaller-example/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/pyinstaller-example/</link>
       <pubDate>Fri, 14 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-14-pyinstaller-example/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/pyinstaller-example/</guid>
       <description>&lt;h1 id=&#34;1-pyinstall-示例&#34;&gt;1. pyinstall 示例&lt;/h1&gt;
 &lt;h2 id=&#34;11-__import__-处理&#34;&gt;1.1 &lt;strong&gt;import&lt;/strong&gt; 处理&lt;/h2&gt;
 &lt;p&gt;如果代码里使用了动态import，pyinstaller无法找到对应的依赖，需要明确指出，下面示例通过hiddenimports来指出需要显示引入的依赖。&lt;/p&gt;
@@ -58,10 +58,10 @@
     
     <item>
       <title>python2.6转到python3.5记录</title>
-      <link>https://kangxiaoning.github.io/post/2017-04-12-python2-to-python3-note/</link>
+      <link>https://kangxiaoning.github.io/post/2017/04/python2-to-python3-note/</link>
       <pubDate>Wed, 12 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-04-12-python2-to-python3-note/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/04/python2-to-python3-note/</guid>
       <description>&lt;h1 id=&#34;1-string&#34;&gt;1. String&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;python2.6&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -74,10 +74,10 @@
     
     <item>
       <title>监控agent及定时自动升级</title>
-      <link>https://kangxiaoning.github.io/post/2017-03-18-monitor-agent/</link>
+      <link>https://kangxiaoning.github.io/post/2017/03/monitor-agent/</link>
       <pubDate>Sat, 18 Mar 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-03-18-monitor-agent/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/03/monitor-agent/</guid>
       <description>&lt;h1 id=&#34;1-功能&#34;&gt;1. 功能&lt;/h1&gt;
 &lt;p&gt;监控主机上的agent，检测版本及升级功能，包括升级自身，兼容linux和windows。&lt;/p&gt;
 &lt;p&gt;通过配置crontab或者windows上的定时任务触发，为了均衡server端压力，会随机sleep一段时间后向server请求需要的文件 。&lt;/p&gt;</description>
@@ -85,10 +85,10 @@
     
     <item>
       <title>趣味题-水仙花数</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-26-armstrong-number/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/armstrong-number/</link>
       <pubDate>Sun, 26 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-26-armstrong-number/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/armstrong-number/</guid>
       <description>&lt;h1 id=&#34;1-水仙花数&#34;&gt;1. 水仙花数&lt;/h1&gt;
 &lt;p&gt;水仙花数（Narcissistic number）也被称为超完全数字不变数（pluperfect
 digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯特朗数
@@ -98,20 +98,20 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>趣味题-尾数前移</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-25-weishuqianyi/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/weishuqianyi/</link>
       <pubDate>Sat, 25 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-25-weishuqianyi/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/weishuqianyi/</guid>
       <description>&lt;h1 id=&#34;1-问题&#34;&gt;1. 问题&lt;/h1&gt;
 &lt;p&gt;求一个自然数N，个位数是6，将6提到最前面所得数是N的4倍。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之trackback</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-22-traceback/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/traceback/</link>
       <pubDate>Wed, 22 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-22-traceback/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/traceback/</guid>
       <description>&lt;p&gt;traceback.print_exc()函数只是traceback.print_exception()函数的一个简写
 形式，而它们获取异常相关的数据都是通过sys.exc_info()函数得到的。&lt;/p&gt;
 &lt;p&gt;sys.exc_info()返回的值是一个元组，其中第一个元素，exc_type是异常的对象类
@@ -121,19 +121,19 @@ digital invariant, PPDI）、自恋数、自幂数、阿姆斯壮数或阿姆斯
     
     <item>
       <title>python unicode编码</title>
-      <link>https://kangxiaoning.github.io/post/2017-02-19-unicode/</link>
+      <link>https://kangxiaoning.github.io/post/2017/02/unicode/</link>
       <pubDate>Sun, 19 Feb 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2017-02-19-unicode/</guid>
+      <guid>https://kangxiaoning.github.io/post/2017/02/unicode/</guid>
       <description>&lt;p&gt;遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之string</title>
-      <link>https://kangxiaoning.github.io/post/2016-12-10-lib-string/</link>
+      <link>https://kangxiaoning.github.io/post/2016/12/lib-string/</link>
       <pubDate>Sat, 10 Dec 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-12-10-lib-string/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/12/lib-string/</guid>
       <description>&lt;h1 id=&#34;1-介绍&#34;&gt;1. 介绍&lt;/h1&gt;
 &lt;p&gt;string模块包含一些有用的常量和类。&lt;/p&gt;
 &lt;p&gt;常量主要是一些数字，大小写字母，标点符号和可打印字符。&lt;/p&gt;
@@ -143,10 +143,10 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>模块使用之subprocess</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-30-subprocess/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/subprocess/</link>
       <pubDate>Wed, 30 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-30-subprocess/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/subprocess/</guid>
       <description>&lt;h1 id=&#34;1-subprocess介绍&#34;&gt;1. subprocess介绍&lt;/h1&gt;
 &lt;p&gt;使用subprocess模块可以产生新的进程，然后连接它们的 input/output/error pipes，
 并获取返回值。本模块意在替换下面几个老的模块和函数：&lt;/p&gt;</description>
@@ -154,69 +154,69 @@ Template可以在字符串嵌入变更，然后使用Template类的substitute方
     
     <item>
       <title>模块使用之collections</title>
-      <link>https://kangxiaoning.github.io/post/2016-11-23-collections/</link>
+      <link>https://kangxiaoning.github.io/post/2016/11/collections/</link>
       <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-11-23-collections/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/11/collections/</guid>
       <description>&lt;p&gt;collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
 使用起来更方便。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之argparse</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-25-argparse/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/argparse/</link>
       <pubDate>Tue, 25 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-25-argparse/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/argparse/</guid>
       <description>&lt;p&gt;练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
 令行参数数据类型进行约束。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之weakref</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-24-weakref/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/weakref/</link>
       <pubDate>Mon, 24 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-24-weakref/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/weakref/</guid>
       <description>&lt;p&gt;练习 weakref 使用，掌握 weakref 使用场景和目的。&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;http://sleepd.blog.51cto.com/3034090/1073044&#34;&gt;示例参考&lt;/a&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之xlwt</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-17-python-excel-xlwt/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/python-excel-xlwt/</link>
       <pubDate>Fri, 17 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-17-python-excel-xlwt/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/python-excel-xlwt/</guid>
       <description>&lt;p&gt;python 中可以使用 xlwt 生成 excel 文件，对应的还有 xlrd 来读取
 excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>统计字符串出现的次数</title>
-      <link>https://kangxiaoning.github.io/post/2016-04-07-count-word/</link>
+      <link>https://kangxiaoning.github.io/post/2016/04/count-word/</link>
       <pubDate>Thu, 07 Apr 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-04-07-count-word/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/04/count-word/</guid>
       <description>1. 示例 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 #_*_coding:utf-8_*_ import operator f = open(&amp;#34;monitor_down.log&amp;#34;) # 初始化空字典，key为行内容，value为该行出现的次数 result = {} for line in f: line = line.strip() # setdefault(key[, default]):</description>
     </item>
     
     <item>
       <title>递归的应用</title>
-      <link>https://kangxiaoning.github.io/post/2016-06-18-recursive-functions/</link>
+      <link>https://kangxiaoning.github.io/post/2016/06/recursive-functions/</link>
       <pubDate>Thu, 07 Apr 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-06-18-recursive-functions/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/06/recursive-functions/</guid>
       <description>&lt;h1 id=&#34;1-解析多层dict示例&#34;&gt;1. 解析多层dict示例&lt;/h1&gt;
 &lt;p&gt;根据规则解析多层级的字典。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>pip代理设置</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-10-pip-proxy/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/pip-proxy/</link>
       <pubDate>Sun, 10 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-10-pip-proxy/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/pip-proxy/</guid>
       <description>&lt;h1 id=&#34;1-windows-7&#34;&gt;1. Windows 7&lt;/h1&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -241,19 +241,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>python打包</title>
-      <link>https://kangxiaoning.github.io/post/2016-10-21-python-setup-rpm-tar/</link>
+      <link>https://kangxiaoning.github.io/post/2016/10/python-setup-rpm-tar/</link>
       <pubDate>Sun, 10 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-10-21-python-setup-rpm-tar/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/10/python-setup-rpm-tar/</guid>
       <description>&lt;p&gt;打包练习。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>windows安装celery和tornado</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-03-windows-install-celery/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/windows-install-celery/</link>
       <pubDate>Sun, 03 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-03-windows-install-celery/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/windows-install-celery/</guid>
       <description>&lt;p&gt;由于公司电脑不能上 Internet ，也没有 pip 仓库，因此安装 celery 需要
 按原始方式安装，有些依赖包必须先安装才能成功安装上 celery。&lt;/p&gt;
 &lt;p&gt;下载相关包及包里requests.txt中提到的依赖包。&lt;/p&gt;</description>
@@ -261,19 +261,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>celery简单使用</title>
-      <link>https://kangxiaoning.github.io/post/2016-01-01-celery-learn/</link>
+      <link>https://kangxiaoning.github.io/post/2016/01/celery-learn/</link>
       <pubDate>Fri, 01 Jan 2016 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2016-01-01-celery-learn/</guid>
+      <guid>https://kangxiaoning.github.io/post/2016/01/celery-learn/</guid>
       <description>&lt;h1 id=&#34;1-环境&#34;&gt;1. 环境&lt;/h1&gt;</description>
     </item>
     
     <item>
       <title>__init__.py和__all__</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-29-init-all/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/init-all/</link>
       <pubDate>Tue, 29 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-29-init-all/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/init-all/</guid>
       <description>&lt;h1 id=&#34;1-知识点&#34;&gt;1. 知识点&lt;/h1&gt;
 &lt;ol&gt;
 &lt;li&gt;from pkg import * 只能导入__init__.py 里 __all__ 指定的变量&lt;/li&gt;
@@ -284,10 +284,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>absolute_import</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-26-absolute_import/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/absolute_import/</link>
       <pubDate>Sat, 26 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-26-absolute_import/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/absolute_import/</guid>
       <description>&lt;h1 id=&#34;1-模块导入规则&#34;&gt;1. 模块导入规则&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;import xxx 时搜索文件的优先级如下&lt;/strong&gt;&lt;/p&gt;
 &lt;ol&gt;
@@ -301,19 +301,19 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>模块使用之multiprocessing</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-13-multiprocessing-http-request/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/multiprocessing-http-request/</link>
       <pubDate>Sun, 13 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-13-multiprocessing-http-request/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/multiprocessing-http-request/</guid>
       <description>&lt;p&gt;利用multiprocessing模块的pool类实现并发 http 请求。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>模块使用之paramiko</title>
-      <link>https://kangxiaoning.github.io/post/2015-12-09-paramiko/</link>
+      <link>https://kangxiaoning.github.io/post/2015/12/paramiko/</link>
       <pubDate>Wed, 09 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-12-09-paramiko/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/12/paramiko/</guid>
       <description>&lt;p&gt;paramiko 是基于 python 实现的 SSH2 远程安全连接，支持认证及密钥方式，
 平时写远程执行脚本、文件批量传输等功能很有用。&lt;/p&gt;
 &lt;p&gt;multiprocessing 是多线程/多进程的一个模块，和 paramiko 结合可以大大提高效率，写一些自动化小脚本很实用。&lt;/p&gt;
@@ -322,10 +322,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>python模拟死锁</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/python-deadlock/</link>
       <pubDate>Thu, 29 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/python-deadlock/</guid>
       <description>&lt;h1 id=&#34;1-死锁原因&#34;&gt;1. 死锁原因&lt;/h1&gt;
 &lt;p&gt;在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;当出现如下情况时发生死锁&lt;/strong&gt;&lt;/p&gt;
@@ -337,37 +337,37 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>django views和urls练习</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-10-django-views-urls/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/django-views-urls/</link>
       <pubDate>Sat, 10 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-10-django-views-urls/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/django-views-urls/</guid>
       <description>&lt;p&gt;注：参考自强学堂教程练习&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>Django初步使用</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-04-learning-django/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/learning-django/</link>
       <pubDate>Sun, 04 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-04-learning-django/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/learning-django/</guid>
       <description>&lt;p&gt;在线中文文档：http://djangobook.py3k.cn/&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>安装Python 2.7.10和 3.5.0</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-04-linux-install-python/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/linux-install-python/</link>
       <pubDate>Sun, 04 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-04-linux-install-python/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/linux-install-python/</guid>
       <description>&lt;p&gt;同一个系统安装多个 python 版本，不影响系统自带版本。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>安装pip</title>
-      <link>https://kangxiaoning.github.io/post/2015-10-02-install-pip/</link>
+      <link>https://kangxiaoning.github.io/post/2015/10/install-pip/</link>
       <pubDate>Fri, 02 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-10-02-install-pip/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/10/install-pip/</guid>
       <description>&lt;h1 id=&#34;1-下载并安装-setuptools&#34;&gt;1. 下载并安装 setuptools&lt;/h1&gt;
 &lt;p&gt;&lt;a href=&#34;https://pypi.python.org/pypi/setuptools#downloads&#34;&gt;https://pypi.python.org/pypi/setuptools#downloads&lt;/a&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -387,10 +387,10 @@ excel，使用方法差不多，如下是实际使用示例。&lt;/p&gt;</descri
     
     <item>
       <title>InsecurePlatformWarning解决</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-30-insecureplatformwarning/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/insecureplatformwarning/</link>
       <pubDate>Wed, 30 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-30-insecureplatformwarning/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/insecureplatformwarning/</guid>
       <description>&lt;h1 id=&#34;用户指南&#34;&gt;用户指南&lt;/h1&gt;
 &lt;pre&gt;&lt;code&gt;http://cn.python-requests.org/zh_CN/latest/
 &lt;/code&gt;&lt;/pre&gt;
@@ -404,10 +404,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>python中的with语法</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-28-with/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/with/</link>
       <pubDate>Mon, 28 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-28-with/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/with/</guid>
       <description>&lt;h1 id=&#34;1-with-简介&#34;&gt;1. with 简介&lt;/h1&gt;
 &lt;p&gt;python 中的 with 语法简化了 try&amp;hellip;except&amp;hellip;finally 的使用，通过 with 语法从代码中把 try，except，finally关键字和资源分配释放相关的代码去掉。&lt;/p&gt;
 &lt;p&gt;它仅仅能工作于支持 context management 协议的对象。&lt;/p&gt;</description>
@@ -415,10 +415,10 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>python函数的可变参数</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-26-arguments/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/arguments/</link>
       <pubDate>Sat, 26 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-26-arguments/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/arguments/</guid>
       <description>&lt;p&gt;除了常见的位置参数、关键字参数、默认参数，python还有可变参数，支持任意多的参数。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
@@ -437,38 +437,38 @@ c. 通过 U 盘 copy 到工作电脑
     
     <item>
       <title>模块使用之os</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-25-os/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/os/</link>
       <pubDate>Fri, 25 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-25-os/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/os/</guid>
       <description>&lt;p&gt;练习 os 模块，需要的时候可以查询官方文档获取需要的函数。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>threadPool与multiprocessing.Pool</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-22-multiprocessing/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/multiprocessing/</link>
       <pubDate>Tue, 22 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-22-multiprocessing/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/multiprocessing/</guid>
       <description>&lt;p&gt;为了和官方文档保持一致 ，这里把线程沲叫做 ThreadPool ，进程沲叫 multiprocessing.Pool。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>python迭代器</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-20-iterator/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/iterator/</link>
       <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-20-iterator/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/iterator/</guid>
       <description>&lt;h1 id=&#34;1-可迭代对象&#34;&gt;1. 可迭代对象&lt;/h1&gt;
 &lt;p&gt;指的是支持 iter 的一个对象。如果对象是实际保存的序列，或者可以在迭代工具环境中（如，for 循环）一次产生一个结果的对象，就看做是可迭代的。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>zip和enumerate</title>
-      <link>https://kangxiaoning.github.io/post/2015-09-20-enumerate/</link>
+      <link>https://kangxiaoning.github.io/post/2015/09/enumerate/</link>
       <pubDate>Sun, 20 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2015-09-20-enumerate/</guid>
+      <guid>https://kangxiaoning.github.io/post/2015/09/enumerate/</guid>
       <description>&lt;h1 id=&#34;1-构造字典&#34;&gt;1. 构造字典&lt;/h1&gt;</description>
     </item>
     

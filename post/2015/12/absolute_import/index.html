@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>absolute_import - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="1. 模块导入规则 import xxx 时搜索文件的优先级如下
+ The home directory of the program PYTHONPATH directories (if set) Standard library directories The contents of any .pth files (if present) The site-packages home of third-party extensions " /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/12/absolute_import/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="absolute_import" />
+<meta property="og:description" content="1. 模块导入规则
+import xxx 时搜索文件的优先级如下
+
+The home directory of the program
+PYTHONPATH directories (if set)
+Standard library directories
+The contents of any .pth files (if present)
+The site-packages home of third-party extensions
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/12/absolute_import/" />
+<meta property="article:published_time" content="2015-12-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2015-12-26T00:00:00+00:00" />
+<meta itemprop="name" content="absolute_import">
+<meta itemprop="description" content="1. 模块导入规则
+import xxx 时搜索文件的优先级如下
+
+The home directory of the program
+PYTHONPATH directories (if set)
+Standard library directories
+The contents of any .pth files (if present)
+The site-packages home of third-party extensions
+">
+<meta itemprop="datePublished" content="2015-12-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2015-12-26T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1213">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="absolute_import"/>
+<meta name="twitter:description" content="1. 模块导入规则
+import xxx 时搜索文件的优先级如下
+
+The home directory of the program
+PYTHONPATH directories (if set)
+Standard library directories
+The contents of any .pth files (if present)
+The site-packages home of third-party extensions
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">absolute_import</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-12-26 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-模块导入规则">1. 模块导入规则</a></li>
+    <li><a href="#2-syspath">2. sys.path</a></li>
+    <li><a href="#3-参考">3. 参考</a></li>
+    <li><a href="#4-总结">4. 总结</a></li>
+    <li><a href="#5-解释">5. 解释</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="1-模块导入规则">1. 模块导入规则</h1>
+<p><strong>import xxx 时搜索文件的优先级如下</strong></p>
+<ol>
+<li>The home directory of the program</li>
+<li>PYTHONPATH directories (if set)</li>
+<li>Standard library directories</li>
+<li>The contents of any .pth files (if present)</li>
+<li>The site-packages home of third-party extensions</li>
+</ol>
+<p>top-level file 指的是 main 模块文件。</p>
+<p>sys.path 是模块搜索的 PATH ，在 Python 程序启动时进行配置，自动将
+top-level file 的 home 目录（或用一个'&lsquo;表示当前工作目录）、
+PYTHONPATH 设置的目录、.pth 文件里的目录、标准库目录合并成一个 list，
+组成每次 import 时 Python 搜索的目录列表。</p>
+<h1 id="2-syspath">2. sys.path</h1>
+<p>如下 sys.path 列表的 '&rsquo; 表示是当前目录。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">python</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Nov</span> <span class="m">22</span> <span class="m">2013</span><span class="p">,</span> <span class="m">12</span>:<span class="m">16</span>:<span class="m">22</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">path</span><span class="err">
+</span><span class="err"></span>[<span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/setuptools-9.1-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/certifi-2015.9.6-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/futures-3.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/requests_futures-0.9.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/six-1.8.0-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/singledispatch-3.4.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/Tornado_MySQL-0.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/suds-0.4-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/bigsuds-1.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python26.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/plat-linux2&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-tk&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-old&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-dynload&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gst-0.10&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gtk-2.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/webkit-1.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages&#39;</span>]<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">exit</span><span class="p">()</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">python3</span><span class="err">
+</span><span class="err"></span><span class="nx">python3</span>   <span class="nx">python34</span>  <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">python34</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">3</span>.<span class="m">4</span>.<span class="m">3</span> <span class="p">(</span><span class="nx">default</span><span class="p">,</span> <span class="nx">Oct</span>  <span class="m">8</span> <span class="m">2015</span><span class="p">,</span> <span class="m">17</span>:<span class="m">58</span>:<span class="m">21</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">path</span><span class="err">
+</span><span class="err"></span>[<span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4/site-packages/Django-1.8.5-py3.4.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4/site-packages/tornado-4.2.1-py3.4-linux-x86_64.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python34.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4/plat-linux&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4/lib-dynload&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/local/python34/lib/python3.4/site-packages&#39;</span>]<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="3-参考">3. 参考</h1>
+<p><strong>官方</strong><br>
+<a href="http://legacy.python.org/dev/peps/pep-0328/">http://legacy.python.org/dev/peps/pep-0328/</a></p>
+<p><strong>stackoverflow</strong><br>
+<a href="http://stackoverflow.com/questions/33743880/what-does-from-future-import-absolute-import-actually-do">http://stackoverflow.com/questions/33743880/what-does-from-future-import-absolute-import-actually-do</a></p>
+<h1 id="4-总结">4. 总结</h1>
+<p>相对导入，表示只在 package 的内部目录中搜索，并且不会搜索位于 sys.path
+上某处同名的模块，直接效果就是包模块覆盖了外部的模块。</p>
+<p>绝对导入，表示在 sys.path 中搜索。</p>
+<p>Python 2.6 中，包的代码中的常规导入（没有前面的点号），目前默认为先相对
+再绝对 的搜索顺序，然而在 3.0 中，在一个包中导入默认是绝对的，在缺少点语
+法的时候，导入忽略了包自身的搜索，在 sys.path 目录里搜索。</p>
+<p>from <strong>future</strong> import absolute_import，表示打开了 Python 3.0
+的默认绝对搜索路径特性。</p>
+<ol>
+<li>
+<p>从一个 module 导入多个 names，用括号将多个 names 包围</p>
+<p>from Tkinter import (Tk, Frame, Button, Entry, Canvas, Text,
+LEFT, DISABLED, NORMAL, RIDGE, END)</p>
+</li>
+<li>
+<p>from <strong>future</strong> import absolute_import</p>
+</li>
+</ol>
+<p>means that if you import string, Python will always look for
+a top-level string module, rather than current_package.
+string. However, it does not affect the logic Python uses to decide what file is the string module.</p>
+<ol start="3">
+<li>python pkg/main2.py 和 python pkg.main2 的行为是不一样的</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">pkg/
+pkg/__init__.py
+pkg/main.py
+pkg/string.py
+</code></pre></td></tr></table>
+</div>
+</div><p>python pkg/main2.py 在 Python 看起来并不是 package 形式，所以是
+按常规程序对待的，pkg 目录会被加入到 sys.path ，pgk 目录下所有以 .py
+结尾的文件都被视为 top-level 模块，这时 import string 将找到
+pkg/string.py，并不是因为相对导入，而是因为 pkg/string.py 出现在
+top-level ，结果是标准 string 模块没有被导入。</p>
+<p>python -m pkg.main2 是将 package 作为脚本执行的方法 ，pkg 目录不
+会加入到 sys.path ，而是将 current directory 添加到 sys.path。</p>
+<p>所以 python pkg/main2.py 和 python -m pkg.main2 的 top-level
+是不一样的，影响搜索路径。</p>
+<p>import pkg.main2 相当于解释器使用的 -m 开关。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">pwd</span><span class="err">
+</span><span class="err"></span><span class="sr">/root/</span><span class="nx">Music</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">cat</span> <span class="nx">pkg</span>/<span class="nx">main1</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>#<span class="nx">import</span> <span class="nx">string</span>;<span class="nx">print</span><span class="p">(</span><span class="nx">string</span>.<span class="nx">ascii_uppercase</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="nx">print</span> <span class="nx">sys</span>.<span class="nx">path</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">cat</span> <span class="nx">pkg</span>/<span class="nx">main2</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span><span class="nx">from</span> <span class="nx">__future__</span> <span class="nx">import</span> <span class="nx">absolute_import</span><span class="err">
+</span><span class="err"></span>#<span class="nx">import</span> <span class="nx">string</span>;<span class="nx">print</span><span class="p">(</span><span class="nx">string</span>.<span class="nx">ascii_uppercase</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="nx">print</span> <span class="nx">sys</span>.<span class="nx">path</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span> <span class="nx">pkg</span>/<span class="nx">main1</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="s1">&#39;/root/Music/pkg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/setuptools-9.1-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/certifi-2015.9.6-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/futures-3.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/requests_futures-0.9.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/six-1.8.0-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/singledispatch-3.4.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/Tornado_MySQL-0.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/suds-0.4-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/bigsuds-1.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python26.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/plat-linux2&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-tk&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-old&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-dynload&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gst-0.10&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gtk-2.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/webkit-1.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages&#39;</span>]<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]#  <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span> <span class="p">-</span><span class="nx">m</span> <span class="nx">pkg</span>.<span class="nx">main1</span><span class="err">
+</span><span class="err"></span>[<span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/setuptools-9.1-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/certifi-2015.9.6-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/futures-3.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/requests_futures-0.9.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/six-1.8.0-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/singledispatch-3.4.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/Tornado_MySQL-0.5-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/suds-0.4-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages/bigsuds-1.0.3-py2.6.egg&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python26.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/plat-linux2&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-tk&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-old&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/lib-dynload&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gst-0.10&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/gtk-2.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib64/python2.6/site-packages/webkit-1.0&#39;</span><span class="p">,</span> <span class="s1">&#39;/usr/lib/python2.6/site-packages&#39;</span>]<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="5-解释">5. 解释</h1>
+<p>In Python 2.6, any import statement that results in an
+intra-package import will raise DeprecationWarning (this
+also applies to from &lt;&gt; import that fails to use the
+relative import syntax).</p>
+<p>Note that python2 pkg/main2.py has a different behaviour
+then launching python2 and then importing pkg.main2 (which
+is equivalent to using the -m switch).
+If you ever want to run a submodule of a package always use
+the -m switch which prevents the interpreter for chaning the
+sys.path list and correctly handles the semantics of the
+submodule.</p>
+<p>Also, I much prefer using explicit relative imports for package submodules since they provide more semantics and better error messages in case of failure.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">mkdir</span> <span class="nx">pkg</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">touch</span> <span class="nx">pkg</span>/<span class="nx">__init__</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">touch</span> <span class="nx">pkg</span>/<span class="nx">string</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">echo</span> <span class="s1">&#39;import string;print(string.ascii_uppercase)&#39;</span> <span class="p">&gt;</span> <span class="nx">pkg</span>/<span class="nx">main1</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Nov</span> <span class="m">22</span> <span class="m">2013</span><span class="p">,</span> <span class="m">12</span>:<span class="m">16</span>:<span class="m">22</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">pkg</span>.<span class="nx">main1</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;pkg/main1.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span>    <span class="nx">import</span> <span class="nx">string</span>;<span class="nx">print</span><span class="p">(</span><span class="nx">string</span>.<span class="nx">ascii_uppercase</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">AttributeError</span>: <span class="s1">&#39;module&#39;</span> <span class="nx">object</span> <span class="nx">has</span> <span class="nx">no</span> <span class="nx">attribute</span> <span class="s1">&#39;ascii_uppercase&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">exit</span><span class="p">()</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">echo</span> <span class="s1">&#39;from __future__ import absolute_import;import string;print(string.ascii_uppercase)&#39;</span> <span class="p">&gt;</span> <span class="nx">pkg</span>/<span class="nx">main2</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Nov</span> <span class="m">22</span> <span class="m">2013</span><span class="p">,</span> <span class="m">12</span>:<span class="m">16</span>:<span class="m">22</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">pkg</span>.<span class="nx">main2</span><span class="err">
+</span><span class="err"></span><span class="nx">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">exit</span><span class="p">()</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span> <span class="nx">pkg</span>/<span class="nx">main2</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;pkg/main2.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span>    <span class="nx">from</span> <span class="nx">__future__</span> <span class="nx">import</span> <span class="nx">absolute_import</span>;<span class="nx">import</span> <span class="nx">string</span>;<span class="nx">print</span><span class="p">(</span><span class="nx">string</span>.<span class="nx">ascii_uppercase</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">AttributeError</span>: <span class="s1">&#39;module&#39;</span> <span class="nx">object</span> <span class="nx">has</span> <span class="nx">no</span> <span class="nx">attribute</span> <span class="s1">&#39;ascii_uppercase&#39;</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Nov</span> <span class="m">22</span> <span class="m">2013</span><span class="p">,</span> <span class="m">12</span>:<span class="m">16</span>:<span class="m">22</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">pkg</span>.<span class="nx">main2</span><span class="err">
+</span><span class="err"></span><span class="nx">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">exit</span><span class="p">()</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="nx">python</span> <span class="p">-</span><span class="nx">m</span> <span class="nx">pkg</span>.<span class="nx">main2</span><span class="err">
+</span><span class="err"></span><span class="nx">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Music</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2015-12-26
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2015/12/init-all/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">__init__.py和__all__</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2015/12/multiprocessing-http-request/">
+            <span class="next-text nav-default">模块使用之multiprocessing</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2015-12-26 00:00:00 \u002b0000 UTC',
+        title: 'absolute_import',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

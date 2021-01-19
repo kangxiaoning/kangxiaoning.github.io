@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>虚拟化基础 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="cpu虚拟化 模拟：emulation 虚拟：virtulization" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2017/02/virtualization-fundation/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="虚拟化基础" />
+<meta property="og:description" content="cpu虚拟化
+模拟：emulation
+虚拟：virtulization" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/virtualization-fundation/" />
+<meta property="article:published_time" content="2017-02-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-02-06T00:00:00+00:00" />
+<meta itemprop="name" content="虚拟化基础">
+<meta itemprop="description" content="cpu虚拟化
+模拟：emulation
+虚拟：virtulization">
+<meta itemprop="datePublished" content="2017-02-06T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-02-06T00:00:00+00:00" />
+<meta itemprop="wordCount" content="938">
+
+
+
+<meta itemprop="keywords" content="虚拟化,kvm,xen," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="虚拟化基础"/>
+<meta name="twitter:description" content="cpu虚拟化
+模拟：emulation
+虚拟：virtulization"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">虚拟化基础</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-02-06 </span>
+        <div class="post-category">
+            <a href="/categories/virtualization/"> virtualization </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#cpu虚拟化">cpu虚拟化</a>
+      <ul>
+        <li><a href="#模拟emulation">模拟：emulation</a></li>
+        <li><a href="#虚拟virtulization">虚拟：virtulization</a>
+          <ul>
+            <li><a href="#完全虚拟化full-virtulization">完全虚拟化（full-virtulization）</a></li>
+            <li><a href="#半虚拟化para-virtulization">半虚拟化(para-virtulization)</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#memory虚拟化">Memory虚拟化</a></li>
+    <li><a href="#io虚拟化">I/O虚拟化</a></li>
+    <li><a href="#intel硬件辅助的虚拟化">Intel硬件辅助的虚拟化</a></li>
+    <li><a href="#虚拟化技术的分类">虚拟化技术的分类</a></li>
+    <li><a href="#使用brctl的配置的过程示例">使用brctl的配置的过程示例</a></li>
+    <li><a href="#tun与tap">TUN与TAP</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="cpu虚拟化">cpu虚拟化</h1>
+<h2 id="模拟emulation">模拟：emulation</h2>
+<h2 id="虚拟virtulization">虚拟：virtulization</h2>
+<h3 id="完全虚拟化full-virtulization">完全虚拟化（full-virtulization）</h3>
+<h4 id="bt-二进制翻译-软件">BT: 二进制翻译 （软件）</h4>
+<p><img src="/images/virtualization/bt-virtualization.jpg" alt="BT-virtualization"></p>
+<h4 id="hvm硬件辅助的虚拟化-硬件">HVM：硬件辅助的虚拟化 （硬件）</h4>
+<p><img src="/images/virtualization/system-hardware-virtualization.jpg" alt="HVM-virtualization"></p>
+<h3 id="半虚拟化para-virtulization">半虚拟化(para-virtulization)</h3>
+<p><img src="/images/virtualization/para-virtualization.jpg" alt="para-virtualization"></p>
+<h1 id="memory虚拟化">Memory虚拟化</h1>
+<p><img src="/images/virtualization/memory-virtualization.jpg" alt="para-virtualization"></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">进程：线性地址空间
+内核：物理地址空间
+
+MMU Virtulization
+    Intel: EPT, Extended Page Table
+    AMD: NTP, Nested Page Table
+
+TLB virtulization
+    tagged TLB
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="io虚拟化">I/O虚拟化</h1>
+<p><img src="/images/virtualization/io-virtualization.jpg" alt="para-virtualization"></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">外存：
+    硬盘、光盘、U盘
+网络设备：
+    网卡
+显示设备：
+    VGA: frame buffer机制
+键盘鼠标：
+    ps/2, usb
+
+I/O虚拟化的方式：
+    模拟: 完全使用软件来模拟真实硬件
+    半虚拟化化:
+    IO-through: IO透传
+
+Intel: VT-d
+    基于北桥的硬件辅助的虚拟化技术；
+
+两种实现方式：
+	Type-I:
+		xen, vmware ESX/ESXi
+	Type-II:
+		kvm, vmware workstation, virtualbox
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="intel硬件辅助的虚拟化">Intel硬件辅助的虚拟化</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">CPU: vt-x, EPT, tagged-TLB
+IO/CPU: vt-d, IOV, VMDq
+
+第一类：跟处理器相关：vt-x
+第二类：跟芯片相关：vt-d
+第三类：跟IO相关：VMDq和SR-IOV
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="虚拟化技术的分类">虚拟化技术的分类</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">模拟：著名的模拟器，PearPC, Bochs, QEMU
+完全虚拟化：也称为native virtulization
+    两种加速方式：
+        BT
+        HVM
+    VMware Workstation, VMware Server, Parallels Desktop, KVM, Xen(HVM)
+半虚拟化：para-virtualization
+    xen, uml(user-mode linux)
+OS级别的虚拟化:
+    OpenVZ, lxc
+    Solaris Containers
+    FreeBSD jails
+库虚拟化：
+    wine
+应用程序虚拟化：
+    jvm
+
+虚拟化网络：
+	nat mode
+	bridge mode
+	routed mode
+	isolation mode
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="使用brctl的配置的过程示例">使用brctl的配置的过程示例</h1>
+<p><strong>注意</strong> 配置bridge时不要启用NetworkManager服务。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">安装brctl命令</span><span class="err">
+</span><span class="err"></span><span class="nx">yum</span> <span class="nx">install</span> <span class="nx">bridge</span><span class="p">-</span><span class="nx">utils</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p><strong>通过brctl配置bridge</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">brctl</span> <span class="nx">addbr</span> <span class="nx">br0</span><span class="err">
+</span><span class="err"></span># <span class="nx">brctl</span> <span class="nx">stp</span> <span class="nx">br0</span> <span class="nx">on</span><span class="err">
+</span><span class="err"></span># <span class="nx">ifconfig</span> <span class="nx">eth0</span> <span class="m">0</span> <span class="nx">up</span> # <span class="nx">取消地址</span><span class="err">
+</span><span class="err"></span># <span class="nx">brctl</span> <span class="nx">addif</span> <span class="nx">br0</span> <span class="nx">eth0</span><span class="err">
+</span><span class="err"></span># <span class="nx">ifconfig</span> <span class="nx">br0</span> <span class="nx">IP</span>/<span class="nx">NETMASK</span> <span class="nx">up</span><span class="err">
+</span><span class="err"></span># <span class="nx">route</span> <span class="nx">add</span> <span class="nx">default</span> <span class="nx">gw</span> <span class="nx">GW</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="tun与tap">TUN与TAP</h1>
+<p>在计算机网络中，TUN与TAP是操作系统内核中的虚拟网络设备。不同于普通靠硬件网路板卡实现的设备，这些虚拟的网络设备全部用软件实现，并向运行于操作系统上的软件提供与硬件的网络设备完全相同的功能。</p>
+<p>TAP等同于一个以太网设备，它操作第二层数据包如以太网数据帧。TUN模拟了网络层设备，操作第三层数据包比如IP数据封包。</p>
+<p>操作系统通过TUN/TAP设备向绑定该设备的用户空间的程序发送数据，反之，用户空间的程序也可以像操作硬件网络设备那样，通过TUN/TAP设备发送数据。在后种情况下，TUN/TAP设备向操作系统的网络栈投递（或“注入”）数据包，从而模拟从外部接受数据的过程。</p>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2017-02-06
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/">虚拟化</a>
+          <a href="/tags/kvm/">kvm</a>
+          <a href="/tags/xen/">xen</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2017/02/xen-fundation/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Xen虚拟化基础一</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016/12/elementaryos-install/">
+            <span class="next-text nav-default">elementaryOS体验</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2017-02-06 00:00:00 \u002b0000 UTC',
+        title: '虚拟化基础',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
