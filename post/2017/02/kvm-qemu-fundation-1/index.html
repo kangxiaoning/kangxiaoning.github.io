@@ -1,467 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>KVM虚拟化基础一 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="1. KVM组件 KVM主要两类组件组成
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="KVM虚拟化基础一" />
-<meta property="og:description" content="1. KVM组件
-KVM主要两类组件组成" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/" />
-<meta property="article:published_time" content="2017-02-12T00:00:00+00:00" />
-<meta property="article:modified_time" content="2017-02-12T00:00:00+00:00" />
-<meta itemprop="name" content="KVM虚拟化基础一">
-<meta itemprop="description" content="1. KVM组件
-KVM主要两类组件组成">
-<meta itemprop="datePublished" content="2017-02-12T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2017-02-12T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1366">
-
-
-
-<meta itemprop="keywords" content="虚拟化,kvm,xen," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="KVM虚拟化基础一"/>
-<meta name="twitter:description" content="1. KVM组件
-KVM主要两类组件组成"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">KVM虚拟化基础一</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2017-02-12 </span>
-        <div class="post-category">
-            <a href="/categories/virtualization/"> virtualization </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-kvm组件">1. KVM组件</a>
-      <ul>
-        <li><a href="#11-devkvm">1.1 /dev/kvm</a></li>
-        <li><a href="#12-qemu进程">1.2 qemu进程</a></li>
-      </ul>
-    </li>
-    <li><a href="#2-kvm管理工具栈">2. KVM管理工具栈</a></li>
-    <li><a href="#3-安装kvm">3. 安装kvm</a>
-      <ul>
-        <li><a href="#31-实验环境">3.1 实验环境</a></li>
-        <li><a href="#32-确保cpu支持hvm">3.2 确保CPU支持HVM</a></li>
-        <li><a href="#33-装载模块">3.3 装载模块</a></li>
-        <li><a href="#34-验证">3.4 验证</a></li>
-        <li><a href="#35-安装qemu-kvm">3.5 安装qemu-kvm</a></li>
-      </ul>
-    </li>
-    <li><a href="#4-简单使用qemu-kvm">4. 简单使用qemu-kvm</a>
-      <ul>
-        <li><a href="#41-启动虚拟机">4.1 启动虚拟机</a></li>
-        <li><a href="#42-通过vncviewer连接">4.2 通过vncviewer连接</a></li>
-        <li><a href="#43-虚拟机实际是host上一个进程">4.3 虚拟机实际是HOST上一个进程</a></li>
-      </ul>
-    </li>
-    <li><a href="#5-kvm内存管理">5. KVM内存管理</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="1-kvm组件">1. KVM组件</h1>
-<p><strong>KVM主要两类组件组成</strong></p>
-<h2 id="11-devkvm">1.1 /dev/kvm</h2>
-<pre><code>管理虚拟机的设备文件，用户空间的程序可通过其ioctl()系统调用集来完成虚拟机的创建启动等管理工作；
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>KVM虚拟化基础一 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="1. KVM组件 KVM主要两类组件组成"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="KVM虚拟化基础一"><meta property="og:description" content="1. KVM组件
+KVM主要两类组件组成"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-1/"><meta property="article:published_time" content="2017-02-12T00:00:00+00:00"><meta property="article:modified_time" content="2017-02-12T00:00:00+00:00"><meta itemprop=name content="KVM虚拟化基础一"><meta itemprop=description content="1. KVM组件
+KVM主要两类组件组成"><meta itemprop=datePublished content="2017-02-12T00:00:00+00:00"><meta itemprop=dateModified content="2017-02-12T00:00:00+00:00"><meta itemprop=wordCount content="1366"><meta itemprop=keywords content="虚拟化,kvm,xen,"><meta name=twitter:card content="summary"><meta name=twitter:title content="KVM虚拟化基础一"><meta name=twitter:description content="1. KVM组件
+KVM主要两类组件组成"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>KVM虚拟化基础一</h1><div class=post-meta><span class=post-time>2017-02-12</span><div class=post-category><a href=/categories/virtualization/>virtualization</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-kvm组件>1. KVM组件</a><ul><li><a href=#11-devkvm>1.1 /dev/kvm</a></li><li><a href=#12-qemu进程>1.2 qemu进程</a></li></ul></li><li><a href=#2-kvm管理工具栈>2. KVM管理工具栈</a></li><li><a href=#3-安装kvm>3. 安装kvm</a><ul><li><a href=#31-实验环境>3.1 实验环境</a></li><li><a href=#32-确保cpu支持hvm>3.2 确保CPU支持HVM</a></li><li><a href=#33-装载模块>3.3 装载模块</a></li><li><a href=#34-验证>3.4 验证</a></li><li><a href=#35-安装qemu-kvm>3.5 安装qemu-kvm</a></li></ul></li><li><a href=#4-简单使用qemu-kvm>4. 简单使用qemu-kvm</a><ul><li><a href=#41-启动虚拟机>4.1 启动虚拟机</a></li><li><a href=#42-通过vncviewer连接>4.2 通过vncviewer连接</a></li><li><a href=#43-虚拟机实际是host上一个进程>4.3 虚拟机实际是HOST上一个进程</a></li></ul></li><li><a href=#5-kvm内存管理>5. KVM内存管理</a></li></ul></nav></div></div><div class=post-content><h1 id=1-kvm组件>1. KVM组件</h1><p><strong>KVM主要两类组件组成</strong></p><h2 id=11-devkvm>1.1 /dev/kvm</h2><pre><code>管理虚拟机的设备文件，用户空间的程序可通过其ioctl()系统调用集来完成虚拟机的创建启动等管理工作；
 它是一个字符设备；其主要完成的操作包括：
     创建虚拟机；
     为虚拟机分配内存；
     读、写VCPU的寄存器；
     向VCPU注入中断；
     运行VCPU；
-</code></pre>
-<h2 id="12-qemu进程">1.2 qemu进程</h2>
-<pre><code>工作于用户空间的组件，用于仿真PC机的I/O类硬件设备；
-</code></pre>
-<h1 id="2-kvm管理工具栈">2. KVM管理工具栈</h1>
-<p><img src="/images/virtualization/kvm-tools.jpg" alt="kvm-tools"></p>
-<h1 id="3-安装kvm">3. 安装kvm</h1>
-<h2 id="31-实验环境">3.1 实验环境</h2>
-<p>在Vmware Workstation 12.5.2 build-4638234上进行实验，就是在Vmware Workstation上安装Linux，然后在该Linux上进行kvm的实验。
-要注意的是启用虚拟机上的CPU硬件虚拟化支持，如下图的“虚拟化引擎”勾选第二项。</p>
-<p><img src="/images/virtualization/vmware-workstation-config.jpg" alt="vmware-config"></p>
-<h2 id="32-确保cpu支持hvm">3.2 确保CPU支持HVM</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">grep</span> <span class="p">-</span><span class="nx">E</span> <span class="s2">&#34;vmx|svm&#34;</span> <span class="sr">/proc/</span><span class="nx">cpuinfo</span> <span class="p">--</span><span class="nx">color</span><span class="p">=</span><span class="nx">auto</span><span class="err">
-</span><span class="err"></span><span class="nx">flags</span>		: <span class="nx">fpu</span> <span class="nx">vme</span> <span class="nx">de</span> <span class="nx">pse</span> <span class="nx">tsc</span> <span class="nx">msr</span> <span class="nx">pae</span> <span class="nx">mce</span> <span class="nx">cx8</span> <span class="nx">apic</span> <span class="nx">sep</span> <span class="nx">mtrr</span> <span class="nx">pge</span> <span class="nx">mca</span> <span class="nx">cmov</span> <span class="nx">pat</span> <span class="nx">pse36</span> <span class="nx">clflush</span> <span class="nx">dts</span> <span class="nx">mmx</span> <span class="nx">fxsr</span> <span class="nx">sse</span> <span class="nx">sse2</span> <span class="nx">ss</span> <span class="nx">syscall</span> <span class="nx">nx</span> <span class="nx">pdpe1gb</span> <span class="nx">rdtscp</span> <span class="nx">lm</span> <span class="nx">constant_tsc</span> <span class="nx">up</span> <span class="nx">arch_perfmon</span> <span class="nx">pebs</span> <span class="nx">bts</span> <span class="nx">xtopology</span> <span class="nx">tsc_reliable</span> <span class="nx">nonstop_tsc</span> <span class="nx">aperfmperf</span> <span class="nx">unfair_spinlock</span> <span class="nx">pni</span> <span class="nx">pclmulqdq</span> <span class="nx">vmx</span> <span class="nx">ssse3</span> <span class="nx">fma</span> <span class="nx">cx16</span> <span class="nx">pcid</span> <span class="nx">sse4_1</span> <span class="nx">sse4_2</span> <span class="nx">x2apic</span> <span class="nx">movbe</span> <span class="nx">popcnt</span> <span class="nx">tsc_deadline_timer</span> <span class="nx">aes</span> <span class="nx">xsave</span> <span class="nx">avx</span> <span class="nx">f16c</span> <span class="nx">rdrand</span> <span class="nx">hypervisor</span> <span class="nx">lahf_lm</span> <span class="nx">abm</span> <span class="nx">ida</span> <span class="nx">arat</span> <span class="nx">epb</span> <span class="nx">xsaveopt</span> <span class="nx">pln</span> <span class="nx">pts</span> <span class="nx">dts</span> <span class="nx">tpr_shadow</span> <span class="nx">vnmi</span> <span class="nx">ept</span> <span class="nx">vpid</span> <span class="nx">fsgsbase</span> <span class="nx">bmi1</span> <span class="nx">avx2</span> <span class="nx">smep</span> <span class="nx">bmi2</span> <span class="nx">invpcid</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="33-装载模块">3.3 装载模块</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">modprobe</span> <span class="nx">kvm</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">modprobe</span> <span class="nx">kvm</span><span class="p">-</span><span class="nx">intel</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">lsmod</span> <span class="p">|</span> <span class="nx">grep</span> <span class="nx">kvm</span><span class="err">
-</span><span class="err"></span><span class="nx">kvm_intel</span>              <span class="m">54285</span>  <span class="m">0</span> <span class="err">
-</span><span class="err"></span><span class="nx">kvm</span>                   <span class="m">333172</span>  <span class="m">1</span> <span class="nx">kvm_intel</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]#<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="34-验证">3.4 验证</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">ls</span> <span class="p">-</span><span class="nx">l</span> <span class="sr">/dev/</span><span class="nx">kvm</span> <span class="err">
-</span><span class="err"></span><span class="nx">crw</span><span class="p">-</span><span class="nx">rw</span><span class="p">----</span> <span class="m">1</span> <span class="nx">root</span> <span class="nx">root</span> <span class="m">10</span><span class="p">,</span> <span class="m">232</span> <span class="nx">Feb</span> <span class="m">12</span> <span class="m">12</span>:<span class="m">38</span> <span class="sr">/dev/</span><span class="nx">kvm</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="35-安装qemu-kvm">3.5 安装qemu-kvm</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">安装qemu</span><span class="p">-</span><span class="nx">kvm</span><span class="err">
-</span><span class="err"></span><span class="nx">yum</span> <span class="nx">install</span> <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span><span class="err">
-</span><span class="err"></span># <span class="nx">可执行文件不在PATH路径</span><span class="err">
-</span><span class="err"></span><span class="nx">rpm</span> <span class="p">-</span><span class="nx">ql</span> <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="err">
-</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]# <span class="nx">ln</span> <span class="p">-</span><span class="nx">sv</span> <span class="sr">/usr/</span><span class="nx">libexec</span><span class="sr">/qemu-kvm /</span><span class="nx">usr</span><span class="sr">/bin/</span><span class="err">
-</span><span class="err"></span>`<span class="sr">/usr/</span><span class="nx">bin</span><span class="sr">/qemu-kvm&#39; -&gt; `/</span><span class="nx">usr</span><span class="sr">/libexec/</span><span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span>&#39;<span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">Desktop</span>]#<span class="err">
-</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="4-简单使用qemu-kvm">4. 简单使用qemu-kvm</h1>
-<h2 id="41-启动虚拟机">4.1 启动虚拟机</h2>
-<p>如下通过一个已有镜像启动一台虚拟机，这是一个精简的linux系统，启动后可以执行一些Linux命令。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">m</span> <span class="m">128</span> <span class="p">-</span><span class="nx">smp</span> <span class="m">1</span> <span class="p">-</span><span class="nx">name</span> <span class="nx">test</span> <span class="p">-</span><span class="nx">hda</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">cirros</span><span class="m">-0</span>.<span class="m">3</span>.<span class="m">3</span><span class="p">-</span><span class="nx">i386</span><span class="p">-</span><span class="nx">disk</span>.<span class="nx">img</span><span class="err">
-</span><span class="err"></span><span class="nx">VNC</span> <span class="nx">server</span> <span class="nx">running</span> <span class="nx">on</span> `<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">5900</span>&#39;<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="42-通过vncviewer连接">4.2 通过vncviewer连接</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">报错解决</span>：<span class="nx">WARNING</span><span class="p">!</span> <span class="nx">The</span> <span class="nx">remote</span> <span class="nx">SSH</span> <span class="nx">server</span> <span class="nx">rejected</span> <span class="nx">X11</span> <span class="nx">forwarding</span> <span class="nx">request</span>.<span class="err">
-</span><span class="err"></span><span class="nx">yum</span> <span class="p">-</span><span class="nx">y</span> <span class="nx">install</span> <span class="nx">xorg</span><span class="p">-</span><span class="nx">x11</span><span class="p">-</span><span class="nx">xauth</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span># <span class="nx">vncviewer连接</span>，<span class="nx">会弹出图形界面</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">vncviewer</span> :<span class="m">5900</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">TigerVNC</span> <span class="nx">Viewer</span> <span class="m">64</span><span class="p">-</span><span class="nx">bit</span> <span class="nx">v1</span>.<span class="m">3</span>.<span class="m">1</span> <span class="p">(</span><span class="m">20161116</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">Built</span> <span class="nx">on</span> <span class="nx">Nov</span> <span class="m">16</span> <span class="m">2016</span> <span class="nx">at</span> <span class="m">13</span>:<span class="m">37</span>:<span class="m">43</span><span class="err">
-</span><span class="err"></span><span class="nx">Copyright</span> <span class="p">(</span><span class="nx">C</span><span class="p">)</span> <span class="m">1999-2011</span> <span class="nx">TigerVNC</span> <span class="nx">Team</span> <span class="nx">and</span> <span class="nx">many</span> <span class="nx">others</span> <span class="p">(</span><span class="nx">see</span> <span class="nx">README</span>.<span class="nx">txt</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">See</span> <span class="nx">http</span>:<span class="sr">//</span><span class="nx">www</span>.<span class="nx">tigervnc</span>.<span class="nx">org</span> <span class="nx">for</span> <span class="nx">information</span> <span class="nx">on</span> <span class="nx">TigerVNC</span>.<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Feb</span> <span class="m">13</span> <span class="m">04</span>:<span class="m">52</span>:<span class="m">44</span> <span class="m">2017</span><span class="err">
-</span><span class="err"></span> <span class="nx">CConn</span>:       <span class="nx">connected</span> <span class="nx">to</span> <span class="nx">host</span> <span class="nx">localhost</span> <span class="nx">port</span> <span class="m">5900</span><span class="err">
-</span><span class="err"></span> <span class="nx">CConnection</span>: <span class="nx">Server</span> <span class="nx">supports</span> <span class="nx">RFB</span> <span class="nx">protocol</span> <span class="nx">version</span> <span class="m">3</span>.<span class="m">8</span><span class="err">
-</span><span class="err"></span> <span class="nx">CConnection</span>: <span class="nx">Using</span> <span class="nx">RFB</span> <span class="nx">protocol</span> <span class="nx">version</span> <span class="m">3</span>.<span class="m">8</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Feb</span> <span class="m">13</span> <span class="m">04</span>:<span class="m">52</span>:<span class="m">45</span> <span class="m">2017</span><span class="err">
-</span><span class="err"></span> <span class="nx">PlatformPixelBuffer</span>: <span class="nx">Using</span> <span class="nx">default</span> <span class="nx">colormap</span> <span class="nx">and</span> <span class="nx">visual</span><span class="p">,</span> <span class="nx">TrueColor</span><span class="p">,</span> <span class="nx">depth</span> <span class="m">24</span>.<span class="err">
-</span><span class="err"></span><span class="nx">Xlib</span>:  <span class="nx">extension</span> <span class="s2">&#34;MIT-SHM&#34;</span> <span class="nx">missing</span> <span class="nx">on</span> <span class="nx">display</span> <span class="s2">&#34;localhost:10.0&#34;</span>.<span class="err">
-</span><span class="err"></span> <span class="nx">CConn</span>:       <span class="nx">Using</span> <span class="nx">pixel</span> <span class="nx">format</span> <span class="nx">depth</span> <span class="m">24</span> <span class="p">(</span><span class="m">32</span>bpp<span class="p">)</span> <span class="nx">little</span><span class="p">-</span><span class="nx">endian</span> <span class="nx">rgb888</span><span class="err">
-</span><span class="err"></span> <span class="nx">CConn</span>:       <span class="nx">Using</span> <span class="nx">Tight</span> <span class="nx">encoding</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>下面这个就是虚拟机上的虚拟机，Vmware Workstation 上安装 Linux, Linux上
-安装kvm虚拟机，如下是在嵌套上虚拟里执行了ifconfig命令的示例。</p>
-<p><img src="/images/virtualization/qemu-kvm-test.jpg" alt="kvm-test"></p>
-<h2 id="43-虚拟机实际是host上一个进程">4.3 虚拟机实际是HOST上一个进程</h2>
-<p>在Linux上查看，上面的虚拟机实际上是Linux系统上的一个进程。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]# <span class="nx">ps</span> <span class="p">-</span><span class="nx">ef</span> <span class="p">|</span> <span class="nx">grep</span> <span class="nx">qemu</span> <span class="p">|</span> <span class="nx">grep</span> <span class="p">-</span><span class="nx">v</span> <span class="nx">grep</span><span class="err">
-</span><span class="err"></span><span class="nx">root</span>       <span class="m">3141</span>   <span class="m">3108</span>  <span class="m">0</span> <span class="m">04</span>:<span class="m">39</span> <span class="nx">pts</span><span class="sr">/0    00:00:15 qemu-kvm -m 128 -smp 1 -name test -hda /</span><span class="nx">images</span><span class="sr">/kvm/</span><span class="nx">cirros</span><span class="m">-0</span>.<span class="m">3</span>.<span class="m">3</span><span class="p">-</span><span class="nx">i386</span><span class="p">-</span><span class="nx">disk</span>.<span class="nx">img</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="p">~</span>]#<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="5-kvm内存管理">5. KVM内存管理</h1>
-<p>KVM继承了Linux系统管理内存的诸多特性，比如，分配给虚拟使用的内存可以被交换至交换空间、能够使用大内存页以实现更好的性能，以及对NUMA的支持能够让虚拟机高效访问更大的内存空间等。</p>
-<p>KVM基于Intel的EPT（Extended Page Table）或AMD的RVI（Rapid Virtualization Indexing）技术可以支持更新的内存虚拟功能，这可以降低CPU的占用率，并提供较好的吞吐量。</p>
-<p>此外，KVM还借助于KSM（Kernel Same-page Merging）这个内核特性实现了内存页面共享。KSM通过扫描每个虚拟机的内存查找各虚拟机间相同的内存页，并将这些内存页合并为一个被各相关虚拟机共享的单独页面。在某虚拟机试图修改此页面中的数据时，KSM会重新为其提供一个新的页面副本。实践中，运行于同一台物理主机上的具有相同GuestOS的虚拟机之间出现相同内存页面的概率是很的，比如共享库、内核或其它内存对象等都有可能表现为相同的内存页，因此，KSM技术可以降低内存占用进而提高整体性能。</p>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2017-02-12
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/">虚拟化</a>
-          <a href="/tags/kvm/">kvm</a>
-          <a href="/tags/xen/">xen</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2017/02/kvm-qemu-fundation-2/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">KVM虚拟化基础二</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2017/02/xen-fundation-2/">
-            <span class="next-text nav-default">Xen虚拟化基础二</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2017-02-12 00:00:00 \u002b0000 UTC',
-        title: 'KVM虚拟化基础一',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+</code></pre><h2 id=12-qemu进程>1.2 qemu进程</h2><pre><code>工作于用户空间的组件，用于仿真PC机的I/O类硬件设备；
+</code></pre><h1 id=2-kvm管理工具栈>2. KVM管理工具栈</h1><p><img src=/images/virtualization/kvm-tools.jpg alt=kvm-tools></p><h1 id=3-安装kvm>3. 安装kvm</h1><h2 id=31-实验环境>3.1 实验环境</h2><p>在Vmware Workstation 12.5.2 build-4638234上进行实验，就是在Vmware Workstation上安装Linux，然后在该Linux上进行kvm的实验。
+要注意的是启用虚拟机上的CPU硬件虚拟化支持，如下图的“虚拟化引擎”勾选第二项。</p><p><img src=/images/virtualization/vmware-workstation-config.jpg alt=vmware-config></p><h2 id=32-确保cpu支持hvm>3.2 确保CPU支持HVM</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>grep</span> <span class=p>-</span><span class=nx>E</span> <span class=s2>&#34;vmx|svm&#34;</span> <span class=sr>/proc/</span><span class=nx>cpuinfo</span> <span class=p>--</span><span class=nx>color</span><span class=p>=</span><span class=nx>auto</span><span class=err>
+</span><span class=err></span><span class=nx>flags</span>		: <span class=nx>fpu</span> <span class=nx>vme</span> <span class=nx>de</span> <span class=nx>pse</span> <span class=nx>tsc</span> <span class=nx>msr</span> <span class=nx>pae</span> <span class=nx>mce</span> <span class=nx>cx8</span> <span class=nx>apic</span> <span class=nx>sep</span> <span class=nx>mtrr</span> <span class=nx>pge</span> <span class=nx>mca</span> <span class=nx>cmov</span> <span class=nx>pat</span> <span class=nx>pse36</span> <span class=nx>clflush</span> <span class=nx>dts</span> <span class=nx>mmx</span> <span class=nx>fxsr</span> <span class=nx>sse</span> <span class=nx>sse2</span> <span class=nx>ss</span> <span class=nx>syscall</span> <span class=nx>nx</span> <span class=nx>pdpe1gb</span> <span class=nx>rdtscp</span> <span class=nx>lm</span> <span class=nx>constant_tsc</span> <span class=nx>up</span> <span class=nx>arch_perfmon</span> <span class=nx>pebs</span> <span class=nx>bts</span> <span class=nx>xtopology</span> <span class=nx>tsc_reliable</span> <span class=nx>nonstop_tsc</span> <span class=nx>aperfmperf</span> <span class=nx>unfair_spinlock</span> <span class=nx>pni</span> <span class=nx>pclmulqdq</span> <span class=nx>vmx</span> <span class=nx>ssse3</span> <span class=nx>fma</span> <span class=nx>cx16</span> <span class=nx>pcid</span> <span class=nx>sse4_1</span> <span class=nx>sse4_2</span> <span class=nx>x2apic</span> <span class=nx>movbe</span> <span class=nx>popcnt</span> <span class=nx>tsc_deadline_timer</span> <span class=nx>aes</span> <span class=nx>xsave</span> <span class=nx>avx</span> <span class=nx>f16c</span> <span class=nx>rdrand</span> <span class=nx>hypervisor</span> <span class=nx>lahf_lm</span> <span class=nx>abm</span> <span class=nx>ida</span> <span class=nx>arat</span> <span class=nx>epb</span> <span class=nx>xsaveopt</span> <span class=nx>pln</span> <span class=nx>pts</span> <span class=nx>dts</span> <span class=nx>tpr_shadow</span> <span class=nx>vnmi</span> <span class=nx>ept</span> <span class=nx>vpid</span> <span class=nx>fsgsbase</span> <span class=nx>bmi1</span> <span class=nx>avx2</span> <span class=nx>smep</span> <span class=nx>bmi2</span> <span class=nx>invpcid</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=33-装载模块>3.3 装载模块</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>modprobe</span> <span class=nx>kvm</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>modprobe</span> <span class=nx>kvm</span><span class=p>-</span><span class=nx>intel</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>lsmod</span> <span class=p>|</span> <span class=nx>grep</span> <span class=nx>kvm</span><span class=err>
+</span><span class=err></span><span class=nx>kvm_intel</span>              <span class=m>54285</span>  <span class=m>0</span> <span class=err>
+</span><span class=err></span><span class=nx>kvm</span>                   <span class=m>333172</span>  <span class=m>1</span> <span class=nx>kvm_intel</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]#<span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=34-验证>3.4 验证</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>ls</span> <span class=p>-</span><span class=nx>l</span> <span class=sr>/dev/</span><span class=nx>kvm</span> <span class=err>
+</span><span class=err></span><span class=nx>crw</span><span class=p>-</span><span class=nx>rw</span><span class=p>----</span> <span class=m>1</span> <span class=nx>root</span> <span class=nx>root</span> <span class=m>10</span><span class=p>,</span> <span class=m>232</span> <span class=nx>Feb</span> <span class=m>12</span> <span class=m>12</span>:<span class=m>38</span> <span class=sr>/dev/</span><span class=nx>kvm</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=35-安装qemu-kvm>3.5 安装qemu-kvm</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim># <span class=nx>安装qemu</span><span class=p>-</span><span class=nx>kvm</span><span class=err>
+</span><span class=err></span><span class=nx>yum</span> <span class=nx>install</span> <span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span><span class=err>
+</span><span class=err></span># <span class=nx>可执行文件不在PATH路径</span><span class=err>
+</span><span class=err></span><span class=nx>rpm</span> <span class=p>-</span><span class=nx>ql</span> <span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=err>
+</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]# <span class=nx>ln</span> <span class=p>-</span><span class=nx>sv</span> <span class=sr>/usr/</span><span class=nx>libexec</span><span class=sr>/qemu-kvm /</span><span class=nx>usr</span><span class=sr>/bin/</span><span class=err>
+</span><span class=err></span>`<span class=sr>/usr/</span><span class=nx>bin</span><span class=sr>/qemu-kvm&#39; -&gt; `/</span><span class=nx>usr</span><span class=sr>/libexec/</span><span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span>&#39;<span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>Desktop</span>]#<span class=err>
+</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=4-简单使用qemu-kvm>4. 简单使用qemu-kvm</h1><h2 id=41-启动虚拟机>4.1 启动虚拟机</h2><p>如下通过一个已有镜像启动一台虚拟机，这是一个精简的linux系统，启动后可以执行一些Linux命令。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=p>~</span>]# <span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>m</span> <span class=m>128</span> <span class=p>-</span><span class=nx>smp</span> <span class=m>1</span> <span class=p>-</span><span class=nx>name</span> <span class=nx>test</span> <span class=p>-</span><span class=nx>hda</span> <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>cirros</span><span class=m>-0</span>.<span class=m>3</span>.<span class=m>3</span><span class=p>-</span><span class=nx>i386</span><span class=p>-</span><span class=nx>disk</span>.<span class=nx>img</span><span class=err>
+</span><span class=err></span><span class=nx>VNC</span> <span class=nx>server</span> <span class=nx>running</span> <span class=nx>on</span> `<span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>5900</span>&#39;<span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=42-通过vncviewer连接>4.2 通过vncviewer连接</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim># <span class=nx>报错解决</span>：<span class=nx>WARNING</span><span class=p>!</span> <span class=nx>The</span> <span class=nx>remote</span> <span class=nx>SSH</span> <span class=nx>server</span> <span class=nx>rejected</span> <span class=nx>X11</span> <span class=nx>forwarding</span> <span class=nx>request</span>.<span class=err>
+</span><span class=err></span><span class=nx>yum</span> <span class=p>-</span><span class=nx>y</span> <span class=nx>install</span> <span class=nx>xorg</span><span class=p>-</span><span class=nx>x11</span><span class=p>-</span><span class=nx>xauth</span><span class=err>
+</span><span class=err>
+</span><span class=err></span># <span class=nx>vncviewer连接</span>，<span class=nx>会弹出图形界面</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=p>~</span>]# <span class=nx>vncviewer</span> :<span class=m>5900</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>TigerVNC</span> <span class=nx>Viewer</span> <span class=m>64</span><span class=p>-</span><span class=nx>bit</span> <span class=nx>v1</span>.<span class=m>3</span>.<span class=m>1</span> <span class=p>(</span><span class=m>20161116</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>Built</span> <span class=nx>on</span> <span class=nx>Nov</span> <span class=m>16</span> <span class=m>2016</span> <span class=nx>at</span> <span class=m>13</span>:<span class=m>37</span>:<span class=m>43</span><span class=err>
+</span><span class=err></span><span class=nx>Copyright</span> <span class=p>(</span><span class=nx>C</span><span class=p>)</span> <span class=m>1999-2011</span> <span class=nx>TigerVNC</span> <span class=nx>Team</span> <span class=nx>and</span> <span class=nx>many</span> <span class=nx>others</span> <span class=p>(</span><span class=nx>see</span> <span class=nx>README</span>.<span class=nx>txt</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>See</span> <span class=nx>http</span>:<span class=sr>//</span><span class=nx>www</span>.<span class=nx>tigervnc</span>.<span class=nx>org</span> <span class=nx>for</span> <span class=nx>information</span> <span class=nx>on</span> <span class=nx>TigerVNC</span>.<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Feb</span> <span class=m>13</span> <span class=m>04</span>:<span class=m>52</span>:<span class=m>44</span> <span class=m>2017</span><span class=err>
+</span><span class=err></span> <span class=nx>CConn</span>:       <span class=nx>connected</span> <span class=nx>to</span> <span class=nx>host</span> <span class=nx>localhost</span> <span class=nx>port</span> <span class=m>5900</span><span class=err>
+</span><span class=err></span> <span class=nx>CConnection</span>: <span class=nx>Server</span> <span class=nx>supports</span> <span class=nx>RFB</span> <span class=nx>protocol</span> <span class=nx>version</span> <span class=m>3</span>.<span class=m>8</span><span class=err>
+</span><span class=err></span> <span class=nx>CConnection</span>: <span class=nx>Using</span> <span class=nx>RFB</span> <span class=nx>protocol</span> <span class=nx>version</span> <span class=m>3</span>.<span class=m>8</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Feb</span> <span class=m>13</span> <span class=m>04</span>:<span class=m>52</span>:<span class=m>45</span> <span class=m>2017</span><span class=err>
+</span><span class=err></span> <span class=nx>PlatformPixelBuffer</span>: <span class=nx>Using</span> <span class=nx>default</span> <span class=nx>colormap</span> <span class=nx>and</span> <span class=nx>visual</span><span class=p>,</span> <span class=nx>TrueColor</span><span class=p>,</span> <span class=nx>depth</span> <span class=m>24</span>.<span class=err>
+</span><span class=err></span><span class=nx>Xlib</span>:  <span class=nx>extension</span> <span class=s2>&#34;MIT-SHM&#34;</span> <span class=nx>missing</span> <span class=nx>on</span> <span class=nx>display</span> <span class=s2>&#34;localhost:10.0&#34;</span>.<span class=err>
+</span><span class=err></span> <span class=nx>CConn</span>:       <span class=nx>Using</span> <span class=nx>pixel</span> <span class=nx>format</span> <span class=nx>depth</span> <span class=m>24</span> <span class=p>(</span><span class=m>32</span>bpp<span class=p>)</span> <span class=nx>little</span><span class=p>-</span><span class=nx>endian</span> <span class=nx>rgb888</span><span class=err>
+</span><span class=err></span> <span class=nx>CConn</span>:       <span class=nx>Using</span> <span class=nx>Tight</span> <span class=nx>encoding</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>下面这个就是虚拟机上的虚拟机，Vmware Workstation 上安装 Linux, Linux上
+安装kvm虚拟机，如下是在嵌套上虚拟里执行了ifconfig命令的示例。</p><p><img src=/images/virtualization/qemu-kvm-test.jpg alt=kvm-test></p><h2 id=43-虚拟机实际是host上一个进程>4.3 虚拟机实际是HOST上一个进程</h2><p>在Linux上查看，上面的虚拟机实际上是Linux系统上的一个进程。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=p>~</span>]# <span class=nx>ps</span> <span class=p>-</span><span class=nx>ef</span> <span class=p>|</span> <span class=nx>grep</span> <span class=nx>qemu</span> <span class=p>|</span> <span class=nx>grep</span> <span class=p>-</span><span class=nx>v</span> <span class=nx>grep</span><span class=err>
+</span><span class=err></span><span class=nx>root</span>       <span class=m>3141</span>   <span class=m>3108</span>  <span class=m>0</span> <span class=m>04</span>:<span class=m>39</span> <span class=nx>pts</span><span class=sr>/0    00:00:15 qemu-kvm -m 128 -smp 1 -name test -hda /</span><span class=nx>images</span><span class=sr>/kvm/</span><span class=nx>cirros</span><span class=m>-0</span>.<span class=m>3</span>.<span class=m>3</span><span class=p>-</span><span class=nx>i386</span><span class=p>-</span><span class=nx>disk</span>.<span class=nx>img</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=p>~</span>]#<span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=5-kvm内存管理>5. KVM内存管理</h1><p>KVM继承了Linux系统管理内存的诸多特性，比如，分配给虚拟使用的内存可以被交换至交换空间、能够使用大内存页以实现更好的性能，以及对NUMA的支持能够让虚拟机高效访问更大的内存空间等。</p><p>KVM基于Intel的EPT（Extended Page Table）或AMD的RVI（Rapid Virtualization Indexing）技术可以支持更新的内存虚拟功能，这可以降低CPU的占用率，并提供较好的吞吐量。</p><p>此外，KVM还借助于KSM（Kernel Same-page Merging）这个内核特性实现了内存页面共享。KSM通过扫描每个虚拟机的内存查找各虚拟机间相同的内存页，并将这些内存页合并为一个被各相关虚拟机共享的单独页面。在某虚拟机试图修改此页面中的数据时，KSM会重新为其提供一个新的页面副本。实践中，运行于同一台物理主机上的具有相同GuestOS的虚拟机之间出现相同内存页面的概率是很的，比如共享库、内核或其它内存对象等都有可能表现为相同的内存页，因此，KSM技术可以降低内存占用进而提高整体性能。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2017-02-12</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/>虚拟化</a>
+<a href=/tags/kvm/>kvm</a>
+<a href=/tags/xen/>xen</a></div><nav class=post-nav><a class=prev href=/post/2017/02/kvm-qemu-fundation-2/><i class="iconfont icon-left"></i><span class="prev-text nav-default">KVM虚拟化基础二</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2017/02/xen-fundation-2/><span class="next-text nav-default">Xen虚拟化基础二</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2017-02-12 00:00:00 \u002b0000 UTC',title:'KVM虚拟化基础一',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

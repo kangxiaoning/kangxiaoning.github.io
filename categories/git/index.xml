@@ -1,37 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>git on 南寨小子</title>
-    <link>https://kangxiaoning.github.io/categories/git/</link>
-    <description>Recent content in git on 南寨小子</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Sat, 16 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/categories/git/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Git Submodule</title>
-      <link>https://kangxiaoning.github.io/post/2019/02/git-submoule/</link>
-      <pubDate>Sat, 16 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2019/02/git-submoule/</guid>
-      <description>&lt;h2 id=&#34;11-背景&#34;&gt;1.1 背景&lt;/h2&gt;
-&lt;p&gt;在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;如何获取第三方库更新？&lt;/li&gt;
-&lt;li&gt;如何在 clone 主项目的时候导入第三方库的代码？&lt;/li&gt;
-&lt;li&gt;修改了第三方库代码又想继续跟踪第三库的更新怎么办？&lt;/li&gt;
-&lt;/ol&gt;</description>
-    </item>
-    
-    <item>
-      <title>git配置多个仓库</title>
-      <link>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</link>
-      <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</guid>
-      <description>&lt;h1 id=&#34;配置&#34;&gt;配置&lt;/h1&gt;
-&lt;p&gt;电脑先用了git.oschina的仓库，再去clone github上的项目时失败，因为用户不一样。
-这时候需要先把全局配置取消，然后对每个仓库单独设置。&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>git on 南寨小子</title><link>https://kangxiaoning.github.io/categories/git/</link><description>Recent content in git on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 16 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/categories/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Git Submodule</title><link>https://kangxiaoning.github.io/post/2019/02/git-submoule/</link><pubDate>Sat, 16 Feb 2019 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2019/02/git-submoule/</guid><description>&lt;h2 id="11-背景">1.1 背景&lt;/h2>
+&lt;p>在 git 项目中引入第三方库，通过 git clone 下载到项目里，于是产生了 git 嵌套，如果我们要解决如下问题，那么需要考虑 git submodule。&lt;/p>
+&lt;ol>
+&lt;li>如何获取第三方库更新？&lt;/li>
+&lt;li>如何在 clone 主项目的时候导入第三方库的代码？&lt;/li>
+&lt;li>修改了第三方库代码又想继续跟踪第三库的更新怎么办？&lt;/li>
+&lt;/ol></description></item><item><title>git配置多个仓库</title><link>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</link><pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2016/11/git-multi-repo/</guid><description>&lt;h1 id="配置">配置&lt;/h1>
+&lt;p>电脑先用了git.oschina的仓库，再去clone github上的项目时失败，因为用户不一样。
+这时候需要先把全局配置取消，然后对每个仓库单独设置。&lt;/p></description></item></channel></rss>

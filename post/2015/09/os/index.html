@@ -1,508 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>模块使用之os - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>模块使用之os - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2015/09/os/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="模块使用之os"><meta property="og:description" content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2015/09/os/"><meta property="article:published_time" content="2015-09-25T00:00:00+00:00"><meta property="article:modified_time" content="2015-09-25T00:00:00+00:00"><meta itemprop=name content="模块使用之os"><meta itemprop=description content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。"><meta itemprop=datePublished content="2015-09-25T00:00:00+00:00"><meta itemprop=dateModified content="2015-09-25T00:00:00+00:00"><meta itemprop=wordCount content="411"><meta itemprop=keywords content="python,"><meta name=twitter:card content="summary"><meta name=twitter:title content="模块使用之os"><meta name=twitter:description content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>模块使用之os</h1><div class=post-meta><span class=post-time>2015-09-25</span><div class=post-category><a href=/categories/python/>python</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-ossep>1. os.sep</a></li><li><a href=#2-操作系统类型>2. 操作系统类型</a></li><li><a href=#3-当前目录>3. 当前目录</a></li><li><a href=#4-oslistdirpath>4. os.listdir(path)</a></li><li><a href=#5-文件或目录是否存在>5. 文件或目录是否存在</a></li><li><a href=#6-执行-shell-命令>6. 执行 shell 命令</a></li><li><a href=#7-osremovepath>7. os.remove(path)</a></li><li><a href=#8-环境变量>8. 环境变量</a></li><li><a href=#9-oslinesep>9. os.linesep</a></li></ul></nav></div></div><div class=post-content><p>练习 os 模块，需要的时候可以查询官方文档获取需要的函数。</p><h1 id=1-ossep>1. os.sep</h1><p>操作系统特定的路径分隔符</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=c1># Linux 平台</span>
+<span class=p>[</span><span class=n>root</span><span class=nd>@payu</span> <span class=o>~</span><span class=p>]</span><span class=c1># python</span>
+<span class=n>Python</span> <span class=mf>2.6</span><span class=o>.</span><span class=mi>6</span> <span class=p>(</span><span class=n>r266</span><span class=p>:</span><span class=mi>84292</span><span class=p>,</span> <span class=n>Nov</span> <span class=mi>22</span> <span class=mi>2013</span><span class=p>,</span> <span class=mi>12</span><span class=p>:</span><span class=mi>16</span><span class=p>:</span><span class=mi>22</span><span class=p>)</span> 
+<span class=p>[</span><span class=n>GCC</span> <span class=mf>4.4</span><span class=o>.</span><span class=mi>7</span> <span class=mi>20120313</span> <span class=p>(</span><span class=n>Red</span> <span class=n>Hat</span> <span class=mf>4.4</span><span class=o>.</span><span class=mi>7</span><span class=o>-</span><span class=mi>4</span><span class=p>)]</span> <span class=n>on</span> <span class=n>linux2</span>
+<span class=n>Type</span> <span class=s2>&#34;help&#34;</span><span class=p>,</span> <span class=s2>&#34;copyright&#34;</span><span class=p>,</span> <span class=s2>&#34;credits&#34;</span> <span class=ow>or</span> <span class=s2>&#34;license&#34;</span> <span class=k>for</span> <span class=n>more</span> <span class=n>information</span><span class=o>.</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=kn>import</span> <span class=nn>os</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>sep</span>
+<span class=s1>&#39;/&#39;</span>
+<span class=o>&gt;&gt;&gt;</span> 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<span class=c1># Windows 平台</span>
+<span class=n>C</span><span class=p>:</span>\<span class=n>Users</span>\<span class=n>payun</span><span class=o>&gt;</span><span class=n>python</span>
+<span class=n>Python</span> <span class=mf>2.7</span><span class=o>.</span><span class=mi>10</span> <span class=p>(</span><span class=n>default</span><span class=p>,</span> <span class=n>May</span> <span class=mi>23</span> <span class=mi>2015</span><span class=p>,</span> <span class=mi>09</span><span class=p>:</span><span class=mi>40</span><span class=p>:</span><span class=mi>32</span><span class=p>)</span> <span class=p>[</span><span class=n>MSC</span> <span class=n>v</span><span class=o>.</span><span class=mi>1500</span> <span class=mi>32</span> <span class=n>bit</span> <span class=p>(</span><span class=n>Intel</span><span class=p>)]</span> <span class=n>on</span> <span class=n>win32</span>
+<span class=n>Type</span> <span class=s2>&#34;help&#34;</span><span class=p>,</span> <span class=s2>&#34;copyright&#34;</span><span class=p>,</span> <span class=s2>&#34;credits&#34;</span> <span class=ow>or</span> <span class=s2>&#34;license&#34;</span> <span class=k>for</span> <span class=n>more</span> <span class=n>information</span><span class=o>.</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=kn>import</span> <span class=nn>os</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>sep</span>
+<span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>name</span> 
+</code></pre></td></tr></table></div></div><h1 id=2-操作系统类型>2. 操作系统类型</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=c1># Linux</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>name</span>
+<span class=s1>&#39;posix&#39;</span>
+<span class=o>&gt;&gt;&gt;</span> 
 
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+<span class=c1># Windows</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>name</span>
+<span class=s1>&#39;nt&#39;</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>getcwd</span><span class=p>()</span> 
+</code></pre></td></tr></table></div></div><h1 id=3-当前目录>3. 当前目录</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>getcwd</span><span class=p>()</span>
+<span class=s1>&#39;/root&#39;</span>
+<span class=c1># os.chdir(path) 进入指定目录，相当于 cd</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>chdir</span><span class=p>(</span><span class=s1>&#39;Downloads&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>getcwd</span><span class=p>()</span>
+<span class=s1>&#39;/root/Downloads&#39;</span>
+<span class=c1># 目录不存在会报错</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>chdir</span><span class=p>(</span><span class=s1>&#39;../tmp&#39;</span><span class=p>)</span>
+<span class=n>Traceback</span> <span class=p>(</span><span class=n>most</span> <span class=n>recent</span> <span class=n>call</span> <span class=n>last</span><span class=p>):</span>
+  <span class=n>File</span> <span class=s2>&#34;&lt;stdin&gt;&#34;</span><span class=p>,</span> <span class=n>line</span> <span class=mi>1</span><span class=p>,</span> <span class=ow>in</span> <span class=o>&lt;</span><span class=n>module</span><span class=o>&gt;</span>
+<span class=ne>OSError</span><span class=p>:</span> <span class=p>[</span><span class=n>Errno</span> <span class=mi>2</span><span class=p>]</span> <span class=n>No</span> <span class=n>such</span> <span class=nb>file</span> <span class=ow>or</span> <span class=n>directory</span><span class=p>:</span> <span class=s1>&#39;../tmp&#39;</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>chdir</span><span class=p>(</span><span class=s1>&#39;../../tmp&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>getcwd</span><span class=p>()</span>
+<span class=s1>&#39;/tmp&#39;</span>
+<span class=o>&gt;&gt;&gt;</span>
+</code></pre></td></tr></table></div></div><h1 id=4-oslistdirpath>4. os.listdir(path)</h1><p>返回指定目录下的文件，相当于 ls -a</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>listdir</span><span class=p>(</span><span class=n>os</span><span class=o>.</span><span class=n>getcwd</span><span class=p>())</span>
+<span class=p>[</span><span class=s1>&#39;hsperfdata_root&#39;</span><span class=p>,</span> <span class=s1>&#39;localsoftfix.sh&#39;</span><span class=p>,</span> <span class=s1>&#39;.esd-0&#39;</span><span class=p>,</span> <span class=s1>&#39;.ICE-unix&#39;</span><span class=p>,</span> <span class=s1>&#39;pulse-vAE1BleSKdz8&#39;</span><span class=p>]</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=nb>file</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><h1 id=5-文件或目录是否存在>5. 文件或目录是否存在</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=s1>&#39;tmp&#39;</span><span class=p>)</span>
+<span class=bp>False</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>path</span><span class=o>.</span><span class=n>exists</span><span class=p>(</span><span class=s1>&#39;.esd-0&#39;</span><span class=p>)</span>
+<span class=bp>True</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>system</span><span class=p>(</span><span class=n>command</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><h1 id=6-执行-shell-命令>6. 执行 shell 命令</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>system</span><span class=p>(</span><span class=s1>&#39;touch payun.tmp&#39;</span><span class=p>)</span>
+<span class=mi>0</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>system</span><span class=p>(</span><span class=s1>&#39;ls -l|grep payun&#39;</span><span class=p>)</span>
+<span class=o>-</span><span class=n>rw</span><span class=o>-</span><span class=n>r</span><span class=o>--</span><span class=n>r</span><span class=o>--</span>  <span class=mi>1</span> <span class=n>root</span> <span class=n>root</span>     <span class=mi>0</span> <span class=n>Sep</span> <span class=mi>25</span> <span class=mi>23</span><span class=p>:</span><span class=mo>07</span> <span class=n>payun</span><span class=o>.</span><span class=n>tmp</span>
+<span class=mi>0</span>
+<span class=o>&gt;&gt;&gt;</span>
+</code></pre></td></tr></table></div></div><h1 id=7-osremovepath>7. os.remove(path)</h1><p>删除指定文件</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>remove</span><span class=p>(</span><span class=s1>&#39;payun.tmp&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>system</span><span class=p>(</span><span class=s1>&#39;ls -l|grep payun&#39;</span><span class=p>)</span>
+<span class=mi>256</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>()</span>
+</code></pre></td></tr></table></div></div><h1 id=8-环境变量>8. 环境变量</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>getenv</span><span class=p>(</span><span class=s1>&#39;LANG&#39;</span><span class=p>)</span>
+<span class=s1>&#39;en_US.UTF-8&#39;</span>
+<span class=o>&gt;&gt;&gt;</span>
+<span class=n>os</span><span class=o>.</span><span class=n>putenv</span><span class=p>(</span><span class=n>key</span><span class=p>,</span> <span class=n>value</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><h1 id=9-oslinesep>9. os.linesep</h1><p>换行符</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=c1># Linux 下的换行符</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>linesep</span>
+<span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span>
+<span class=o>&gt;&gt;&gt;</span> 
 
-
-<meta name="author" content="dbo" /><meta name="description" content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/09/os/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="模块使用之os" />
-<meta property="og:description" content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/09/os/" />
-<meta property="article:published_time" content="2015-09-25T00:00:00+00:00" />
-<meta property="article:modified_time" content="2015-09-25T00:00:00+00:00" />
-<meta itemprop="name" content="模块使用之os">
-<meta itemprop="description" content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。">
-<meta itemprop="datePublished" content="2015-09-25T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2015-09-25T00:00:00+00:00" />
-<meta itemprop="wordCount" content="411">
-
-
-
-<meta itemprop="keywords" content="python," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="模块使用之os"/>
-<meta name="twitter:description" content="练习 os 模块，需要的时候可以查询官方文档获取需要的函数。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">模块使用之os</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2015-09-25 </span>
-        <div class="post-category">
-            <a href="/categories/python/"> python </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-ossep">1. os.sep</a></li>
-    <li><a href="#2-操作系统类型">2. 操作系统类型</a></li>
-    <li><a href="#3-当前目录">3. 当前目录</a></li>
-    <li><a href="#4-oslistdirpath">4. os.listdir(path)</a></li>
-    <li><a href="#5-文件或目录是否存在">5. 文件或目录是否存在</a></li>
-    <li><a href="#6-执行-shell-命令">6. 执行 shell 命令</a></li>
-    <li><a href="#7-osremovepath">7. os.remove(path)</a></li>
-    <li><a href="#8-环境变量">8. 环境变量</a></li>
-    <li><a href="#9-oslinesep">9. os.linesep</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <p>练习 os 模块，需要的时候可以查询官方文档获取需要的函数。</p>
-<h1 id="1-ossep">1. os.sep</h1>
-<p>操作系统特定的路径分隔符</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Linux 平台</span>
-<span class="p">[</span><span class="n">root</span><span class="nd">@payu</span> <span class="o">~</span><span class="p">]</span><span class="c1"># python</span>
-<span class="n">Python</span> <span class="mf">2.6</span><span class="o">.</span><span class="mi">6</span> <span class="p">(</span><span class="n">r266</span><span class="p">:</span><span class="mi">84292</span><span class="p">,</span> <span class="n">Nov</span> <span class="mi">22</span> <span class="mi">2013</span><span class="p">,</span> <span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">22</span><span class="p">)</span> 
-<span class="p">[</span><span class="n">GCC</span> <span class="mf">4.4</span><span class="o">.</span><span class="mi">7</span> <span class="mi">20120313</span> <span class="p">(</span><span class="n">Red</span> <span class="n">Hat</span> <span class="mf">4.4</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="mi">4</span><span class="p">)]</span> <span class="n">on</span> <span class="n">linux2</span>
-<span class="n">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="ow">or</span> <span class="s2">&#34;license&#34;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="o">.</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">os</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
-<span class="s1">&#39;/&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> 
-
-<span class="c1"># Windows 平台</span>
-<span class="n">C</span><span class="p">:</span>\<span class="n">Users</span>\<span class="n">payun</span><span class="o">&gt;</span><span class="n">python</span>
-<span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">10</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">May</span> <span class="mi">23</span> <span class="mi">2015</span><span class="p">,</span> <span class="mi">09</span><span class="p">:</span><span class="mi">40</span><span class="p">:</span><span class="mi">32</span><span class="p">)</span> <span class="p">[</span><span class="n">MSC</span> <span class="n">v</span><span class="o">.</span><span class="mi">1500</span> <span class="mi">32</span> <span class="n">bit</span> <span class="p">(</span><span class="n">Intel</span><span class="p">)]</span> <span class="n">on</span> <span class="n">win32</span>
-<span class="n">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="ow">or</span> <span class="s2">&#34;license&#34;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="o">.</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">os</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
-<span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">name</span> 
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="2-操作系统类型">2. 操作系统类型</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Linux</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span>
-<span class="s1">&#39;posix&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> 
-
-<span class="c1"># Windows</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span>
-<span class="s1">&#39;nt&#39;</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> 
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="3-当前目录">3. 当前目录</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="s1">&#39;/root&#39;</span>
-<span class="c1"># os.chdir(path) 进入指定目录，相当于 cd</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;Downloads&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="s1">&#39;/root/Downloads&#39;</span>
-<span class="c1"># 目录不存在会报错</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;../tmp&#39;</span><span class="p">)</span>
-<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
-  <span class="n">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="ne">OSError</span><span class="p">:</span> <span class="p">[</span><span class="n">Errno</span> <span class="mi">2</span><span class="p">]</span> <span class="n">No</span> <span class="n">such</span> <span class="nb">file</span> <span class="ow">or</span> <span class="n">directory</span><span class="p">:</span> <span class="s1">&#39;../tmp&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s1">&#39;../../tmp&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="s1">&#39;/tmp&#39;</span>
-<span class="o">&gt;&gt;&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="4-oslistdirpath">4. os.listdir(path)</h1>
-<p>返回指定目录下的文件，相当于 ls -a</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
-<span class="p">[</span><span class="s1">&#39;hsperfdata_root&#39;</span><span class="p">,</span> <span class="s1">&#39;localsoftfix.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;.esd-0&#39;</span><span class="p">,</span> <span class="s1">&#39;.ICE-unix&#39;</span><span class="p">,</span> <span class="s1">&#39;pulse-vAE1BleSKdz8&#39;</span><span class="p">]</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="5-文件或目录是否存在">5. 文件或目录是否存在</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
-<span class="bp">False</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;.esd-0&#39;</span><span class="p">)</span>
-<span class="bp">True</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="6-执行-shell-命令">6. 执行 shell 命令</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;touch payun.tmp&#39;</span><span class="p">)</span>
-<span class="mi">0</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;ls -l|grep payun&#39;</span><span class="p">)</span>
-<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>  <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>     <span class="mi">0</span> <span class="n">Sep</span> <span class="mi">25</span> <span class="mi">23</span><span class="p">:</span><span class="mo">07</span> <span class="n">payun</span><span class="o">.</span><span class="n">tmp</span>
-<span class="mi">0</span>
-<span class="o">&gt;&gt;&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="7-osremovepath">7. os.remove(path)</h1>
-<p>删除指定文件</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;payun.tmp&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;ls -l|grep payun&#39;</span><span class="p">)</span>
-<span class="mi">256</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">()</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="8-环境变量">8. 环境变量</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;LANG&#39;</span><span class="p">)</span>
-<span class="s1">&#39;en_US.UTF-8&#39;</span>
-<span class="o">&gt;&gt;&gt;</span>
-<span class="n">os</span><span class="o">.</span><span class="n">putenv</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="9-oslinesep">9. os.linesep</h1>
-<p>换行符</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Linux 下的换行符</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span>
-<span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-<span class="o">&gt;&gt;&gt;</span> 
-
-<span class="c1"># Windows 下的换行符</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span>
-<span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
-<span class="o">&gt;&gt;&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2015-09-25
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/python/">python</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2015/09/arguments/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">python函数的可变参数</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2015/09/sed-rc.local/">
-            <span class="next-text nav-default">/etc/rc.local开机启动失效</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2015-09-25 00:00:00 \u002b0000 UTC',
-        title: '模块使用之os',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+<span class=c1># Windows 下的换行符</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>os</span><span class=o>.</span><span class=n>linesep</span>
+<span class=s1>&#39;</span><span class=se>\r\n</span><span class=s1>&#39;</span>
+<span class=o>&gt;&gt;&gt;</span>
+</code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2015-09-25</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/python/>python</a></div><nav class=post-nav><a class=prev href=/post/2015/09/arguments/><i class="iconfont icon-left"></i><span class="prev-text nav-default">python函数的可变参数</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2015/09/sed-rc.local/><span class="next-text nav-default">/etc/rc.local开机启动失效</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2015-09-25 00:00:00 \u002b0000 UTC',title:'模块使用之os',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

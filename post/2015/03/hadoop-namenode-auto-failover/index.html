@@ -1,474 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Hadoop学习3-NameNode自动failover - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="(二) NameNode自动failover 工作原理参照QJM自动failover原理。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="Hadoop学习3-NameNode自动failover" />
-<meta property="og:description" content="(二) NameNode自动failover
-工作原理参照QJM自动failover原理。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/" />
-<meta property="article:published_time" content="2015-03-03T00:00:00+00:00" />
-<meta property="article:modified_time" content="2015-03-03T00:00:00+00:00" />
-<meta itemprop="name" content="Hadoop学习3-NameNode自动failover">
-<meta itemprop="description" content="(二) NameNode自动failover
-工作原理参照QJM自动failover原理。">
-<meta itemprop="datePublished" content="2015-03-03T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2015-03-03T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1129">
-
-
-
-<meta itemprop="keywords" content="hadoop,bigdata," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hadoop学习3-NameNode自动failover"/>
-<meta name="twitter:description" content="(二) NameNode自动failover
-工作原理参照QJM自动failover原理。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">Hadoop学习3-NameNode自动failover</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2015-03-03 </span>
-        <div class="post-category">
-            <a href="/categories/hadoop/"> hadoop </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#二-namenode自动failover">(二) NameNode自动failover</a>
-          <ul>
-            <li><a href="#步骤一-资源规划">步骤一、 资源规划</a></li>
-            <li><a href="#步骤二-主机环境变量">步骤二、 主机环境变量</a></li>
-            <li><a href="#步骤三-安装配置zookeeper">步骤三、 安装配置zookeeper</a></li>
-            <li><a href="#步骤四-启动zookeeper">步骤四、 启动zookeeper</a></li>
-            <li><a href="#步骤五-配置hadoop">步骤五、 配置hadoop</a></li>
-            <li><a href="#1-停止hadoop">1) 停止hadoop</a></li>
-            <li><a href="#步骤六-格式化zookeeper">步骤六、 格式化zookeeper</a></li>
-            <li><a href="#步骤七-验证自动failover">步骤七、 验证自动failover</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h2 id="二-namenode自动failover">(二) NameNode自动failover</h2>
-<p>工作原理参照<a href="http://user.github.io/blog/2015/03/01/hadoop-foundation.html#qjmfailover">QJM自动failover原理</a>。</p>
-<h3 id="步骤一-资源规划">步骤一、 资源规划</h3>
-<p>在如下3台机器搭建3个节点的zookeeper集群，ZKFC进程自动在NameNode节点启动。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">主机名</th>
-<th style="text-align:left">IP</th>
-<th style="text-align:left">用户</th>
-<th style="text-align:left">Zookeeper</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">namenode1</td>
-<td style="text-align:left">10.20.16.217</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">QuorumPeerMain、DFSZKFailoverController</td>
-</tr>
-<tr>
-<td style="text-align:left">namenode2</td>
-<td style="text-align:left">10.20.16.218</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">QuorumPeerMain、DFSZKFailoverController</td>
-</tr>
-<tr>
-<td style="text-align:left">datanode1</td>
-<td style="text-align:left">10.20.16.219</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">QuorumPeerMain</td>
-</tr>
-</tbody>
-</table>
-<h3 id="步骤二-主机环境变量">步骤二、 主机环境变量</h3>
-<p>在/etc/profile添加如下环境变量</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">ZOOKEEPER_HOME</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">zookeeper</span><span class="m">-3</span>.<span class="m">4</span>.<span class="m">6</span><span class="err">
-</span><span class="err"></span><span class="nx">export</span> <span class="nx">PATH</span><span class="p">=</span>$<span class="nx">ZOOKEEPER_HOME</span>/<span class="nx">bin</span>:$<span class="nx">PATH</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="步骤三-安装配置zookeeper">步骤三、 安装配置zookeeper</h3>
-<p>下载zookeeper的安装包并上传到namenode1节点, 解压后进入zookeeper目录下的conf子目录。</p>
-<p>**注意：**zoo.cfg脚本比较严格，多余的注释可能会导致解析错误，获取不到dataDir配置，默认将数据存放到/tmp下，从而导致停止时出现“no zookeeper to stop”等错误，因此仅将如下配置添加到zoo.cfg文件即可。</p>
-<h4 id="1-配置zookeeper">1) 配置zookeeper</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">vi</span> <span class="nx">zoo</span>.<span class="nx">cfg</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">zoo</span>.<span class="nx">cfg</span> <span class="nx">内容如下</span><span class="err">
-</span><span class="err"></span><span class="nx">tickTime</span><span class="p">=</span><span class="m">2000</span><span class="err">
-</span><span class="err"></span><span class="nx">initLimit</span><span class="p">=</span><span class="m">10</span><span class="err">
-</span><span class="err"></span><span class="nx">syncLimit</span><span class="p">=</span><span class="m">5</span><span class="err">
-</span><span class="err"></span><span class="nx">dataDir</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span><span class="sr">/zookeeper-3.4.6/</span><span class="nx">zkdata</span><span class="err">
-</span><span class="err"></span><span class="nx">dataLogDir</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span><span class="sr">/zookeeper-3.4.6/</span><span class="nx">zkdatalog</span><span class="err">
-</span><span class="err"></span><span class="nx">clientPort</span><span class="p">=</span><span class="m">2181</span><span class="err">
-</span><span class="err"></span><span class="nx">server</span>.<span class="m">1</span><span class="p">=</span><span class="nx">namenode1</span>:<span class="m">2888</span>:<span class="m">3888</span><span class="err">
-</span><span class="err"></span><span class="nx">server</span>.<span class="m">2</span><span class="p">=</span><span class="nx">namenode2</span>:<span class="m">2888</span>:<span class="m">3888</span><span class="err">
-</span><span class="err"></span><span class="nx">server</span>.<span class="m">3</span><span class="p">=</span><span class="nx">datanode1</span>:<span class="m">2888</span>:<span class="m">3888</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-完成其它节点安装">2) 完成其它节点安装</h4>
-<p>配置完成后，将zookeeper复制到其它2个节点。</p>
-<h3 id="步骤四-启动zookeeper">步骤四、 启动zookeeper</h3>
-<h4 id="1-启动zookeeper">1) 启动zookeeper</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">zkServer</span>.<span class="nx">sh</span> <span class="nx">start</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-验证进程">2) 验证进程</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">jps
-</code></pre></td></tr></table>
-</div>
-</div><p>**示例：**每个节点都可以看到QuorumPeerMain</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">zkdata</span>]$ <span class="nx">jps</span><span class="err">
-</span><span class="err"></span><span class="m">63889</span> <span class="nx">Jps</span><span class="err">
-</span><span class="err"></span><span class="m">63191</span> <span class="nx">QuorumPeerMain</span><span class="err">
-</span><span class="err"></span>[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">zkdata</span>]$<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="步骤五-配置hadoop">步骤五、 配置hadoop</h3>
-<h3 id="1-停止hadoop">1) 停止hadoop</h3>
-<p>在配置hadoop前先停止hadoop所有进程。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">mr</span><span class="p">-</span><span class="nx">jobhistory</span><span class="p">-</span><span class="nx">daemon</span>.<span class="nx">sh</span> <span class="nx">stop</span> <span class="nx">historyserver</span><span class="err">
-</span><span class="err"></span><span class="nx">stop</span><span class="p">-</span><span class="nx">yarn</span>.<span class="nx">sh</span><span class="err">
-</span><span class="err"></span><span class="nx">stop</span><span class="p">-</span><span class="nx">dfs</span>.<span class="nx">sh</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-hdfs-sitexml">2) hdfs-site.xml</h4>
-<p>添加如下配置，启用自动failover。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;property&gt;</span>
-    <span class="nt">&lt;name&gt;</span>dfs.ha.automatic-failover.enabled<span class="nt">&lt;/name&gt;</span>
-    <span class="nt">&lt;value&gt;</span>true<span class="nt">&lt;/value&gt;</span>
-<span class="nt">&lt;/property&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><h4 id="3-core-sitexml">3) core-site.xml</h4>
-<p>添加如下配置，指定zookeeper集群节点。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="nt">&lt;property&gt;</span>
-    <span class="nt">&lt;name&gt;</span>ha.zookeeper.quorum<span class="nt">&lt;/name&gt;</span>
-    <span class="nt">&lt;value&gt;</span>zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181<span class="nt">&lt;/value&gt;</span>
-<span class="nt">&lt;/property&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><h4 id="4-完成所有节点安装">4) 完成所有节点安装</h4>
-<p>参照hadoop安装步骤，将修改的配置文件同步到所有hadoop节点。</p>
-<h3 id="步骤六-格式化zookeeper">步骤六、 格式化zookeeper</h3>
-<p>在namenode1节点执行如下命令，创建znode用于保存自动failover需要存储的状态。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">hdfs</span> <span class="nx">zkfc</span> <span class="p">-</span><span class="nx">formatZK</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="步骤七-验证自动failover">步骤七、 验证自动failover</h3>
-<p>启动后，查看NameNode状态，发现已经有一个节点是active了，接着kill掉active节点，发现另一个节点由standby变成active状态，此时证明自动failover已经生效。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">start</span><span class="p">-</span><span class="nx">dfs</span>.<span class="nx">sh</span><span class="err">
-</span><span class="err"></span><span class="nx">start</span><span class="p">-</span><span class="nx">yarn</span>.<span class="nx">sh</span><span class="err">
-</span><span class="err"></span><span class="nx">hdfs</span> <span class="nx">haadmin</span> <span class="p">-</span><span class="nx">getServiceState</span> <span class="nx">nn1</span><span class="err">
-</span><span class="err"></span><span class="nx">hdfs</span> <span class="nx">haadmin</span> <span class="p">-</span><span class="nx">getServiceState</span> <span class="nx">nn2</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2015-03-03
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/hadoop/">hadoop</a>
-          <a href="/tags/bigdata/">bigdata</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2015/03/hbase-install/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Hadoop学习4-Hbase双Hmaster集群搭建</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2015/03/hadoop-install/">
-            <span class="next-text nav-default">Hadoop学习2-集群搭建</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2015-03-03 00:00:00 \u002b0000 UTC',
-        title: 'Hadoop学习3-NameNode自动failover',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Hadoop学习3-NameNode自动failover - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="(二) NameNode自动failover 工作原理参照QJM自动failover原理。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Hadoop学习3-NameNode自动failover"><meta property="og:description" content="(二) NameNode自动failover
+工作原理参照QJM自动failover原理。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hadoop-namenode-auto-failover/"><meta property="article:published_time" content="2015-03-03T00:00:00+00:00"><meta property="article:modified_time" content="2015-03-03T00:00:00+00:00"><meta itemprop=name content="Hadoop学习3-NameNode自动failover"><meta itemprop=description content="(二) NameNode自动failover
+工作原理参照QJM自动failover原理。"><meta itemprop=datePublished content="2015-03-03T00:00:00+00:00"><meta itemprop=dateModified content="2015-03-03T00:00:00+00:00"><meta itemprop=wordCount content="1129"><meta itemprop=keywords content="hadoop,bigdata,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Hadoop学习3-NameNode自动failover"><meta name=twitter:description content="(二) NameNode自动failover
+工作原理参照QJM自动failover原理。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Hadoop学习3-NameNode自动failover</h1><div class=post-meta><span class=post-time>2015-03-03</span><div class=post-category><a href=/categories/hadoop/>hadoop</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#二-namenode自动failover>(二) NameNode自动failover</a><ul><li><a href=#步骤一-资源规划>步骤一、 资源规划</a></li><li><a href=#步骤二-主机环境变量>步骤二、 主机环境变量</a></li><li><a href=#步骤三-安装配置zookeeper>步骤三、 安装配置zookeeper</a></li><li><a href=#步骤四-启动zookeeper>步骤四、 启动zookeeper</a></li><li><a href=#步骤五-配置hadoop>步骤五、 配置hadoop</a></li><li><a href=#1-停止hadoop>1) 停止hadoop</a></li><li><a href=#步骤六-格式化zookeeper>步骤六、 格式化zookeeper</a></li><li><a href=#步骤七-验证自动failover>步骤七、 验证自动failover</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=二-namenode自动failover>(二) NameNode自动failover</h2><p>工作原理参照<a href=http://user.github.io/blog/2015/03/01/hadoop-foundation.html#qjmfailover>QJM自动failover原理</a>。</p><h3 id=步骤一-资源规划>步骤一、 资源规划</h3><p>在如下3台机器搭建3个节点的zookeeper集群，ZKFC进程自动在NameNode节点启动。</p><table><thead><tr><th style=text-align:left>主机名</th><th style=text-align:left>IP</th><th style=text-align:left>用户</th><th style=text-align:left>Zookeeper</th></tr></thead><tbody><tr><td style=text-align:left>namenode1</td><td style=text-align:left>10.20.16.217</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>QuorumPeerMain、DFSZKFailoverController</td></tr><tr><td style=text-align:left>namenode2</td><td style=text-align:left>10.20.16.218</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>QuorumPeerMain、DFSZKFailoverController</td></tr><tr><td style=text-align:left>datanode1</td><td style=text-align:left>10.20.16.219</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>QuorumPeerMain</td></tr></tbody></table><h3 id=步骤二-主机环境变量>步骤二、 主机环境变量</h3><p>在/etc/profile添加如下环境变量</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>export</span> <span class=nx>ZOOKEEPER_HOME</span><span class=p>=</span><span class=sr>/home/</span><span class=nx>hadoop</span>/<span class=nx>zookeeper</span><span class=m>-3</span>.<span class=m>4</span>.<span class=m>6</span><span class=err>
+</span><span class=err></span><span class=nx>export</span> <span class=nx>PATH</span><span class=p>=</span>$<span class=nx>ZOOKEEPER_HOME</span>/<span class=nx>bin</span>:$<span class=nx>PATH</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=步骤三-安装配置zookeeper>步骤三、 安装配置zookeeper</h3><p>下载zookeeper的安装包并上传到namenode1节点, 解压后进入zookeeper目录下的conf子目录。</p><p>**注意：**zoo.cfg脚本比较严格，多余的注释可能会导致解析错误，获取不到dataDir配置，默认将数据存放到/tmp下，从而导致停止时出现“no zookeeper to stop”等错误，因此仅将如下配置添加到zoo.cfg文件即可。</p><h4 id=1-配置zookeeper>1) 配置zookeeper</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>vi</span> <span class=nx>zoo</span>.<span class=nx>cfg</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>zoo</span>.<span class=nx>cfg</span> <span class=nx>内容如下</span><span class=err>
+</span><span class=err></span><span class=nx>tickTime</span><span class=p>=</span><span class=m>2000</span><span class=err>
+</span><span class=err></span><span class=nx>initLimit</span><span class=p>=</span><span class=m>10</span><span class=err>
+</span><span class=err></span><span class=nx>syncLimit</span><span class=p>=</span><span class=m>5</span><span class=err>
+</span><span class=err></span><span class=nx>dataDir</span><span class=p>=</span><span class=sr>/home/</span><span class=nx>hadoop</span><span class=sr>/zookeeper-3.4.6/</span><span class=nx>zkdata</span><span class=err>
+</span><span class=err></span><span class=nx>dataLogDir</span><span class=p>=</span><span class=sr>/home/</span><span class=nx>hadoop</span><span class=sr>/zookeeper-3.4.6/</span><span class=nx>zkdatalog</span><span class=err>
+</span><span class=err></span><span class=nx>clientPort</span><span class=p>=</span><span class=m>2181</span><span class=err>
+</span><span class=err></span><span class=nx>server</span>.<span class=m>1</span><span class=p>=</span><span class=nx>namenode1</span>:<span class=m>2888</span>:<span class=m>3888</span><span class=err>
+</span><span class=err></span><span class=nx>server</span>.<span class=m>2</span><span class=p>=</span><span class=nx>namenode2</span>:<span class=m>2888</span>:<span class=m>3888</span><span class=err>
+</span><span class=err></span><span class=nx>server</span>.<span class=m>3</span><span class=p>=</span><span class=nx>datanode1</span>:<span class=m>2888</span>:<span class=m>3888</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-完成其它节点安装>2) 完成其它节点安装</h4><p>配置完成后，将zookeeper复制到其它2个节点。</p><h3 id=步骤四-启动zookeeper>步骤四、 启动zookeeper</h3><h4 id=1-启动zookeeper>1) 启动zookeeper</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>zkServer</span>.<span class=nx>sh</span> <span class=nx>start</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-验证进程>2) 验证进程</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>jps
+</code></pre></td></tr></table></div></div><p>**示例：**每个节点都可以看到QuorumPeerMain</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>zkdata</span>]$ <span class=nx>jps</span><span class=err>
+</span><span class=err></span><span class=m>63889</span> <span class=nx>Jps</span><span class=err>
+</span><span class=err></span><span class=m>63191</span> <span class=nx>QuorumPeerMain</span><span class=err>
+</span><span class=err></span>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>zkdata</span>]$<span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=步骤五-配置hadoop>步骤五、 配置hadoop</h3><h3 id=1-停止hadoop>1) 停止hadoop</h3><p>在配置hadoop前先停止hadoop所有进程。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>mr</span><span class=p>-</span><span class=nx>jobhistory</span><span class=p>-</span><span class=nx>daemon</span>.<span class=nx>sh</span> <span class=nx>stop</span> <span class=nx>historyserver</span><span class=err>
+</span><span class=err></span><span class=nx>stop</span><span class=p>-</span><span class=nx>yarn</span>.<span class=nx>sh</span><span class=err>
+</span><span class=err></span><span class=nx>stop</span><span class=p>-</span><span class=nx>dfs</span>.<span class=nx>sh</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-hdfs-sitexml>2) hdfs-site.xml</h4><p>添加如下配置，启用自动failover。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml><span class=nt>&lt;property&gt;</span>
+    <span class=nt>&lt;name&gt;</span>dfs.ha.automatic-failover.enabled<span class=nt>&lt;/name&gt;</span>
+    <span class=nt>&lt;value&gt;</span>true<span class=nt>&lt;/value&gt;</span>
+<span class=nt>&lt;/property&gt;</span>
+</code></pre></td></tr></table></div></div><h4 id=3-core-sitexml>3) core-site.xml</h4><p>添加如下配置，指定zookeeper集群节点。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml><span class=nt>&lt;property&gt;</span>
+    <span class=nt>&lt;name&gt;</span>ha.zookeeper.quorum<span class=nt>&lt;/name&gt;</span>
+    <span class=nt>&lt;value&gt;</span>zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181<span class=nt>&lt;/value&gt;</span>
+<span class=nt>&lt;/property&gt;</span>
+</code></pre></td></tr></table></div></div><h4 id=4-完成所有节点安装>4) 完成所有节点安装</h4><p>参照hadoop安装步骤，将修改的配置文件同步到所有hadoop节点。</p><h3 id=步骤六-格式化zookeeper>步骤六、 格式化zookeeper</h3><p>在namenode1节点执行如下命令，创建znode用于保存自动failover需要存储的状态。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>hdfs</span> <span class=nx>zkfc</span> <span class=p>-</span><span class=nx>formatZK</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=步骤七-验证自动failover>步骤七、 验证自动failover</h3><p>启动后，查看NameNode状态，发现已经有一个节点是active了，接着kill掉active节点，发现另一个节点由standby变成active状态，此时证明自动failover已经生效。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>start</span><span class=p>-</span><span class=nx>dfs</span>.<span class=nx>sh</span><span class=err>
+</span><span class=err></span><span class=nx>start</span><span class=p>-</span><span class=nx>yarn</span>.<span class=nx>sh</span><span class=err>
+</span><span class=err></span><span class=nx>hdfs</span> <span class=nx>haadmin</span> <span class=p>-</span><span class=nx>getServiceState</span> <span class=nx>nn1</span><span class=err>
+</span><span class=err></span><span class=nx>hdfs</span> <span class=nx>haadmin</span> <span class=p>-</span><span class=nx>getServiceState</span> <span class=nx>nn2</span><span class=err>
+</span></code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2015-03-03</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/hadoop/>hadoop</a>
+<a href=/tags/bigdata/>bigdata</a></div><nav class=post-nav><a class=prev href=/post/2015/03/hbase-install/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Hadoop学习4-Hbase双Hmaster集群搭建</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2015/03/hadoop-install/><span class="next-text nav-default">Hadoop学习2-集群搭建</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2015-03-03 00:00:00 \u002b0000 UTC',title:'Hadoop学习3-NameNode自动failover',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

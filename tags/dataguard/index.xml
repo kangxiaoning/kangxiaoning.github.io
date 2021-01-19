@@ -1,99 +1,17 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>DataGuard on 南寨小子</title>
-    <link>https://kangxiaoning.github.io/tags/dataguard/</link>
-    <description>Recent content in DataGuard on 南寨小子</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Sun, 23 Sep 2012 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/dataguard/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>DataGrard异常-DG异常导致日志备份失败</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;def库dg异常导致日志备份失败&#34;&gt;DEF库DG异常导致日志备份失败&lt;/h2&gt;
-&lt;p&gt;先了解下DEF的DG环境：
-生产 -&amp;gt; 同城DG -&amp;gt; 上海DG.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-DG端缺少文件导致MRP无法启动</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;dg端缺少文件导致mrp无法启动&#34;&gt;DG端缺少文件导致MRP无法启动&lt;/h2&gt;
-&lt;h3 id=&#34;环境信息&#34;&gt;环境信息&lt;/h3&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-FAL参数设置错误导致DG无法自动处理gap</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;fal参数设置错误导致dg无法自动处理gap&#34;&gt;FAL参数设置错误导致DG无法自动处理gap&lt;/h2&gt;
-&lt;p&gt;由于主机异常重启，导致DG出现GAP，在主机正常后，启动standby库，发现无法自动处理gap.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-No standby redo logfiles of size 2048000 blocks available</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;no-standby-redo-logfiles-of-size-2048000-blocks-available&#34;&gt;No standby redo logfiles of size 2048000 blocks available&lt;/h2&gt;
-&lt;p&gt;DG报错，本次现象可以看到，此错误一旦出现，DG同步将变的非常慢。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-ORA-01111 offline drop</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;ora-01111-offline-drop&#34;&gt;ORA-01111 offline drop&lt;/h2&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-ORA-01157/ORA-01110/ORA-27037</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;ora-01157ora-01110ora-27037&#34;&gt;ORA-01157/ORA-01110/ORA-27037&lt;/h2&gt;
-&lt;p&gt;这个报错导致数据库MRP进程无法启动，同步无法进行。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-ORA-38868</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;ora-38868&#34;&gt;ORA-38868&lt;/h2&gt;
-&lt;p&gt;数据库alert报错，并且MRP进程无法启动，数据库同步发生了异常。&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>DataGrard异常-不传输日志</title>
-      <link>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</link>
-      <pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</guid>
-      <description>&lt;!-- toc --&gt;
-&lt;h2 id=&#34;dg不传输日志&#34;&gt;DG不传输日志&lt;/h2&gt;
-&lt;p&gt;ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DataGuard on 南寨小子</title><link>https://kangxiaoning.github.io/tags/dataguard/</link><description>Recent content in DataGuard on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 23 Sep 2012 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/dataguard/index.xml" rel="self" type="application/rss+xml"/><item><title>DataGrard异常-DG异常导致日志备份失败</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-05/</guid><description>&lt;!-- toc -->
+&lt;h2 id="def库dg异常导致日志备份失败">DEF库DG异常导致日志备份失败&lt;/h2>
+&lt;p>先了解下DEF的DG环境：
+生产 -&amp;gt; 同城DG -&amp;gt; 上海DG.&lt;/p></description></item><item><title>DataGrard异常-DG端缺少文件导致MRP无法启动</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-08/</guid><description>&lt;!-- toc -->
+&lt;h2 id="dg端缺少文件导致mrp无法启动">DG端缺少文件导致MRP无法启动&lt;/h2>
+&lt;h3 id="环境信息">环境信息&lt;/h3></description></item><item><title>DataGrard异常-FAL参数设置错误导致DG无法自动处理gap</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-04/</guid><description>&lt;!-- toc -->
+&lt;h2 id="fal参数设置错误导致dg无法自动处理gap">FAL参数设置错误导致DG无法自动处理gap&lt;/h2>
+&lt;p>由于主机异常重启，导致DG出现GAP，在主机正常后，启动standby库，发现无法自动处理gap.&lt;/p></description></item><item><title>DataGrard异常-No standby redo logfiles of size 2048000 blocks available</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-06/</guid><description>&lt;!-- toc -->
+&lt;h2 id="no-standby-redo-logfiles-of-size-2048000-blocks-available">No standby redo logfiles of size 2048000 blocks available&lt;/h2>
+&lt;p>DG报错，本次现象可以看到，此错误一旦出现，DG同步将变的非常慢。&lt;/p></description></item><item><title>DataGrard异常-ORA-01111 offline drop</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-07/</guid><description>&lt;!-- toc -->
+&lt;h2 id="ora-01111-offline-drop">ORA-01111 offline drop&lt;/h2></description></item><item><title>DataGrard异常-ORA-01157/ORA-01110/ORA-27037</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-02/</guid><description>&lt;!-- toc -->
+&lt;h2 id="ora-01157ora-01110ora-27037">ORA-01157/ORA-01110/ORA-27037&lt;/h2>
+&lt;p>这个报错导致数据库MRP进程无法启动，同步无法进行。&lt;/p></description></item><item><title>DataGrard异常-ORA-38868</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-01/</guid><description>&lt;!-- toc -->
+&lt;h2 id="ora-38868">ORA-38868&lt;/h2>
+&lt;p>数据库alert报错，并且MRP进程无法启动，数据库同步发生了异常。&lt;/p></description></item><item><title>DataGrard异常-不传输日志</title><link>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</link><pubDate>Sun, 23 Sep 2012 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2012/09/dg-exception-03/</guid><description>&lt;!-- toc -->
+&lt;h2 id="dg不传输日志">DG不传输日志&lt;/h2>
+&lt;p>ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。&lt;/p></description></item></channel></rss>

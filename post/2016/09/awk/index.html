@@ -1,892 +1,357 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>awk使用总结 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="1. 概念 文本处理三工具
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>awk使用总结 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="1. 概念 文本处理三工具
 grep, sed, awk
-grep, egrep, fgrep：文本过滤工具pattern sed: 行编辑器 模式空间、保持空间 awk：报告生成器，格式化文本输出 AWK: Aho, Weinberger, Kernighan --&amp;gt; New AWK, NAWK GNU awk, gawk  gawk - pattern scanning and processing language
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/09/awk/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="awk使用总结" />
-<meta property="og:description" content="1. 概念
+grep, egrep, fgrep：文本过滤工具pattern sed: 行编辑器 模式空间、保持空间 awk：报告生成器，格式化文本输出 AWK: Aho, Weinberger, Kernighan --&amp;gt; New AWK, NAWK GNU awk, gawk  gawk - pattern scanning and processing language"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2016/09/awk/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="awk使用总结"><meta property="og:description" content="1. 概念
 文本处理三工具
 grep, sed, awk
 grep, egrep, fgrep：文本过滤工具pattern
 sed: 行编辑器
     模式空间、保持空间
 awk：报告生成器，格式化文本输出
-AWK: Aho, Weinberger, Kernighan --&gt; New AWK, NAWK
+AWK: Aho, Weinberger, Kernighan --> New AWK, NAWK
 GNU awk, gawk
 
-gawk - pattern scanning and processing language" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/09/awk/" />
-<meta property="article:published_time" content="2016-09-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2016-09-19T00:00:00+00:00" />
-<meta itemprop="name" content="awk使用总结">
-<meta itemprop="description" content="1. 概念
+gawk - pattern scanning and processing language"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2016/09/awk/"><meta property="article:published_time" content="2016-09-19T00:00:00+00:00"><meta property="article:modified_time" content="2016-09-19T00:00:00+00:00"><meta itemprop=name content="awk使用总结"><meta itemprop=description content="1. 概念
 文本处理三工具
 grep, sed, awk
 grep, egrep, fgrep：文本过滤工具pattern
 sed: 行编辑器
     模式空间、保持空间
 awk：报告生成器，格式化文本输出
-AWK: Aho, Weinberger, Kernighan --&gt; New AWK, NAWK
+AWK: Aho, Weinberger, Kernighan --> New AWK, NAWK
 GNU awk, gawk
 
-gawk - pattern scanning and processing language">
-<meta itemprop="datePublished" content="2016-09-19T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2016-09-19T00:00:00+00:00" />
-<meta itemprop="wordCount" content="2237">
-
-
-
-<meta itemprop="keywords" content="linux," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="awk使用总结"/>
-<meta name="twitter:description" content="1. 概念
+gawk - pattern scanning and processing language"><meta itemprop=datePublished content="2016-09-19T00:00:00+00:00"><meta itemprop=dateModified content="2016-09-19T00:00:00+00:00"><meta itemprop=wordCount content="2237"><meta itemprop=keywords content="linux,"><meta name=twitter:card content="summary"><meta name=twitter:title content="awk使用总结"><meta name=twitter:description content="1. 概念
 文本处理三工具
 grep, sed, awk
 grep, egrep, fgrep：文本过滤工具pattern
 sed: 行编辑器
     模式空间、保持空间
 awk：报告生成器，格式化文本输出
-AWK: Aho, Weinberger, Kernighan --&gt; New AWK, NAWK
+AWK: Aho, Weinberger, Kernighan --> New AWK, NAWK
 GNU awk, gawk
 
-gawk - pattern scanning and processing language"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">awk使用总结</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2016-09-19 </span>
-        <div class="post-category">
-            <a href="/categories/linux/"> Linux </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-概念">1. 概念</a></li>
-    <li><a href="#2-print">2. print</a></li>
-    <li><a href="#3-变量">3. 变量</a>
-      <ul>
-        <li><a href="#31-内建变量">3.1 内建变量</a></li>
-        <li><a href="#32-自定义变量">3.2 自定义变量</a></li>
-      </ul>
-    </li>
-    <li><a href="#4-printf命令">4. printf命令</a></li>
-    <li><a href="#5-操作符">5. 操作符</a></li>
-    <li><a href="#6-pattern">6. PATTERN</a></li>
-    <li><a href="#7常用的action">7.常用的action</a></li>
-    <li><a href="#8-控制语句">8. 控制语句</a>
-      <ul>
-        <li><a href="#81-if-else">8.1 if-else</a></li>
-        <li><a href="#82-while循环">8.2 while循环</a></li>
-        <li><a href="#83-do-while循环">8.3 do-while循环</a></li>
-        <li><a href="#84-for循环">8.4 for循环</a></li>
-        <li><a href="#85-switch语句">8.5 switch语句</a></li>
-        <li><a href="#86-break和continue">8.6 break和continue</a></li>
-        <li><a href="#87-next">8.7 next</a></li>
-        <li><a href="#9-array">9. array</a></li>
-      </ul>
-    </li>
-    <li><a href="#10-函数">10. 函数</a>
-      <ul>
-        <li><a href="#101-内置函数">10.1 内置函数</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="1-概念">1. 概念</h1>
-<p><strong>文本处理三工具</strong></p>
-<p>grep, sed, awk</p>
-<pre><code>grep, egrep, fgrep：文本过滤工具pattern
+gawk - pattern scanning and processing language"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>awk使用总结</h1><div class=post-meta><span class=post-time>2016-09-19</span><div class=post-category><a href=/categories/linux/>Linux</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-概念>1. 概念</a></li><li><a href=#2-print>2. print</a></li><li><a href=#3-变量>3. 变量</a><ul><li><a href=#31-内建变量>3.1 内建变量</a></li><li><a href=#32-自定义变量>3.2 自定义变量</a></li></ul></li><li><a href=#4-printf命令>4. printf命令</a></li><li><a href=#5-操作符>5. 操作符</a></li><li><a href=#6-pattern>6. PATTERN</a></li><li><a href=#7常用的action>7.常用的action</a></li><li><a href=#8-控制语句>8. 控制语句</a><ul><li><a href=#81-if-else>8.1 if-else</a></li><li><a href=#82-while循环>8.2 while循环</a></li><li><a href=#83-do-while循环>8.3 do-while循环</a></li><li><a href=#84-for循环>8.4 for循环</a></li><li><a href=#85-switch语句>8.5 switch语句</a></li><li><a href=#86-break和continue>8.6 break和continue</a></li><li><a href=#87-next>8.7 next</a></li><li><a href=#9-array>9. array</a></li></ul></li><li><a href=#10-函数>10. 函数</a><ul><li><a href=#101-内置函数>10.1 内置函数</a></li></ul></li></ul></nav></div></div><div class=post-content><h1 id=1-概念>1. 概念</h1><p><strong>文本处理三工具</strong></p><p>grep, sed, awk</p><pre><code>grep, egrep, fgrep：文本过滤工具pattern
 sed: 行编辑器
     模式空间、保持空间
 awk：报告生成器，格式化文本输出
 AWK: Aho, Weinberger, Kernighan --&gt; New AWK, NAWK
 GNU awk, gawk
-</code></pre>
-<p>gawk - pattern scanning and processing language</p>
-<p><strong>基本用法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">gawk</span> [<span class="nx">options</span>] <span class="s1">&#39;program&#39;</span> <span class="nx">FILE</span> ...<span class="err">
-</span><span class="err"></span>    <span class="nx">program</span>: <span class="nx">PATTERN</span>{<span class="nx">ACTION</span> <span class="nx">STATEMENTS</span>;<span class="nx">ACTION</span> <span class="nx">STATEMENTS</span>}<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">语句之间用分号分隔</span><span class="err">
-</span><span class="err"></span><span class="nx">print</span><span class="p">,</span> <span class="nx">printf</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">选项</span><span class="err">
-</span><span class="err"></span>   <span class="p">-</span><span class="nx">F</span>：<span class="nx">指明输入时用到的字段分隔符</span><span class="err">
-</span><span class="err"></span>   <span class="p">-</span><span class="nx">v</span> <span class="nx">var</span><span class="p">=</span><span class="nx">value</span>: <span class="nx">自定义变量</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="2-print">2. print</h1>
-<p>print item1, item2, &hellip;</p>
-<p><strong>要点</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="nx">逗号分隔符</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="nx">输出的各item可以字符串</span>，<span class="nx">也可以是数值当前记录的字段</span>、<span class="nx">变量或awk的表达式</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">3</span><span class="p">)</span> <span class="nx">如省略item</span>，<span class="nx">相当于print</span> $<span class="m">0</span>; <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="3-变量">3. 变量</h1>
-<h2 id="31-内建变量">3.1 内建变量</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">FS</span>：<span class="nx">input</span> <span class="nx">field</span> <span class="nx">seperator</span>，<span class="nx">默认为空白字符</span><span class="err">
-</span><span class="err"></span><span class="nx">OFS</span>：<span class="nx">output</span> <span class="nx">field</span> <span class="nx">seperator</span>，<span class="nx">默认为空白字符</span><span class="err">
-</span><span class="err"></span><span class="nx">RS</span>：<span class="nx">input</span> <span class="nx">record</span> <span class="nx">seperator</span>，<span class="nx">输入时的换行符</span><span class="err">
-</span><span class="err"></span><span class="nx">ORS</span>：<span class="nx">output</span> <span class="nx">record</span> <span class="nx">seperator</span>，<span class="nx">输出时的换行符</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">NF</span>：<span class="nx">number</span> <span class="nx">of</span> <span class="nx">field</span>，<span class="nx">字段数量</span><span class="err">
-</span><span class="err"></span>    {<span class="nx">print</span> <span class="nx">NF</span>}<span class="p">,</span> {<span class="nx">print</span> $<span class="nx">NF</span>}<span class="err">
-</span><span class="err"></span><span class="nx">NR</span>：<span class="nx">number</span> <span class="nx">of</span> <span class="nx">record</span><span class="p">,</span> <span class="nx">行数</span><span class="err">
-</span><span class="err"></span><span class="nx">FNR</span>：<span class="nx">各文件分别计数行数</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">FILENAME</span>：<span class="nx">当前文件名</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">ARGC</span>：<span class="nx">命令行参数的个数</span><span class="err">
-</span><span class="err"></span><span class="nx">ARGV</span>：<span class="nx">数组</span>，<span class="nx">保存的是命令行所给定的各参数</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN {print ARGV[0]}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span> <span class="err">
-</span><span class="err"></span><span class="nx">awk</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN {print ARGV[1]}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span>  <span class="err">
-</span><span class="err"></span><span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN {print ARGV[2]}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span>  <span class="err">
-</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN {print ARGC}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span>      <span class="err">
-</span><span class="err"></span><span class="m">2</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="32-自定义变量">3.2 自定义变量</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="p">-</span><span class="nx">v</span> <span class="nx">var</span><span class="p">=</span><span class="nx">value</span><span class="err">
-</span><span class="err"></span>    <span class="nx">变量名区分字符大小写</span><span class="err">
-</span><span class="err"></span>    <span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="nx">在program中直接定义</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="p">-</span><span class="nx">v</span> <span class="nx">test</span><span class="p">=</span><span class="s1">&#39;hello gawk&#39;</span> <span class="s1">&#39;BEGIN {print test}&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">hello</span> <span class="nx">gawk</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN {test=&#34;hello gawk&#34;;print test}&#39;</span>                        <span class="err">
-</span><span class="err"></span><span class="nx">hello</span> <span class="nx">gawk</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">REA</span><span class="p">-</span><span class="nx">L0029372</span> <span class="p">~</span>]#<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="4-printf命令">4. printf命令</h1>
-<p>格式化输出：printf FORMAT, item1, item2, &hellip;</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-apache" data-lang="apache"><span class="err">(1)</span> <span class="err">FORMAT必须给出;</span> 
-<span class="err">(2)</span> <span class="err">不会自动换行，需要显式给出换行控制符，\</span><span class="nb">n</span>
+</code></pre><p>gawk - pattern scanning and processing language</p><p><strong>基本用法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>gawk</span> [<span class=nx>options</span>] <span class=s1>&#39;program&#39;</span> <span class=nx>FILE</span> ...<span class=err>
+</span><span class=err></span>    <span class=nx>program</span>: <span class=nx>PATTERN</span>{<span class=nx>ACTION</span> <span class=nx>STATEMENTS</span>;<span class=nx>ACTION</span> <span class=nx>STATEMENTS</span>}<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>语句之间用分号分隔</span><span class=err>
+</span><span class=err></span><span class=nx>print</span><span class=p>,</span> <span class=nx>printf</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>选项</span><span class=err>
+</span><span class=err></span>   <span class=p>-</span><span class=nx>F</span>：<span class=nx>指明输入时用到的字段分隔符</span><span class=err>
+</span><span class=err></span>   <span class=p>-</span><span class=nx>v</span> <span class=nx>var</span><span class=p>=</span><span class=nx>value</span>: <span class=nx>自定义变量</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=2-print>2. print</h1><p>print item1, item2, &mldr;</p><p><strong>要点</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>(</span><span class=m>1</span><span class=p>)</span> <span class=nx>逗号分隔符</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>2</span><span class=p>)</span> <span class=nx>输出的各item可以字符串</span>，<span class=nx>也可以是数值当前记录的字段</span>、<span class=nx>变量或awk的表达式</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>3</span><span class=p>)</span> <span class=nx>如省略item</span>，<span class=nx>相当于print</span> $<span class=m>0</span>; <span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=3-变量>3. 变量</h1><h2 id=31-内建变量>3.1 内建变量</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>FS</span>：<span class=nx>input</span> <span class=nx>field</span> <span class=nx>seperator</span>，<span class=nx>默认为空白字符</span><span class=err>
+</span><span class=err></span><span class=nx>OFS</span>：<span class=nx>output</span> <span class=nx>field</span> <span class=nx>seperator</span>，<span class=nx>默认为空白字符</span><span class=err>
+</span><span class=err></span><span class=nx>RS</span>：<span class=nx>input</span> <span class=nx>record</span> <span class=nx>seperator</span>，<span class=nx>输入时的换行符</span><span class=err>
+</span><span class=err></span><span class=nx>ORS</span>：<span class=nx>output</span> <span class=nx>record</span> <span class=nx>seperator</span>，<span class=nx>输出时的换行符</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>NF</span>：<span class=nx>number</span> <span class=nx>of</span> <span class=nx>field</span>，<span class=nx>字段数量</span><span class=err>
+</span><span class=err></span>    {<span class=nx>print</span> <span class=nx>NF</span>}<span class=p>,</span> {<span class=nx>print</span> $<span class=nx>NF</span>}<span class=err>
+</span><span class=err></span><span class=nx>NR</span>：<span class=nx>number</span> <span class=nx>of</span> <span class=nx>record</span><span class=p>,</span> <span class=nx>行数</span><span class=err>
+</span><span class=err></span><span class=nx>FNR</span>：<span class=nx>各文件分别计数行数</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>FILENAME</span>：<span class=nx>当前文件名</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>ARGC</span>：<span class=nx>命令行参数的个数</span><span class=err>
+</span><span class=err></span><span class=nx>ARGV</span>：<span class=nx>数组</span>，<span class=nx>保存的是命令行所给定的各参数</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN {print ARGV[0]}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span> <span class=err>
+</span><span class=err></span><span class=nx>awk</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN {print ARGV[1]}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span>  <span class=err>
+</span><span class=err></span><span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN {print ARGV[2]}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span>  <span class=err>
+</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN {print ARGC}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span>      <span class=err>
+</span><span class=err></span><span class=m>2</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=32-自定义变量>3.2 自定义变量</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>(</span><span class=m>1</span><span class=p>)</span> <span class=p>-</span><span class=nx>v</span> <span class=nx>var</span><span class=p>=</span><span class=nx>value</span><span class=err>
+</span><span class=err></span>    <span class=nx>变量名区分字符大小写</span><span class=err>
+</span><span class=err></span>    <span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>2</span><span class=p>)</span> <span class=nx>在program中直接定义</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=p>-</span><span class=nx>v</span> <span class=nx>test</span><span class=p>=</span><span class=s1>&#39;hello gawk&#39;</span> <span class=s1>&#39;BEGIN {print test}&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>hello</span> <span class=nx>gawk</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN {test=&#34;hello gawk&#34;;print test}&#39;</span>                        <span class=err>
+</span><span class=err></span><span class=nx>hello</span> <span class=nx>gawk</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>REA</span><span class=p>-</span><span class=nx>L0029372</span> <span class=p>~</span>]#<span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=4-printf命令>4. printf命令</h1><p>格式化输出：printf FORMAT, item1, item2, &mldr;</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-apache data-lang=apache><span class=err>(1)</span> <span class=err>FORMAT必须给出;</span> 
+<span class=err>(2)</span> <span class=err>不会自动换行，需要显式给出换行控制符，\</span><span class=nb>n</span>
 (3) FORMAT中需要分别为后面的每个item指定一个格式化符号
 
-<span class="err">格式符：</span>
-    <span class="err">%c:</span> <span class="err">显示字符的</span><span class="nb">ASCII码</span>
+<span class=err>格式符：</span>
+    <span class=err>%c:</span> <span class=err>显示字符的</span><span class=nb>ASCII码</span>
     %d : %i: 显示十进制整数
-    <span class="err">%</span><span class="nb">e</span> : %E: 科学计数法数值显示
-    <span class="err">%f：显示为浮点数</span>
-    <span class="err">%</span><span class="nb">g</span> : %G：以科学计数法或浮点形式显示数值
-    <span class="err">%s：显示字符串</span>
-    <span class="err">%u：无符号整数</span>
-    <span class="err">%%:</span> <span class="err">显示%自身</span>
+    <span class=err>%</span><span class=nb>e</span> : %E: 科学计数法数值显示
+    <span class=err>%f：显示为浮点数</span>
+    <span class=err>%</span><span class=nb>g</span> : %G：以科学计数法或浮点形式显示数值
+    <span class=err>%s：显示字符串</span>
+    <span class=err>%u：无符号整数</span>
+    <span class=err>%%:</span> <span class=err>显示%自身</span>
 
-<span class="err">修饰符：</span>
-    <span class="c">#[.#]：第一个数字控制显示的宽度第二个#表示小数点后的精度</span>
-        <span class="err">%3</span>.<span class="err">1</span><span class="nb">f</span>
+<span class=err>修饰符：</span>
+    <span class=c>#[.#]：第一个数字控制显示的宽度第二个#表示小数点后的精度</span>
+        <span class=err>%3</span>.<span class=err>1</span><span class=nb>f</span>
     -: 左对齐
-    <span class="err">+：显示数值的符号</span>
-        <span class="nb">awk</span> -F: &#39;{printf <span class="s2">&#34;Username: %-15s, UID: %d\n&#34;</span>,$1,$3}&#39; <span class="sx">/etc/passwd</span>
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="5-操作符">5. 操作符</h1>
-<p><strong>算术操作符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">x</span><span class="p">+</span><span class="nx">y</span><span class="p">,</span> <span class="nx">x</span><span class="p">-</span><span class="nx">y</span><span class="p">,</span> <span class="nx">x</span>*<span class="nx">y</span><span class="p">,</span> <span class="nx">x</span>/<span class="nx">y</span><span class="p">,</span> <span class="nx">x</span>^<span class="nx">y</span><span class="p">,</span> <span class="nx">x</span>%<span class="nx">y</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">x</span><span class="err">
-</span><span class="err"></span><span class="p">+</span><span class="nx">x</span>: <span class="nx">转为数值</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>字符串操作符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">没有符号的操作符</span>，<span class="nx">字符串连接</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>赋值操作符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">=,</span> <span class="p">+=,</span> <span class="p">-=,</span> *<span class="p">=,</span> /<span class="p">=,</span> %<span class="p">=,</span> ^<span class="p">=</span><span class="err">
-</span><span class="err"></span><span class="p">++,</span> <span class="p">--</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>比较操作符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">&gt;,</span> <span class="p">&gt;=,</span> <span class="p">&lt;,</span> <span class="p">&lt;=,</span> <span class="p">!=,</span> <span class="p">==</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>模式匹配符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>：<span class="nx">是否匹配</span><span class="err">
-</span><span class="err"></span><span class="p">!~</span>：<span class="nx">是否不匹配</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>逻辑操作符</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&amp;&amp;
+    <span class=err>+：显示数值的符号</span>
+        <span class=nb>awk</span> -F: &#39;{printf <span class=s2>&#34;Username: %-15s, UID: %d\n&#34;</span>,$1,$3}&#39; <span class=sx>/etc/passwd</span>
+</code></pre></td></tr></table></div></div><h1 id=5-操作符>5. 操作符</h1><p><strong>算术操作符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>x</span><span class=p>+</span><span class=nx>y</span><span class=p>,</span> <span class=nx>x</span><span class=p>-</span><span class=nx>y</span><span class=p>,</span> <span class=nx>x</span>*<span class=nx>y</span><span class=p>,</span> <span class=nx>x</span>/<span class=nx>y</span><span class=p>,</span> <span class=nx>x</span>^<span class=nx>y</span><span class=p>,</span> <span class=nx>x</span>%<span class=nx>y</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>x</span><span class=err>
+</span><span class=err></span><span class=p>+</span><span class=nx>x</span>: <span class=nx>转为数值</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>字符串操作符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>没有符号的操作符</span>，<span class=nx>字符串连接</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>赋值操作符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>=,</span> <span class=p>+=,</span> <span class=p>-=,</span> *<span class=p>=,</span> /<span class=p>=,</span> %<span class=p>=,</span> ^<span class=p>=</span><span class=err>
+</span><span class=err></span><span class=p>++,</span> <span class=p>--</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>比较操作符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>&gt;,</span> <span class=p>&gt;=,</span> <span class=p>&lt;,</span> <span class=p>&lt;=,</span> <span class=p>!=,</span> <span class=p>==</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>模式匹配符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>：<span class=nx>是否匹配</span><span class=err>
+</span><span class=err></span><span class=p>!~</span>：<span class=nx>是否不匹配</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>逻辑操作符</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>&amp;&amp;
 ||
 !
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>函数调用</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">function_name</span><span class="p">(</span><span class="nx">argu1</span><span class="p">,</span> <span class="nx">argu2</span><span class="p">,</span> ...<span class="p">)</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>条件表达式</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">selector</span>?<span class="k">if</span><span class="p">-</span><span class="nx">true</span><span class="p">-</span><span class="nx">expression</span>:<span class="k">if</span><span class="p">-</span><span class="nx">false</span><span class="p">-</span><span class="nx">expression</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span># <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;{$3&gt;=1000?usertype=&#34;Common User&#34;:usertype=&#34;Sysadmin or SysUser&#34;;printf &#34;%15s:%-s\n&#34;,$1,usertype}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="6-pattern">6. PATTERN</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="nx">empty</span>：<span class="nx">空模式</span>，<span class="nx">匹配每一行</span><span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="s1">&#39;/^UUID/{print $1}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="s1">&#39;!/^UUID/{print $1}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="sr">/regular expression/</span>：<span class="nx">仅处理能够被此处的模式匹配到的行</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">3</span><span class="p">)</span> <span class="nx">relational</span> <span class="nx">expression</span>: <span class="nx">关系表达式结果有</span>“<span class="nx">真</span>”<span class="nx">有</span>“<span class="nx">假</span>”<span class="nx">结果为</span>“<span class="nx">真</span>”<span class="nx">才会被处理</span><span class="err">
-</span><span class="err"></span>    <span class="nx">真</span>：<span class="nx">结果为非0值</span>，<span class="nx">非空字符串</span><span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;$3&gt;=1000{print $1,$3}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;$NF==&#34;/bin/bash&#34;{print $1,$NF}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span> <span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;$NF~/bash$/{print $1,$NF}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span>  #<span class="nx">模式要用</span><span class="sr">//</span><span class="nx">圈起来</span>，<span class="nx">此例表示以bash结尾</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">4</span><span class="p">)</span> <span class="nx">line</span> <span class="nx">ranges</span>：<span class="nx">行范围</span>，<span class="err">
-</span><span class="err"></span>    <span class="nx">startline</span><span class="p">,</span><span class="nx">endline</span>：<span class="sr">/pat1/</span><span class="p">,</span><span class="sr">/pat2/</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>    <span class="nx">注意</span>： <span class="nx">不支持直接给出数字的格式</span><span class="err">
-</span><span class="err"></span>    <span class="p">~</span>]# <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;(NR&gt;=2&amp;&amp;NR&lt;=10){print $1}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span> <span class="err">
-</span><span class="err"></span>          <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;/^root/,/^halt/{print $1}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span><span class="err"></span><span class="p">(</span><span class="m">5</span><span class="p">)</span> <span class="nx">BEGIN</span>/<span class="nx">END模式</span><span class="err">
-</span><span class="err"></span>    <span class="nx">BEGIN</span>{}: <span class="nx">仅在开始处理文件中的文本之前执行一次</span><span class="err">
-</span><span class="err"></span>    <span class="nx">END</span>{}：<span class="nx">仅在文本处理完成之后执行一次</span><span class="err">
-</span><span class="err"></span>  <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;BEGIN{print &#34;-----begin-----&#34;}{printf &#34;%-25s,%-10s\n&#34;,$1,$3}END{&#34;-----end-----&#34;}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="7常用的action">7.常用的action</h1>
-<ul>
-<li>(1) Expressions</li>
-<li>(2) Control statements：if, while等</li>
-<li>(3) Compound statements：组合语句</li>
-<li>(4) input statements</li>
-<li>(5) output statements</li>
-</ul>
-<h1 id="8-控制语句">8. 控制语句</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="k">if</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span> {<span class="nx">statments</span>} <span class="err">
-</span><span class="err"></span><span class="k">if</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span> {<span class="nx">statments</span>} <span class="k">else</span> {<span class="nx">statements</span>}<span class="err">
-</span><span class="err"></span><span class="nx">while</span><span class="p">(</span><span class="nx">conditon</span><span class="p">)</span> {<span class="nx">statments</span>}<span class="err">
-</span><span class="err"></span><span class="nx">o</span> {<span class="nx">statements</span>} <span class="nx">while</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">for</span><span class="p">(</span><span class="nx">expr1</span>;<span class="nx">expr2</span>;<span class="nx">expr3</span><span class="p">)</span> {<span class="nx">statements</span>}<span class="err">
-</span><span class="err"></span><span class="nx">break</span><span class="err">
-</span><span class="err"></span><span class="nx">continue</span><span class="err">
-</span><span class="err"></span><span class="nx">delete</span> <span class="nx">array</span>[<span class="nx">index</span>]<span class="err">
-</span><span class="err"></span><span class="nx">delete</span> <span class="nx">array</span><span class="err">
-</span><span class="err"></span><span class="nx">exit</span> <span class="err">
-</span><span class="err"></span>{ <span class="nx">statements</span> }<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="81-if-else">8.1 if-else</h2>
-<p>使用场景：对awk取得的整行或某个字段做条件判断。</p>
-<p><strong>语法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="k">if</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span> <span class="nx">statement</span> [<span class="k">else</span> <span class="nx">statement</span>]<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;{if($3&gt;=1000) {printf &#34;Common user: %s\n&#34;,$1} else {printf &#34;root or Sysuser: %s\n&#34;,$1}}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;{if($NF==&#34;/bin/bash&#34;) print $1}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;{if(NF&gt;5) print $0}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">df</span> <span class="p">-</span><span class="nx">h</span> <span class="p">|</span> <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>[%] <span class="s1">&#39;/^\/dev/{print $1}&#39;</span> <span class="p">|</span> <span class="nx">awk</span> <span class="s1">&#39;{if($NF&gt;=20) print $1}&#39;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="82-while循环">8.2 while循环</h2>
-<p><strong>语法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">while</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span> <span class="nx">statement</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>条件“真”，进入循环条件“假”，退出循环。</p>
-<p>使用场景：对一行内的多个字段逐一类似处理时使用对数组中的各元素逐一处理时使用</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;/^[[:space:]]*linux16/{i=1;while(i&lt;=NF) {print $i,length($i); i++}}&#39;</span> <span class="sr">/etc/</span><span class="nx">grub2</span>.<span class="nx">cfg</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;/^[[:space:]]*linux16/{i=1;while(i&lt;=NF) {if(length($i)&gt;=7) {print $i,length($i)}; i++}}&#39;</span> <span class="sr">/etc/</span><span class="nx">grub2</span>.<span class="nx">cfg</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="83-do-while循环">8.3 do-while循环</h2>
-<p><strong>语法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">do</span> <span class="nx">statement</span> <span class="nx">while</span><span class="p">(</span><span class="nx">condition</span><span class="p">)</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>意义：至少执行一次循环体</p>
-<h2 id="84-for循环">8.4 for循环</h2>
-<p><strong>语法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span><span class="p">(</span><span class="nx">expr1</span>;<span class="nx">expr2</span>;<span class="nx">expr3</span><span class="p">)</span> <span class="nx">statement</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">for</span><span class="p">(</span><span class="nx">variable</span> <span class="nx">assignment</span>;<span class="nx">condition</span>;<span class="nx">iteration</span> <span class="nx">process</span><span class="p">)</span> {<span class="nx">for</span><span class="p">-</span><span class="nx">body</span>}<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;/^[[:space:]]*linux16/{for(i=1;i&lt;=NF;i++) {print $i,length($i)}}&#39;</span> <span class="sr">/etc/</span><span class="nx">grub2</span>.<span class="nx">cfg</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>特殊用法：</strong> 能够遍历数组中的元素。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span><span class="p">(</span><span class="nx">var</span> <span class="nx">in</span> <span class="nx">array</span><span class="p">)</span> {<span class="nx">for</span><span class="p">-</span><span class="nx">body</span>}<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="85-switch语句">8.5 switch语句</h2>
-<p><strong>语法</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">switch</span><span class="p">(</span><span class="nx">expression</span><span class="p">)</span> {<span class="nx">case</span> <span class="nx">VALUE1</span> <span class="nx">or</span> <span class="sr">/REGEXP/</span>: <span class="nx">statement</span>; <span class="nx">case</span> <span class="nx">VALUE2</span> <span class="nx">or</span> <span class="sr">/REGEXP2/</span>: <span class="nx">statement</span>; ...; <span class="nx">default</span>: <span class="nx">statement</span>}<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="86-break和continue">8.6 break和continue</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">break</span> [<span class="nx">n</span>]<span class="err">
-</span><span class="err"></span><span class="nx">continue</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="87-next">8.7 next</h2>
-<p>提前结束对本行的处理而直接进入下一行</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">awk</span> <span class="p">-</span><span class="nx">F</span>: <span class="s1">&#39;{if($3%2!=0) next; print $1,$3}&#39;</span> <span class="sr">/etc/</span><span class="nx">passwd</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="9-array">9. array</h2>
-<p><strong>关联数组：</strong> array[index-expression]</p>
-<ul>
-<li>(1) 可使用任意字符串字符串要使用双引号，单引号用来引programe，因此不能使用</li>
-<li>(2) 如果某数组元素事先不存在，在引用时，awk会自动创建此元素，并将其值初始化为“空串”</li>
-</ul>
-<p>若要判断数组中是否存在某元素，要使用&quot;index in array&quot;格式进行</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">    <span class="nx">weekdays</span>[“<span class="nx">mon</span>”]<span class="p">=</span><span class="s2">&#34;Monday&#34;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>若要遍历数组中的每个元素，要使用for循环。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span><span class="p">(</span><span class="nx">var</span> <span class="nx">in</span> <span class="nx">array</span><span class="p">)</span> {<span class="nx">for</span><span class="p">-</span><span class="nx">body</span>}<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;BEGIN{weekdays[&#34;mon&#34;]=&#34;Monday&#34;;weekdays[&#34;tue&#34;]=&#34;Tuesday&#34;;for(i in weekdays) {print weekdays[i]}}&#39;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>**注意：**var会遍历array的每个索引。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">state</span>[<span class="s2">&#34;LISTEN&#34;</span>]<span class="p">++</span><span class="err">
-</span><span class="err"></span><span class="nx">state</span>[<span class="s2">&#34;ESTABLISHED&#34;</span>]<span class="p">++</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">netstat</span> <span class="p">-</span><span class="nx">tan</span> <span class="p">|</span> <span class="nx">awk</span> <span class="s1">&#39;/^tcp\&gt;/{state[$NF]++}END{for(i in state) { print i,state[i]}}&#39;</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;{ip[$1]++}END{for(i in ip) {print i,ip[i]}}&#39;</span> <span class="sr">/var/</span><span class="nx">log</span><span class="sr">/httpd/</span><span class="nx">access_log</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>练习1</strong></p>
-<p>统计/etc/fstab文件中每个文件系统类型出现的次数。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;/^UUID/{fs[$3]++}END{for(i in fs) {print i,fs[i]}}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>练习2</strong></p>
-<p>统计指定文件中每个单词出现的次数。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">awk</span> <span class="s1">&#39;{for(i=1;i&lt;=NF;i++){count[$i]++}}END{for(i in count) {print i,count[i]}}&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="10-函数">10. 函数</h1>
-<h2 id="101-内置函数">10.1 内置函数</h2>
-<p><strong>数值处理</strong> rand()：返回0和1之间一个随机数。</p>
-<p><strong>字符串处理</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">length</span><span class="p">(</span>[<span class="nx">s</span>]<span class="p">)</span>：<span class="nx">返回指定字符串的长度</span><span class="err">
-</span><span class="err"></span><span class="nx">sub</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span>[<span class="nx">t</span>]<span class="p">)</span>：<span class="nx">以r表示的模式来查找t所表示的字符中的匹配的内容</span>，<span class="nx">并将其第一次出现替换为s所表示的内容</span><span class="err">
-</span><span class="err"></span><span class="nx">gsub</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span><span class="nx">s</span><span class="p">,</span>[<span class="nx">t</span>]<span class="p">)</span>：<span class="nx">以r表示的模式来查找t所表示的字符中的匹配的内容</span>，<span class="nx">并将其所有出现均替换为s所表示的内容</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">split</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span><span class="nx">a</span>[<span class="p">,</span><span class="nx">r</span>]<span class="p">)</span>：<span class="nx">以r为分隔符切割字符s</span>，<span class="nx">并将切割后的结果保存至a所表示的数组中</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">~</span>]# <span class="nx">netstat</span> <span class="p">-</span><span class="nx">tan</span> <span class="p">|</span> <span class="nx">awk</span> <span class="s1">&#39;/^tcp\&gt;/{split($5,ip,&#34;:&#34;);count[ip[1]]++}END{for (i in count) {print i,count[i]}}&#39;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2016-09-19
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/linux/">linux</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2016/09/enable-lldp/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">saltstack批量启用lldpd</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2016/09/sed/">
-            <span class="next-text nav-default">sed使用总结</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2016-09-19 00:00:00 \u002b0000 UTC',
-        title: 'awk使用总结',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+</code></pre></td></tr></table></div></div><p><strong>函数调用</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>function_name</span><span class=p>(</span><span class=nx>argu1</span><span class=p>,</span> <span class=nx>argu2</span><span class=p>,</span> ...<span class=p>)</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>条件表达式</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>selector</span>?<span class=k>if</span><span class=p>-</span><span class=nx>true</span><span class=p>-</span><span class=nx>expression</span>:<span class=k>if</span><span class=p>-</span><span class=nx>false</span><span class=p>-</span><span class=nx>expression</span><span class=err>
+</span><span class=err>
+</span><span class=err></span># <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;{$3&gt;=1000?usertype=&#34;Common User&#34;:usertype=&#34;Sysadmin or SysUser&#34;;printf &#34;%15s:%-s\n&#34;,$1,usertype}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=6-pattern>6. PATTERN</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>(</span><span class=m>1</span><span class=p>)</span> <span class=nx>empty</span>：<span class=nx>空模式</span>，<span class=nx>匹配每一行</span><span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=s1>&#39;/^UUID/{print $1}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=s1>&#39;!/^UUID/{print $1}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>2</span><span class=p>)</span> <span class=sr>/regular expression/</span>：<span class=nx>仅处理能够被此处的模式匹配到的行</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>3</span><span class=p>)</span> <span class=nx>relational</span> <span class=nx>expression</span>: <span class=nx>关系表达式结果有</span>“<span class=nx>真</span>”<span class=nx>有</span>“<span class=nx>假</span>”<span class=nx>结果为</span>“<span class=nx>真</span>”<span class=nx>才会被处理</span><span class=err>
+</span><span class=err></span>    <span class=nx>真</span>：<span class=nx>结果为非0值</span>，<span class=nx>非空字符串</span><span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;$3&gt;=1000{print $1,$3}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;$NF==&#34;/bin/bash&#34;{print $1,$NF}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span> <span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;$NF~/bash$/{print $1,$NF}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span>  #<span class=nx>模式要用</span><span class=sr>//</span><span class=nx>圈起来</span>，<span class=nx>此例表示以bash结尾</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>4</span><span class=p>)</span> <span class=nx>line</span> <span class=nx>ranges</span>：<span class=nx>行范围</span>，<span class=err>
+</span><span class=err></span>    <span class=nx>startline</span><span class=p>,</span><span class=nx>endline</span>：<span class=sr>/pat1/</span><span class=p>,</span><span class=sr>/pat2/</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>    <span class=nx>注意</span>： <span class=nx>不支持直接给出数字的格式</span><span class=err>
+</span><span class=err></span>    <span class=p>~</span>]# <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;(NR&gt;=2&amp;&amp;NR&lt;=10){print $1}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span> <span class=err>
+</span><span class=err></span>          <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;/^root/,/^halt/{print $1}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span><span class=err></span><span class=p>(</span><span class=m>5</span><span class=p>)</span> <span class=nx>BEGIN</span>/<span class=nx>END模式</span><span class=err>
+</span><span class=err></span>    <span class=nx>BEGIN</span>{}: <span class=nx>仅在开始处理文件中的文本之前执行一次</span><span class=err>
+</span><span class=err></span>    <span class=nx>END</span>{}：<span class=nx>仅在文本处理完成之后执行一次</span><span class=err>
+</span><span class=err></span>  <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;BEGIN{print &#34;-----begin-----&#34;}{printf &#34;%-25s,%-10s\n&#34;,$1,$3}END{&#34;-----end-----&#34;}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=7常用的action>7.常用的action</h1><ul><li>(1) Expressions</li><li>(2) Control statements：if, while等</li><li>(3) Compound statements：组合语句</li><li>(4) input statements</li><li>(5) output statements</li></ul><h1 id=8-控制语句>8. 控制语句</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=k>if</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span> {<span class=nx>statments</span>} <span class=err>
+</span><span class=err></span><span class=k>if</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span> {<span class=nx>statments</span>} <span class=k>else</span> {<span class=nx>statements</span>}<span class=err>
+</span><span class=err></span><span class=nx>while</span><span class=p>(</span><span class=nx>conditon</span><span class=p>)</span> {<span class=nx>statments</span>}<span class=err>
+</span><span class=err></span><span class=nx>o</span> {<span class=nx>statements</span>} <span class=nx>while</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>for</span><span class=p>(</span><span class=nx>expr1</span>;<span class=nx>expr2</span>;<span class=nx>expr3</span><span class=p>)</span> {<span class=nx>statements</span>}<span class=err>
+</span><span class=err></span><span class=nx>break</span><span class=err>
+</span><span class=err></span><span class=nx>continue</span><span class=err>
+</span><span class=err></span><span class=nx>delete</span> <span class=nx>array</span>[<span class=nx>index</span>]<span class=err>
+</span><span class=err></span><span class=nx>delete</span> <span class=nx>array</span><span class=err>
+</span><span class=err></span><span class=nx>exit</span> <span class=err>
+</span><span class=err></span>{ <span class=nx>statements</span> }<span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=81-if-else>8.1 if-else</h2><p>使用场景：对awk取得的整行或某个字段做条件判断。</p><p><strong>语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=k>if</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span> <span class=nx>statement</span> [<span class=k>else</span> <span class=nx>statement</span>]<span class=err>
+</span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;{if($3&gt;=1000) {printf &#34;Common user: %s\n&#34;,$1} else {printf &#34;root or Sysuser: %s\n&#34;,$1}}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;{if($NF==&#34;/bin/bash&#34;) print $1}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;{if(NF&gt;5) print $0}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>df</span> <span class=p>-</span><span class=nx>h</span> <span class=p>|</span> <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>[%] <span class=s1>&#39;/^\/dev/{print $1}&#39;</span> <span class=p>|</span> <span class=nx>awk</span> <span class=s1>&#39;{if($NF&gt;=20) print $1}&#39;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=82-while循环>8.2 while循环</h2><p><strong>语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>while</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span> <span class=nx>statement</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>条件“真”，进入循环条件“假”，退出循环。</p><p>使用场景：对一行内的多个字段逐一类似处理时使用对数组中的各元素逐一处理时使用</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;/^[[:space:]]*linux16/{i=1;while(i&lt;=NF) {print $i,length($i); i++}}&#39;</span> <span class=sr>/etc/</span><span class=nx>grub2</span>.<span class=nx>cfg</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;/^[[:space:]]*linux16/{i=1;while(i&lt;=NF) {if(length($i)&gt;=7) {print $i,length($i)}; i++}}&#39;</span> <span class=sr>/etc/</span><span class=nx>grub2</span>.<span class=nx>cfg</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=83-do-while循环>8.3 do-while循环</h2><p><strong>语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>do</span> <span class=nx>statement</span> <span class=nx>while</span><span class=p>(</span><span class=nx>condition</span><span class=p>)</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>意义：至少执行一次循环体</p><h2 id=84-for循环>8.4 for循环</h2><p><strong>语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>for</span><span class=p>(</span><span class=nx>expr1</span>;<span class=nx>expr2</span>;<span class=nx>expr3</span><span class=p>)</span> <span class=nx>statement</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>for</span><span class=p>(</span><span class=nx>variable</span> <span class=nx>assignment</span>;<span class=nx>condition</span>;<span class=nx>iteration</span> <span class=nx>process</span><span class=p>)</span> {<span class=nx>for</span><span class=p>-</span><span class=nx>body</span>}<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;/^[[:space:]]*linux16/{for(i=1;i&lt;=NF;i++) {print $i,length($i)}}&#39;</span> <span class=sr>/etc/</span><span class=nx>grub2</span>.<span class=nx>cfg</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>特殊用法：</strong> 能够遍历数组中的元素。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>for</span><span class=p>(</span><span class=nx>var</span> <span class=nx>in</span> <span class=nx>array</span><span class=p>)</span> {<span class=nx>for</span><span class=p>-</span><span class=nx>body</span>}<span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=85-switch语句>8.5 switch语句</h2><p><strong>语法</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>switch</span><span class=p>(</span><span class=nx>expression</span><span class=p>)</span> {<span class=nx>case</span> <span class=nx>VALUE1</span> <span class=nx>or</span> <span class=sr>/REGEXP/</span>: <span class=nx>statement</span>; <span class=nx>case</span> <span class=nx>VALUE2</span> <span class=nx>or</span> <span class=sr>/REGEXP2/</span>: <span class=nx>statement</span>; ...; <span class=nx>default</span>: <span class=nx>statement</span>}<span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=86-break和continue>8.6 break和continue</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>break</span> [<span class=nx>n</span>]<span class=err>
+</span><span class=err></span><span class=nx>continue</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=87-next>8.7 next</h2><p>提前结束对本行的处理而直接进入下一行</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>awk</span> <span class=p>-</span><span class=nx>F</span>: <span class=s1>&#39;{if($3%2!=0) next; print $1,$3}&#39;</span> <span class=sr>/etc/</span><span class=nx>passwd</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=9-array>9. array</h2><p><strong>关联数组：</strong> array[index-expression]</p><ul><li>(1) 可使用任意字符串字符串要使用双引号，单引号用来引programe，因此不能使用</li><li>(2) 如果某数组元素事先不存在，在引用时，awk会自动创建此元素，并将其值初始化为“空串”</li></ul><p>若要判断数组中是否存在某元素，要使用"index in array"格式进行</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>    <span class=nx>weekdays</span>[“<span class=nx>mon</span>”]<span class=p>=</span><span class=s2>&#34;Monday&#34;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>若要遍历数组中的每个元素，要使用for循环。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>for</span><span class=p>(</span><span class=nx>var</span> <span class=nx>in</span> <span class=nx>array</span><span class=p>)</span> {<span class=nx>for</span><span class=p>-</span><span class=nx>body</span>}<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;BEGIN{weekdays[&#34;mon&#34;]=&#34;Monday&#34;;weekdays[&#34;tue&#34;]=&#34;Tuesday&#34;;for(i in weekdays) {print weekdays[i]}}&#39;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>**注意：**var会遍历array的每个索引。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>state</span>[<span class=s2>&#34;LISTEN&#34;</span>]<span class=p>++</span><span class=err>
+</span><span class=err></span><span class=nx>state</span>[<span class=s2>&#34;ESTABLISHED&#34;</span>]<span class=p>++</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>netstat</span> <span class=p>-</span><span class=nx>tan</span> <span class=p>|</span> <span class=nx>awk</span> <span class=s1>&#39;/^tcp\&gt;/{state[$NF]++}END{for(i in state) { print i,state[i]}}&#39;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;{ip[$1]++}END{for(i in ip) {print i,ip[i]}}&#39;</span> <span class=sr>/var/</span><span class=nx>log</span><span class=sr>/httpd/</span><span class=nx>access_log</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>练习1</strong></p><p>统计/etc/fstab文件中每个文件系统类型出现的次数。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;/^UUID/{fs[$3]++}END{for(i in fs) {print i,fs[i]}}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>练习2</strong></p><p>统计指定文件中每个单词出现的次数。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>awk</span> <span class=s1>&#39;{for(i=1;i&lt;=NF;i++){count[$i]++}}END{for(i in count) {print i,count[i]}}&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=10-函数>10. 函数</h1><h2 id=101-内置函数>10.1 内置函数</h2><p><strong>数值处理</strong> rand()：返回0和1之间一个随机数。</p><p><strong>字符串处理</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>length</span><span class=p>(</span>[<span class=nx>s</span>]<span class=p>)</span>：<span class=nx>返回指定字符串的长度</span><span class=err>
+</span><span class=err></span><span class=nx>sub</span><span class=p>(</span><span class=nx>r</span><span class=p>,</span><span class=nx>s</span><span class=p>,</span>[<span class=nx>t</span>]<span class=p>)</span>：<span class=nx>以r表示的模式来查找t所表示的字符中的匹配的内容</span>，<span class=nx>并将其第一次出现替换为s所表示的内容</span><span class=err>
+</span><span class=err></span><span class=nx>gsub</span><span class=p>(</span><span class=nx>r</span><span class=p>,</span><span class=nx>s</span><span class=p>,</span>[<span class=nx>t</span>]<span class=p>)</span>：<span class=nx>以r表示的模式来查找t所表示的字符中的匹配的内容</span>，<span class=nx>并将其所有出现均替换为s所表示的内容</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>split</span><span class=p>(</span><span class=nx>s</span><span class=p>,</span><span class=nx>a</span>[<span class=p>,</span><span class=nx>r</span>]<span class=p>)</span>：<span class=nx>以r为分隔符切割字符s</span>，<span class=nx>并将切割后的结果保存至a所表示的数组中</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>~</span>]# <span class=nx>netstat</span> <span class=p>-</span><span class=nx>tan</span> <span class=p>|</span> <span class=nx>awk</span> <span class=s1>&#39;/^tcp\&gt;/{split($5,ip,&#34;:&#34;);count[ip[1]]++}END{for (i in count) {print i,count[i]}}&#39;</span><span class=err>
+</span></code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2016-09-19</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/linux/>linux</a></div><nav class=post-nav><a class=prev href=/post/2016/09/enable-lldp/><i class="iconfont icon-left"></i><span class="prev-text nav-default">saltstack批量启用lldpd</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2016/09/sed/><span class="next-text nav-default">sed使用总结</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2016-09-19 00:00:00 \u002b0000 UTC',title:'awk使用总结',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

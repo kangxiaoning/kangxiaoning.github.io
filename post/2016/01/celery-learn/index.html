@@ -1,543 +1,267 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>celery简单使用 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="1. 环境" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/01/celery-learn/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="celery简单使用" />
-<meta property="og:description" content="1. 环境" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/01/celery-learn/" />
-<meta property="article:published_time" content="2016-01-01T00:00:00+00:00" />
-<meta property="article:modified_time" content="2016-01-01T00:00:00+00:00" />
-<meta itemprop="name" content="celery简单使用">
-<meta itemprop="description" content="1. 环境">
-<meta itemprop="datePublished" content="2016-01-01T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2016-01-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="780">
-
-
-
-<meta itemprop="keywords" content="python," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="celery简单使用"/>
-<meta name="twitter:description" content="1. 环境"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">celery简单使用</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2016-01-01 </span>
-        <div class="post-category">
-            <a href="/categories/python/"> python </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-环境">1. 环境</a></li>
-    <li><a href="#2-结果查询">2. 结果查询</a></li>
-    <li><a href="#3-日志">3. 日志</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="1-环境">1. 环境</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">study</span>]$ <span class="nx">pwd</span><span class="err">
-</span><span class="err"></span><span class="sr">/home/</span><span class="nx">celery</span>/<span class="nx">study</span><span class="err">
-</span><span class="err"></span>[<span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">study</span>]$ <span class="nx">python</span><span class="err">
-</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Jan</span> <span class="m">22</span> <span class="m">2014</span><span class="p">,</span> <span class="m">01</span>:<span class="m">49</span>:<span class="m">05</span><span class="p">)</span> <span class="err">
-</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
-</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">from</span> <span class="nx">tasks</span> <span class="nx">import</span> <span class="nx">add</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">add</span>.<span class="nx">delay</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">&lt;</span><span class="nx">AsyncResult</span>: <span class="m">9</span>d<span class="m">825137</span><span class="p">-</span><span class="nx">c4a5</span><span class="m">-4749-9669-2</span>ae<span class="m">06</span>a<span class="m">45</span>fd<span class="m">74</span><span class="p">&gt;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span> <span class="p">=</span> <span class="nx">add</span>.<span class="nx">delay</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">ready</span><span class="p">()</span><span class="err">
-</span><span class="err"></span><span class="nx">True</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">get</span><span class="p">(</span><span class="nx">timeout</span><span class="p">=</span><span class="m">1</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/result.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">162</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">get</span><span class="err">
-</span><span class="err"></span>    <span class="nx">self</span>.<span class="nx">maybe_reraise</span><span class="p">()</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/result.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">271</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">maybe_reraise</span><span class="err">
-</span><span class="err"></span>    <span class="nx">raise</span> <span class="nx">self</span>.<span class="nx">result</span><span class="err">
-</span><span class="err"></span><span class="nx">TypeError</span>: <span class="nx">unsupported</span> <span class="nx">operand</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">for</span> <span class="p">+</span>: <span class="s1">&#39;int&#39;</span> <span class="nx">and</span> <span class="s1">&#39;str&#39;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">get</span><span class="p">(</span><span class="nx">propagate</span><span class="p">=</span><span class="nx">False</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">TypeError</span><span class="p">(</span><span class="s2">&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class="p">,)</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">traceback</span><span class="err">
-</span><span class="err"></span><span class="s1">&#39;Traceback (most recent call last):\n  File &#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File &#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File &#34;/home/celery/study/tasks.py&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: \&#39;</span><span class="nx">int</span>\<span class="s1">&#39; and \&#39;</span><span class="nx">str</span>\<span class="s1">&#39;\n&#39;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">print</span> <span class="nx">result</span>.<span class="nx">traceback</span><span class="err">
-</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">240</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">trace_task</span><span class="err">
-</span><span class="err"></span>    <span class="nx">R</span> <span class="p">=</span> <span class="nx">retval</span> <span class="p">=</span> <span class="k">fun</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">438</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">__protected_call__</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">self</span>.<span class="nx">run</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/home/celery/study/tasks.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">7</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">add</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">x</span> <span class="p">+</span> <span class="nx">y</span><span class="err">
-</span><span class="err"></span><span class="nx">TypeError</span>: <span class="nx">unsupported</span> <span class="nx">operand</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">for</span> <span class="p">+</span>: <span class="s1">&#39;int&#39;</span> <span class="nx">and</span> <span class="s1">&#39;str&#39;</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span> <span class="p">=</span> <span class="nx">add</span>.<span class="nx">delay</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="m">123</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">ready</span><span class="p">()</span><span class="err">
-</span><span class="err"></span><span class="nx">True</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">result</span>.<span class="nx">get</span><span class="p">(</span><span class="nx">timeout</span><span class="p">=</span><span class="m">1</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="m">127</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="2-结果查询">2. 结果查询</h1>
-<p>在 redis 中查询结果，每个 task_id 是一个 key。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">study</span>]$ <span class="nx">redis</span><span class="p">-</span><span class="nx">cli</span> <span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="nx">keys</span> *<span class="err">
-</span><span class="err"></span><span class="m">1</span><span class="p">)</span> <span class="s2">&#34;celery-task-meta-09fa2c0a-b587-43c9-be22-0466bd261d84&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">2</span><span class="p">)</span> <span class="s2">&#34;celery-task-meta-9d825137-c4a5-4749-9669-2ae06a45fd74&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">3</span><span class="p">)</span> <span class="s2">&#34;_kombu.binding.celery&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">4</span><span class="p">)</span> <span class="s2">&#34;celery-task-meta-7a88edf2-ce35-448e-99c2-2b6eb8afbe6a&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">5</span><span class="p">)</span> <span class="s2">&#34;_kombu.binding.celery.pidbox&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">6</span><span class="p">)</span> <span class="s2">&#34;_kombu.binding.celeryev&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="nx">get</span> <span class="s2">&#34;celery-task-meta-09fa2c0a-b587-43c9-be22-0466bd261d84&#34;</span><span class="err">
-</span><span class="err"></span><span class="c">&#34;\x80\x02}q\x01(U\x06statusq\x02U\aFAILUREq\x03U\ttracebackq\x04T\xa8\x01\x00\x00Traceback (most recent call last):\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File \&#34;/home/celery/study/tasks.py\&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;\nq\x05U\x06resultq\x06cexceptions\nTypeError\nq\aU2unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;q\b\x85q\tRq\nU\bchildrenq\x0b]q\x0cu.&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="nx">get</span> <span class="s2">&#34;celery-task-meta-9d825137-c4a5-4749-9669-2ae06a45fd74&#34;</span><span class="err">
-</span><span class="err"></span><span class="c">&#34;\x80\x02}q\x01(U\x06statusq\x02U\aFAILUREq\x03U\ttracebackq\x04T\xa8\x01\x00\x00Traceback (most recent call last):\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File \&#34;/home/celery/study/tasks.py\&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;\nq\x05U\x06resultq\x06cexceptions\nTypeError\nq\aU2unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;q\b\x85q\tRq\nU\bchildrenq\x0b]q\x0cu.&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span> <span class="nx">get</span> <span class="s2">&#34;celery-task-meta-7a88edf2-ce35-448e-99c2-2b6eb8afbe6a&#34;</span><span class="err">
-</span><span class="err"></span><span class="c">&#34;\x80\x02}q\x01(U\x06statusq\x02U\aSUCCESSq\x03U\ttracebackq\x04NU\x06resultq\x05K\x7fU\bchildrenq\x06]q\au.&#34;</span><span class="err">
-</span><span class="err"></span><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">6379</span><span class="p">&gt;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="3-日志">3. 日志</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">study</span>]$ <span class="nx">celery</span> <span class="p">-</span><span class="nx">A</span> <span class="nx">tasks</span> <span class="nx">worker</span> <span class="p">--</span><span class="nx">loglevel</span><span class="p">=</span><span class="nx">info</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">55</span>:<span class="m">22</span><span class="p">,</span><span class="m">789</span>: <span class="nx">WARNING</span><span class="sr">/MainProcess] /</span><span class="nx">usr</span><span class="sr">/lib/</span><span class="nx">python2</span>.<span class="m">6</span><span class="sr">/site-packages/</span><span class="nx">celery</span><span class="sr">/apps/</span><span class="nx">worker</span>.<span class="nx">py</span>:<span class="m">161</span>: <span class="nx">CDeprecationWarning</span>: <span class="err">
-</span><span class="err"></span><span class="nx">Starting</span> <span class="nx">from</span> <span class="nx">version</span> <span class="m">3</span>.<span class="m">2</span> <span class="nx">Celery</span> <span class="nx">will</span> <span class="nx">refuse</span> <span class="nx">to</span> <span class="nx">accept</span> <span class="nx">pickle</span> <span class="nx">by</span> <span class="nx">default</span>.<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">The</span> <span class="nx">pickle</span> <span class="nx">serializer</span> <span class="nx">is</span> <span class="nx">a</span> <span class="nx">security</span> <span class="nx">concern</span> <span class="nx">as</span> <span class="nx">it</span> <span class="nx">may</span> <span class="nx">give</span> <span class="nx">attackers</span><span class="err">
-</span><span class="err"></span><span class="nx">the</span> <span class="nx">ability</span> <span class="nx">to</span> <span class="nx">execute</span> <span class="nx">any</span> <span class="nx">command</span>.  <span class="nx">It</span>&#39;<span class="nx">s</span> <span class="nx">important</span> <span class="nx">to</span> <span class="nx">secure</span><span class="err">
-</span><span class="err"></span><span class="nx">your</span> <span class="nx">broker</span> <span class="nx">from</span> <span class="nx">unauthorized</span> <span class="nx">access</span> <span class="nx">when</span> <span class="nx">using</span> <span class="nx">pickle</span><span class="p">,</span> <span class="nx">so</span> <span class="nx">we</span> <span class="nx">think</span><span class="err">
-</span><span class="err"></span><span class="nx">that</span> <span class="nx">enabling</span> <span class="nx">pickle</span> <span class="nx">should</span> <span class="nx">require</span> <span class="nx">a</span> <span class="nx">deliberate</span> <span class="nx">action</span> <span class="nx">and</span> <span class="nx">not</span> <span class="nx">be</span><span class="err">
-</span><span class="err"></span><span class="nx">the</span> <span class="nx">default</span> <span class="nx">choice</span>.<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">If</span> <span class="nx">you</span> <span class="nx">depend</span> <span class="nx">on</span> <span class="nx">pickle</span> <span class="nx">then</span> <span class="nx">you</span> <span class="nx">should</span> <span class="nx">set</span> <span class="nx">a</span> <span class="nx">setting</span> <span class="nx">to</span> <span class="nx">disable</span> <span class="nx">this</span><span class="err">
-</span><span class="err"></span><span class="nx">warning</span> <span class="nx">and</span> <span class="nx">to</span> <span class="nx">be</span> <span class="nx">sure</span> <span class="nx">that</span> <span class="nx">everything</span> <span class="nx">will</span> <span class="nx">continue</span> <span class="nx">working</span><span class="err">
-</span><span class="err"></span><span class="nx">when</span> <span class="nx">you</span> <span class="nx">upgrade</span> <span class="nx">to</span> <span class="nx">Celery</span> <span class="m">3</span>.<span class="m">2</span>::<span class="err">
-</span><span class="err">
-</span><span class="err"></span>    <span class="nx">CELERY_ACCEPT_CONTENT</span> <span class="p">=</span> [<span class="s1">&#39;pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;msgpack&#39;</span><span class="p">,</span> <span class="s1">&#39;yaml&#39;</span>]<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">You</span> <span class="nx">must</span> <span class="nx">only</span> <span class="nx">enable</span> <span class="nx">the</span> <span class="nx">serializers</span> <span class="nx">that</span> <span class="nx">you</span> <span class="nx">will</span> <span class="nx">actually</span> <span class="nx">use</span>.<span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>  <span class="nx">warnings</span>.<span class="nx">warn</span><span class="p">(</span><span class="nx">CDeprecationWarning</span><span class="p">(</span><span class="nx">W_PICKLE_DEPRECATED</span><span class="p">))</span><span class="err">
-</span><span class="err"></span> <span class="err">
-</span><span class="err"></span> <span class="p">--------------</span> <span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">v3</span>.<span class="m">1</span>.<span class="m">19</span> <span class="p">(</span><span class="nx">Cipater</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">----</span> **** <span class="p">-----</span> <span class="err">
-</span><span class="err"></span><span class="p">---</span> * ***  * <span class="p">--</span> <span class="nx">Linux</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">32-504</span>.<span class="nx">el6</span>.<span class="nx">x86_64</span><span class="p">-</span><span class="nx">x86_64</span><span class="p">-</span><span class="nx">with</span><span class="p">-</span><span class="nx">redhat</span><span class="m">-6</span>.<span class="m">6</span><span class="p">-</span><span class="nx">Santiago</span><span class="err">
-</span><span class="err"></span><span class="p">--</span> * <span class="p">-</span> **** <span class="p">---</span> <span class="err">
-</span><span class="err"></span><span class="p">-</span> ** <span class="p">----------</span> [<span class="nx">config</span>]<span class="err">
-</span><span class="err"></span><span class="p">-</span> ** <span class="p">----------</span> .<span class="p">&gt;</span> <span class="nx">app</span>:         <span class="nx">tasks</span>:<span class="m">0</span>x<span class="m">192</span>c<span class="m">210</span><span class="err">
-</span><span class="err"></span><span class="p">-</span> ** <span class="p">----------</span> .<span class="p">&gt;</span> <span class="nx">transport</span>:   <span class="nx">redis</span>:<span class="sr">//</span><span class="nx">localhost</span>:<span class="m">6379</span><span class="sr">//</span><span class="err">
-</span><span class="err"></span><span class="p">-</span> ** <span class="p">----------</span> .<span class="p">&gt;</span> <span class="nx">results</span>:     <span class="nx">redis</span>:<span class="sr">//</span><span class="nx">localhost</span><span class="err">
-</span><span class="err"></span><span class="p">-</span> *** <span class="p">---</span> * <span class="p">---</span> .<span class="p">&gt;</span> <span class="nx">concurrency</span>: <span class="m">2</span> <span class="p">(</span><span class="nx">prefork</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">--</span> ******* <span class="p">----</span> <span class="err">
-</span><span class="err"></span><span class="p">---</span> ***** <span class="p">-----</span> [<span class="nx">queues</span>]<span class="err">
-</span><span class="err"></span> <span class="p">--------------</span> .<span class="p">&gt;</span> <span class="nx">celery</span>           <span class="nx">exchange</span><span class="p">=</span><span class="nx">celery</span><span class="p">(</span><span class="nx">direct</span><span class="p">)</span> <span class="nx">key</span><span class="p">=</span><span class="nx">celery</span><span class="err">
-</span><span class="err"></span>                <span class="err">
-</span><span class="err">
-</span><span class="err"></span>[<span class="nx">tasks</span>]<span class="err">
-</span><span class="err"></span>  . <span class="nx">tasks</span>.<span class="nx">add</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">55</span>:<span class="m">22</span><span class="p">,</span><span class="m">809</span>: <span class="nx">INFO</span><span class="sr">/MainProcess] Connected to redis://localhost:6379/</span>/<span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">55</span>:<span class="m">22</span><span class="p">,</span><span class="m">817</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">mingle</span>: <span class="nx">searching</span> <span class="nx">for</span> <span class="nx">neighbors</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">55</span>:<span class="m">23</span><span class="p">,</span><span class="m">823</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">mingle</span>: <span class="nx">all</span> <span class="nx">alone</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">55</span>:<span class="m">23</span><span class="p">,</span><span class="m">834</span>: <span class="nx">WARNING</span>/<span class="nx">MainProcess</span>] <span class="nx">celery</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">ready</span>.<span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">56</span>:<span class="m">23</span><span class="p">,</span><span class="m">926</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">Received</span> <span class="nx">task</span>: <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">9</span>d<span class="m">825137</span><span class="p">-</span><span class="nx">c4a5</span><span class="m">-4749-9669-2</span>ae<span class="m">06</span>a<span class="m">45</span>fd<span class="m">74</span>]<span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">56</span>:<span class="m">23</span><span class="p">,</span><span class="m">931</span>: <span class="nx">ERROR</span>/<span class="nx">MainProcess</span>] <span class="nx">Task</span> <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">9</span>d<span class="m">825137</span><span class="p">-</span><span class="nx">c4a5</span><span class="m">-4749-9669-2</span>ae<span class="m">06</span>a<span class="m">45</span>fd<span class="m">74</span>] <span class="nx">raised</span> <span class="nx">unexpected</span>: <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class="p">,)</span><span class="err">
-</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">240</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">trace_task</span><span class="err">
-</span><span class="err"></span>    <span class="nx">R</span> <span class="p">=</span> <span class="nx">retval</span> <span class="p">=</span> <span class="k">fun</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">438</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">__protected_call__</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">self</span>.<span class="nx">run</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/home/celery/study/tasks.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">7</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">add</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">x</span> <span class="p">+</span> <span class="nx">y</span><span class="err">
-</span><span class="err"></span><span class="nx">TypeError</span>: <span class="nx">unsupported</span> <span class="nx">operand</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">for</span> <span class="p">+</span>: <span class="s1">&#39;int&#39;</span> <span class="nx">and</span> <span class="s1">&#39;str&#39;</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">56</span>:<span class="m">51</span><span class="p">,</span><span class="m">025</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">Received</span> <span class="nx">task</span>: <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">09</span>fa<span class="m">2</span>c<span class="m">0</span>a<span class="p">-</span><span class="nx">b587</span><span class="m">-43</span>c<span class="m">9</span><span class="p">-</span><span class="nx">be22</span><span class="m">-0466</span>bd<span class="m">261</span>d<span class="m">84</span>]<span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">14</span>:<span class="m">56</span>:<span class="m">51</span><span class="p">,</span><span class="m">029</span>: <span class="nx">ERROR</span>/<span class="nx">MainProcess</span>] <span class="nx">Task</span> <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">09</span>fa<span class="m">2</span>c<span class="m">0</span>a<span class="p">-</span><span class="nx">b587</span><span class="m">-43</span>c<span class="m">9</span><span class="p">-</span><span class="nx">be22</span><span class="m">-0466</span>bd<span class="m">261</span>d<span class="m">84</span>] <span class="nx">raised</span> <span class="nx">unexpected</span>: <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class="p">,)</span><span class="err">
-</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">240</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">trace_task</span><span class="err">
-</span><span class="err"></span>    <span class="nx">R</span> <span class="p">=</span> <span class="nx">retval</span> <span class="p">=</span> <span class="k">fun</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">438</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">__protected_call__</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">self</span>.<span class="nx">run</span><span class="p">(</span>*<span class="nx">args</span><span class="p">,</span> **<span class="nx">kwargs</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/home/celery/study/tasks.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">7</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">add</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">x</span> <span class="p">+</span> <span class="nx">y</span><span class="err">
-</span><span class="err"></span><span class="nx">TypeError</span>: <span class="nx">unsupported</span> <span class="nx">operand</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="nx">for</span> <span class="p">+</span>: <span class="s1">&#39;int&#39;</span> <span class="nx">and</span> <span class="s1">&#39;str&#39;</span><span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">15</span>:<span class="m">12</span>:<span class="m">35</span><span class="p">,</span><span class="m">352</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">Received</span> <span class="nx">task</span>: <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">7</span>a<span class="m">88</span>edf<span class="m">2</span><span class="p">-</span><span class="nx">ce35</span><span class="m">-448</span>e<span class="m">-99</span>c<span class="m">2-2</span>b<span class="m">6</span>eb<span class="m">8</span>afbe<span class="m">6</span>a]<span class="err">
-</span><span class="err"></span>[<span class="m">2016-01-01</span> <span class="m">15</span>:<span class="m">12</span>:<span class="m">35</span><span class="p">,</span><span class="m">355</span>: <span class="nx">INFO</span>/<span class="nx">MainProcess</span>] <span class="nx">Task</span> <span class="nx">tasks</span>.<span class="nx">add</span>[<span class="m">7</span>a<span class="m">88</span>edf<span class="m">2</span><span class="p">-</span><span class="nx">ce35</span><span class="m">-448</span>e<span class="m">-99</span>c<span class="m">2-2</span>b<span class="m">6</span>eb<span class="m">8</span>afbe<span class="m">6</span>a] <span class="nx">succeeded</span> <span class="nx">in</span> <span class="m">0</span>.<span class="m">00156113225967</span>s: <span class="m">127</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2016-01-01
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/python/">python</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2016/01/windows-install-celery/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">windows安装celery和tornado</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2015/12/init-all/">
-            <span class="next-text nav-default">__init__.py和__all__</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2016-01-01 00:00:00 \u002b0000 UTC',
-        title: 'celery简单使用',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>celery简单使用 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="1. 环境"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2016/01/celery-learn/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="celery简单使用"><meta property="og:description" content="1. 环境"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2016/01/celery-learn/"><meta property="article:published_time" content="2016-01-01T00:00:00+00:00"><meta property="article:modified_time" content="2016-01-01T00:00:00+00:00"><meta itemprop=name content="celery简单使用"><meta itemprop=description content="1. 环境"><meta itemprop=datePublished content="2016-01-01T00:00:00+00:00"><meta itemprop=dateModified content="2016-01-01T00:00:00+00:00"><meta itemprop=wordCount content="780"><meta itemprop=keywords content="python,"><meta name=twitter:card content="summary"><meta name=twitter:title content="celery简单使用"><meta name=twitter:description content="1. 环境"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>celery简单使用</h1><div class=post-meta><span class=post-time>2016-01-01</span><div class=post-category><a href=/categories/python/>python</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-环境>1. 环境</a></li><li><a href=#2-结果查询>2. 结果查询</a></li><li><a href=#3-日志>3. 日志</a></li></ul></nav></div></div><div class=post-content><h1 id=1-环境>1. 环境</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>study</span>]$ <span class=nx>pwd</span><span class=err>
+</span><span class=err></span><span class=sr>/home/</span><span class=nx>celery</span>/<span class=nx>study</span><span class=err>
+</span><span class=err></span>[<span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>study</span>]$ <span class=nx>python</span><span class=err>
+</span><span class=err></span><span class=nx>Python</span> <span class=m>2</span>.<span class=m>6</span>.<span class=m>6</span> <span class=p>(</span><span class=nx>r266</span>:<span class=m>84292</span><span class=p>,</span> <span class=nx>Jan</span> <span class=m>22</span> <span class=m>2014</span><span class=p>,</span> <span class=m>01</span>:<span class=m>49</span>:<span class=m>05</span><span class=p>)</span> <span class=err>
+</span><span class=err></span>[<span class=nx>GCC</span> <span class=m>4</span>.<span class=m>4</span>.<span class=m>7</span> <span class=m>20120313</span> <span class=p>(</span><span class=nx>Red</span> <span class=nx>Hat</span> <span class=m>4</span>.<span class=m>4</span>.<span class=m>7-4</span><span class=p>)</span>] <span class=nx>on</span> <span class=nx>linux2</span><span class=err>
+</span><span class=err></span><span class=nx>Type</span> <span class=s2>&#34;help&#34;</span><span class=p>,</span> <span class=s2>&#34;copyright&#34;</span><span class=p>,</span> <span class=s2>&#34;credits&#34;</span> <span class=nx>or</span> <span class=s2>&#34;license&#34;</span> <span class=nx>for</span> <span class=nx>more</span> <span class=nx>information</span>.<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>from</span> <span class=nx>tasks</span> <span class=nx>import</span> <span class=nx>add</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>add</span>.<span class=nx>delay</span><span class=p>(</span><span class=m>4</span><span class=p>,</span> <span class=s1>&#39;a&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>&lt;</span><span class=nx>AsyncResult</span>: <span class=m>9</span>d<span class=m>825137</span><span class=p>-</span><span class=nx>c4a5</span><span class=m>-4749-9669-2</span>ae<span class=m>06</span>a<span class=m>45</span>fd<span class=m>74</span><span class=p>&gt;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span> <span class=p>=</span> <span class=nx>add</span>.<span class=nx>delay</span><span class=p>(</span><span class=m>4</span><span class=p>,</span> <span class=s1>&#39;a&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>ready</span><span class=p>()</span><span class=err>
+</span><span class=err></span><span class=nx>True</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>get</span><span class=p>(</span><span class=nx>timeout</span><span class=p>=</span><span class=m>1</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>Traceback</span> <span class=p>(</span><span class=nx>most</span> <span class=nx>recent</span> <span class=nx>call</span> <span class=nx>last</span><span class=p>)</span>:<span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;&lt;stdin&gt;&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>1</span><span class=p>,</span> <span class=nx>in</span> <span class=p>&lt;</span><span class=nx>module</span><span class=p>&gt;</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/result.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>162</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>get</span><span class=err>
+</span><span class=err></span>    <span class=nx>self</span>.<span class=nx>maybe_reraise</span><span class=p>()</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/result.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>271</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>maybe_reraise</span><span class=err>
+</span><span class=err></span>    <span class=nx>raise</span> <span class=nx>self</span>.<span class=nx>result</span><span class=err>
+</span><span class=err></span><span class=nx>TypeError</span>: <span class=nx>unsupported</span> <span class=nx>operand</span> <span class=nx>type</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=nx>for</span> <span class=p>+</span>: <span class=s1>&#39;int&#39;</span> <span class=nx>and</span> <span class=s1>&#39;str&#39;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>get</span><span class=p>(</span><span class=nx>propagate</span><span class=p>=</span><span class=nx>False</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>TypeError</span><span class=p>(</span><span class=s2>&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class=p>,)</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>traceback</span><span class=err>
+</span><span class=err></span><span class=s1>&#39;Traceback (most recent call last):\n  File &#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File &#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File &#34;/home/celery/study/tasks.py&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: \&#39;</span><span class=nx>int</span>\<span class=s1>&#39; and \&#39;</span><span class=nx>str</span>\<span class=s1>&#39;\n&#39;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>print</span> <span class=nx>result</span>.<span class=nx>traceback</span><span class=err>
+</span><span class=err></span><span class=nx>Traceback</span> <span class=p>(</span><span class=nx>most</span> <span class=nx>recent</span> <span class=nx>call</span> <span class=nx>last</span><span class=p>)</span>:<span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>240</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>trace_task</span><span class=err>
+</span><span class=err></span>    <span class=nx>R</span> <span class=p>=</span> <span class=nx>retval</span> <span class=p>=</span> <span class=k>fun</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>438</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>__protected_call__</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>self</span>.<span class=nx>run</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/home/celery/study/tasks.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>7</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>add</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>x</span> <span class=p>+</span> <span class=nx>y</span><span class=err>
+</span><span class=err></span><span class=nx>TypeError</span>: <span class=nx>unsupported</span> <span class=nx>operand</span> <span class=nx>type</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=nx>for</span> <span class=p>+</span>: <span class=s1>&#39;int&#39;</span> <span class=nx>and</span> <span class=s1>&#39;str&#39;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span> <span class=p>=</span> <span class=nx>add</span>.<span class=nx>delay</span><span class=p>(</span><span class=m>4</span><span class=p>,</span> <span class=m>123</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>ready</span><span class=p>()</span><span class=err>
+</span><span class=err></span><span class=nx>True</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>result</span>.<span class=nx>get</span><span class=p>(</span><span class=nx>timeout</span><span class=p>=</span><span class=m>1</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=m>127</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=2-结果查询>2. 结果查询</h1><p>在 redis 中查询结果，每个 task_id 是一个 key。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>study</span>]$ <span class=nx>redis</span><span class=p>-</span><span class=nx>cli</span> <span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=nx>keys</span> *<span class=err>
+</span><span class=err></span><span class=m>1</span><span class=p>)</span> <span class=s2>&#34;celery-task-meta-09fa2c0a-b587-43c9-be22-0466bd261d84&#34;</span><span class=err>
+</span><span class=err></span><span class=m>2</span><span class=p>)</span> <span class=s2>&#34;celery-task-meta-9d825137-c4a5-4749-9669-2ae06a45fd74&#34;</span><span class=err>
+</span><span class=err></span><span class=m>3</span><span class=p>)</span> <span class=s2>&#34;_kombu.binding.celery&#34;</span><span class=err>
+</span><span class=err></span><span class=m>4</span><span class=p>)</span> <span class=s2>&#34;celery-task-meta-7a88edf2-ce35-448e-99c2-2b6eb8afbe6a&#34;</span><span class=err>
+</span><span class=err></span><span class=m>5</span><span class=p>)</span> <span class=s2>&#34;_kombu.binding.celery.pidbox&#34;</span><span class=err>
+</span><span class=err></span><span class=m>6</span><span class=p>)</span> <span class=s2>&#34;_kombu.binding.celeryev&#34;</span><span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=nx>get</span> <span class=s2>&#34;celery-task-meta-09fa2c0a-b587-43c9-be22-0466bd261d84&#34;</span><span class=err>
+</span><span class=err></span><span class=c>&#34;\x80\x02}q\x01(U\x06statusq\x02U\aFAILUREq\x03U\ttracebackq\x04T\xa8\x01\x00\x00Traceback (most recent call last):\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File \&#34;/home/celery/study/tasks.py\&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;\nq\x05U\x06resultq\x06cexceptions\nTypeError\nq\aU2unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;q\b\x85q\tRq\nU\bchildrenq\x0b]q\x0cu.&#34;</span><span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=nx>get</span> <span class=s2>&#34;celery-task-meta-9d825137-c4a5-4749-9669-2ae06a45fd74&#34;</span><span class=err>
+</span><span class=err></span><span class=c>&#34;\x80\x02}q\x01(U\x06statusq\x02U\aFAILUREq\x03U\ttracebackq\x04T\xa8\x01\x00\x00Traceback (most recent call last):\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 240, in trace_task\n    R = retval = fun(*args, **kwargs)\n  File \&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py\&#34;, line 438, in __protected_call__\n    return self.run(*args, **kwargs)\n  File \&#34;/home/celery/study/tasks.py\&#34;, line 7, in add\n    return x + y\nTypeError: unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;\nq\x05U\x06resultq\x06cexceptions\nTypeError\nq\aU2unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;q\b\x85q\tRq\nU\bchildrenq\x0b]q\x0cu.&#34;</span><span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span> <span class=nx>get</span> <span class=s2>&#34;celery-task-meta-7a88edf2-ce35-448e-99c2-2b6eb8afbe6a&#34;</span><span class=err>
+</span><span class=err></span><span class=c>&#34;\x80\x02}q\x01(U\x06statusq\x02U\aSUCCESSq\x03U\ttracebackq\x04NU\x06resultq\x05K\x7fU\bchildrenq\x06]q\au.&#34;</span><span class=err>
+</span><span class=err></span><span class=m>127</span>.<span class=m>0</span>.<span class=m>0</span>.<span class=m>1</span>:<span class=m>6379</span><span class=p>&gt;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=3-日志>3. 日志</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>study</span>]$ <span class=nx>celery</span> <span class=p>-</span><span class=nx>A</span> <span class=nx>tasks</span> <span class=nx>worker</span> <span class=p>--</span><span class=nx>loglevel</span><span class=p>=</span><span class=nx>info</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>55</span>:<span class=m>22</span><span class=p>,</span><span class=m>789</span>: <span class=nx>WARNING</span><span class=sr>/MainProcess] /</span><span class=nx>usr</span><span class=sr>/lib/</span><span class=nx>python2</span>.<span class=m>6</span><span class=sr>/site-packages/</span><span class=nx>celery</span><span class=sr>/apps/</span><span class=nx>worker</span>.<span class=nx>py</span>:<span class=m>161</span>: <span class=nx>CDeprecationWarning</span>: <span class=err>
+</span><span class=err></span><span class=nx>Starting</span> <span class=nx>from</span> <span class=nx>version</span> <span class=m>3</span>.<span class=m>2</span> <span class=nx>Celery</span> <span class=nx>will</span> <span class=nx>refuse</span> <span class=nx>to</span> <span class=nx>accept</span> <span class=nx>pickle</span> <span class=nx>by</span> <span class=nx>default</span>.<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>The</span> <span class=nx>pickle</span> <span class=nx>serializer</span> <span class=nx>is</span> <span class=nx>a</span> <span class=nx>security</span> <span class=nx>concern</span> <span class=nx>as</span> <span class=nx>it</span> <span class=nx>may</span> <span class=nx>give</span> <span class=nx>attackers</span><span class=err>
+</span><span class=err></span><span class=nx>the</span> <span class=nx>ability</span> <span class=nx>to</span> <span class=nx>execute</span> <span class=nx>any</span> <span class=nx>command</span>.  <span class=nx>It</span>&#39;<span class=nx>s</span> <span class=nx>important</span> <span class=nx>to</span> <span class=nx>secure</span><span class=err>
+</span><span class=err></span><span class=nx>your</span> <span class=nx>broker</span> <span class=nx>from</span> <span class=nx>unauthorized</span> <span class=nx>access</span> <span class=nx>when</span> <span class=nx>using</span> <span class=nx>pickle</span><span class=p>,</span> <span class=nx>so</span> <span class=nx>we</span> <span class=nx>think</span><span class=err>
+</span><span class=err></span><span class=nx>that</span> <span class=nx>enabling</span> <span class=nx>pickle</span> <span class=nx>should</span> <span class=nx>require</span> <span class=nx>a</span> <span class=nx>deliberate</span> <span class=nx>action</span> <span class=nx>and</span> <span class=nx>not</span> <span class=nx>be</span><span class=err>
+</span><span class=err></span><span class=nx>the</span> <span class=nx>default</span> <span class=nx>choice</span>.<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>If</span> <span class=nx>you</span> <span class=nx>depend</span> <span class=nx>on</span> <span class=nx>pickle</span> <span class=nx>then</span> <span class=nx>you</span> <span class=nx>should</span> <span class=nx>set</span> <span class=nx>a</span> <span class=nx>setting</span> <span class=nx>to</span> <span class=nx>disable</span> <span class=nx>this</span><span class=err>
+</span><span class=err></span><span class=nx>warning</span> <span class=nx>and</span> <span class=nx>to</span> <span class=nx>be</span> <span class=nx>sure</span> <span class=nx>that</span> <span class=nx>everything</span> <span class=nx>will</span> <span class=nx>continue</span> <span class=nx>working</span><span class=err>
+</span><span class=err></span><span class=nx>when</span> <span class=nx>you</span> <span class=nx>upgrade</span> <span class=nx>to</span> <span class=nx>Celery</span> <span class=m>3</span>.<span class=m>2</span>::<span class=err>
+</span><span class=err>
+</span><span class=err></span>    <span class=nx>CELERY_ACCEPT_CONTENT</span> <span class=p>=</span> [<span class=s1>&#39;pickle&#39;</span><span class=p>,</span> <span class=s1>&#39;json&#39;</span><span class=p>,</span> <span class=s1>&#39;msgpack&#39;</span><span class=p>,</span> <span class=s1>&#39;yaml&#39;</span>]<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>You</span> <span class=nx>must</span> <span class=nx>only</span> <span class=nx>enable</span> <span class=nx>the</span> <span class=nx>serializers</span> <span class=nx>that</span> <span class=nx>you</span> <span class=nx>will</span> <span class=nx>actually</span> <span class=nx>use</span>.<span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>  <span class=nx>warnings</span>.<span class=nx>warn</span><span class=p>(</span><span class=nx>CDeprecationWarning</span><span class=p>(</span><span class=nx>W_PICKLE_DEPRECATED</span><span class=p>))</span><span class=err>
+</span><span class=err></span> <span class=err>
+</span><span class=err></span> <span class=p>--------------</span> <span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>v3</span>.<span class=m>1</span>.<span class=m>19</span> <span class=p>(</span><span class=nx>Cipater</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>----</span> **** <span class=p>-----</span> <span class=err>
+</span><span class=err></span><span class=p>---</span> * ***  * <span class=p>--</span> <span class=nx>Linux</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>32-504</span>.<span class=nx>el6</span>.<span class=nx>x86_64</span><span class=p>-</span><span class=nx>x86_64</span><span class=p>-</span><span class=nx>with</span><span class=p>-</span><span class=nx>redhat</span><span class=m>-6</span>.<span class=m>6</span><span class=p>-</span><span class=nx>Santiago</span><span class=err>
+</span><span class=err></span><span class=p>--</span> * <span class=p>-</span> **** <span class=p>---</span> <span class=err>
+</span><span class=err></span><span class=p>-</span> ** <span class=p>----------</span> [<span class=nx>config</span>]<span class=err>
+</span><span class=err></span><span class=p>-</span> ** <span class=p>----------</span> .<span class=p>&gt;</span> <span class=nx>app</span>:         <span class=nx>tasks</span>:<span class=m>0</span>x<span class=m>192</span>c<span class=m>210</span><span class=err>
+</span><span class=err></span><span class=p>-</span> ** <span class=p>----------</span> .<span class=p>&gt;</span> <span class=nx>transport</span>:   <span class=nx>redis</span>:<span class=sr>//</span><span class=nx>localhost</span>:<span class=m>6379</span><span class=sr>//</span><span class=err>
+</span><span class=err></span><span class=p>-</span> ** <span class=p>----------</span> .<span class=p>&gt;</span> <span class=nx>results</span>:     <span class=nx>redis</span>:<span class=sr>//</span><span class=nx>localhost</span><span class=err>
+</span><span class=err></span><span class=p>-</span> *** <span class=p>---</span> * <span class=p>---</span> .<span class=p>&gt;</span> <span class=nx>concurrency</span>: <span class=m>2</span> <span class=p>(</span><span class=nx>prefork</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>--</span> ******* <span class=p>----</span> <span class=err>
+</span><span class=err></span><span class=p>---</span> ***** <span class=p>-----</span> [<span class=nx>queues</span>]<span class=err>
+</span><span class=err></span> <span class=p>--------------</span> .<span class=p>&gt;</span> <span class=nx>celery</span>           <span class=nx>exchange</span><span class=p>=</span><span class=nx>celery</span><span class=p>(</span><span class=nx>direct</span><span class=p>)</span> <span class=nx>key</span><span class=p>=</span><span class=nx>celery</span><span class=err>
+</span><span class=err></span>                <span class=err>
+</span><span class=err>
+</span><span class=err></span>[<span class=nx>tasks</span>]<span class=err>
+</span><span class=err></span>  . <span class=nx>tasks</span>.<span class=nx>add</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>55</span>:<span class=m>22</span><span class=p>,</span><span class=m>809</span>: <span class=nx>INFO</span><span class=sr>/MainProcess] Connected to redis://localhost:6379/</span>/<span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>55</span>:<span class=m>22</span><span class=p>,</span><span class=m>817</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>mingle</span>: <span class=nx>searching</span> <span class=nx>for</span> <span class=nx>neighbors</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>55</span>:<span class=m>23</span><span class=p>,</span><span class=m>823</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>mingle</span>: <span class=nx>all</span> <span class=nx>alone</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>55</span>:<span class=m>23</span><span class=p>,</span><span class=m>834</span>: <span class=nx>WARNING</span>/<span class=nx>MainProcess</span>] <span class=nx>celery</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=nx>ready</span>.<span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>56</span>:<span class=m>23</span><span class=p>,</span><span class=m>926</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>Received</span> <span class=nx>task</span>: <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>9</span>d<span class=m>825137</span><span class=p>-</span><span class=nx>c4a5</span><span class=m>-4749-9669-2</span>ae<span class=m>06</span>a<span class=m>45</span>fd<span class=m>74</span>]<span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>56</span>:<span class=m>23</span><span class=p>,</span><span class=m>931</span>: <span class=nx>ERROR</span>/<span class=nx>MainProcess</span>] <span class=nx>Task</span> <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>9</span>d<span class=m>825137</span><span class=p>-</span><span class=nx>c4a5</span><span class=m>-4749-9669-2</span>ae<span class=m>06</span>a<span class=m>45</span>fd<span class=m>74</span>] <span class=nx>raised</span> <span class=nx>unexpected</span>: <span class=nx>TypeError</span><span class=p>(</span><span class=s2>&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class=p>,)</span><span class=err>
+</span><span class=err></span><span class=nx>Traceback</span> <span class=p>(</span><span class=nx>most</span> <span class=nx>recent</span> <span class=nx>call</span> <span class=nx>last</span><span class=p>)</span>:<span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>240</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>trace_task</span><span class=err>
+</span><span class=err></span>    <span class=nx>R</span> <span class=p>=</span> <span class=nx>retval</span> <span class=p>=</span> <span class=k>fun</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>438</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>__protected_call__</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>self</span>.<span class=nx>run</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/home/celery/study/tasks.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>7</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>add</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>x</span> <span class=p>+</span> <span class=nx>y</span><span class=err>
+</span><span class=err></span><span class=nx>TypeError</span>: <span class=nx>unsupported</span> <span class=nx>operand</span> <span class=nx>type</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=nx>for</span> <span class=p>+</span>: <span class=s1>&#39;int&#39;</span> <span class=nx>and</span> <span class=s1>&#39;str&#39;</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>56</span>:<span class=m>51</span><span class=p>,</span><span class=m>025</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>Received</span> <span class=nx>task</span>: <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>09</span>fa<span class=m>2</span>c<span class=m>0</span>a<span class=p>-</span><span class=nx>b587</span><span class=m>-43</span>c<span class=m>9</span><span class=p>-</span><span class=nx>be22</span><span class=m>-0466</span>bd<span class=m>261</span>d<span class=m>84</span>]<span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>14</span>:<span class=m>56</span>:<span class=m>51</span><span class=p>,</span><span class=m>029</span>: <span class=nx>ERROR</span>/<span class=nx>MainProcess</span>] <span class=nx>Task</span> <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>09</span>fa<span class=m>2</span>c<span class=m>0</span>a<span class=p>-</span><span class=nx>b587</span><span class=m>-43</span>c<span class=m>9</span><span class=p>-</span><span class=nx>be22</span><span class=m>-0466</span>bd<span class=m>261</span>d<span class=m>84</span>] <span class=nx>raised</span> <span class=nx>unexpected</span>: <span class=nx>TypeError</span><span class=p>(</span><span class=s2>&#34;unsupported operand type(s) for +: &#39;int&#39; and &#39;str&#39;&#34;</span><span class=p>,)</span><span class=err>
+</span><span class=err></span><span class=nx>Traceback</span> <span class=p>(</span><span class=nx>most</span> <span class=nx>recent</span> <span class=nx>call</span> <span class=nx>last</span><span class=p>)</span>:<span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>240</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>trace_task</span><span class=err>
+</span><span class=err></span>    <span class=nx>R</span> <span class=p>=</span> <span class=nx>retval</span> <span class=p>=</span> <span class=k>fun</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/usr/lib/python2.6/site-packages/celery/app/trace.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>438</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>__protected_call__</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>self</span>.<span class=nx>run</span><span class=p>(</span>*<span class=nx>args</span><span class=p>,</span> **<span class=nx>kwargs</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>File</span> <span class=s2>&#34;/home/celery/study/tasks.py&#34;</span><span class=p>,</span> <span class=nx>line</span> <span class=m>7</span><span class=p>,</span> <span class=nx>in</span> <span class=nx>add</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>x</span> <span class=p>+</span> <span class=nx>y</span><span class=err>
+</span><span class=err></span><span class=nx>TypeError</span>: <span class=nx>unsupported</span> <span class=nx>operand</span> <span class=nx>type</span><span class=p>(</span><span class=nx>s</span><span class=p>)</span> <span class=nx>for</span> <span class=p>+</span>: <span class=s1>&#39;int&#39;</span> <span class=nx>and</span> <span class=s1>&#39;str&#39;</span><span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>15</span>:<span class=m>12</span>:<span class=m>35</span><span class=p>,</span><span class=m>352</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>Received</span> <span class=nx>task</span>: <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>7</span>a<span class=m>88</span>edf<span class=m>2</span><span class=p>-</span><span class=nx>ce35</span><span class=m>-448</span>e<span class=m>-99</span>c<span class=m>2-2</span>b<span class=m>6</span>eb<span class=m>8</span>afbe<span class=m>6</span>a]<span class=err>
+</span><span class=err></span>[<span class=m>2016-01-01</span> <span class=m>15</span>:<span class=m>12</span>:<span class=m>35</span><span class=p>,</span><span class=m>355</span>: <span class=nx>INFO</span>/<span class=nx>MainProcess</span>] <span class=nx>Task</span> <span class=nx>tasks</span>.<span class=nx>add</span>[<span class=m>7</span>a<span class=m>88</span>edf<span class=m>2</span><span class=p>-</span><span class=nx>ce35</span><span class=m>-448</span>e<span class=m>-99</span>c<span class=m>2-2</span>b<span class=m>6</span>eb<span class=m>8</span>afbe<span class=m>6</span>a] <span class=nx>succeeded</span> <span class=nx>in</span> <span class=m>0</span>.<span class=m>00156113225967</span>s: <span class=m>127</span><span class=err>
+</span></code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2016-01-01</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/python/>python</a></div><nav class=post-nav><a class=prev href=/post/2016/01/windows-install-celery/><i class="iconfont icon-left"></i><span class="prev-text nav-default">windows安装celery和tornado</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2015/12/init-all/><span class="next-text nav-default">__init__.py和__all__</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2016-01-01 00:00:00 \u002b0000 UTC',title:'celery简单使用',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

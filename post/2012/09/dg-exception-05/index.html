@@ -1,540 +1,231 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>DataGrard异常-DG异常导致日志备份失败 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="DEF库DG异常导致日志备份失败 先了解下DEF的DG环境： 生产 -&amp;gt; 同城DG -&amp;gt; 上海DG.
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2012/09/dg-exception-05/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="DataGrard异常-DG异常导致日志备份失败" />
-<meta property="og:description" content="
-DEF库DG异常导致日志备份失败
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>DataGrard异常-DG异常导致日志备份失败 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="DEF库DG异常导致日志备份失败 先了解下DEF的DG环境： 生产 -&amp;gt; 同城DG -&amp;gt; 上海DG."><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2012/09/dg-exception-05/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="DataGrard异常-DG异常导致日志备份失败"><meta property="og:description" content="DEF库DG异常导致日志备份失败
 先了解下DEF的DG环境：
-生产 -&gt; 同城DG -&gt; 上海DG." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2012/09/dg-exception-05/" />
-<meta property="article:published_time" content="2012-09-23T00:00:00+00:00" />
-<meta property="article:modified_time" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="name" content="DataGrard异常-DG异常导致日志备份失败">
-<meta itemprop="description" content="
-DEF库DG异常导致日志备份失败
+生产 -> 同城DG -> 上海DG."><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2012/09/dg-exception-05/"><meta property="article:published_time" content="2012-09-23T00:00:00+00:00"><meta property="article:modified_time" content="2012-09-23T00:00:00+00:00"><meta itemprop=name content="DataGrard异常-DG异常导致日志备份失败"><meta itemprop=description content="DEF库DG异常导致日志备份失败
 先了解下DEF的DG环境：
-生产 -&gt; 同城DG -&gt; 上海DG.">
-<meta itemprop="datePublished" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1408">
-
-
-
-<meta itemprop="keywords" content="Database,Oracle,DG,DataGuard," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="DataGrard异常-DG异常导致日志备份失败"/>
-<meta name="twitter:description" content="
-DEF库DG异常导致日志备份失败
+生产 -> 同城DG -> 上海DG."><meta itemprop=datePublished content="2012-09-23T00:00:00+00:00"><meta itemprop=dateModified content="2012-09-23T00:00:00+00:00"><meta itemprop=wordCount content="1408"><meta itemprop=keywords content="Database,Oracle,DG,DataGuard,"><meta name=twitter:card content="summary"><meta name=twitter:title content="DataGrard异常-DG异常导致日志备份失败"><meta name=twitter:description content="DEF库DG异常导致日志备份失败
 先了解下DEF的DG环境：
-生产 -&gt; 同城DG -&gt; 上海DG."/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">DataGrard异常-DG异常导致日志备份失败</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2012-09-23 </span>
-        <div class="post-category">
-            <a href="/categories/database/"> Database </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#def库dg异常导致日志备份失败">DEF库DG异常导致日志备份失败</a>
-          <ul>
-            <li><a href="#环境信息">环境信息</a></li>
-            <li><a href="#报错内容">报错内容</a></li>
-            <li><a href="#解决方法">解决方法</a></li>
-            <li><a href="#分析总结">分析总结</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <!-- toc -->
-<h2 id="def库dg异常导致日志备份失败">DEF库DG异常导致日志备份失败</h2>
-<p>先了解下DEF的DG环境：
-生产 -&gt; 同城DG -&gt; 上海DG.</p>
-<p><strong>日志清理策略</strong></p>
-<p>&ndash;生产策略</p>
-<p>CONFIGURE ARCHIVELOG DELETION POLICY TO SHIPPED TO ALL STANDBY;</p>
-<p>&ndash;同城DG策略</p>
-<p>CONFIGURE ARCHIVELOG DELETION POLICY TO SHIPPED TO ALL STANDBY;</p>
-<p>&ndash;上海DG策略</p>
-<p>CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON STANDBY;</p>
-<h3 id="环境信息">环境信息</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">localhost</span>:<span class="nx">database1</span> <span class="p">&gt;</span> <span class="nx">uname</span> <span class="p">-</span><span class="nx">a</span><span class="err">
-</span><span class="err"></span><span class="nx">AIX</span> <span class="nx">localhost</span> <span class="m">1</span> <span class="m">6</span> <span class="m">00</span>F<span class="m">694464</span>C<span class="m">00</span><span class="err">
-</span><span class="err"></span><span class="nx">localhost</span>:<span class="nx">database1</span> <span class="p">&gt;</span> <span class="nx">sqlplus</span> <span class="s1">&#39;/as sysdba&#39;</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">SQL</span>*<span class="nx">Plus</span>: <span class="nx">Release</span> <span class="m">11</span>.<span class="m">2</span>.<span class="m">0</span>.<span class="m">2</span>.<span class="m">0</span> <span class="nx">Production</span> <span class="nx">on</span> <span class="nx">Tue</span> <span class="nx">May</span> <span class="m">1</span> <span class="m">15</span>:<span class="m">14</span>:<span class="m">15</span> <span class="m">2012</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Copyright</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="m">1982</span><span class="p">,</span> <span class="m">2010</span><span class="p">,</span> <span class="nx">Oracle</span>.  <span class="nx">All</span> <span class="nx">rights</span> <span class="nx">reserved</span>.<span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Connected</span> <span class="nx">to</span>:<span class="err">
-</span><span class="err"></span><span class="nx">Oracle</span> <span class="nx">Database</span> <span class="m">11</span>g <span class="nx">Enterprise</span> <span class="nx">Edition</span> <span class="nx">Release</span> <span class="m">11</span>.<span class="m">2</span>.<span class="m">0</span>.<span class="m">2</span>.<span class="m">0</span> <span class="p">-</span> <span class="m">64</span>bit <span class="nx">Production</span><span class="err">
-</span><span class="err"></span><span class="nx">With</span> <span class="nx">the</span> <span class="nx">Partitioning</span><span class="p">,</span> <span class="nx">Real</span> <span class="nx">Application</span> <span class="nx">Clusters</span> <span class="nx">and</span> <span class="nx">Automatic</span> <span class="nx">Storage</span> <span class="nx">Management</span> <span class="nx">options</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">SQL</span><span class="p">&gt;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="报错内容">报错内容</h3>
-<p>这里涉及生产、同城DG、上海DG共3个数据库的日志。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span><span class="lnt">72
-</span><span class="lnt">73
-</span><span class="lnt">74
-</span><span class="lnt">75
-</span><span class="lnt">76
-</span><span class="lnt">77
-</span><span class="lnt">78
-</span><span class="lnt">79
-</span><span class="lnt">80
-</span><span class="lnt">81
-</span><span class="lnt">82
-</span><span class="lnt">83
-</span><span class="lnt">84
-</span><span class="lnt">85
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">--</span><span class="nx">生产</span> <span class="nx">alert</span> <span class="nx">日志</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">43</span>:<span class="m">57</span> <span class="m">2012</span>  # <span class="nx">这个时间点正常</span>，<span class="nx">同时归档dest_3和dest_4</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26459</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_4</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">44</span>:<span class="m">00</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Archived</span> <span class="nx">Log</span> <span class="nx">entry</span> <span class="m">303238</span> <span class="nx">added</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26458</span> <span class="nx">ID</span> <span class="m">0</span>x<span class="m">4</span>e<span class="m">9</span>a<span class="m">1</span>d<span class="m">90</span> <span class="nx">dest</span> <span class="m">1</span>:<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">44</span>:<span class="m">00</span> <span class="m">2012</span>  # <span class="nx">这个时间点正常</span>，<span class="nx">同时归档dest_3和dest_4</span><span class="err">
-</span><span class="err"></span><span class="nx">ARCk</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26458</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">44</span>:<span class="m">09</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Attempting</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="p">(</span><span class="m">270</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="nx">abandoned</span><span class="err">
-</span><span class="err"></span><span class="nx">Error</span> <span class="m">270</span> <span class="nx">for</span> <span class="nx">archive</span> <span class="nx">log</span> <span class="nx">file</span> <span class="m">6</span> <span class="nx">to</span> <span class="s1">&#39;defdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">Errors</span> <span class="nx">in</span> <span class="nx">file</span> <span class="sr">/path/</span><span class="nx">app</span><span class="sr">/oracle/</span><span class="nx">rdbms</span><span class="sr">/diag/</span><span class="nx">rdbms</span><span class="sr">/fcr/</span><span class="nx">database1</span><span class="sr">/trace/</span><span class="nx">database1_nsa3_43253878</span>.<span class="nx">trc</span>:<span class="err">
-</span><span class="err"></span><span class="nx">ORA</span><span class="m">-00270</span>: <span class="nx">error</span> <span class="nx">creating</span> <span class="nx">archive</span> <span class="nx">log</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">46</span>:<span class="m">46</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">26460</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">7</span> <span class="nx">seq</span># <span class="m">26460</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA_DG</span><span class="sr">/fcr/</span><span class="nx">onlinelog</span>/<span class="nx">group_7</span>.<span class="m">405</span>.<span class="m">764420717</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">7</span> <span class="nx">seq</span># <span class="m">26460</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">onlinelog</span>/<span class="nx">group_7</span>.<span class="m">12419</span>.<span class="m">764420719</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">46</span>:<span class="m">46</span> <span class="m">2012</span>  # <span class="nx">这个时间点异常</span>，<span class="nx">只归档dest_4</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26460</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_4</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">46</span>:<span class="m">46</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Archived</span> <span class="nx">Log</span> <span class="nx">entry</span> <span class="m">303247</span> <span class="nx">added</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26459</span> <span class="nx">ID</span> <span class="m">0</span>x<span class="m">4</span>e<span class="m">9</span>a<span class="m">1</span>d<span class="m">90</span> <span class="nx">dest</span> <span class="m">1</span>:<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">47</span>:<span class="m">02</span> <span class="m">2012</span>  # <span class="nx">这个时间点异常</span>，<span class="nx">归档dest_3时报错</span>，<span class="nx">此时查询v</span>$<span class="nx">archive_dest发现</span>“<span class="nx">ORA</span><span class="m">-00270</span>: <span class="nx">error</span> <span class="nx">creating</span> <span class="nx">archive</span> <span class="nx">log</span>”<span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Attempting</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="p">(</span><span class="m">270</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="nx">abandoned</span><span class="err">
-</span><span class="err"></span><span class="nx">Error</span> <span class="m">270</span> <span class="nx">for</span> <span class="nx">archive</span> <span class="nx">log</span> <span class="nx">file</span> <span class="m">7</span> <span class="nx">to</span> <span class="s1">&#39;defdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">Errors</span> <span class="nx">in</span> <span class="nx">file</span> <span class="sr">/path/</span><span class="nx">app</span><span class="sr">/oracle/</span><span class="nx">rdbms</span><span class="sr">/diag/</span><span class="nx">rdbms</span><span class="sr">/fcr/</span><span class="nx">database1</span><span class="sr">/trace/</span><span class="nx">database1_nsa3_43253878</span>.<span class="nx">trc</span>:<span class="err">
-</span><span class="err"></span><span class="nx">ORA</span><span class="m">-00270</span>: <span class="nx">error</span> <span class="nx">creating</span> <span class="nx">archive</span> <span class="nx">log</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">47</span>:<span class="m">02</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">ARCm</span>: <span class="nx">Attempting</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="p">(</span><span class="m">270</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">ARCm</span>: <span class="nx">Destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="nx">abandoned</span><span class="err">
-</span><span class="err"></span><span class="nx">FAL</span>[<span class="nx">server</span><span class="p">,</span> <span class="nx">ARCm</span>]: <span class="nx">Error</span> <span class="m">270</span> <span class="nx">creating</span> <span class="nx">remote</span> <span class="nx">archivelog</span> <span class="nx">file</span> <span class="s1">&#39;defdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">FAL</span>[<span class="nx">server</span><span class="p">,</span> <span class="nx">ARCm</span>]: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span><span class="p">,</span> <span class="nx">see</span> <span class="nx">trace</span> <span class="nx">file</span>.<span class="err">
-</span><span class="err"></span><span class="nx">ARCH</span>: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span><span class="err">
-</span><span class="err"></span><span class="nx">ORACLE</span> <span class="nx">Instance</span> <span class="nx">database1</span> <span class="p">-</span> <span class="nx">Archival</span> <span class="nx">Error</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span>.<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">48</span>:<span class="m">58</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">26461</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">8</span> <span class="nx">seq</span># <span class="m">26461</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA_DG</span><span class="sr">/fcr/</span><span class="nx">onlinelog</span>/<span class="nx">group_8</span>.<span class="m">403</span>.<span class="m">764420721</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">8</span> <span class="nx">seq</span># <span class="m">26461</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">onlinelog</span>/<span class="nx">group_8</span>.<span class="m">12410</span>.<span class="m">764420723</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">48</span>:<span class="m">59</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26461</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_4</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">48</span>:<span class="m">59</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Deleted</span> <span class="nx">Oracle</span> <span class="nx">managed</span> <span class="nx">file</span> <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">archivelog</span><span class="sr">/2012_04_17/</span><span class="nx">thread_1_seq_25172</span>.<span class="m">5931</span>.<span class="m">780854251</span><span class="err">
-</span><span class="err"></span><span class="nx">Archived</span> <span class="nx">Log</span> <span class="nx">entry</span> <span class="m">303251</span> <span class="nx">added</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">26460</span> <span class="nx">ID</span> <span class="m">0</span>x<span class="m">4</span>e<span class="m">9</span>a<span class="m">1</span>d<span class="m">90</span> <span class="nx">dest</span> <span class="m">1</span>:<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Apr</span> <span class="m">26</span> <span class="m">03</span>:<span class="m">49</span>:<span class="m">08</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Attempting</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="p">(</span><span class="m">270</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Destination</span> <span class="nx">LOG_ARCHIVE_DEST_3</span> <span class="nx">network</span> <span class="nx">reconnect</span> <span class="nx">abandoned</span><span class="err">
-</span><span class="err"></span><span class="nx">Error</span> <span class="m">270</span> <span class="nx">for</span> <span class="nx">archive</span> <span class="nx">log</span> <span class="nx">file</span> <span class="m">8</span> <span class="nx">to</span> <span class="s1">&#39;defdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">Errors</span> <span class="nx">in</span> <span class="nx">file</span> <span class="sr">/path/</span><span class="nx">app</span><span class="sr">/oracle/</span><span class="nx">rdbms</span><span class="sr">/diag/</span><span class="nx">rdbms</span><span class="sr">/fcr/</span><span class="nx">database1</span><span class="sr">/trace/</span><span class="nx">database1_nsa3_43253878</span>.<span class="nx">trc</span>:<span class="err">
-</span><span class="err"></span><span class="nx">ORA</span><span class="m">-00270</span>: <span class="nx">error</span> <span class="nx">creating</span> <span class="nx">archive</span> <span class="nx">log</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">SQL</span><span class="p">&gt;</span> <span class="nx">select</span> <span class="nx">dest_name</span><span class="p">,</span><span class="nx">status</span><span class="p">,</span><span class="nx">error</span> <span class="nx">from</span> <span class="nx">v</span>$<span class="nx">archive_dest</span>;<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">DEST_NAME</span>                                                                        <span class="nx">STATUS</span>    <span class="nx">ERROR</span><span class="err">
-</span><span class="err"></span><span class="p">--------------------------------------------------------------------------------</span> <span class="p">---------</span> <span class="p">--------------------------------------------</span><span class="err">
-</span><span class="err"></span><span class="nx">LOG_ARCHIVE_DEST_1</span>                                                               <span class="nx">VALID</span>     <span class="err">
-</span><span class="err"></span><span class="nx">LOG_ARCHIVE_DEST_2</span>                                                               <span class="nx">INACTIVE</span>  <span class="err">
-</span><span class="err"></span><span class="nx">LOG_ARCHIVE_DEST_3</span>                                                               <span class="nx">ERROR</span>     <span class="nx">ORA</span><span class="m">-00270</span>: <span class="nx">error</span> <span class="nx">creating</span> <span class="nx">archive</span> <span class="nx">log</span><span class="err">
-</span><span class="err"></span><span class="nx">LOG_ARCHIVE_DEST_4</span>                                                               <span class="nx">VALID</span>     <span class="err">
-</span><span class="err"></span><span class="nx">LOG_ARCHIVE_DEST_5</span>                                                               <span class="nx">INACTIVE</span>  <span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">同城DG</span> <span class="nx">alert</span> <span class="nx">日志</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">14</span>:<span class="m">54</span>:<span class="m">49</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Log</span> <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">archivelog</span><span class="sr">/2012_04_30/</span><span class="nx">thread_1_seq_27063</span>.<span class="m">3374</span>.<span class="m">781973683</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Waiting</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">2</span> <span class="nx">sequence</span> <span class="m">29288</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">16</span>:<span class="m">25</span>:<span class="m">21</span> <span class="m">2012</span>  #  <span class="nx">这个时间点开始</span>，<span class="nx">指向上海DG的归档出现异常</span><span class="err">
-</span><span class="err"></span><span class="nx">ARCd</span>: <span class="nx">Archive</span> <span class="nx">log</span> <span class="nx">rejected</span> <span class="p">(</span><span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">27053</span><span class="p">)</span> <span class="nx">at</span> <span class="nx">host</span> <span class="s1">&#39;fcrshdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">FAL</span>[<span class="nx">server</span><span class="p">,</span> <span class="nx">ARCd</span>]: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span><span class="p">,</span> <span class="nx">see</span> <span class="nx">trace</span> <span class="nx">file</span>.<span class="err">
-</span><span class="err"></span><span class="nx">ARCH</span>: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span><span class="err">
-</span><span class="err"></span><span class="nx">ORACLE</span> <span class="nx">Instance</span> <span class="nx">database1</span> <span class="p">-</span> <span class="nx">Archival</span> <span class="nx">Error</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span>.<span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">16</span>:<span class="m">25</span>:<span class="m">21</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">ARCf</span>: <span class="nx">Archive</span> <span class="nx">log</span> <span class="nx">rejected</span> <span class="p">(</span><span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">27055</span><span class="p">)</span> <span class="nx">at</span> <span class="nx">host</span> <span class="s1">&#39;fcrshdg&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">FAL</span>[<span class="nx">server</span><span class="p">,</span> <span class="nx">ARCf</span>]: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span><span class="p">,</span> <span class="nx">see</span> <span class="nx">trace</span> <span class="nx">file</span>.<span class="err">
-</span><span class="err"></span><span class="nx">ARCH</span>: <span class="nx">FAL</span> <span class="nx">archive</span> <span class="nx">failed</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span><span class="err">
-</span><span class="err"></span><span class="nx">ORACLE</span> <span class="nx">Instance</span> <span class="nx">database1</span> <span class="p">-</span> <span class="nx">Archival</span> <span class="nx">Error</span>. <span class="nx">Archiver</span> <span class="nx">continuing</span>.<span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">16</span>:<span class="m">25</span>:<span class="m">21</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">上海DG</span> <span class="nx">alert</span> <span class="nx">日志</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">16</span>:<span class="m">56</span>:<span class="m">43</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Log</span> <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">archivelog</span><span class="sr">/2012_04_30/</span><span class="nx">thread_2_seq_29286</span>.<span class="m">27144</span>.<span class="m">781979577</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Log</span> <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">archivelog</span><span class="sr">/2012_04_30/</span><span class="nx">thread_1_seq_27062</span>.<span class="m">21155</span>.<span class="m">781978759</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">16</span>:<span class="m">57</span>:<span class="m">07</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Log</span> <span class="p">+</span><span class="nx">FRA_DG</span><span class="sr">/fcr/</span><span class="nx">archivelog</span><span class="sr">/2012_04_30/</span><span class="nx">thread_2_seq_29287</span>.<span class="m">25171</span>.<span class="m">781979609</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Waiting</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">27063</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">18</span>:<span class="m">33</span>:<span class="m">34</span> <span class="m">2012</span>  #  <span class="nx">这个时间点开始</span>，<span class="nx">上海DG和同城DG通信异常</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">23046</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Mon</span> <span class="nx">Apr</span> <span class="m">30</span> <span class="m">18</span>:<span class="m">33</span>:<span class="m">37</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">23043</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="解决方法">解决方法</h3>
-<p>这里要解决如下几个问题：</p>
-<ol>
-<li>上海DG和同城DG通信异常</li>
-<li>生产向同城DG归档异常</li>
-<li>如上两个问题处理好后，保证从生产到上海的整个级连DG同步正常</li>
-<li>通过RMAN适当清理同城DG和上海DG的FRA，本次我清理了4天前的日志，确认是DG不需要的</li>
-</ol>
-<h3 id="分析总结">分析总结</h3>
-<p>处理这个问题比较简单，用到的知识在之前发过的DG异常案例都有，因此没有把详细命令和步骤贴出来。</p>
-<p>在同城DG和上海DG都正常同步后，我发现在生产切换日志时，不会立刻被同城DG感知，所以现在这个状态是个不合格的同城DG。仔细研究后，发现通过下面操作可以解决该问题：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="m">1</span>. <span class="nx">select</span> * <span class="nx">from</span> <span class="nx">v</span>$<span class="nx">archive_dest</span> <span class="nx">where</span> <span class="nx">status</span> <span class="p">!=</span> <span class="s1">&#39;INACTIVE&#39;</span>;  #  <span class="nx">这个返回结果发现dest_3依然被oracle认为是invalid</span>，<span class="nx">并且错误信息和之前一样</span><span class="err">
-</span><span class="err"></span><span class="m">2</span>. <span class="nx">alter</span> <span class="nx">system</span> <span class="nx">set</span> <span class="nx">log_archive_dest_state_3</span> <span class="p">=</span> <span class="s1">&#39;enable&#39;</span>;<span class="err">
-</span><span class="err"></span><span class="m">3</span>. <span class="nx">select</span> * <span class="nx">from</span> <span class="nx">v</span>$<span class="nx">archive_dest</span> <span class="nx">where</span> <span class="nx">status</span> <span class="p">!=</span> <span class="s1">&#39;INACTIVE&#39;</span>;  #  <span class="nx">再次查询</span>，<span class="nx">结果显示正常</span><span class="err">
-</span><span class="err"></span><span class="m">4</span>. <span class="nx">在生产库切换日志</span>，<span class="nx">同城DG立刻有感知</span>，<span class="nx">至此这个问题处理完毕</span><span class="err">
-</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>解决问题后，再深入检查了一下，发现同城DG最近一直是通过 fetch gap 的机制和生产同步，因此同步也是延迟的。</p>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2012-09-23
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/database/">Database</a>
-          <a href="/tags/oracle/">Oracle</a>
-          <a href="/tags/dg/">DG</a>
-          <a href="/tags/dataguard/">DataGuard</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2015/03/hadoop-foundation/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Hadoop学习1-基础理论</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2012/09/dg-exception-08/">
-            <span class="next-text nav-default">DataGrard异常-DG端缺少文件导致MRP无法启动</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2012-09-23 00:00:00 \u002b0000 UTC',
-        title: 'DataGrard异常-DG异常导致日志备份失败',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+生产 -> 同城DG -> 上海DG."><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>DataGrard异常-DG异常导致日志备份失败</h1><div class=post-meta><span class=post-time>2012-09-23</span><div class=post-category><a href=/categories/database/>Database</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#def库dg异常导致日志备份失败>DEF库DG异常导致日志备份失败</a><ul><li><a href=#环境信息>环境信息</a></li><li><a href=#报错内容>报错内容</a></li><li><a href=#解决方法>解决方法</a></li><li><a href=#分析总结>分析总结</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=def库dg异常导致日志备份失败>DEF库DG异常导致日志备份失败</h2><p>先了解下DEF的DG环境：
+生产 -> 同城DG -> 上海DG.</p><p><strong>日志清理策略</strong></p><p>&ndash;生产策略</p><p>CONFIGURE ARCHIVELOG DELETION POLICY TO SHIPPED TO ALL STANDBY;</p><p>&ndash;同城DG策略</p><p>CONFIGURE ARCHIVELOG DELETION POLICY TO SHIPPED TO ALL STANDBY;</p><p>&ndash;上海DG策略</p><p>CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON STANDBY;</p><h3 id=环境信息>环境信息</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>localhost</span>:<span class=nx>database1</span> <span class=p>&gt;</span> <span class=nx>uname</span> <span class=p>-</span><span class=nx>a</span><span class=err>
+</span><span class=err></span><span class=nx>AIX</span> <span class=nx>localhost</span> <span class=m>1</span> <span class=m>6</span> <span class=m>00</span>F<span class=m>694464</span>C<span class=m>00</span><span class=err>
+</span><span class=err></span><span class=nx>localhost</span>:<span class=nx>database1</span> <span class=p>&gt;</span> <span class=nx>sqlplus</span> <span class=s1>&#39;/as sysdba&#39;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>SQL</span>*<span class=nx>Plus</span>: <span class=nx>Release</span> <span class=m>11</span>.<span class=m>2</span>.<span class=m>0</span>.<span class=m>2</span>.<span class=m>0</span> <span class=nx>Production</span> <span class=nx>on</span> <span class=nx>Tue</span> <span class=nx>May</span> <span class=m>1</span> <span class=m>15</span>:<span class=m>14</span>:<span class=m>15</span> <span class=m>2012</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Copyright</span> <span class=p>(</span><span class=nx>c</span><span class=p>)</span> <span class=m>1982</span><span class=p>,</span> <span class=m>2010</span><span class=p>,</span> <span class=nx>Oracle</span>.  <span class=nx>All</span> <span class=nx>rights</span> <span class=nx>reserved</span>.<span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Connected</span> <span class=nx>to</span>:<span class=err>
+</span><span class=err></span><span class=nx>Oracle</span> <span class=nx>Database</span> <span class=m>11</span>g <span class=nx>Enterprise</span> <span class=nx>Edition</span> <span class=nx>Release</span> <span class=m>11</span>.<span class=m>2</span>.<span class=m>0</span>.<span class=m>2</span>.<span class=m>0</span> <span class=p>-</span> <span class=m>64</span>bit <span class=nx>Production</span><span class=err>
+</span><span class=err></span><span class=nx>With</span> <span class=nx>the</span> <span class=nx>Partitioning</span><span class=p>,</span> <span class=nx>Real</span> <span class=nx>Application</span> <span class=nx>Clusters</span> <span class=nx>and</span> <span class=nx>Automatic</span> <span class=nx>Storage</span> <span class=nx>Management</span> <span class=nx>options</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>SQL</span><span class=p>&gt;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=报错内容>报错内容</h3><p>这里涉及生产、同城DG、上海DG共3个数据库的日志。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>--</span><span class=nx>生产</span> <span class=nx>alert</span> <span class=nx>日志</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>43</span>:<span class=m>57</span> <span class=m>2012</span>  # <span class=nx>这个时间点正常</span>，<span class=nx>同时归档dest_3和dest_4</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26459</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_4</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>44</span>:<span class=m>00</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Archived</span> <span class=nx>Log</span> <span class=nx>entry</span> <span class=m>303238</span> <span class=nx>added</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26458</span> <span class=nx>ID</span> <span class=m>0</span>x<span class=m>4</span>e<span class=m>9</span>a<span class=m>1</span>d<span class=m>90</span> <span class=nx>dest</span> <span class=m>1</span>:<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>44</span>:<span class=m>00</span> <span class=m>2012</span>  # <span class=nx>这个时间点正常</span>，<span class=nx>同时归档dest_3和dest_4</span><span class=err>
+</span><span class=err></span><span class=nx>ARCk</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26458</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>44</span>:<span class=m>09</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Attempting</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=p>(</span><span class=m>270</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=nx>abandoned</span><span class=err>
+</span><span class=err></span><span class=nx>Error</span> <span class=m>270</span> <span class=nx>for</span> <span class=nx>archive</span> <span class=nx>log</span> <span class=nx>file</span> <span class=m>6</span> <span class=nx>to</span> <span class=s1>&#39;defdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>Errors</span> <span class=nx>in</span> <span class=nx>file</span> <span class=sr>/path/</span><span class=nx>app</span><span class=sr>/oracle/</span><span class=nx>rdbms</span><span class=sr>/diag/</span><span class=nx>rdbms</span><span class=sr>/fcr/</span><span class=nx>database1</span><span class=sr>/trace/</span><span class=nx>database1_nsa3_43253878</span>.<span class=nx>trc</span>:<span class=err>
+</span><span class=err></span><span class=nx>ORA</span><span class=m>-00270</span>: <span class=nx>error</span> <span class=nx>creating</span> <span class=nx>archive</span> <span class=nx>log</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>46</span>:<span class=m>46</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>26460</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>7</span> <span class=nx>seq</span># <span class=m>26460</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA_DG</span><span class=sr>/fcr/</span><span class=nx>onlinelog</span>/<span class=nx>group_7</span>.<span class=m>405</span>.<span class=m>764420717</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>7</span> <span class=nx>seq</span># <span class=m>26460</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>onlinelog</span>/<span class=nx>group_7</span>.<span class=m>12419</span>.<span class=m>764420719</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>46</span>:<span class=m>46</span> <span class=m>2012</span>  # <span class=nx>这个时间点异常</span>，<span class=nx>只归档dest_4</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26460</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_4</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>46</span>:<span class=m>46</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Archived</span> <span class=nx>Log</span> <span class=nx>entry</span> <span class=m>303247</span> <span class=nx>added</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26459</span> <span class=nx>ID</span> <span class=m>0</span>x<span class=m>4</span>e<span class=m>9</span>a<span class=m>1</span>d<span class=m>90</span> <span class=nx>dest</span> <span class=m>1</span>:<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>47</span>:<span class=m>02</span> <span class=m>2012</span>  # <span class=nx>这个时间点异常</span>，<span class=nx>归档dest_3时报错</span>，<span class=nx>此时查询v</span>$<span class=nx>archive_dest发现</span>“<span class=nx>ORA</span><span class=m>-00270</span>: <span class=nx>error</span> <span class=nx>creating</span> <span class=nx>archive</span> <span class=nx>log</span>”<span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Attempting</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=p>(</span><span class=m>270</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=nx>abandoned</span><span class=err>
+</span><span class=err></span><span class=nx>Error</span> <span class=m>270</span> <span class=nx>for</span> <span class=nx>archive</span> <span class=nx>log</span> <span class=nx>file</span> <span class=m>7</span> <span class=nx>to</span> <span class=s1>&#39;defdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>Errors</span> <span class=nx>in</span> <span class=nx>file</span> <span class=sr>/path/</span><span class=nx>app</span><span class=sr>/oracle/</span><span class=nx>rdbms</span><span class=sr>/diag/</span><span class=nx>rdbms</span><span class=sr>/fcr/</span><span class=nx>database1</span><span class=sr>/trace/</span><span class=nx>database1_nsa3_43253878</span>.<span class=nx>trc</span>:<span class=err>
+</span><span class=err></span><span class=nx>ORA</span><span class=m>-00270</span>: <span class=nx>error</span> <span class=nx>creating</span> <span class=nx>archive</span> <span class=nx>log</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>47</span>:<span class=m>02</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>ARCm</span>: <span class=nx>Attempting</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=p>(</span><span class=m>270</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>ARCm</span>: <span class=nx>Destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=nx>abandoned</span><span class=err>
+</span><span class=err></span><span class=nx>FAL</span>[<span class=nx>server</span><span class=p>,</span> <span class=nx>ARCm</span>]: <span class=nx>Error</span> <span class=m>270</span> <span class=nx>creating</span> <span class=nx>remote</span> <span class=nx>archivelog</span> <span class=nx>file</span> <span class=s1>&#39;defdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>FAL</span>[<span class=nx>server</span><span class=p>,</span> <span class=nx>ARCm</span>]: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span><span class=p>,</span> <span class=nx>see</span> <span class=nx>trace</span> <span class=nx>file</span>.<span class=err>
+</span><span class=err></span><span class=nx>ARCH</span>: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span><span class=err>
+</span><span class=err></span><span class=nx>ORACLE</span> <span class=nx>Instance</span> <span class=nx>database1</span> <span class=p>-</span> <span class=nx>Archival</span> <span class=nx>Error</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span>.<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>48</span>:<span class=m>58</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>26461</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>8</span> <span class=nx>seq</span># <span class=m>26461</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA_DG</span><span class=sr>/fcr/</span><span class=nx>onlinelog</span>/<span class=nx>group_8</span>.<span class=m>403</span>.<span class=m>764420721</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>8</span> <span class=nx>seq</span># <span class=m>26461</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>onlinelog</span>/<span class=nx>group_8</span>.<span class=m>12410</span>.<span class=m>764420723</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>48</span>:<span class=m>59</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26461</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_4</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>48</span>:<span class=m>59</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Deleted</span> <span class=nx>Oracle</span> <span class=nx>managed</span> <span class=nx>file</span> <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>archivelog</span><span class=sr>/2012_04_17/</span><span class=nx>thread_1_seq_25172</span>.<span class=m>5931</span>.<span class=m>780854251</span><span class=err>
+</span><span class=err></span><span class=nx>Archived</span> <span class=nx>Log</span> <span class=nx>entry</span> <span class=m>303251</span> <span class=nx>added</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>26460</span> <span class=nx>ID</span> <span class=m>0</span>x<span class=m>4</span>e<span class=m>9</span>a<span class=m>1</span>d<span class=m>90</span> <span class=nx>dest</span> <span class=m>1</span>:<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Apr</span> <span class=m>26</span> <span class=m>03</span>:<span class=m>49</span>:<span class=m>08</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Attempting</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=p>(</span><span class=m>270</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Destination</span> <span class=nx>LOG_ARCHIVE_DEST_3</span> <span class=nx>network</span> <span class=nx>reconnect</span> <span class=nx>abandoned</span><span class=err>
+</span><span class=err></span><span class=nx>Error</span> <span class=m>270</span> <span class=nx>for</span> <span class=nx>archive</span> <span class=nx>log</span> <span class=nx>file</span> <span class=m>8</span> <span class=nx>to</span> <span class=s1>&#39;defdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>Errors</span> <span class=nx>in</span> <span class=nx>file</span> <span class=sr>/path/</span><span class=nx>app</span><span class=sr>/oracle/</span><span class=nx>rdbms</span><span class=sr>/diag/</span><span class=nx>rdbms</span><span class=sr>/fcr/</span><span class=nx>database1</span><span class=sr>/trace/</span><span class=nx>database1_nsa3_43253878</span>.<span class=nx>trc</span>:<span class=err>
+</span><span class=err></span><span class=nx>ORA</span><span class=m>-00270</span>: <span class=nx>error</span> <span class=nx>creating</span> <span class=nx>archive</span> <span class=nx>log</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>SQL</span><span class=p>&gt;</span> <span class=nx>select</span> <span class=nx>dest_name</span><span class=p>,</span><span class=nx>status</span><span class=p>,</span><span class=nx>error</span> <span class=nx>from</span> <span class=nx>v</span>$<span class=nx>archive_dest</span>;<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>DEST_NAME</span>                                                                        <span class=nx>STATUS</span>    <span class=nx>ERROR</span><span class=err>
+</span><span class=err></span><span class=p>--------------------------------------------------------------------------------</span> <span class=p>---------</span> <span class=p>--------------------------------------------</span><span class=err>
+</span><span class=err></span><span class=nx>LOG_ARCHIVE_DEST_1</span>                                                               <span class=nx>VALID</span>     <span class=err>
+</span><span class=err></span><span class=nx>LOG_ARCHIVE_DEST_2</span>                                                               <span class=nx>INACTIVE</span>  <span class=err>
+</span><span class=err></span><span class=nx>LOG_ARCHIVE_DEST_3</span>                                                               <span class=nx>ERROR</span>     <span class=nx>ORA</span><span class=m>-00270</span>: <span class=nx>error</span> <span class=nx>creating</span> <span class=nx>archive</span> <span class=nx>log</span><span class=err>
+</span><span class=err></span><span class=nx>LOG_ARCHIVE_DEST_4</span>                                                               <span class=nx>VALID</span>     <span class=err>
+</span><span class=err></span><span class=nx>LOG_ARCHIVE_DEST_5</span>                                                               <span class=nx>INACTIVE</span>  <span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>同城DG</span> <span class=nx>alert</span> <span class=nx>日志</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>14</span>:<span class=m>54</span>:<span class=m>49</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Log</span> <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>archivelog</span><span class=sr>/2012_04_30/</span><span class=nx>thread_1_seq_27063</span>.<span class=m>3374</span>.<span class=m>781973683</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Waiting</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>2</span> <span class=nx>sequence</span> <span class=m>29288</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>16</span>:<span class=m>25</span>:<span class=m>21</span> <span class=m>2012</span>  #  <span class=nx>这个时间点开始</span>，<span class=nx>指向上海DG的归档出现异常</span><span class=err>
+</span><span class=err></span><span class=nx>ARCd</span>: <span class=nx>Archive</span> <span class=nx>log</span> <span class=nx>rejected</span> <span class=p>(</span><span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>27053</span><span class=p>)</span> <span class=nx>at</span> <span class=nx>host</span> <span class=s1>&#39;fcrshdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>FAL</span>[<span class=nx>server</span><span class=p>,</span> <span class=nx>ARCd</span>]: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span><span class=p>,</span> <span class=nx>see</span> <span class=nx>trace</span> <span class=nx>file</span>.<span class=err>
+</span><span class=err></span><span class=nx>ARCH</span>: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span><span class=err>
+</span><span class=err></span><span class=nx>ORACLE</span> <span class=nx>Instance</span> <span class=nx>database1</span> <span class=p>-</span> <span class=nx>Archival</span> <span class=nx>Error</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span>.<span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>16</span>:<span class=m>25</span>:<span class=m>21</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>ARCf</span>: <span class=nx>Archive</span> <span class=nx>log</span> <span class=nx>rejected</span> <span class=p>(</span><span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>27055</span><span class=p>)</span> <span class=nx>at</span> <span class=nx>host</span> <span class=s1>&#39;fcrshdg&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>FAL</span>[<span class=nx>server</span><span class=p>,</span> <span class=nx>ARCf</span>]: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span><span class=p>,</span> <span class=nx>see</span> <span class=nx>trace</span> <span class=nx>file</span>.<span class=err>
+</span><span class=err></span><span class=nx>ARCH</span>: <span class=nx>FAL</span> <span class=nx>archive</span> <span class=nx>failed</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span><span class=err>
+</span><span class=err></span><span class=nx>ORACLE</span> <span class=nx>Instance</span> <span class=nx>database1</span> <span class=p>-</span> <span class=nx>Archival</span> <span class=nx>Error</span>. <span class=nx>Archiver</span> <span class=nx>continuing</span>.<span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>16</span>:<span class=m>25</span>:<span class=m>21</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>上海DG</span> <span class=nx>alert</span> <span class=nx>日志</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>16</span>:<span class=m>56</span>:<span class=m>43</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Log</span> <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>archivelog</span><span class=sr>/2012_04_30/</span><span class=nx>thread_2_seq_29286</span>.<span class=m>27144</span>.<span class=m>781979577</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Log</span> <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>archivelog</span><span class=sr>/2012_04_30/</span><span class=nx>thread_1_seq_27062</span>.<span class=m>21155</span>.<span class=m>781978759</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>16</span>:<span class=m>57</span>:<span class=m>07</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Log</span> <span class=p>+</span><span class=nx>FRA_DG</span><span class=sr>/fcr/</span><span class=nx>archivelog</span><span class=sr>/2012_04_30/</span><span class=nx>thread_2_seq_29287</span>.<span class=m>25171</span>.<span class=m>781979609</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Waiting</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>27063</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>18</span>:<span class=m>33</span>:<span class=m>34</span> <span class=m>2012</span>  #  <span class=nx>这个时间点开始</span>，<span class=nx>上海DG和同城DG通信异常</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>23046</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Mon</span> <span class=nx>Apr</span> <span class=m>30</span> <span class=m>18</span>:<span class=m>33</span>:<span class=m>37</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>23043</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=解决方法>解决方法</h3><p>这里要解决如下几个问题：</p><ol><li>上海DG和同城DG通信异常</li><li>生产向同城DG归档异常</li><li>如上两个问题处理好后，保证从生产到上海的整个级连DG同步正常</li><li>通过RMAN适当清理同城DG和上海DG的FRA，本次我清理了4天前的日志，确认是DG不需要的</li></ol><h3 id=分析总结>分析总结</h3><p>处理这个问题比较简单，用到的知识在之前发过的DG异常案例都有，因此没有把详细命令和步骤贴出来。</p><p>在同城DG和上海DG都正常同步后，我发现在生产切换日志时，不会立刻被同城DG感知，所以现在这个状态是个不合格的同城DG。仔细研究后，发现通过下面操作可以解决该问题：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=m>1</span>. <span class=nx>select</span> * <span class=nx>from</span> <span class=nx>v</span>$<span class=nx>archive_dest</span> <span class=nx>where</span> <span class=nx>status</span> <span class=p>!=</span> <span class=s1>&#39;INACTIVE&#39;</span>;  #  <span class=nx>这个返回结果发现dest_3依然被oracle认为是invalid</span>，<span class=nx>并且错误信息和之前一样</span><span class=err>
+</span><span class=err></span><span class=m>2</span>. <span class=nx>alter</span> <span class=nx>system</span> <span class=nx>set</span> <span class=nx>log_archive_dest_state_3</span> <span class=p>=</span> <span class=s1>&#39;enable&#39;</span>;<span class=err>
+</span><span class=err></span><span class=m>3</span>. <span class=nx>select</span> * <span class=nx>from</span> <span class=nx>v</span>$<span class=nx>archive_dest</span> <span class=nx>where</span> <span class=nx>status</span> <span class=p>!=</span> <span class=s1>&#39;INACTIVE&#39;</span>;  #  <span class=nx>再次查询</span>，<span class=nx>结果显示正常</span><span class=err>
+</span><span class=err></span><span class=m>4</span>. <span class=nx>在生产库切换日志</span>，<span class=nx>同城DG立刻有感知</span>，<span class=nx>至此这个问题处理完毕</span><span class=err>
+</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>解决问题后，再深入检查了一下，发现同城DG最近一直是通过 fetch gap 的机制和生产同步，因此同步也是延迟的。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2012-09-23</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/database/>Database</a>
+<a href=/tags/oracle/>Oracle</a>
+<a href=/tags/dg/>DG</a>
+<a href=/tags/dataguard/>DataGuard</a></div><nav class=post-nav><a class=prev href=/post/2015/03/hadoop-foundation/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Hadoop学习1-基础理论</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2012/09/dg-exception-08/><span class="next-text nav-default">DataGrard异常-DG端缺少文件导致MRP无法启动</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2012-09-23 00:00:00 \u002b0000 UTC',title:'DataGrard异常-DG异常导致日志备份失败',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

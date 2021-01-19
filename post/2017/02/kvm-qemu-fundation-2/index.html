@@ -1,667 +1,394 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>KVM虚拟化基础二 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="1. 命令使用帮助 1.1 qemu-img 不同格式支持的选项不一样，通过如下方式查看支持的选项。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="KVM虚拟化基础二" />
-<meta property="og:description" content="1. 命令使用帮助
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>KVM虚拟化基础二 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="1. 命令使用帮助 1.1 qemu-img 不同格式支持的选项不一样，通过如下方式查看支持的选项。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="KVM虚拟化基础二"><meta property="og:description" content="1. 命令使用帮助
 1.1 qemu-img
-不同格式支持的选项不一样，通过如下方式查看支持的选项。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/" />
-<meta property="article:published_time" content="2017-02-13T00:00:00+00:00" />
-<meta property="article:modified_time" content="2017-02-13T00:00:00+00:00" />
-<meta itemprop="name" content="KVM虚拟化基础二">
-<meta itemprop="description" content="1. 命令使用帮助
+不同格式支持的选项不一样，通过如下方式查看支持的选项。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2017/02/kvm-qemu-fundation-2/"><meta property="article:published_time" content="2017-02-13T00:00:00+00:00"><meta property="article:modified_time" content="2017-02-13T00:00:00+00:00"><meta itemprop=name content="KVM虚拟化基础二"><meta itemprop=description content="1. 命令使用帮助
 1.1 qemu-img
-不同格式支持的选项不一样，通过如下方式查看支持的选项。">
-<meta itemprop="datePublished" content="2017-02-13T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2017-02-13T00:00:00+00:00" />
-<meta itemprop="wordCount" content="9474">
-
-
-
-<meta itemprop="keywords" content="虚拟化,kvm,xen," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="KVM虚拟化基础二"/>
-<meta name="twitter:description" content="1. 命令使用帮助
+不同格式支持的选项不一样，通过如下方式查看支持的选项。"><meta itemprop=datePublished content="2017-02-13T00:00:00+00:00"><meta itemprop=dateModified content="2017-02-13T00:00:00+00:00"><meta itemprop=wordCount content="9474"><meta itemprop=keywords content="虚拟化,kvm,xen,"><meta name=twitter:card content="summary"><meta name=twitter:title content="KVM虚拟化基础二"><meta name=twitter:description content="1. 命令使用帮助
 1.1 qemu-img
-不同格式支持的选项不一样，通过如下方式查看支持的选项。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">KVM虚拟化基础二</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2017-02-13 </span>
-        <div class="post-category">
-            <a href="/categories/virtualization/"> virtualization </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-命令使用帮助">1. 命令使用帮助</a>
-      <ul>
-        <li><a href="#11-qemu-img">1.1 qemu-img</a></li>
-        <li><a href="#12-qemu-kvm">1.2 qemu-kvm</a></li>
-      </ul>
-    </li>
-    <li><a href="#2-qemu-kvm的标准选项">2. qemu-kvm的标准选项</a></li>
-    <li><a href="#3-qemu-kvm的显示选项">3. qemu-kvm的显示选项</a></li>
-    <li><a href="#4-网络">4. 网络</a>
-      <ul>
-        <li><a href="#41-网络模型">4.1 网络模型</a>
-          <ul>
-            <li><a href="#隔离模型">隔离模型</a></li>
-            <li><a href="#路由模型">路由模型</a></li>
-            <li><a href="#nat模型">NAT模型</a></li>
-            <li><a href="#桥接模型">桥接模型</a></li>
-          </ul>
-        </li>
-        <li><a href="#42-网络属性相关选项">4.2 网络属性相关选项</a></li>
-      </ul>
-    </li>
-    <li><a href="#5-使用示例">5. 使用示例</a>
-      <ul>
-        <li><a href="#51-示例一">5.1 示例一</a></li>
-        <li><a href="#52-以网络接口启动">5.2 以网络接口启动</a></li>
-        <li><a href="#53-以deamon方式运行">5.3 以deamon方式运行</a></li>
-        <li><a href="#54-鼠标轨迹不同步">5.4 鼠标轨迹不同步</a></li>
-      </ul>
-    </li>
-    <li><a href="#6-vmware-workstation上的kvm实验">6. vmware-workstation上的kvm实验</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="1-命令使用帮助">1. 命令使用帮助</h1>
-<h2 id="11-qemu-img">1.1 qemu-img</h2>
-<p>不同格式支持的选项不一样，通过如下方式查看支持的选项。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">qemu</span><span class="p">-</span><span class="nx">img</span> <span class="nx">create</span> <span class="p">-</span><span class="nx">o</span> ? <span class="p">-</span><span class="nx">f</span> <span class="nx">qcow2</span> <span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
-</span><span class="err"></span><span class="nx">Supported</span> <span class="nx">options</span>:<span class="err">
-</span><span class="err"></span><span class="nx">size</span>             <span class="nx">Virtual</span> <span class="nx">disk</span> <span class="nx">size</span><span class="err">
-</span><span class="err"></span><span class="nx">compat</span>           <span class="nx">Compatibility</span> <span class="nx">level</span> <span class="p">(</span><span class="m">0</span>.<span class="m">10</span> <span class="nx">or</span> <span class="m">1</span>.<span class="m">1</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">backing_file</span>     <span class="nx">File</span> <span class="nx">name</span> <span class="nx">of</span> <span class="nx">a</span> <span class="nx">base</span> <span class="nx">image</span><span class="err">
-</span><span class="err"></span><span class="nx">backing_fmt</span>      <span class="nx">Image</span> <span class="nx">format</span> <span class="nx">of</span> <span class="nx">the</span> <span class="nx">base</span> <span class="nx">image</span><span class="err">
-</span><span class="err"></span><span class="nx">encryption</span>       <span class="nx">Encrypt</span> <span class="nx">the</span> <span class="nx">image</span><span class="err">
-</span><span class="err"></span><span class="nx">cluster_size</span>     <span class="nx">qcow2</span> <span class="nx">cluster</span> <span class="nx">size</span><span class="err">
-</span><span class="err"></span><span class="nx">preallocation</span>    <span class="nx">Preallocation</span> <span class="nx">mode</span> <span class="p">(</span><span class="nx">allowed</span> <span class="nx">values</span>: <span class="nx">off</span><span class="p">,</span> <span class="nx">metadata</span><span class="p">,</span> <span class="nx">falloc</span><span class="p">,</span> <span class="nx">full</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">lazy_refcounts</span>   <span class="nx">Postpone</span> <span class="nx">refcount</span> <span class="nx">updates</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]#<span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">qemu</span><span class="p">-</span><span class="nx">img</span> <span class="nx">create</span> <span class="p">-</span><span class="nx">o</span> <span class="nx">size</span><span class="p">=</span><span class="m">20</span>G<span class="p">,</span><span class="nx">preallocation</span><span class="p">=</span><span class="nx">metadata</span> <span class="p">-</span><span class="nx">f</span> <span class="nx">qcow2</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
-</span><span class="err"></span><span class="nx">Formatting</span> <span class="s1">&#39;/images/kvm/centos6.qcow2&#39;</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">=</span><span class="nx">qcow2</span> <span class="nx">size</span><span class="p">=</span><span class="m">21474836480</span> <span class="nx">encryption</span><span class="p">=</span><span class="nx">off</span> <span class="nx">cluster_size</span><span class="p">=</span><span class="m">65536</span> <span class="nx">preallocation</span><span class="p">=</span><span class="s1">&#39;metadata&#39;</span> <span class="nx">lazy_refcounts</span><span class="p">=</span><span class="nx">off</span> <span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">ls</span> <span class="p">-</span><span class="nx">lh</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span> <span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span>. <span class="m">1</span> <span class="nx">root</span> <span class="nx">root</span> <span class="m">21</span>G <span class="nx">Feb</span> <span class="m">14</span> <span class="m">00</span>:<span class="m">06</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="nx">du</span> <span class="p">-</span><span class="nx">sh</span> <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
-</span><span class="err"></span><span class="m">4</span>.<span class="m">1</span>M    <span class="sr">/images/</span><span class="nx">kvm</span>/<span class="nx">centos6</span>.<span class="nx">qcow2</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">localhost</span> <span class="nx">kvm</span>]# <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="12-qemu-kvm">1.2 qemu-kvm</h2>
-<p>查看qemu-kvm支持的网卡类型。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# qemu-kvm -net nic,model=?
+不同格式支持的选项不一样，通过如下方式查看支持的选项。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>KVM虚拟化基础二</h1><div class=post-meta><span class=post-time>2017-02-13</span><div class=post-category><a href=/categories/virtualization/>virtualization</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-命令使用帮助>1. 命令使用帮助</a><ul><li><a href=#11-qemu-img>1.1 qemu-img</a></li><li><a href=#12-qemu-kvm>1.2 qemu-kvm</a></li></ul></li><li><a href=#2-qemu-kvm的标准选项>2. qemu-kvm的标准选项</a></li><li><a href=#3-qemu-kvm的显示选项>3. qemu-kvm的显示选项</a></li><li><a href=#4-网络>4. 网络</a><ul><li><a href=#41-网络模型>4.1 网络模型</a><ul><li><a href=#隔离模型>隔离模型</a></li><li><a href=#路由模型>路由模型</a></li><li><a href=#nat模型>NAT模型</a></li><li><a href=#桥接模型>桥接模型</a></li></ul></li><li><a href=#42-网络属性相关选项>4.2 网络属性相关选项</a></li></ul></li><li><a href=#5-使用示例>5. 使用示例</a><ul><li><a href=#51-示例一>5.1 示例一</a></li><li><a href=#52-以网络接口启动>5.2 以网络接口启动</a></li><li><a href=#53-以deamon方式运行>5.3 以deamon方式运行</a></li><li><a href=#54-鼠标轨迹不同步>5.4 鼠标轨迹不同步</a></li></ul></li><li><a href=#6-vmware-workstation上的kvm实验>6. vmware-workstation上的kvm实验</a></li></ul></nav></div></div><div class=post-content><h1 id=1-命令使用帮助>1. 命令使用帮助</h1><h2 id=11-qemu-img>1.1 qemu-img</h2><p>不同格式支持的选项不一样，通过如下方式查看支持的选项。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=nx>qemu</span><span class=p>-</span><span class=nx>img</span> <span class=nx>create</span> <span class=p>-</span><span class=nx>o</span> ? <span class=p>-</span><span class=nx>f</span> <span class=nx>qcow2</span> <span class=nx>centos6</span>.<span class=nx>qcow2</span><span class=err>
+</span><span class=err></span><span class=nx>Supported</span> <span class=nx>options</span>:<span class=err>
+</span><span class=err></span><span class=nx>size</span>             <span class=nx>Virtual</span> <span class=nx>disk</span> <span class=nx>size</span><span class=err>
+</span><span class=err></span><span class=nx>compat</span>           <span class=nx>Compatibility</span> <span class=nx>level</span> <span class=p>(</span><span class=m>0</span>.<span class=m>10</span> <span class=nx>or</span> <span class=m>1</span>.<span class=m>1</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>backing_file</span>     <span class=nx>File</span> <span class=nx>name</span> <span class=nx>of</span> <span class=nx>a</span> <span class=nx>base</span> <span class=nx>image</span><span class=err>
+</span><span class=err></span><span class=nx>backing_fmt</span>      <span class=nx>Image</span> <span class=nx>format</span> <span class=nx>of</span> <span class=nx>the</span> <span class=nx>base</span> <span class=nx>image</span><span class=err>
+</span><span class=err></span><span class=nx>encryption</span>       <span class=nx>Encrypt</span> <span class=nx>the</span> <span class=nx>image</span><span class=err>
+</span><span class=err></span><span class=nx>cluster_size</span>     <span class=nx>qcow2</span> <span class=nx>cluster</span> <span class=nx>size</span><span class=err>
+</span><span class=err></span><span class=nx>preallocation</span>    <span class=nx>Preallocation</span> <span class=nx>mode</span> <span class=p>(</span><span class=nx>allowed</span> <span class=nx>values</span>: <span class=nx>off</span><span class=p>,</span> <span class=nx>metadata</span><span class=p>,</span> <span class=nx>falloc</span><span class=p>,</span> <span class=nx>full</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>lazy_refcounts</span>   <span class=nx>Postpone</span> <span class=nx>refcount</span> <span class=nx>updates</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]#<span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=nx>qemu</span><span class=p>-</span><span class=nx>img</span> <span class=nx>create</span> <span class=p>-</span><span class=nx>o</span> <span class=nx>size</span><span class=p>=</span><span class=m>20</span>G<span class=p>,</span><span class=nx>preallocation</span><span class=p>=</span><span class=nx>metadata</span> <span class=p>-</span><span class=nx>f</span> <span class=nx>qcow2</span> <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>centos6</span>.<span class=nx>qcow2</span><span class=err>
+</span><span class=err></span><span class=nx>Formatting</span> <span class=s1>&#39;/images/kvm/centos6.qcow2&#39;</span><span class=p>,</span> <span class=nx>fmt</span><span class=p>=</span><span class=nx>qcow2</span> <span class=nx>size</span><span class=p>=</span><span class=m>21474836480</span> <span class=nx>encryption</span><span class=p>=</span><span class=nx>off</span> <span class=nx>cluster_size</span><span class=p>=</span><span class=m>65536</span> <span class=nx>preallocation</span><span class=p>=</span><span class=s1>&#39;metadata&#39;</span> <span class=nx>lazy_refcounts</span><span class=p>=</span><span class=nx>off</span> <span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=nx>ls</span> <span class=p>-</span><span class=nx>lh</span> <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>centos6</span>.<span class=nx>qcow2</span> <span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>rw</span><span class=p>-</span><span class=nx>r</span><span class=p>--</span><span class=nx>r</span><span class=p>--</span>. <span class=m>1</span> <span class=nx>root</span> <span class=nx>root</span> <span class=m>21</span>G <span class=nx>Feb</span> <span class=m>14</span> <span class=m>00</span>:<span class=m>06</span> <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>centos6</span>.<span class=nx>qcow2</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=nx>du</span> <span class=p>-</span><span class=nx>sh</span> <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>centos6</span>.<span class=nx>qcow2</span><span class=err>
+</span><span class=err></span><span class=m>4</span>.<span class=m>1</span>M    <span class=sr>/images/</span><span class=nx>kvm</span>/<span class=nx>centos6</span>.<span class=nx>qcow2</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>localhost</span> <span class=nx>kvm</span>]# <span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=12-qemu-kvm>1.2 qemu-kvm</h2><p>查看qemu-kvm支持的网卡类型。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>[root@localhost ~]# qemu-kvm -net nic,model=?
 qemu: Supported NIC models: ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet,virtio
 [root@localhost ~]# 
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="2-qemu-kvm的标准选项">2. qemu-kvm的标准选项</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm的标准选项主要涉及指定主机类型</span>、<span class="nx">CPU模式</span>、<span class="nx">NUMA</span>、<span class="nx">软驱设备</span>、<span class="nx">光驱设备及硬件设备等</span>。<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">name</span> <span class="nx">name</span>：<span class="nx">设定虚拟机名称</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">M</span> <span class="nx">machine</span>：<span class="nx">指定要模拟的主机类型</span>，<span class="nx">如Standard</span> <span class="nx">PC</span>、<span class="nx">ISA</span><span class="p">-</span><span class="nx">only</span> <span class="nx">PC或Intel</span><span class="p">-</span><span class="nx">Mac等</span>，<span class="nx">可以使用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">M</span> ?”<span class="nx">获取所支持的所有类型</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">m</span> <span class="nx">megs</span>：<span class="nx">设定虚拟机的RAM大小</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">cpu</span> <span class="nx">model</span>：<span class="nx">设定CPU模型</span>，<span class="nx">如coreduo</span>、<span class="nx">qemu64等</span>，<span class="nx">可以使用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">cpu</span> ?”<span class="nx">获取所支持的所有模型</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="nx">n</span>[<span class="p">,</span><span class="nx">cores</span><span class="p">=</span><span class="nx">cores</span>][<span class="p">,</span><span class="nx">threads</span><span class="p">=</span><span class="nx">threads</span>][<span class="p">,</span><span class="nx">sockets</span><span class="p">=</span><span class="nx">sockets</span>][<span class="p">,</span><span class="nx">maxcpus</span><span class="p">=</span><span class="nx">maxcpus</span>]：<span class="nx">设定模拟的SMP架构中CPU的个数等</span>、<span class="nx">每个CPU的核心数及CPU的socket数目等</span>；<span class="nx">PC机上最多可以模拟255颗CPU</span>；<span class="nx">maxcpus用于指定热插入的CPU个数上限</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">numa</span> <span class="nx">opts</span>：<span class="nx">指定模拟多节点的numa设备</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">fda</span> <span class="nx">file</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">fdb</span> <span class="nx">file</span>：<span class="nx">使用指定文件</span><span class="p">(</span><span class="nx">file</span><span class="p">)</span><span class="nx">作为软盘镜像</span>，<span class="nx">file为</span><span class="sr">/dev/</span><span class="nx">fd0表示使用物理软驱</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">hda</span> <span class="nx">file</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">hdb</span> <span class="nx">file</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">hdc</span> <span class="nx">file</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">hdd</span> <span class="nx">file</span>：<span class="nx">使用指定file作为硬盘镜像</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">cdrom</span> <span class="nx">file</span>：<span class="nx">使用指定file作为CD</span><span class="p">-</span><span class="nx">ROM镜像</span>，<span class="nx">需要注意的是</span><span class="p">-</span><span class="nx">cdrom和</span><span class="p">-</span><span class="nx">hdc不能同时使用</span>；<span class="nx">将file指定为</span><span class="sr">/dev/</span><span class="nx">cdrom可以直接使用物理光驱</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]]：<span class="nx">定义一个硬盘设备</span>；<span class="nx">可用子选项有很多</span>。<span class="err">
-</span><span class="err"></span>    <span class="nx">file</span><span class="p">=</span><span class="sr">/path/</span><span class="nx">to</span>/<span class="nx">somefile</span>：<span class="nx">硬件映像文件路径</span>；<span class="err">
-</span><span class="err"></span>    <span class="k">if</span><span class="p">=</span><span class="nx">interface</span>：<span class="nx">指定硬盘设备所连接的接口类型</span>，<span class="nx">即控制器类型</span>，<span class="nx">如ide</span>、<span class="nx">scsi</span>、<span class="nx">sd</span>、<span class="nx">mtd</span>、<span class="nx">floppy</span>、<span class="nx">pflash及virtio等</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">index</span><span class="p">=</span><span class="nx">index</span>：<span class="nx">设定同一种控制器类型中不同设备的索引号</span>，<span class="nx">即标识号</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">media</span><span class="p">=</span><span class="nx">media</span>：<span class="nx">定义介质类型为硬盘</span><span class="p">(</span><span class="nx">disk</span><span class="p">)</span><span class="nx">还是光盘</span><span class="p">(</span><span class="nx">cdrom</span><span class="p">)</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">snapshot</span><span class="p">=</span><span class="nx">snapshot</span>：<span class="nx">指定当前硬盘设备是否支持快照功能</span>：<span class="nx">on或off</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">cache</span><span class="p">=</span><span class="nx">cache</span>：<span class="nx">定义如何使用物理机缓存来访问块数据</span>，<span class="nx">其可用值有none</span>、<span class="nx">writeback</span>、<span class="nx">unsafe和writethrough四个</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">format</span><span class="p">=</span><span class="nx">format</span>：<span class="nx">指定映像文件的格式</span>，<span class="nx">具体格式可参见qemu</span><span class="p">-</span><span class="nx">img命令</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">boot</span> [<span class="nx">order</span><span class="p">=</span><span class="nx">drives</span>][<span class="p">,</span><span class="nx">once</span><span class="p">=</span><span class="nx">drives</span>][<span class="p">,</span><span class="nx">menu</span><span class="p">=</span><span class="nx">on</span><span class="p">|</span><span class="nx">off</span>]：<span class="nx">定义启动设备的引导次序</span>，<span class="nx">每种设备使用一个字符表示</span>；<span class="nx">不同的架构所支持的设备及其表示字符不尽相同</span>，<span class="nx">在x86</span> <span class="nx">PC架构上</span>，<span class="nx">a</span>、<span class="nx">b表示软驱</span>、<span class="nx">c表示第一块硬盘</span>，<span class="nx">d表示第一个光驱设备</span>，<span class="nx">n</span><span class="p">-</span><span class="nx">p表示网络适配器</span>；<span class="nx">默认为硬盘设备</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">boot</span> <span class="nx">order</span><span class="p">=</span><span class="nx">dc</span><span class="p">,</span><span class="nx">once</span><span class="p">=</span><span class="nx">d</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="3-qemu-kvm的显示选项">3. qemu-kvm的显示选项</h1>
-<p>显示选项用于定义虚拟机启动后的显示接口相关类型及属性等。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">-</span><span class="nx">nographic</span>：<span class="nx">默认情况下</span>，<span class="nx">qemu使用SDL来显示VGA输出</span>；<span class="nx">而此选项用于禁止图形接口</span>，<span class="nx">此时</span><span class="p">,</span><span class="nx">qemu类似一个简单的命令行程序</span>，<span class="nx">其仿真串口设备将被重定向到控制台</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">curses</span>：<span class="nx">禁止图形接口</span>，<span class="nx">并使用curses</span>/<span class="nx">ncurses作为交互接口</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">alt</span><span class="p">-</span><span class="nx">grab</span>：<span class="nx">使用Ctrl</span><span class="p">+</span><span class="nx">Alt</span><span class="p">+</span><span class="nx">Shift组合键释放鼠标</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">ctrl</span><span class="p">-</span><span class="nx">grab</span>：<span class="nx">使用右Ctrl键释放鼠标</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">sdl</span>：<span class="nx">启用SDL</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">Simple</span> <span class="nx">Directmedia</span> <span class="nx">Layer</span>，<span class="nx">C语言开发</span>，<span class="nx">实现跨平台的开源多媒体程序库文件</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">spice</span> <span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]：<span class="nx">启用spice远程桌面协议</span>；<span class="nx">其有许多子选项</span>，<span class="nx">具体请参照qemu</span><span class="p">-</span><span class="nx">kvm的手册</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">type</span>：<span class="nx">指定要仿真的VGA接口类型</span>，<span class="nx">常见类型有</span>：<span class="err">
-</span><span class="err"></span>    <span class="nx">cirrus</span>：<span class="nx">Cirrus</span> <span class="nx">Logic</span> <span class="nx">GD5446显示卡</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">std</span>：<span class="nx">带有Bochs</span> <span class="nx">VBI扩展的标准VGA显示卡</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">vmware</span>：<span class="nx">VMWare</span> <span class="nx">SVGA</span><span class="p">-</span><span class="nx">II兼容的显示适配器</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">qxl</span>：<span class="nx">QXL半虚拟化显示卡</span>；<span class="nx">与VGA兼容</span>；<span class="nx">在Guest中安装qxl驱动后能以很好的方式工作</span>，<span class="nx">在使用spice协议时推荐使用此类型</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">none</span>：<span class="nx">禁用VGA卡</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">vnc</span> <span class="nx">display</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span><span class="nx">option</span>[<span class="p">,</span>...]]]：<span class="nx">默认情况下</span>，<span class="nx">qemu使用SDL显示VGA输</span><span class="err">
-</span><span class="err"></span>    <span class="nx">出</span>；<span class="nx">使用</span><span class="p">-</span><span class="nx">vnc选项</span>，<span class="nx">可以让qemu监听在VNC上</span>，<span class="nx">并将VGA输出重定向至VNC会话</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">使用此选项时</span>，<span class="nx">必须使用</span><span class="p">-</span><span class="nx">k选项指定键盘布局类型</span>；<span class="nx">其有许多子选项</span>，<span class="nx">具体请参</span><span class="err">
-</span><span class="err"></span>    <span class="nx">照qemu</span><span class="p">-</span><span class="nx">kvm的手册</span>；<span class="err">
-</span><span class="err"></span>    <span class="err">
-</span><span class="err"></span>    <span class="nx">VNC</span>: <span class="nx">Virtual</span> <span class="nx">Network</span> <span class="nx">Computing</span>，<span class="nx">基于RFB</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>    <span class="nx">display</span>:<span class="err">
-</span><span class="err"></span>    	<span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="nx">host</span>:<span class="nx">N</span>，<span class="nx">N是桌面号</span>，<span class="nx">转换成监听的端口</span><span class="p">=</span><span class="m">5900</span><span class="p">+</span><span class="nx">N</span><span class="err">
-</span><span class="err"></span>    		<span class="m">172</span>.<span class="m">16</span>.<span class="m">100</span>.<span class="m">7</span>:<span class="m">1</span><span class="p">,</span> <span class="nx">监听于172</span>.<span class="m">16</span>.<span class="m">100</span>.<span class="m">7</span>主的<span class="m">5900</span><span class="p">+</span><span class="nx">N的端口上</span><span class="err">
-</span><span class="err"></span>    	<span class="p">(</span><span class="m">2</span><span class="p">)</span> <span class="nx">unix</span>:<span class="sr">/path/</span><span class="nx">to</span>/<span class="nx">socket_file</span><span class="err">
-</span><span class="err"></span>    	<span class="p">(</span><span class="m">3</span><span class="p">)</span> <span class="nx">none</span><span class="err">
-</span><span class="err"></span>    <span class="nx">options</span>:<span class="err">
-</span><span class="err"></span>    	<span class="nx">password</span>: <span class="nx">连接时需要验正密码</span>；<span class="nx">设定密码通过monitor接口使用change</span><span class="err">
-</span><span class="err"></span>    	<span class="nx">reverse</span>: “<span class="nx">反向</span>”<span class="nx">连接至某处于监听状态的vncview上</span>；<span class="err">
-</span><span class="err"></span>    <span class="p">-</span><span class="nx">monitor</span> <span class="nx">stdio</span>：<span class="nx">表示在标准输入输出上显示monitor界面</span><span class="err">
-</span><span class="err"></span>    <span class="p">-</span><span class="nx">nographic</span><span class="err">
-</span><span class="err"></span>    	<span class="nx">Ctrl</span><span class="p">-</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span>: <span class="nx">在console和monitor之间切换</span><span class="err">
-</span><span class="err"></span>    	<span class="nx">Ctrl</span><span class="p">-</span><span class="nx">a</span><span class="p">,</span> <span class="nx">h</span>: <span class="nx">显示帮助信息</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="4-网络">4. 网络</h1>
-<h2 id="41-网络模型">4.1 网络模型</h2>
-<h3 id="隔离模型">隔离模型</h3>
-<p>同一HOST上的虚拟机可以通信，不能和外部通信。</p>
-<p>每一个虚拟机的网络接口都有前半段和后半段，前半段在虚拟机内部，后半段在物理
-机上，关联到bridge上，相当于接入到了一个交换机，因此两个虚拟机之间可以通信。</p>
-<p><img src="/images/virtualization/kvm-net-isolation.jpg" alt="隔离模型"></p>
-<h3 id="路由模型">路由模型</h3>
-<p>如何让虚拟和外部通信呢？在物理机上再添加一块虚拟网卡，让该虚拟网卡接到bridge
+</code></pre></td></tr></table></div></div><h1 id=2-qemu-kvm的标准选项>2. qemu-kvm的标准选项</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm的标准选项主要涉及指定主机类型</span>、<span class=nx>CPU模式</span>、<span class=nx>NUMA</span>、<span class=nx>软驱设备</span>、<span class=nx>光驱设备及硬件设备等</span>。<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>name</span> <span class=nx>name</span>：<span class=nx>设定虚拟机名称</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>M</span> <span class=nx>machine</span>：<span class=nx>指定要模拟的主机类型</span>，<span class=nx>如Standard</span> <span class=nx>PC</span>、<span class=nx>ISA</span><span class=p>-</span><span class=nx>only</span> <span class=nx>PC或Intel</span><span class=p>-</span><span class=nx>Mac等</span>，<span class=nx>可以使用</span>“<span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>M</span> ?”<span class=nx>获取所支持的所有类型</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>m</span> <span class=nx>megs</span>：<span class=nx>设定虚拟机的RAM大小</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>cpu</span> <span class=nx>model</span>：<span class=nx>设定CPU模型</span>，<span class=nx>如coreduo</span>、<span class=nx>qemu64等</span>，<span class=nx>可以使用</span>“<span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>cpu</span> ?”<span class=nx>获取所支持的所有模型</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>smp</span> <span class=nx>n</span>[<span class=p>,</span><span class=nx>cores</span><span class=p>=</span><span class=nx>cores</span>][<span class=p>,</span><span class=nx>threads</span><span class=p>=</span><span class=nx>threads</span>][<span class=p>,</span><span class=nx>sockets</span><span class=p>=</span><span class=nx>sockets</span>][<span class=p>,</span><span class=nx>maxcpus</span><span class=p>=</span><span class=nx>maxcpus</span>]：<span class=nx>设定模拟的SMP架构中CPU的个数等</span>、<span class=nx>每个CPU的核心数及CPU的socket数目等</span>；<span class=nx>PC机上最多可以模拟255颗CPU</span>；<span class=nx>maxcpus用于指定热插入的CPU个数上限</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>numa</span> <span class=nx>opts</span>：<span class=nx>指定模拟多节点的numa设备</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>fda</span> <span class=nx>file</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>fdb</span> <span class=nx>file</span>：<span class=nx>使用指定文件</span><span class=p>(</span><span class=nx>file</span><span class=p>)</span><span class=nx>作为软盘镜像</span>，<span class=nx>file为</span><span class=sr>/dev/</span><span class=nx>fd0表示使用物理软驱</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>hda</span> <span class=nx>file</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>hdb</span> <span class=nx>file</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>hdc</span> <span class=nx>file</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>hdd</span> <span class=nx>file</span>：<span class=nx>使用指定file作为硬盘镜像</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>cdrom</span> <span class=nx>file</span>：<span class=nx>使用指定file作为CD</span><span class=p>-</span><span class=nx>ROM镜像</span>，<span class=nx>需要注意的是</span><span class=p>-</span><span class=nx>cdrom和</span><span class=p>-</span><span class=nx>hdc不能同时使用</span>；<span class=nx>将file指定为</span><span class=sr>/dev/</span><span class=nx>cdrom可以直接使用物理光驱</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>drive</span> <span class=nx>option</span>[<span class=p>,</span><span class=nx>option</span>[<span class=p>,</span><span class=nx>option</span>[<span class=p>,</span>...]]]：<span class=nx>定义一个硬盘设备</span>；<span class=nx>可用子选项有很多</span>。<span class=err>
+</span><span class=err></span>    <span class=nx>file</span><span class=p>=</span><span class=sr>/path/</span><span class=nx>to</span>/<span class=nx>somefile</span>：<span class=nx>硬件映像文件路径</span>；<span class=err>
+</span><span class=err></span>    <span class=k>if</span><span class=p>=</span><span class=nx>interface</span>：<span class=nx>指定硬盘设备所连接的接口类型</span>，<span class=nx>即控制器类型</span>，<span class=nx>如ide</span>、<span class=nx>scsi</span>、<span class=nx>sd</span>、<span class=nx>mtd</span>、<span class=nx>floppy</span>、<span class=nx>pflash及virtio等</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>index</span><span class=p>=</span><span class=nx>index</span>：<span class=nx>设定同一种控制器类型中不同设备的索引号</span>，<span class=nx>即标识号</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>media</span><span class=p>=</span><span class=nx>media</span>：<span class=nx>定义介质类型为硬盘</span><span class=p>(</span><span class=nx>disk</span><span class=p>)</span><span class=nx>还是光盘</span><span class=p>(</span><span class=nx>cdrom</span><span class=p>)</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>snapshot</span><span class=p>=</span><span class=nx>snapshot</span>：<span class=nx>指定当前硬盘设备是否支持快照功能</span>：<span class=nx>on或off</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>cache</span><span class=p>=</span><span class=nx>cache</span>：<span class=nx>定义如何使用物理机缓存来访问块数据</span>，<span class=nx>其可用值有none</span>、<span class=nx>writeback</span>、<span class=nx>unsafe和writethrough四个</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>format</span><span class=p>=</span><span class=nx>format</span>：<span class=nx>指定映像文件的格式</span>，<span class=nx>具体格式可参见qemu</span><span class=p>-</span><span class=nx>img命令</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>boot</span> [<span class=nx>order</span><span class=p>=</span><span class=nx>drives</span>][<span class=p>,</span><span class=nx>once</span><span class=p>=</span><span class=nx>drives</span>][<span class=p>,</span><span class=nx>menu</span><span class=p>=</span><span class=nx>on</span><span class=p>|</span><span class=nx>off</span>]：<span class=nx>定义启动设备的引导次序</span>，<span class=nx>每种设备使用一个字符表示</span>；<span class=nx>不同的架构所支持的设备及其表示字符不尽相同</span>，<span class=nx>在x86</span> <span class=nx>PC架构上</span>，<span class=nx>a</span>、<span class=nx>b表示软驱</span>、<span class=nx>c表示第一块硬盘</span>，<span class=nx>d表示第一个光驱设备</span>，<span class=nx>n</span><span class=p>-</span><span class=nx>p表示网络适配器</span>；<span class=nx>默认为硬盘设备</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>boot</span> <span class=nx>order</span><span class=p>=</span><span class=nx>dc</span><span class=p>,</span><span class=nx>once</span><span class=p>=</span><span class=nx>d</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=3-qemu-kvm的显示选项>3. qemu-kvm的显示选项</h1><p>显示选项用于定义虚拟机启动后的显示接口相关类型及属性等。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>-</span><span class=nx>nographic</span>：<span class=nx>默认情况下</span>，<span class=nx>qemu使用SDL来显示VGA输出</span>；<span class=nx>而此选项用于禁止图形接口</span>，<span class=nx>此时</span><span class=p>,</span><span class=nx>qemu类似一个简单的命令行程序</span>，<span class=nx>其仿真串口设备将被重定向到控制台</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>curses</span>：<span class=nx>禁止图形接口</span>，<span class=nx>并使用curses</span>/<span class=nx>ncurses作为交互接口</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>alt</span><span class=p>-</span><span class=nx>grab</span>：<span class=nx>使用Ctrl</span><span class=p>+</span><span class=nx>Alt</span><span class=p>+</span><span class=nx>Shift组合键释放鼠标</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>ctrl</span><span class=p>-</span><span class=nx>grab</span>：<span class=nx>使用右Ctrl键释放鼠标</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>sdl</span>：<span class=nx>启用SDL</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>Simple</span> <span class=nx>Directmedia</span> <span class=nx>Layer</span>，<span class=nx>C语言开发</span>，<span class=nx>实现跨平台的开源多媒体程序库文件</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>spice</span> <span class=nx>option</span>[<span class=p>,</span><span class=nx>option</span>[<span class=p>,</span>...]]：<span class=nx>启用spice远程桌面协议</span>；<span class=nx>其有许多子选项</span>，<span class=nx>具体请参照qemu</span><span class=p>-</span><span class=nx>kvm的手册</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>vga</span> <span class=nx>type</span>：<span class=nx>指定要仿真的VGA接口类型</span>，<span class=nx>常见类型有</span>：<span class=err>
+</span><span class=err></span>    <span class=nx>cirrus</span>：<span class=nx>Cirrus</span> <span class=nx>Logic</span> <span class=nx>GD5446显示卡</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>std</span>：<span class=nx>带有Bochs</span> <span class=nx>VBI扩展的标准VGA显示卡</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>vmware</span>：<span class=nx>VMWare</span> <span class=nx>SVGA</span><span class=p>-</span><span class=nx>II兼容的显示适配器</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>qxl</span>：<span class=nx>QXL半虚拟化显示卡</span>；<span class=nx>与VGA兼容</span>；<span class=nx>在Guest中安装qxl驱动后能以很好的方式工作</span>，<span class=nx>在使用spice协议时推荐使用此类型</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>none</span>：<span class=nx>禁用VGA卡</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>vnc</span> <span class=nx>display</span>[<span class=p>,</span><span class=nx>option</span>[<span class=p>,</span><span class=nx>option</span>[<span class=p>,</span>...]]]：<span class=nx>默认情况下</span>，<span class=nx>qemu使用SDL显示VGA输</span><span class=err>
+</span><span class=err></span>    <span class=nx>出</span>；<span class=nx>使用</span><span class=p>-</span><span class=nx>vnc选项</span>，<span class=nx>可以让qemu监听在VNC上</span>，<span class=nx>并将VGA输出重定向至VNC会话</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>使用此选项时</span>，<span class=nx>必须使用</span><span class=p>-</span><span class=nx>k选项指定键盘布局类型</span>；<span class=nx>其有许多子选项</span>，<span class=nx>具体请参</span><span class=err>
+</span><span class=err></span>    <span class=nx>照qemu</span><span class=p>-</span><span class=nx>kvm的手册</span>；<span class=err>
+</span><span class=err></span>    <span class=err>
+</span><span class=err></span>    <span class=nx>VNC</span>: <span class=nx>Virtual</span> <span class=nx>Network</span> <span class=nx>Computing</span>，<span class=nx>基于RFB</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>    <span class=nx>display</span>:<span class=err>
+</span><span class=err></span>    	<span class=p>(</span><span class=m>1</span><span class=p>)</span> <span class=nx>host</span>:<span class=nx>N</span>，<span class=nx>N是桌面号</span>，<span class=nx>转换成监听的端口</span><span class=p>=</span><span class=m>5900</span><span class=p>+</span><span class=nx>N</span><span class=err>
+</span><span class=err></span>    		<span class=m>172</span>.<span class=m>16</span>.<span class=m>100</span>.<span class=m>7</span>:<span class=m>1</span><span class=p>,</span> <span class=nx>监听于172</span>.<span class=m>16</span>.<span class=m>100</span>.<span class=m>7</span>主的<span class=m>5900</span><span class=p>+</span><span class=nx>N的端口上</span><span class=err>
+</span><span class=err></span>    	<span class=p>(</span><span class=m>2</span><span class=p>)</span> <span class=nx>unix</span>:<span class=sr>/path/</span><span class=nx>to</span>/<span class=nx>socket_file</span><span class=err>
+</span><span class=err></span>    	<span class=p>(</span><span class=m>3</span><span class=p>)</span> <span class=nx>none</span><span class=err>
+</span><span class=err></span>    <span class=nx>options</span>:<span class=err>
+</span><span class=err></span>    	<span class=nx>password</span>: <span class=nx>连接时需要验正密码</span>；<span class=nx>设定密码通过monitor接口使用change</span><span class=err>
+</span><span class=err></span>    	<span class=nx>reverse</span>: “<span class=nx>反向</span>”<span class=nx>连接至某处于监听状态的vncview上</span>；<span class=err>
+</span><span class=err></span>    <span class=p>-</span><span class=nx>monitor</span> <span class=nx>stdio</span>：<span class=nx>表示在标准输入输出上显示monitor界面</span><span class=err>
+</span><span class=err></span>    <span class=p>-</span><span class=nx>nographic</span><span class=err>
+</span><span class=err></span>    	<span class=nx>Ctrl</span><span class=p>-</span><span class=nx>a</span><span class=p>,</span> <span class=nx>c</span>: <span class=nx>在console和monitor之间切换</span><span class=err>
+</span><span class=err></span>    	<span class=nx>Ctrl</span><span class=p>-</span><span class=nx>a</span><span class=p>,</span> <span class=nx>h</span>: <span class=nx>显示帮助信息</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=4-网络>4. 网络</h1><h2 id=41-网络模型>4.1 网络模型</h2><h3 id=隔离模型>隔离模型</h3><p>同一HOST上的虚拟机可以通信，不能和外部通信。</p><p>每一个虚拟机的网络接口都有前半段和后半段，前半段在虚拟机内部，后半段在物理
+机上，关联到bridge上，相当于接入到了一个交换机，因此两个虚拟机之间可以通信。</p><p><img src=/images/virtualization/kvm-net-isolation.jpg alt=隔离模型></p><h3 id=路由模型>路由模型</h3><p>如何让虚拟和外部通信呢？在物理机上再添加一块虚拟网卡，让该虚拟网卡接到bridge
 上，如果物理机上的虚拟网卡和虚拟机在一个网段中，则物理机可以和虚拟机通信。
 每个虚拟机把网关都指向物理机上的虚拟网卡的地址，并在物理机上打开<strong>核心转发</strong>功能，
 这即所谓的路由模型，在外部主机上添加路由，保证回来的包可以到达虚拟机，这样
-虚拟机就可以和外部通信了。</p>
-<p><img src="/images/virtualization/kvm-net-route.jpg" alt="路由模型"></p>
-<h3 id="nat模型">NAT模型</h3>
-<p>上述在每台被通信的物理机加路由，比较麻烦，尽管能够与外部主机通信，仍然不能
-作为通信目标，如果作一个<strong>NAT Server</strong>就可以解决这个问题，即所谓的NAT模型。</p>
-<p><img src="/images/virtualization/kvm-net-nat.jpg" alt="NAT模型"></p>
-<h3 id="桥接模型">桥接模型</h3>
-<p>在物理机上创建bridge设备，把物理网卡关联到bridge上，这样guest OS通过vnet0发送
-的数据包就到了bridge，bridge通过物理网卡就出去了。</p>
-<p>物理机一旦把一个物理网卡当bridge用以后，这个物理网卡就相当于交换机了，二层
+虚拟机就可以和外部通信了。</p><p><img src=/images/virtualization/kvm-net-route.jpg alt=路由模型></p><h3 id=nat模型>NAT模型</h3><p>上述在每台被通信的物理机加路由，比较麻烦，尽管能够与外部主机通信，仍然不能
+作为通信目标，如果作一个<strong>NAT Server</strong>就可以解决这个问题，即所谓的NAT模型。</p><p><img src=/images/virtualization/kvm-net-nat.jpg alt=NAT模型></p><h3 id=桥接模型>桥接模型</h3><p>在物理机上创建bridge设备，把物理网卡关联到bridge上，这样guest OS通过vnet0发送
+的数据包就到了bridge，bridge通过物理网卡就出去了。</p><p>物理机一旦把一个物理网卡当bridge用以后，这个物理网卡就相当于交换机了，二层
 通信依靠MAC地址，通过给物理机再添加一个虚拟网卡，把原物理网卡的MAC地址放在
 虚拟网卡上，在物理网卡上打开混杂模式，不管MAC地址是什么都接收，物理网卡接收
 到数据包后，如果MAC是物理机的则转发到虚拟网卡，如果是虚拟机的则转交给虚拟机
-的虚拟网卡。</p>
-<p><img src="/images/virtualization/kvm-net-bridge.jpg" alt="桥接模型"></p>
-<h2 id="42-网络属性相关选项">4.2 网络属性相关选项</h2>
-<p>网络属性相关选项用于定义网络设备接口类型及其相关的各属性等信息。这里只介绍nic、tap和user三种类型网络接口的属性，其它类型请参照qemu-kvm手册。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span>[<span class="p">,</span><span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>][<span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="nx">mac</span>][<span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">type</span>][<span class="p">,</span><span class="nx">name</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">addr</span><span class="p">=</span><span class="nx">addr</span>][<span class="p">,</span><span class="nx">vectors</span><span class="p">=</span><span class="nx">v</span>]<span class="err">
-</span><span class="err"></span>    <span class="nx">创建一个新的网卡设备并连接至vlan</span> <span class="nx">n中</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">PC架构上默认的NIC为e1000</span>，<span class="err">
-</span><span class="err"></span>    <span class="nx">macaddr用于为其指定MAC地址</span>，<span class="err">
-</span><span class="err"></span>    <span class="nx">name用于指定一个在监控时显示的网上设备名称</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">emu可以模拟多个类型的网卡设备</span>，<span class="nx">如virtio</span>、<span class="nx">i82551</span>、<span class="nx">i82557b</span>、<span class="nx">i82559er</span>、<span class="err">
-</span><span class="err"></span>    <span class="nx">ne2k_isa</span>、<span class="nx">pcnet</span>、<span class="nx">rtl8139</span>、<span class="nx">e1000</span>、<span class="nx">smc91c111</span>、<span class="nx">lance及mcf_fec等</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">不过</span>，<span class="nx">不同平台架构上</span>，<span class="nx">其支持的类型可能只包含前述列表的一部分</span>，<span class="nx">可以使</span><span class="err">
-</span><span class="err"></span>    <span class="nx">用</span>“<span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span>?”<span class="nx">来获取当前平台支持的类型</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">tap</span>[<span class="p">,</span><span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>][<span class="p">,</span><span class="nx">name</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">fd</span><span class="p">=</span><span class="nx">h</span>][<span class="p">,</span><span class="nx">ifname</span><span class="p">=</span><span class="nx">name</span>][<span class="p">,</span><span class="nx">script</span><span class="p">=</span><span class="nx">file</span>][<span class="p">,</span><span class="nx">downscript</span><span class="p">=</span><span class="nx">dfile</span>]<span class="err">
-</span><span class="err"></span>    <span class="nx">通过物理机的TAP网络接口连接至vlan</span> <span class="nx">n中</span>，<span class="nx">使用script</span><span class="p">=</span><span class="nx">file指定的脚本</span><span class="p">(</span><span class="nx">默</span><span class="err">
-</span><span class="err"></span>    <span class="nx">认为</span><span class="sr">/etc/</span><span class="nx">qemu</span><span class="p">-</span><span class="nx">ifup</span><span class="p">)</span><span class="nx">来配置当前网络接口</span>，<span class="nx">并使用downscript</span><span class="p">=</span><span class="nx">file指定的</span><span class="err">
-</span><span class="err"></span>    <span class="nx">脚本</span><span class="p">(</span><span class="nx">默认为</span><span class="sr">/etc/</span><span class="nx">qemu</span><span class="p">-</span><span class="nx">ifdown</span><span class="p">)</span><span class="nx">来撤消接口配置</span>；<span class="nx">使用script</span><span class="p">=</span><span class="nx">no和</span><span class="err">
-</span><span class="err"></span>    <span class="nx">downscript</span><span class="p">=</span><span class="nx">no可分别用来禁止执行脚本</span>；<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">user</span>[<span class="p">,</span><span class="nx">option</span>][<span class="p">,</span><span class="nx">option</span>][<span class="p">,</span>...]：<span class="err">
-</span><span class="err"></span>    <span class="nx">在用户模式配置网络栈</span>，<span class="nx">其不依赖于管理权限</span>；<span class="nx">有效选项有</span><span class="err">
-</span><span class="err"></span>    <span class="nx">vlan</span><span class="p">=</span><span class="nx">n</span>：<span class="nx">连接至vlan</span> <span class="nx">n</span>，<span class="nx">默认n</span><span class="p">=</span><span class="m">0</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">name</span><span class="p">=</span><span class="nx">name</span>：<span class="nx">指定接口的显示名称</span>，<span class="nx">常用于监控模式中</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">net</span><span class="p">=</span><span class="nx">addr</span>[<span class="sr">/mask]：设定GuestOS可见的IP网络，掩码可选，默认为10.0.2.0/</span><span class="m">8</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">host</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定GuestOS中看到的物理机的IP地址</span>，<span class="nx">默认为指定网络中的第二个</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">2</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">dhcpstart</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定DHCP服务地址池中16个地址的起始IP</span>，<span class="nx">默认为第16个至第31个</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">16</span><span class="p">-</span><span class="nx">x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">31</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">dns</span><span class="p">=</span><span class="nx">addr</span>：<span class="nx">指定GuestOS可见的dns服务器地址</span>；<span class="nx">默认为GuestOS网络中的第三个地址</span>，<span class="nx">即x</span>.<span class="nx">x</span>.<span class="nx">x</span>.<span class="m">3</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">tftp</span><span class="p">=</span><span class="nx">dir</span>：<span class="nx">激活内置的tftp服务器</span>，<span class="nx">并使用指定的dir作为tftp服务器的默认根目录</span>；<span class="err">
-</span><span class="err"></span>    <span class="nx">bootfile</span><span class="p">=</span><span class="nx">file</span>：<span class="nx">BOOTP文件名称</span>，<span class="nx">用于实现网络引导GuestOS</span>；<span class="nx">如</span>：<span class="nx">qemu</span> <span class="p">-</span><span class="nx">hda</span> <span class="nx">linux</span>.<span class="nx">img</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">n</span> <span class="p">-</span><span class="nx">net</span> <span class="nx">user</span><span class="p">,</span><span class="nx">tftp</span><span class="p">=</span><span class="sr">/tftpserver/</span><span class="nx">pub</span><span class="p">,</span><span class="nx">bootfile</span><span class="p">=</span>/<span class="nx">pxelinux</span>.<span class="m">0</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="5-使用示例">5. 使用示例</h1>
-<h2 id="51-示例一">5.1 示例一</h2>
-<p>下面的命令创建了一个名为rhel5.8的虚拟机，其RAM大小为512MB，有两颗CPU的SMP架构，默认引导设备为硬盘，有一个硬盘设备和一个光驱设备，网络接口类型为virtio，VGA模式为cirrus，并启用了balloon功能。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">name</span> <span class="s2">&#34;rhel5.8&#34;</span> <span class="p">-</span><span class="nx">m</span> <span class="m">512</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="m">2</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">d</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/VM/</span><span class="nx">images</span><span class="sr">/rhel5.8/</span><span class="nx">hda</span><span class="p">,</span><span class="k">if</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">0</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">disk</span><span class="p">,</span><span class="nx">format</span><span class="p">=</span><span class="nx">qcow2</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/isos/</span><span class="nx">rhel</span><span class="m">-5</span>.<span class="m">8</span>.<span class="nx">iso</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">1</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">cdrom</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="m">52</span>:<span class="m">54</span>:<span class="m">00</span>:<span class="nx">A5</span>:<span class="m">41</span>:<span class="m">1</span>E \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">cirrus</span> <span class="p">-</span><span class="nx">balloon</span> <span class="nx">virtio</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>需要注意的是，上述命令中使用的硬盘映像文件/VM/images/rhel5.8/hda需要事先使用qemu-img命令创建。</p>
-<p>在虚拟机创建并安装GuestOS完成之后，可以免去光驱设备直接启动之。命令如下所示。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"># <span class="nx">qemu</span><span class="p">-</span><span class="nx">kvm</span> <span class="p">-</span><span class="nx">name</span> <span class="s2">&#34;rhel5.8&#34;</span> <span class="p">-</span><span class="nx">m</span> <span class="m">512</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">smp</span> <span class="m">2</span> <span class="p">-</span><span class="nx">boot</span> <span class="nx">d</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">drive</span> <span class="nx">file</span><span class="p">=</span><span class="sr">/VM/</span><span class="nx">images</span><span class="sr">/rhel5.8/</span><span class="nx">hda</span><span class="p">,</span><span class="k">if</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">index</span><span class="p">=</span><span class="m">0</span><span class="p">,</span><span class="nx">media</span><span class="p">=</span><span class="nx">disk</span><span class="p">,</span><span class="nx">format</span><span class="p">=</span><span class="nx">qcow2</span> \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">net</span> <span class="nx">nic</span><span class="p">,</span><span class="nx">model</span><span class="p">=</span><span class="nx">virtio</span><span class="p">,</span><span class="nx">macaddr</span><span class="p">=</span><span class="m">52</span>:<span class="m">54</span>:<span class="m">00</span>:<span class="nx">A5</span>:<span class="m">41</span>:<span class="m">1</span>E \<span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">vga</span> <span class="nx">cirrus</span> <span class="p">-</span><span class="nx">balloon</span> <span class="nx">virtio</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="52-以网络接口启动">5.2 以网络接口启动</h2>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">qemu-kvm -m 512 -smp 2 -name centos \
+的虚拟网卡。</p><p><img src=/images/virtualization/kvm-net-bridge.jpg alt=桥接模型></p><h2 id=42-网络属性相关选项>4.2 网络属性相关选项</h2><p>网络属性相关选项用于定义网络设备接口类型及其相关的各属性等信息。这里只介绍nic、tap和user三种类型网络接口的属性，其它类型请参照qemu-kvm手册。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>-</span><span class=nx>net</span> <span class=nx>nic</span>[<span class=p>,</span><span class=nx>vlan</span><span class=p>=</span><span class=nx>n</span>][<span class=p>,</span><span class=nx>macaddr</span><span class=p>=</span><span class=nx>mac</span>][<span class=p>,</span><span class=nx>model</span><span class=p>=</span><span class=nx>type</span>][<span class=p>,</span><span class=nx>name</span><span class=p>=</span><span class=nx>name</span>][<span class=p>,</span><span class=nx>addr</span><span class=p>=</span><span class=nx>addr</span>][<span class=p>,</span><span class=nx>vectors</span><span class=p>=</span><span class=nx>v</span>]<span class=err>
+</span><span class=err></span>    <span class=nx>创建一个新的网卡设备并连接至vlan</span> <span class=nx>n中</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>PC架构上默认的NIC为e1000</span>，<span class=err>
+</span><span class=err></span>    <span class=nx>macaddr用于为其指定MAC地址</span>，<span class=err>
+</span><span class=err></span>    <span class=nx>name用于指定一个在监控时显示的网上设备名称</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>emu可以模拟多个类型的网卡设备</span>，<span class=nx>如virtio</span>、<span class=nx>i82551</span>、<span class=nx>i82557b</span>、<span class=nx>i82559er</span>、<span class=err>
+</span><span class=err></span>    <span class=nx>ne2k_isa</span>、<span class=nx>pcnet</span>、<span class=nx>rtl8139</span>、<span class=nx>e1000</span>、<span class=nx>smc91c111</span>、<span class=nx>lance及mcf_fec等</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>不过</span>，<span class=nx>不同平台架构上</span>，<span class=nx>其支持的类型可能只包含前述列表的一部分</span>，<span class=nx>可以使</span><span class=err>
+</span><span class=err></span>    <span class=nx>用</span>“<span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>net</span> <span class=nx>nic</span><span class=p>,</span><span class=nx>model</span><span class=p>=</span>?”<span class=nx>来获取当前平台支持的类型</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>net</span> <span class=nx>tap</span>[<span class=p>,</span><span class=nx>vlan</span><span class=p>=</span><span class=nx>n</span>][<span class=p>,</span><span class=nx>name</span><span class=p>=</span><span class=nx>name</span>][<span class=p>,</span><span class=nx>fd</span><span class=p>=</span><span class=nx>h</span>][<span class=p>,</span><span class=nx>ifname</span><span class=p>=</span><span class=nx>name</span>][<span class=p>,</span><span class=nx>script</span><span class=p>=</span><span class=nx>file</span>][<span class=p>,</span><span class=nx>downscript</span><span class=p>=</span><span class=nx>dfile</span>]<span class=err>
+</span><span class=err></span>    <span class=nx>通过物理机的TAP网络接口连接至vlan</span> <span class=nx>n中</span>，<span class=nx>使用script</span><span class=p>=</span><span class=nx>file指定的脚本</span><span class=p>(</span><span class=nx>默</span><span class=err>
+</span><span class=err></span>    <span class=nx>认为</span><span class=sr>/etc/</span><span class=nx>qemu</span><span class=p>-</span><span class=nx>ifup</span><span class=p>)</span><span class=nx>来配置当前网络接口</span>，<span class=nx>并使用downscript</span><span class=p>=</span><span class=nx>file指定的</span><span class=err>
+</span><span class=err></span>    <span class=nx>脚本</span><span class=p>(</span><span class=nx>默认为</span><span class=sr>/etc/</span><span class=nx>qemu</span><span class=p>-</span><span class=nx>ifdown</span><span class=p>)</span><span class=nx>来撤消接口配置</span>；<span class=nx>使用script</span><span class=p>=</span><span class=nx>no和</span><span class=err>
+</span><span class=err></span>    <span class=nx>downscript</span><span class=p>=</span><span class=nx>no可分别用来禁止执行脚本</span>；<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>net</span> <span class=nx>user</span>[<span class=p>,</span><span class=nx>option</span>][<span class=p>,</span><span class=nx>option</span>][<span class=p>,</span>...]：<span class=err>
+</span><span class=err></span>    <span class=nx>在用户模式配置网络栈</span>，<span class=nx>其不依赖于管理权限</span>；<span class=nx>有效选项有</span><span class=err>
+</span><span class=err></span>    <span class=nx>vlan</span><span class=p>=</span><span class=nx>n</span>：<span class=nx>连接至vlan</span> <span class=nx>n</span>，<span class=nx>默认n</span><span class=p>=</span><span class=m>0</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>name</span><span class=p>=</span><span class=nx>name</span>：<span class=nx>指定接口的显示名称</span>，<span class=nx>常用于监控模式中</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>net</span><span class=p>=</span><span class=nx>addr</span>[<span class=sr>/mask]：设定GuestOS可见的IP网络，掩码可选，默认为10.0.2.0/</span><span class=m>8</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>host</span><span class=p>=</span><span class=nx>addr</span>：<span class=nx>指定GuestOS中看到的物理机的IP地址</span>，<span class=nx>默认为指定网络中的第二个</span>，<span class=nx>即x</span>.<span class=nx>x</span>.<span class=nx>x</span>.<span class=m>2</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>dhcpstart</span><span class=p>=</span><span class=nx>addr</span>：<span class=nx>指定DHCP服务地址池中16个地址的起始IP</span>，<span class=nx>默认为第16个至第31个</span>，<span class=nx>即x</span>.<span class=nx>x</span>.<span class=nx>x</span>.<span class=m>16</span><span class=p>-</span><span class=nx>x</span>.<span class=nx>x</span>.<span class=nx>x</span>.<span class=m>31</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>dns</span><span class=p>=</span><span class=nx>addr</span>：<span class=nx>指定GuestOS可见的dns服务器地址</span>；<span class=nx>默认为GuestOS网络中的第三个地址</span>，<span class=nx>即x</span>.<span class=nx>x</span>.<span class=nx>x</span>.<span class=m>3</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>tftp</span><span class=p>=</span><span class=nx>dir</span>：<span class=nx>激活内置的tftp服务器</span>，<span class=nx>并使用指定的dir作为tftp服务器的默认根目录</span>；<span class=err>
+</span><span class=err></span>    <span class=nx>bootfile</span><span class=p>=</span><span class=nx>file</span>：<span class=nx>BOOTP文件名称</span>，<span class=nx>用于实现网络引导GuestOS</span>；<span class=nx>如</span>：<span class=nx>qemu</span> <span class=p>-</span><span class=nx>hda</span> <span class=nx>linux</span>.<span class=nx>img</span> <span class=p>-</span><span class=nx>boot</span> <span class=nx>n</span> <span class=p>-</span><span class=nx>net</span> <span class=nx>user</span><span class=p>,</span><span class=nx>tftp</span><span class=p>=</span><span class=sr>/tftpserver/</span><span class=nx>pub</span><span class=p>,</span><span class=nx>bootfile</span><span class=p>=</span>/<span class=nx>pxelinux</span>.<span class=m>0</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=5-使用示例>5. 使用示例</h1><h2 id=51-示例一>5.1 示例一</h2><p>下面的命令创建了一个名为rhel5.8的虚拟机，其RAM大小为512MB，有两颗CPU的SMP架构，默认引导设备为硬盘，有一个硬盘设备和一个光驱设备，网络接口类型为virtio，VGA模式为cirrus，并启用了balloon功能。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim># <span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>name</span> <span class=s2>&#34;rhel5.8&#34;</span> <span class=p>-</span><span class=nx>m</span> <span class=m>512</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>smp</span> <span class=m>2</span> <span class=p>-</span><span class=nx>boot</span> <span class=nx>d</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>drive</span> <span class=nx>file</span><span class=p>=</span><span class=sr>/VM/</span><span class=nx>images</span><span class=sr>/rhel5.8/</span><span class=nx>hda</span><span class=p>,</span><span class=k>if</span><span class=p>=</span><span class=nx>virtio</span><span class=p>,</span><span class=nx>index</span><span class=p>=</span><span class=m>0</span><span class=p>,</span><span class=nx>media</span><span class=p>=</span><span class=nx>disk</span><span class=p>,</span><span class=nx>format</span><span class=p>=</span><span class=nx>qcow2</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>drive</span> <span class=nx>file</span><span class=p>=</span><span class=sr>/isos/</span><span class=nx>rhel</span><span class=m>-5</span>.<span class=m>8</span>.<span class=nx>iso</span><span class=p>,</span><span class=nx>index</span><span class=p>=</span><span class=m>1</span><span class=p>,</span><span class=nx>media</span><span class=p>=</span><span class=nx>cdrom</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>net</span> <span class=nx>nic</span><span class=p>,</span><span class=nx>model</span><span class=p>=</span><span class=nx>virtio</span><span class=p>,</span><span class=nx>macaddr</span><span class=p>=</span><span class=m>52</span>:<span class=m>54</span>:<span class=m>00</span>:<span class=nx>A5</span>:<span class=m>41</span>:<span class=m>1</span>E \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>vga</span> <span class=nx>cirrus</span> <span class=p>-</span><span class=nx>balloon</span> <span class=nx>virtio</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>需要注意的是，上述命令中使用的硬盘映像文件/VM/images/rhel5.8/hda需要事先使用qemu-img命令创建。</p><p>在虚拟机创建并安装GuestOS完成之后，可以免去光驱设备直接启动之。命令如下所示。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim># <span class=nx>qemu</span><span class=p>-</span><span class=nx>kvm</span> <span class=p>-</span><span class=nx>name</span> <span class=s2>&#34;rhel5.8&#34;</span> <span class=p>-</span><span class=nx>m</span> <span class=m>512</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>smp</span> <span class=m>2</span> <span class=p>-</span><span class=nx>boot</span> <span class=nx>d</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>drive</span> <span class=nx>file</span><span class=p>=</span><span class=sr>/VM/</span><span class=nx>images</span><span class=sr>/rhel5.8/</span><span class=nx>hda</span><span class=p>,</span><span class=k>if</span><span class=p>=</span><span class=nx>virtio</span><span class=p>,</span><span class=nx>index</span><span class=p>=</span><span class=m>0</span><span class=p>,</span><span class=nx>media</span><span class=p>=</span><span class=nx>disk</span><span class=p>,</span><span class=nx>format</span><span class=p>=</span><span class=nx>qcow2</span> \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>net</span> <span class=nx>nic</span><span class=p>,</span><span class=nx>model</span><span class=p>=</span><span class=nx>virtio</span><span class=p>,</span><span class=nx>macaddr</span><span class=p>=</span><span class=m>52</span>:<span class=m>54</span>:<span class=m>00</span>:<span class=nx>A5</span>:<span class=m>41</span>:<span class=m>1</span>E \<span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>vga</span> <span class=nx>cirrus</span> <span class=p>-</span><span class=nx>balloon</span> <span class=nx>virtio</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=52-以网络接口启动>5.2 以网络接口启动</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>qemu-kvm -m 512 -smp 2 -name centos \
 -drive file=/images/centos/centos6.img,media=disk,if=virtio \
 -net nic,model=virtio,macaddr=52:54:00:12:34:88 \
 -net tap,ifname=vnet1,script=/etc/qemu-ifup \
 -boot order=nc,once=n
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="53-以deamon方式运行">5.3 以deamon方式运行</h2>
-<p>指定 -deamonize即可在后台运行。</p>
-<h2 id="54-鼠标轨迹不同步">5.4 鼠标轨迹不同步</h2>
-<p>指定 -usedevice tablet，内外鼠标轨迹就可以同步。</p>
-<h1 id="6-vmware-workstation上的kvm实验">6. vmware-workstation上的kvm实验</h1>
-<p>经过实验发现CPU要如下设置，如果不打开“虚拟化CPU性能计数器”，在启动kvm的vm时会导致host（vmw虚拟的）
-死机，卡在CPU计数器那里。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">  1
-</span><span class="lnt">  2
-</span><span class="lnt">  3
-</span><span class="lnt">  4
-</span><span class="lnt">  5
-</span><span class="lnt">  6
-</span><span class="lnt">  7
-</span><span class="lnt">  8
-</span><span class="lnt">  9
-</span><span class="lnt"> 10
-</span><span class="lnt"> 11
-</span><span class="lnt"> 12
-</span><span class="lnt"> 13
-</span><span class="lnt"> 14
-</span><span class="lnt"> 15
-</span><span class="lnt"> 16
-</span><span class="lnt"> 17
-</span><span class="lnt"> 18
-</span><span class="lnt"> 19
-</span><span class="lnt"> 20
-</span><span class="lnt"> 21
-</span><span class="lnt"> 22
-</span><span class="lnt"> 23
-</span><span class="lnt"> 24
-</span><span class="lnt"> 25
-</span><span class="lnt"> 26
-</span><span class="lnt"> 27
-</span><span class="lnt"> 28
-</span><span class="lnt"> 29
-</span><span class="lnt"> 30
-</span><span class="lnt"> 31
-</span><span class="lnt"> 32
-</span><span class="lnt"> 33
-</span><span class="lnt"> 34
-</span><span class="lnt"> 35
-</span><span class="lnt"> 36
-</span><span class="lnt"> 37
-</span><span class="lnt"> 38
-</span><span class="lnt"> 39
-</span><span class="lnt"> 40
-</span><span class="lnt"> 41
-</span><span class="lnt"> 42
-</span><span class="lnt"> 43
-</span><span class="lnt"> 44
-</span><span class="lnt"> 45
-</span><span class="lnt"> 46
-</span><span class="lnt"> 47
-</span><span class="lnt"> 48
-</span><span class="lnt"> 49
-</span><span class="lnt"> 50
-</span><span class="lnt"> 51
-</span><span class="lnt"> 52
-</span><span class="lnt"> 53
-</span><span class="lnt"> 54
-</span><span class="lnt"> 55
-</span><span class="lnt"> 56
-</span><span class="lnt"> 57
-</span><span class="lnt"> 58
-</span><span class="lnt"> 59
-</span><span class="lnt"> 60
-</span><span class="lnt"> 61
-</span><span class="lnt"> 62
-</span><span class="lnt"> 63
-</span><span class="lnt"> 64
-</span><span class="lnt"> 65
-</span><span class="lnt"> 66
-</span><span class="lnt"> 67
-</span><span class="lnt"> 68
-</span><span class="lnt"> 69
-</span><span class="lnt"> 70
-</span><span class="lnt"> 71
-</span><span class="lnt"> 72
-</span><span class="lnt"> 73
-</span><span class="lnt"> 74
-</span><span class="lnt"> 75
-</span><span class="lnt"> 76
-</span><span class="lnt"> 77
-</span><span class="lnt"> 78
-</span><span class="lnt"> 79
-</span><span class="lnt"> 80
-</span><span class="lnt"> 81
-</span><span class="lnt"> 82
-</span><span class="lnt"> 83
-</span><span class="lnt"> 84
-</span><span class="lnt"> 85
-</span><span class="lnt"> 86
-</span><span class="lnt"> 87
-</span><span class="lnt"> 88
-</span><span class="lnt"> 89
-</span><span class="lnt"> 90
-</span><span class="lnt"> 91
-</span><span class="lnt"> 92
-</span><span class="lnt"> 93
-</span><span class="lnt"> 94
-</span><span class="lnt"> 95
-</span><span class="lnt"> 96
-</span><span class="lnt"> 97
-</span><span class="lnt"> 98
-</span><span class="lnt"> 99
-</span><span class="lnt">100
-</span><span class="lnt">101
-</span><span class="lnt">102
-</span><span class="lnt">103
-</span><span class="lnt">104
-</span><span class="lnt">105
-</span><span class="lnt">106
-</span><span class="lnt">107
-</span><span class="lnt">108
-</span><span class="lnt">109
-</span><span class="lnt">110
-</span><span class="lnt">111
-</span><span class="lnt">112
-</span><span class="lnt">113
-</span><span class="lnt">114
-</span><span class="lnt">115
-</span><span class="lnt">116
-</span><span class="lnt">117
-</span><span class="lnt">118
-</span><span class="lnt">119
-</span><span class="lnt">120
-</span><span class="lnt">121
-</span><span class="lnt">122
-</span><span class="lnt">123
-</span><span class="lnt">124
-</span><span class="lnt">125
-</span><span class="lnt">126
-</span><span class="lnt">127
-</span><span class="lnt">128
-</span><span class="lnt">129
-</span><span class="lnt">130
-</span><span class="lnt">131
-</span><span class="lnt">132
-</span><span class="lnt">133
-</span><span class="lnt">134
-</span><span class="lnt">135
-</span><span class="lnt">136
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# brctl addbr br0
+</code></pre></td></tr></table></div></div><h2 id=53-以deamon方式运行>5.3 以deamon方式运行</h2><p>指定 -deamonize即可在后台运行。</p><h2 id=54-鼠标轨迹不同步>5.4 鼠标轨迹不同步</h2><p>指定 -usedevice tablet，内外鼠标轨迹就可以同步。</p><h1 id=6-vmware-workstation上的kvm实验>6. vmware-workstation上的kvm实验</h1><p>经过实验发现CPU要如下设置，如果不打开“虚拟化CPU性能计数器”，在启动kvm的vm时会导致host（vmw虚拟的）
+死机，卡在CPU计数器那里。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>[root@localhost ~]# brctl addbr br0
 [root@localhost ~]# ip link set dev br0 up
 [root@localhost ~]# ip link show
 1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT 
@@ -797,495 +524,487 @@ qemu: Supported NIC models: ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet
 [    0.136010] ... fixed-purpose events:   0
 [    0.140010] ... event mask:             000000000000000f
 [    0.144098] NMI watchdog enabled, takes one hw-pmu counter.
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="/images/virtualization/vmware-config-for-kvm.jpg" alt="vmware设置"></p>
-<p>设置CPU计数器后，启动正常，如下。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">  1
-</span><span class="lnt">  2
-</span><span class="lnt">  3
-</span><span class="lnt">  4
-</span><span class="lnt">  5
-</span><span class="lnt">  6
-</span><span class="lnt">  7
-</span><span class="lnt">  8
-</span><span class="lnt">  9
-</span><span class="lnt"> 10
-</span><span class="lnt"> 11
-</span><span class="lnt"> 12
-</span><span class="lnt"> 13
-</span><span class="lnt"> 14
-</span><span class="lnt"> 15
-</span><span class="lnt"> 16
-</span><span class="lnt"> 17
-</span><span class="lnt"> 18
-</span><span class="lnt"> 19
-</span><span class="lnt"> 20
-</span><span class="lnt"> 21
-</span><span class="lnt"> 22
-</span><span class="lnt"> 23
-</span><span class="lnt"> 24
-</span><span class="lnt"> 25
-</span><span class="lnt"> 26
-</span><span class="lnt"> 27
-</span><span class="lnt"> 28
-</span><span class="lnt"> 29
-</span><span class="lnt"> 30
-</span><span class="lnt"> 31
-</span><span class="lnt"> 32
-</span><span class="lnt"> 33
-</span><span class="lnt"> 34
-</span><span class="lnt"> 35
-</span><span class="lnt"> 36
-</span><span class="lnt"> 37
-</span><span class="lnt"> 38
-</span><span class="lnt"> 39
-</span><span class="lnt"> 40
-</span><span class="lnt"> 41
-</span><span class="lnt"> 42
-</span><span class="lnt"> 43
-</span><span class="lnt"> 44
-</span><span class="lnt"> 45
-</span><span class="lnt"> 46
-</span><span class="lnt"> 47
-</span><span class="lnt"> 48
-</span><span class="lnt"> 49
-</span><span class="lnt"> 50
-</span><span class="lnt"> 51
-</span><span class="lnt"> 52
-</span><span class="lnt"> 53
-</span><span class="lnt"> 54
-</span><span class="lnt"> 55
-</span><span class="lnt"> 56
-</span><span class="lnt"> 57
-</span><span class="lnt"> 58
-</span><span class="lnt"> 59
-</span><span class="lnt"> 60
-</span><span class="lnt"> 61
-</span><span class="lnt"> 62
-</span><span class="lnt"> 63
-</span><span class="lnt"> 64
-</span><span class="lnt"> 65
-</span><span class="lnt"> 66
-</span><span class="lnt"> 67
-</span><span class="lnt"> 68
-</span><span class="lnt"> 69
-</span><span class="lnt"> 70
-</span><span class="lnt"> 71
-</span><span class="lnt"> 72
-</span><span class="lnt"> 73
-</span><span class="lnt"> 74
-</span><span class="lnt"> 75
-</span><span class="lnt"> 76
-</span><span class="lnt"> 77
-</span><span class="lnt"> 78
-</span><span class="lnt"> 79
-</span><span class="lnt"> 80
-</span><span class="lnt"> 81
-</span><span class="lnt"> 82
-</span><span class="lnt"> 83
-</span><span class="lnt"> 84
-</span><span class="lnt"> 85
-</span><span class="lnt"> 86
-</span><span class="lnt"> 87
-</span><span class="lnt"> 88
-</span><span class="lnt"> 89
-</span><span class="lnt"> 90
-</span><span class="lnt"> 91
-</span><span class="lnt"> 92
-</span><span class="lnt"> 93
-</span><span class="lnt"> 94
-</span><span class="lnt"> 95
-</span><span class="lnt"> 96
-</span><span class="lnt"> 97
-</span><span class="lnt"> 98
-</span><span class="lnt"> 99
-</span><span class="lnt">100
-</span><span class="lnt">101
-</span><span class="lnt">102
-</span><span class="lnt">103
-</span><span class="lnt">104
-</span><span class="lnt">105
-</span><span class="lnt">106
-</span><span class="lnt">107
-</span><span class="lnt">108
-</span><span class="lnt">109
-</span><span class="lnt">110
-</span><span class="lnt">111
-</span><span class="lnt">112
-</span><span class="lnt">113
-</span><span class="lnt">114
-</span><span class="lnt">115
-</span><span class="lnt">116
-</span><span class="lnt">117
-</span><span class="lnt">118
-</span><span class="lnt">119
-</span><span class="lnt">120
-</span><span class="lnt">121
-</span><span class="lnt">122
-</span><span class="lnt">123
-</span><span class="lnt">124
-</span><span class="lnt">125
-</span><span class="lnt">126
-</span><span class="lnt">127
-</span><span class="lnt">128
-</span><span class="lnt">129
-</span><span class="lnt">130
-</span><span class="lnt">131
-</span><span class="lnt">132
-</span><span class="lnt">133
-</span><span class="lnt">134
-</span><span class="lnt">135
-</span><span class="lnt">136
-</span><span class="lnt">137
-</span><span class="lnt">138
-</span><span class="lnt">139
-</span><span class="lnt">140
-</span><span class="lnt">141
-</span><span class="lnt">142
-</span><span class="lnt">143
-</span><span class="lnt">144
-</span><span class="lnt">145
-</span><span class="lnt">146
-</span><span class="lnt">147
-</span><span class="lnt">148
-</span><span class="lnt">149
-</span><span class="lnt">150
-</span><span class="lnt">151
-</span><span class="lnt">152
-</span><span class="lnt">153
-</span><span class="lnt">154
-</span><span class="lnt">155
-</span><span class="lnt">156
-</span><span class="lnt">157
-</span><span class="lnt">158
-</span><span class="lnt">159
-</span><span class="lnt">160
-</span><span class="lnt">161
-</span><span class="lnt">162
-</span><span class="lnt">163
-</span><span class="lnt">164
-</span><span class="lnt">165
-</span><span class="lnt">166
-</span><span class="lnt">167
-</span><span class="lnt">168
-</span><span class="lnt">169
-</span><span class="lnt">170
-</span><span class="lnt">171
-</span><span class="lnt">172
-</span><span class="lnt">173
-</span><span class="lnt">174
-</span><span class="lnt">175
-</span><span class="lnt">176
-</span><span class="lnt">177
-</span><span class="lnt">178
-</span><span class="lnt">179
-</span><span class="lnt">180
-</span><span class="lnt">181
-</span><span class="lnt">182
-</span><span class="lnt">183
-</span><span class="lnt">184
-</span><span class="lnt">185
-</span><span class="lnt">186
-</span><span class="lnt">187
-</span><span class="lnt">188
-</span><span class="lnt">189
-</span><span class="lnt">190
-</span><span class="lnt">191
-</span><span class="lnt">192
-</span><span class="lnt">193
-</span><span class="lnt">194
-</span><span class="lnt">195
-</span><span class="lnt">196
-</span><span class="lnt">197
-</span><span class="lnt">198
-</span><span class="lnt">199
-</span><span class="lnt">200
-</span><span class="lnt">201
-</span><span class="lnt">202
-</span><span class="lnt">203
-</span><span class="lnt">204
-</span><span class="lnt">205
-</span><span class="lnt">206
-</span><span class="lnt">207
-</span><span class="lnt">208
-</span><span class="lnt">209
-</span><span class="lnt">210
-</span><span class="lnt">211
-</span><span class="lnt">212
-</span><span class="lnt">213
-</span><span class="lnt">214
-</span><span class="lnt">215
-</span><span class="lnt">216
-</span><span class="lnt">217
-</span><span class="lnt">218
-</span><span class="lnt">219
-</span><span class="lnt">220
-</span><span class="lnt">221
-</span><span class="lnt">222
-</span><span class="lnt">223
-</span><span class="lnt">224
-</span><span class="lnt">225
-</span><span class="lnt">226
-</span><span class="lnt">227
-</span><span class="lnt">228
-</span><span class="lnt">229
-</span><span class="lnt">230
-</span><span class="lnt">231
-</span><span class="lnt">232
-</span><span class="lnt">233
-</span><span class="lnt">234
-</span><span class="lnt">235
-</span><span class="lnt">236
-</span><span class="lnt">237
-</span><span class="lnt">238
-</span><span class="lnt">239
-</span><span class="lnt">240
-</span><span class="lnt">241
-</span><span class="lnt">242
-</span><span class="lnt">243
-</span><span class="lnt">244
-</span><span class="lnt">245
-</span><span class="lnt">246
-</span><span class="lnt">247
-</span><span class="lnt">248
-</span><span class="lnt">249
-</span><span class="lnt">250
-</span><span class="lnt">251
-</span><span class="lnt">252
-</span><span class="lnt">253
-</span><span class="lnt">254
-</span><span class="lnt">255
-</span><span class="lnt">256
-</span><span class="lnt">257
-</span><span class="lnt">258
-</span><span class="lnt">259
-</span><span class="lnt">260
-</span><span class="lnt">261
-</span><span class="lnt">262
-</span><span class="lnt">263
-</span><span class="lnt">264
-</span><span class="lnt">265
-</span><span class="lnt">266
-</span><span class="lnt">267
-</span><span class="lnt">268
-</span><span class="lnt">269
-</span><span class="lnt">270
-</span><span class="lnt">271
-</span><span class="lnt">272
-</span><span class="lnt">273
-</span><span class="lnt">274
-</span><span class="lnt">275
-</span><span class="lnt">276
-</span><span class="lnt">277
-</span><span class="lnt">278
-</span><span class="lnt">279
-</span><span class="lnt">280
-</span><span class="lnt">281
-</span><span class="lnt">282
-</span><span class="lnt">283
-</span><span class="lnt">284
-</span><span class="lnt">285
-</span><span class="lnt">286
-</span><span class="lnt">287
-</span><span class="lnt">288
-</span><span class="lnt">289
-</span><span class="lnt">290
-</span><span class="lnt">291
-</span><span class="lnt">292
-</span><span class="lnt">293
-</span><span class="lnt">294
-</span><span class="lnt">295
-</span><span class="lnt">296
-</span><span class="lnt">297
-</span><span class="lnt">298
-</span><span class="lnt">299
-</span><span class="lnt">300
-</span><span class="lnt">301
-</span><span class="lnt">302
-</span><span class="lnt">303
-</span><span class="lnt">304
-</span><span class="lnt">305
-</span><span class="lnt">306
-</span><span class="lnt">307
-</span><span class="lnt">308
-</span><span class="lnt">309
-</span><span class="lnt">310
-</span><span class="lnt">311
-</span><span class="lnt">312
-</span><span class="lnt">313
-</span><span class="lnt">314
-</span><span class="lnt">315
-</span><span class="lnt">316
-</span><span class="lnt">317
-</span><span class="lnt">318
-</span><span class="lnt">319
-</span><span class="lnt">320
-</span><span class="lnt">321
-</span><span class="lnt">322
-</span><span class="lnt">323
-</span><span class="lnt">324
-</span><span class="lnt">325
-</span><span class="lnt">326
-</span><span class="lnt">327
-</span><span class="lnt">328
-</span><span class="lnt">329
-</span><span class="lnt">330
-</span><span class="lnt">331
-</span><span class="lnt">332
-</span><span class="lnt">333
-</span><span class="lnt">334
-</span><span class="lnt">335
-</span><span class="lnt">336
-</span><span class="lnt">337
-</span><span class="lnt">338
-</span><span class="lnt">339
-</span><span class="lnt">340
-</span><span class="lnt">341
-</span><span class="lnt">342
-</span><span class="lnt">343
-</span><span class="lnt">344
-</span><span class="lnt">345
-</span><span class="lnt">346
-</span><span class="lnt">347
-</span><span class="lnt">348
-</span><span class="lnt">349
-</span><span class="lnt">350
-</span><span class="lnt">351
-</span><span class="lnt">352
-</span><span class="lnt">353
-</span><span class="lnt">354
-</span><span class="lnt">355
-</span><span class="lnt">356
-</span><span class="lnt">357
-</span><span class="lnt">358
-</span><span class="lnt">359
-</span><span class="lnt">360
-</span><span class="lnt">361
-</span><span class="lnt">362
-</span><span class="lnt">363
-</span><span class="lnt">364
-</span><span class="lnt">365
-</span><span class="lnt">366
-</span><span class="lnt">367
-</span><span class="lnt">368
-</span><span class="lnt">369
-</span><span class="lnt">370
-</span><span class="lnt">371
-</span><span class="lnt">372
-</span><span class="lnt">373
-</span><span class="lnt">374
-</span><span class="lnt">375
-</span><span class="lnt">376
-</span><span class="lnt">377
-</span><span class="lnt">378
-</span><span class="lnt">379
-</span><span class="lnt">380
-</span><span class="lnt">381
-</span><span class="lnt">382
-</span><span class="lnt">383
-</span><span class="lnt">384
-</span><span class="lnt">385
-</span><span class="lnt">386
-</span><span class="lnt">387
-</span><span class="lnt">388
-</span><span class="lnt">389
-</span><span class="lnt">390
-</span><span class="lnt">391
-</span><span class="lnt">392
-</span><span class="lnt">393
-</span><span class="lnt">394
-</span><span class="lnt">395
-</span><span class="lnt">396
-</span><span class="lnt">397
-</span><span class="lnt">398
-</span><span class="lnt">399
-</span><span class="lnt">400
-</span><span class="lnt">401
-</span><span class="lnt">402
-</span><span class="lnt">403
-</span><span class="lnt">404
-</span><span class="lnt">405
-</span><span class="lnt">406
-</span><span class="lnt">407
-</span><span class="lnt">408
-</span><span class="lnt">409
-</span><span class="lnt">410
-</span><span class="lnt">411
-</span><span class="lnt">412
-</span><span class="lnt">413
-</span><span class="lnt">414
-</span><span class="lnt">415
-</span><span class="lnt">416
-</span><span class="lnt">417
-</span><span class="lnt">418
-</span><span class="lnt">419
-</span><span class="lnt">420
-</span><span class="lnt">421
-</span><span class="lnt">422
-</span><span class="lnt">423
-</span><span class="lnt">424
-</span><span class="lnt">425
-</span><span class="lnt">426
-</span><span class="lnt">427
-</span><span class="lnt">428
-</span><span class="lnt">429
-</span><span class="lnt">430
-</span><span class="lnt">431
-</span><span class="lnt">432
-</span><span class="lnt">433
-</span><span class="lnt">434
-</span><span class="lnt">435
-</span><span class="lnt">436
-</span><span class="lnt">437
-</span><span class="lnt">438
-</span><span class="lnt">439
-</span><span class="lnt">440
-</span><span class="lnt">441
-</span><span class="lnt">442
-</span><span class="lnt">443
-</span><span class="lnt">444
-</span><span class="lnt">445
-</span><span class="lnt">446
-</span><span class="lnt">447
-</span><span class="lnt">448
-</span><span class="lnt">449
-</span><span class="lnt">450
-</span><span class="lnt">451
-</span><span class="lnt">452
-</span><span class="lnt">453
-</span><span class="lnt">454
-</span><span class="lnt">455
-</span><span class="lnt">456
-</span><span class="lnt">457
-</span><span class="lnt">458
-</span><span class="lnt">459
-</span><span class="lnt">460
-</span><span class="lnt">461
-</span><span class="lnt">462
-</span><span class="lnt">463
-</span><span class="lnt">464
-</span><span class="lnt">465
-</span><span class="lnt">466
-</span><span class="lnt">467
-</span><span class="lnt">468
-</span><span class="lnt">469
-</span><span class="lnt">470
-</span><span class="lnt">471
-</span><span class="lnt">472
-</span><span class="lnt">473
-</span><span class="lnt">474
-</span><span class="lnt">475
-</span><span class="lnt">476
-</span><span class="lnt">477
-</span><span class="lnt">478
-</span><span class="lnt">479
-</span><span class="lnt">480
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@localhost ~]# brctl addbr br0
+</code></pre></td></tr></table></div></div><p><img src=/images/virtualization/vmware-config-for-kvm.jpg alt=vmware设置></p><p>设置CPU计数器后，启动正常，如下。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span><span class=lnt>210
+</span><span class=lnt>211
+</span><span class=lnt>212
+</span><span class=lnt>213
+</span><span class=lnt>214
+</span><span class=lnt>215
+</span><span class=lnt>216
+</span><span class=lnt>217
+</span><span class=lnt>218
+</span><span class=lnt>219
+</span><span class=lnt>220
+</span><span class=lnt>221
+</span><span class=lnt>222
+</span><span class=lnt>223
+</span><span class=lnt>224
+</span><span class=lnt>225
+</span><span class=lnt>226
+</span><span class=lnt>227
+</span><span class=lnt>228
+</span><span class=lnt>229
+</span><span class=lnt>230
+</span><span class=lnt>231
+</span><span class=lnt>232
+</span><span class=lnt>233
+</span><span class=lnt>234
+</span><span class=lnt>235
+</span><span class=lnt>236
+</span><span class=lnt>237
+</span><span class=lnt>238
+</span><span class=lnt>239
+</span><span class=lnt>240
+</span><span class=lnt>241
+</span><span class=lnt>242
+</span><span class=lnt>243
+</span><span class=lnt>244
+</span><span class=lnt>245
+</span><span class=lnt>246
+</span><span class=lnt>247
+</span><span class=lnt>248
+</span><span class=lnt>249
+</span><span class=lnt>250
+</span><span class=lnt>251
+</span><span class=lnt>252
+</span><span class=lnt>253
+</span><span class=lnt>254
+</span><span class=lnt>255
+</span><span class=lnt>256
+</span><span class=lnt>257
+</span><span class=lnt>258
+</span><span class=lnt>259
+</span><span class=lnt>260
+</span><span class=lnt>261
+</span><span class=lnt>262
+</span><span class=lnt>263
+</span><span class=lnt>264
+</span><span class=lnt>265
+</span><span class=lnt>266
+</span><span class=lnt>267
+</span><span class=lnt>268
+</span><span class=lnt>269
+</span><span class=lnt>270
+</span><span class=lnt>271
+</span><span class=lnt>272
+</span><span class=lnt>273
+</span><span class=lnt>274
+</span><span class=lnt>275
+</span><span class=lnt>276
+</span><span class=lnt>277
+</span><span class=lnt>278
+</span><span class=lnt>279
+</span><span class=lnt>280
+</span><span class=lnt>281
+</span><span class=lnt>282
+</span><span class=lnt>283
+</span><span class=lnt>284
+</span><span class=lnt>285
+</span><span class=lnt>286
+</span><span class=lnt>287
+</span><span class=lnt>288
+</span><span class=lnt>289
+</span><span class=lnt>290
+</span><span class=lnt>291
+</span><span class=lnt>292
+</span><span class=lnt>293
+</span><span class=lnt>294
+</span><span class=lnt>295
+</span><span class=lnt>296
+</span><span class=lnt>297
+</span><span class=lnt>298
+</span><span class=lnt>299
+</span><span class=lnt>300
+</span><span class=lnt>301
+</span><span class=lnt>302
+</span><span class=lnt>303
+</span><span class=lnt>304
+</span><span class=lnt>305
+</span><span class=lnt>306
+</span><span class=lnt>307
+</span><span class=lnt>308
+</span><span class=lnt>309
+</span><span class=lnt>310
+</span><span class=lnt>311
+</span><span class=lnt>312
+</span><span class=lnt>313
+</span><span class=lnt>314
+</span><span class=lnt>315
+</span><span class=lnt>316
+</span><span class=lnt>317
+</span><span class=lnt>318
+</span><span class=lnt>319
+</span><span class=lnt>320
+</span><span class=lnt>321
+</span><span class=lnt>322
+</span><span class=lnt>323
+</span><span class=lnt>324
+</span><span class=lnt>325
+</span><span class=lnt>326
+</span><span class=lnt>327
+</span><span class=lnt>328
+</span><span class=lnt>329
+</span><span class=lnt>330
+</span><span class=lnt>331
+</span><span class=lnt>332
+</span><span class=lnt>333
+</span><span class=lnt>334
+</span><span class=lnt>335
+</span><span class=lnt>336
+</span><span class=lnt>337
+</span><span class=lnt>338
+</span><span class=lnt>339
+</span><span class=lnt>340
+</span><span class=lnt>341
+</span><span class=lnt>342
+</span><span class=lnt>343
+</span><span class=lnt>344
+</span><span class=lnt>345
+</span><span class=lnt>346
+</span><span class=lnt>347
+</span><span class=lnt>348
+</span><span class=lnt>349
+</span><span class=lnt>350
+</span><span class=lnt>351
+</span><span class=lnt>352
+</span><span class=lnt>353
+</span><span class=lnt>354
+</span><span class=lnt>355
+</span><span class=lnt>356
+</span><span class=lnt>357
+</span><span class=lnt>358
+</span><span class=lnt>359
+</span><span class=lnt>360
+</span><span class=lnt>361
+</span><span class=lnt>362
+</span><span class=lnt>363
+</span><span class=lnt>364
+</span><span class=lnt>365
+</span><span class=lnt>366
+</span><span class=lnt>367
+</span><span class=lnt>368
+</span><span class=lnt>369
+</span><span class=lnt>370
+</span><span class=lnt>371
+</span><span class=lnt>372
+</span><span class=lnt>373
+</span><span class=lnt>374
+</span><span class=lnt>375
+</span><span class=lnt>376
+</span><span class=lnt>377
+</span><span class=lnt>378
+</span><span class=lnt>379
+</span><span class=lnt>380
+</span><span class=lnt>381
+</span><span class=lnt>382
+</span><span class=lnt>383
+</span><span class=lnt>384
+</span><span class=lnt>385
+</span><span class=lnt>386
+</span><span class=lnt>387
+</span><span class=lnt>388
+</span><span class=lnt>389
+</span><span class=lnt>390
+</span><span class=lnt>391
+</span><span class=lnt>392
+</span><span class=lnt>393
+</span><span class=lnt>394
+</span><span class=lnt>395
+</span><span class=lnt>396
+</span><span class=lnt>397
+</span><span class=lnt>398
+</span><span class=lnt>399
+</span><span class=lnt>400
+</span><span class=lnt>401
+</span><span class=lnt>402
+</span><span class=lnt>403
+</span><span class=lnt>404
+</span><span class=lnt>405
+</span><span class=lnt>406
+</span><span class=lnt>407
+</span><span class=lnt>408
+</span><span class=lnt>409
+</span><span class=lnt>410
+</span><span class=lnt>411
+</span><span class=lnt>412
+</span><span class=lnt>413
+</span><span class=lnt>414
+</span><span class=lnt>415
+</span><span class=lnt>416
+</span><span class=lnt>417
+</span><span class=lnt>418
+</span><span class=lnt>419
+</span><span class=lnt>420
+</span><span class=lnt>421
+</span><span class=lnt>422
+</span><span class=lnt>423
+</span><span class=lnt>424
+</span><span class=lnt>425
+</span><span class=lnt>426
+</span><span class=lnt>427
+</span><span class=lnt>428
+</span><span class=lnt>429
+</span><span class=lnt>430
+</span><span class=lnt>431
+</span><span class=lnt>432
+</span><span class=lnt>433
+</span><span class=lnt>434
+</span><span class=lnt>435
+</span><span class=lnt>436
+</span><span class=lnt>437
+</span><span class=lnt>438
+</span><span class=lnt>439
+</span><span class=lnt>440
+</span><span class=lnt>441
+</span><span class=lnt>442
+</span><span class=lnt>443
+</span><span class=lnt>444
+</span><span class=lnt>445
+</span><span class=lnt>446
+</span><span class=lnt>447
+</span><span class=lnt>448
+</span><span class=lnt>449
+</span><span class=lnt>450
+</span><span class=lnt>451
+</span><span class=lnt>452
+</span><span class=lnt>453
+</span><span class=lnt>454
+</span><span class=lnt>455
+</span><span class=lnt>456
+</span><span class=lnt>457
+</span><span class=lnt>458
+</span><span class=lnt>459
+</span><span class=lnt>460
+</span><span class=lnt>461
+</span><span class=lnt>462
+</span><span class=lnt>463
+</span><span class=lnt>464
+</span><span class=lnt>465
+</span><span class=lnt>466
+</span><span class=lnt>467
+</span><span class=lnt>468
+</span><span class=lnt>469
+</span><span class=lnt>470
+</span><span class=lnt>471
+</span><span class=lnt>472
+</span><span class=lnt>473
+</span><span class=lnt>474
+</span><span class=lnt>475
+</span><span class=lnt>476
+</span><span class=lnt>477
+</span><span class=lnt>478
+</span><span class=lnt>479
+</span><span class=lnt>480
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>[root@localhost ~]# brctl addbr br0
 [root@localhost ~]# ip link set dev br0 up
 [root@localhost ~]# qemu-kvm -m 128 -cpu host -smp 1 -name &#34;test&#34; -drive file=/images/kvm/cirros-0.3.3-i386-disk.img,if=virtio,media=disk,format=qcow2,cache=writeback -nographic -net nic -net tap,name=ifvif0.0,script=/etc/qemu-ifup
 [    0.000000] Initializing cgroup subsys cpuset
@@ -1765,119 +1484,18 @@ lo        Link encap:Local Loopback
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
 
 #
-</code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2017-02-13
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/">虚拟化</a>
-          <a href="/tags/kvm/">kvm</a>
-          <a href="/tags/xen/">xen</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2017/02/kvm-qemu-fundation-3/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">KVM虚拟化实验-两台VM互相通信</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2017/02/kvm-qemu-fundation-1/">
-            <span class="next-text nav-default">KVM虚拟化基础一</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2017-02-13 00:00:00 \u002b0000 UTC',
-        title: 'KVM虚拟化基础二',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+</code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2017-02-13</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/%E8%99%9A%E6%8B%9F%E5%8C%96/>虚拟化</a>
+<a href=/tags/kvm/>kvm</a>
+<a href=/tags/xen/>xen</a></div><nav class=post-nav><a class=prev href=/post/2017/02/kvm-qemu-fundation-3/><i class="iconfont icon-left"></i><span class="prev-text nav-default">KVM虚拟化实验-两台VM互相通信</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2017/02/kvm-qemu-fundation-1/><span class="next-text nav-default">KVM虚拟化基础一</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2017-02-13 00:00:00 \u002b0000 UTC',title:'KVM虚拟化基础二',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

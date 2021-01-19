@@ -1,432 +1,197 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>模块使用之collections - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等， 使用起来更方便。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/11/collections/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="模块使用之collections" />
-<meta property="og:description" content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
-使用起来更方便。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/11/collections/" />
-<meta property="article:published_time" content="2016-11-23T00:00:00+00:00" />
-<meta property="article:modified_time" content="2016-11-23T00:00:00+00:00" />
-<meta itemprop="name" content="模块使用之collections">
-<meta itemprop="description" content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
-使用起来更方便。">
-<meta itemprop="datePublished" content="2016-11-23T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2016-11-23T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1758">
-
-
-
-<meta itemprop="keywords" content="python," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="模块使用之collections"/>
-<meta name="twitter:description" content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
-使用起来更方便。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">模块使用之collections</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2016-11-23 </span>
-        <div class="post-category">
-            <a href="/categories/python/"> python </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-chainmap">1. ChainMap</a>
-      <ul>
-        <li><a href="#使用场景">使用场景</a></li>
-      </ul>
-    </li>
-    <li><a href="#2-counter">2. Counter</a>
-      <ul>
-        <li><a href="#使用场景-1">使用场景</a></li>
-      </ul>
-    </li>
-    <li><a href="#3-defaultdict">3. defaultdict</a>
-      <ul>
-        <li><a href="#使用场景-2">使用场景</a></li>
-        <li><a href="#自定义默认值">自定义默认值</a></li>
-      </ul>
-    </li>
-    <li><a href="#4-deque">4. deque</a>
-      <ul>
-        <li><a href="#使用场景-3">使用场景</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <p>collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
-使用起来更方便。</p>
-<h1 id="1-chainmap">1. ChainMap</h1>
-<ul>
-<li>ChainMap 是 3.3 版本新增</li>
-<li>支持所有 dict 方法</li>
-</ul>
-<p>dict-like class for creating a single view of multiple mappings.</p>
-<p>是 dict-like 容器，对 dict 进行了封装，可以连接多个mapping提供一个单独的view，使之
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>模块使用之collections - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等， 使用起来更方便。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2016/11/collections/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="模块使用之collections"><meta property="og:description" content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
+使用起来更方便。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2016/11/collections/"><meta property="article:published_time" content="2016-11-23T00:00:00+00:00"><meta property="article:modified_time" content="2016-11-23T00:00:00+00:00"><meta itemprop=name content="模块使用之collections"><meta itemprop=description content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
+使用起来更方便。"><meta itemprop=datePublished content="2016-11-23T00:00:00+00:00"><meta itemprop=dateModified content="2016-11-23T00:00:00+00:00"><meta itemprop=wordCount content="1758"><meta itemprop=keywords content="python,"><meta name=twitter:card content="summary"><meta name=twitter:title content="模块使用之collections"><meta name=twitter:description content="collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
+使用起来更方便。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>模块使用之collections</h1><div class=post-meta><span class=post-time>2016-11-23</span><div class=post-category><a href=/categories/python/>python</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-chainmap>1. ChainMap</a><ul><li><a href=#使用场景>使用场景</a></li></ul></li><li><a href=#2-counter>2. Counter</a><ul><li><a href=#使用场景-1>使用场景</a></li></ul></li><li><a href=#3-defaultdict>3. defaultdict</a><ul><li><a href=#使用场景-2>使用场景</a></li><li><a href=#自定义默认值>自定义默认值</a></li></ul></li><li><a href=#4-deque>4. deque</a><ul><li><a href=#使用场景-3>使用场景</a></li></ul></li></ul></nav></div></div><div class=post-content><p>collections 提供一些容器类型可以替代ptyhon自带的dict、tuple、list、set等，
+使用起来更方便。</p><h1 id=1-chainmap>1. ChainMap</h1><ul><li>ChainMap 是 3.3 版本新增</li><li>支持所有 dict 方法</li></ul><p>dict-like class for creating a single view of multiple mappings.</p><p>是 dict-like 容器，对 dict 进行了封装，可以连接多个mapping提供一个单独的view，使之
 使用起来就是一个dict一样。将多个mapping连接后存储在一个list中，因此对新容器访问
-是有序的,所有的增删改查操作都仅操作ChainMap容器中的第一个mapping。</p>
-<h2 id="使用场景">使用场景</h2>
-<p>如下假设 default_env 存放默认配置，custom_env 存放用户自定义的配置，我们使用
+是有序的,所有的增删改查操作都仅操作ChainMap容器中的第一个mapping。</p><h2 id=使用场景>使用场景</h2><p>如下假设 default_env 存放默认配置，custom_env 存放用户自定义的配置，我们使用
 ChainMap 将两个 dict 连接起来，custom_env 放在前面，这样如果用户提供了配置，
-我们就使用用户的配置，如果用户没提供配置就使用默认配置。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="nx">python3</span><span class="err">
-</span><span class="err"></span><span class="nx">Python</span> <span class="m">3</span>.<span class="m">5</span>.<span class="m">2</span> <span class="p">(</span><span class="nx">default</span><span class="p">,</span> <span class="nx">Sep</span> <span class="m">10</span> <span class="m">2016</span><span class="p">,</span> <span class="m">08</span>:<span class="m">21</span>:<span class="m">44</span><span class="p">)</span> <span class="err">
-</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">5</span>.<span class="m">4</span>.<span class="m">0</span> <span class="m">20160609</span>] <span class="nx">on</span> <span class="nx">linux</span><span class="err">
-</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">collections</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">default_env</span> <span class="p">=</span> {<span class="s1">&#39;pwd&#39;</span>: <span class="s1">&#39;/root&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span>: <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="s1">&#39;mod&#39;</span>: <span class="s1">&#39;755&#39;</span>}<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">custom_env</span> <span class="p">=</span> {<span class="s1">&#39;pwd&#39;</span>: <span class="s1">&#39;/home/apache&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span>: <span class="s1">&#39;apache&#39;</span><span class="p">,</span> <span class="s1">&#39;mod&#39;</span>: <span class="s1">&#39;644&#39;</span>}<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">env</span> <span class="p">=</span> <span class="nx">collections</span>.<span class="nx">ChainMap</span><span class="p">(</span><span class="nx">custom_env</span><span class="p">,</span> <span class="nx">default_env</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">可以将多个</span> <span class="nx">dict</span> <span class="nx">连接起来</span>，<span class="nx">暴露一个unit</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">print</span><span class="p">(</span><span class="nx">env</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">ChainMap</span><span class="p">(</span>{<span class="s1">&#39;mod&#39;</span>: <span class="s1">&#39;644&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span>: <span class="s1">&#39;apache&#39;</span><span class="p">,</span> <span class="s1">&#39;pwd&#39;</span>: <span class="s1">&#39;/home/apache&#39;</span>}<span class="p">,</span> {<span class="s1">&#39;mod&#39;</span>: <span class="s1">&#39;755&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span>: <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="s1">&#39;pwd&#39;</span>: <span class="s1">&#39;/root&#39;</span>}<span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">对ChainMap对象的get操作和使用dict一样</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">env</span>.<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;pwd&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="s1">&#39;/home/apache&#39;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">for</span> <span class="nx">k</span><span class="p">,</span><span class="nx">v</span> <span class="nx">in</span> <span class="nx">env</span>.<span class="nx">items</span><span class="p">()</span>:<span class="err">
-</span><span class="err"></span>...     <span class="nx">print</span> <span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>... <span class="err">
-</span><span class="err"></span><span class="nx">username</span> <span class="nx">apache</span><span class="err">
-</span><span class="err"></span><span class="nx">mod</span> <span class="m">644</span><span class="err">
-</span><span class="err"></span><span class="nx">pwd</span> <span class="sr">/home/</span><span class="nx">apache</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span>  <span class="err">
-</span><span class="err"></span># <span class="nx">新增默认配置</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">default_env</span>[<span class="s1">&#39;enabled&#39;</span>] <span class="p">=</span> <span class="nx">True</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">由于用户没有提供该配置因此获取到的是默认配置</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">env</span>.<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">True</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">如果用户定义了该配置则会获取用户的配置</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">custom_env</span>[<span class="s1">&#39;enabled&#39;</span>] <span class="p">=</span> <span class="nx">False</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">env</span>.<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">False</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">如果用户未定义</span><span class="s1">&#39;pwd&#39;</span><span class="nx">则获取到默认配置</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">del</span> <span class="nx">env</span>[<span class="s1">&#39;pwd&#39;</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">env</span>.<span class="nx">get</span><span class="p">(</span><span class="s1">&#39;pwd&#39;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="s1">&#39;/root&#39;</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="2-counter">2. Counter</h1>
-<ul>
-<li>统计hashable objects中元素的个数</li>
-<li>底层实现是 dict</li>
-<li>提供dict的接口</li>
-<li>支持 + - &amp; | 运算</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">&gt;&gt;&gt;</span> <span class="nx">c</span> <span class="p">=</span> <span class="nx">Counter</span><span class="p">()</span>                           # <span class="nx">a</span> <span class="nx">new</span><span class="p">,</span> <span class="nx">empty</span> <span class="nx">counter</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">c</span> <span class="p">=</span> <span class="nx">Counter</span><span class="p">(</span><span class="s1">&#39;gallahad&#39;</span><span class="p">)</span>                 # <span class="nx">a</span> <span class="nx">new</span> <span class="nx">counter</span> <span class="nx">from</span> <span class="nx">an</span> <span class="nx">iterable</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">c</span> <span class="p">=</span> <span class="nx">Counter</span><span class="p">(</span>{<span class="s1">&#39;red&#39;</span>: <span class="m">4</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span>: <span class="m">2</span>}<span class="p">)</span>      # <span class="nx">a</span> <span class="nx">new</span> <span class="nx">counter</span> <span class="nx">from</span> <span class="nx">a</span> <span class="nx">mapping</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">c</span> <span class="p">=</span> <span class="nx">Counter</span><span class="p">(</span><span class="nx">cats</span><span class="p">=</span><span class="m">4</span><span class="p">,</span> <span class="nx">dogs</span><span class="p">=</span><span class="m">8</span><span class="p">)</span>             # <span class="nx">a</span> <span class="nx">new</span> <span class="nx">counter</span> <span class="nx">from</span> <span class="nx">keyword</span> <span class="nx">args</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h2 id="使用场景-1">使用场景</h2>
-<p>统计一句话中出现最多的前N个单词。</p>
-<p>Counter可以很简单解决这样的问题，如下我们将句子split为list，然后送给Counter
-计算，直接用most_common方法返回前N个最多的单词。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>&#34;<span class="err">
-</span><span class="err"></span>... <span class="nx">A</span> <span class="nx">Counter</span> <span class="nx">is</span> <span class="nx">a</span> <span class="nx">dict</span> <span class="nx">subclass</span> <span class="nx">for</span> <span class="nx">counting</span> <span class="nx">hashable</span> <span class="nx">objects</span>. <span class="nx">It</span> <span class="nx">is</span> <span class="nx">an</span> <span class="nx">unordered</span> <span class="nx">collection</span> <span class="nx">where</span> <span class="nx">elements</span> <span class="nx">are</span> <span class="nx">stored</span> <span class="nx">as</span> <span class="nx">dictionary</span> <span class="nx">keys</span> <span class="nx">and</span> <span class="nx">their</span> <span class="nx">counts</span> <span class="nx">are</span> <span class="nx">stored</span> <span class="nx">as</span> <span class="nx">dictionary</span> <span class="nx">values</span>. <span class="nx">Counts</span> <span class="nx">are</span> <span class="nx">allowed</span> <span class="nx">to</span> <span class="nx">be</span> <span class="nx">any</span> <span class="nx">integer</span> <span class="nx">value</span> <span class="nx">including</span> <span class="nx">zero</span> <span class="nx">or</span> <span class="nx">negative</span> <span class="nx">counts</span>. <span class="nx">The</span> <span class="nx">Counter</span> <span class="nx">class</span> <span class="nx">is</span> <span class="nx">similar</span> <span class="nx">to</span> <span class="nx">bags</span> <span class="nx">or</span> <span class="nx">multisets</span> <span class="nx">in</span> <span class="nx">other</span> <span class="nx">languages</span>.<span class="s2">&#34;&#34;</span>&#34;<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">counter</span> <span class="p">=</span> <span class="nx">collections</span>.<span class="nx">Counter</span><span class="p">(</span><span class="nx">s</span>.<span class="nx">split</span><span class="p">())</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">list</span><span class="p">(</span><span class="nx">counter</span>.<span class="nx">elements</span><span class="p">())</span><span class="err">
-</span><span class="err"></span>[<span class="s1">&#39;counts&#39;</span><span class="p">,</span> <span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="s1">&#39;bags&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;counts.&#39;</span><span class="p">,</span> <span class="s1">&#39;be&#39;</span><span class="p">,</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="s1">&#39;similar&#39;</span><span class="p">,</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;languages.&#39;</span><span class="p">,</span> <span class="s1">&#39;counting&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;including&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">,</span> <span class="s1">&#39;The&#39;</span><span class="p">,</span> <span class="s1">&#39;It&#39;</span><span class="p">,</span> <span class="s1">&#39;unordered&#39;</span><span class="p">,</span> <span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="s1">&#39;elements&#39;</span><span class="p">,</span> <span class="s1">&#39;or&#39;</span><span class="p">,</span> <span class="s1">&#39;or&#39;</span><span class="p">,</span> <span class="s1">&#39;Counter&#39;</span><span class="p">,</span> <span class="s1">&#39;Counter&#39;</span><span class="p">,</span> <span class="s1">&#39;zero&#39;</span><span class="p">,</span> <span class="s1">&#39;multisets&#39;</span><span class="p">,</span> <span class="s1">&#39;an&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;subclass&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;values.&#39;</span><span class="p">,</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">,</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">,</span> <span class="s1">&#39;hashable&#39;</span><span class="p">,</span> <span class="s1">&#39;objects.&#39;</span><span class="p">,</span> <span class="s1">&#39;their&#39;</span><span class="p">,</span> <span class="s1">&#39;stored&#39;</span><span class="p">,</span> <span class="s1">&#39;stored&#39;</span><span class="p">,</span> <span class="s1">&#39;collection&#39;</span><span class="p">,</span> <span class="s1">&#39;allowed&#39;</span><span class="p">,</span> <span class="s1">&#39;Counts&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">counter</span>.<span class="nx">most_common</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>[<span class="p">(</span><span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span># <span class="nx">支持</span> <span class="nx">dict</span> <span class="nx">的操作</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">counter</span>[<span class="s1">&#39;dbo&#39;</span>] <span class="p">=</span> <span class="m">5</span><span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">counter</span>.<span class="nx">most_common</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>[<span class="p">(</span><span class="s1">&#39;dbo&#39;</span><span class="p">,</span> <span class="m">5</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">del</span> <span class="nx">counter</span>[<span class="s1">&#39;dbo&#39;</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">counter</span>.<span class="nx">most_common</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>[<span class="p">(</span><span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="m">2</span><span class="p">)</span>]<span class="err">
-</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="3-defaultdict">3. defaultdict</h1>
-<p>通常一个dict就是一个key对应一个value的映射，如果想一个key对应多个value，那
+我们就使用用户的配置，如果用户没提供配置就使用默认配置。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ <span class=nx>python3</span><span class=err>
+</span><span class=err></span><span class=nx>Python</span> <span class=m>3</span>.<span class=m>5</span>.<span class=m>2</span> <span class=p>(</span><span class=nx>default</span><span class=p>,</span> <span class=nx>Sep</span> <span class=m>10</span> <span class=m>2016</span><span class=p>,</span> <span class=m>08</span>:<span class=m>21</span>:<span class=m>44</span><span class=p>)</span> <span class=err>
+</span><span class=err></span>[<span class=nx>GCC</span> <span class=m>5</span>.<span class=m>4</span>.<span class=m>0</span> <span class=m>20160609</span>] <span class=nx>on</span> <span class=nx>linux</span><span class=err>
+</span><span class=err></span><span class=nx>Type</span> <span class=s2>&#34;help&#34;</span><span class=p>,</span> <span class=s2>&#34;copyright&#34;</span><span class=p>,</span> <span class=s2>&#34;credits&#34;</span> <span class=nx>or</span> <span class=s2>&#34;license&#34;</span> <span class=nx>for</span> <span class=nx>more</span> <span class=nx>information</span>.<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>import</span> <span class=nx>collections</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>default_env</span> <span class=p>=</span> {<span class=s1>&#39;pwd&#39;</span>: <span class=s1>&#39;/root&#39;</span><span class=p>,</span> <span class=s1>&#39;username&#39;</span>: <span class=s1>&#39;root&#39;</span><span class=p>,</span> <span class=s1>&#39;mod&#39;</span>: <span class=s1>&#39;755&#39;</span>}<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>custom_env</span> <span class=p>=</span> {<span class=s1>&#39;pwd&#39;</span>: <span class=s1>&#39;/home/apache&#39;</span><span class=p>,</span> <span class=s1>&#39;username&#39;</span>: <span class=s1>&#39;apache&#39;</span><span class=p>,</span> <span class=s1>&#39;mod&#39;</span>: <span class=s1>&#39;644&#39;</span>}<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>env</span> <span class=p>=</span> <span class=nx>collections</span>.<span class=nx>ChainMap</span><span class=p>(</span><span class=nx>custom_env</span><span class=p>,</span> <span class=nx>default_env</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>可以将多个</span> <span class=nx>dict</span> <span class=nx>连接起来</span>，<span class=nx>暴露一个unit</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>print</span><span class=p>(</span><span class=nx>env</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>ChainMap</span><span class=p>(</span>{<span class=s1>&#39;mod&#39;</span>: <span class=s1>&#39;644&#39;</span><span class=p>,</span> <span class=s1>&#39;username&#39;</span>: <span class=s1>&#39;apache&#39;</span><span class=p>,</span> <span class=s1>&#39;pwd&#39;</span>: <span class=s1>&#39;/home/apache&#39;</span>}<span class=p>,</span> {<span class=s1>&#39;mod&#39;</span>: <span class=s1>&#39;755&#39;</span><span class=p>,</span> <span class=s1>&#39;username&#39;</span>: <span class=s1>&#39;root&#39;</span><span class=p>,</span> <span class=s1>&#39;pwd&#39;</span>: <span class=s1>&#39;/root&#39;</span>}<span class=p>)</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>对ChainMap对象的get操作和使用dict一样</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>env</span>.<span class=nx>get</span><span class=p>(</span><span class=s1>&#39;pwd&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=s1>&#39;/home/apache&#39;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>for</span> <span class=nx>k</span><span class=p>,</span><span class=nx>v</span> <span class=nx>in</span> <span class=nx>env</span>.<span class=nx>items</span><span class=p>()</span>:<span class=err>
+</span><span class=err></span>...     <span class=nx>print</span> <span class=p>(</span><span class=nx>k</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span><span class=err>
+</span><span class=err></span>... <span class=err>
+</span><span class=err></span><span class=nx>username</span> <span class=nx>apache</span><span class=err>
+</span><span class=err></span><span class=nx>mod</span> <span class=m>644</span><span class=err>
+</span><span class=err></span><span class=nx>pwd</span> <span class=sr>/home/</span><span class=nx>apache</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span>  <span class=err>
+</span><span class=err></span># <span class=nx>新增默认配置</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>default_env</span>[<span class=s1>&#39;enabled&#39;</span>] <span class=p>=</span> <span class=nx>True</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>由于用户没有提供该配置因此获取到的是默认配置</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>env</span>.<span class=nx>get</span><span class=p>(</span><span class=s1>&#39;enabled&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>True</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>如果用户定义了该配置则会获取用户的配置</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>custom_env</span>[<span class=s1>&#39;enabled&#39;</span>] <span class=p>=</span> <span class=nx>False</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>env</span>.<span class=nx>get</span><span class=p>(</span><span class=s1>&#39;enabled&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>False</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>如果用户未定义</span><span class=s1>&#39;pwd&#39;</span><span class=nx>则获取到默认配置</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>del</span> <span class=nx>env</span>[<span class=s1>&#39;pwd&#39;</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>env</span>.<span class=nx>get</span><span class=p>(</span><span class=s1>&#39;pwd&#39;</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=s1>&#39;/root&#39;</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=2-counter>2. Counter</h1><ul><li>统计hashable objects中元素的个数</li><li>底层实现是 dict</li><li>提供dict的接口</li><li>支持 + - & | 运算</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>&gt;&gt;&gt;</span> <span class=nx>c</span> <span class=p>=</span> <span class=nx>Counter</span><span class=p>()</span>                           # <span class=nx>a</span> <span class=nx>new</span><span class=p>,</span> <span class=nx>empty</span> <span class=nx>counter</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>c</span> <span class=p>=</span> <span class=nx>Counter</span><span class=p>(</span><span class=s1>&#39;gallahad&#39;</span><span class=p>)</span>                 # <span class=nx>a</span> <span class=nx>new</span> <span class=nx>counter</span> <span class=nx>from</span> <span class=nx>an</span> <span class=nx>iterable</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>c</span> <span class=p>=</span> <span class=nx>Counter</span><span class=p>(</span>{<span class=s1>&#39;red&#39;</span>: <span class=m>4</span><span class=p>,</span> <span class=s1>&#39;blue&#39;</span>: <span class=m>2</span>}<span class=p>)</span>      # <span class=nx>a</span> <span class=nx>new</span> <span class=nx>counter</span> <span class=nx>from</span> <span class=nx>a</span> <span class=nx>mapping</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>c</span> <span class=p>=</span> <span class=nx>Counter</span><span class=p>(</span><span class=nx>cats</span><span class=p>=</span><span class=m>4</span><span class=p>,</span> <span class=nx>dogs</span><span class=p>=</span><span class=m>8</span><span class=p>)</span>             # <span class=nx>a</span> <span class=nx>new</span> <span class=nx>counter</span> <span class=nx>from</span> <span class=nx>keyword</span> <span class=nx>args</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h2 id=使用场景-1>使用场景</h2><p>统计一句话中出现最多的前N个单词。</p><p>Counter可以很简单解决这样的问题，如下我们将句子split为list，然后送给Counter
+计算，直接用most_common方法返回前N个最多的单词。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>&gt;&gt;&gt;</span> <span class=nx>s</span> <span class=p>=</span> <span class=s2>&#34;&#34;</span>&#34;<span class=err>
+</span><span class=err></span>... <span class=nx>A</span> <span class=nx>Counter</span> <span class=nx>is</span> <span class=nx>a</span> <span class=nx>dict</span> <span class=nx>subclass</span> <span class=nx>for</span> <span class=nx>counting</span> <span class=nx>hashable</span> <span class=nx>objects</span>. <span class=nx>It</span> <span class=nx>is</span> <span class=nx>an</span> <span class=nx>unordered</span> <span class=nx>collection</span> <span class=nx>where</span> <span class=nx>elements</span> <span class=nx>are</span> <span class=nx>stored</span> <span class=nx>as</span> <span class=nx>dictionary</span> <span class=nx>keys</span> <span class=nx>and</span> <span class=nx>their</span> <span class=nx>counts</span> <span class=nx>are</span> <span class=nx>stored</span> <span class=nx>as</span> <span class=nx>dictionary</span> <span class=nx>values</span>. <span class=nx>Counts</span> <span class=nx>are</span> <span class=nx>allowed</span> <span class=nx>to</span> <span class=nx>be</span> <span class=nx>any</span> <span class=nx>integer</span> <span class=nx>value</span> <span class=nx>including</span> <span class=nx>zero</span> <span class=nx>or</span> <span class=nx>negative</span> <span class=nx>counts</span>. <span class=nx>The</span> <span class=nx>Counter</span> <span class=nx>class</span> <span class=nx>is</span> <span class=nx>similar</span> <span class=nx>to</span> <span class=nx>bags</span> <span class=nx>or</span> <span class=nx>multisets</span> <span class=nx>in</span> <span class=nx>other</span> <span class=nx>languages</span>.<span class=s2>&#34;&#34;</span>&#34;<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>counter</span> <span class=p>=</span> <span class=nx>collections</span>.<span class=nx>Counter</span><span class=p>(</span><span class=nx>s</span>.<span class=nx>split</span><span class=p>())</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>list</span><span class=p>(</span><span class=nx>counter</span>.<span class=nx>elements</span><span class=p>())</span><span class=err>
+</span><span class=err></span>[<span class=s1>&#39;counts&#39;</span><span class=p>,</span> <span class=s1>&#39;as&#39;</span><span class=p>,</span> <span class=s1>&#39;as&#39;</span><span class=p>,</span> <span class=s1>&#39;A&#39;</span><span class=p>,</span> <span class=s1>&#39;dict&#39;</span><span class=p>,</span> <span class=s1>&#39;keys&#39;</span><span class=p>,</span> <span class=s1>&#39;bags&#39;</span><span class=p>,</span> <span class=s1>&#39;value&#39;</span><span class=p>,</span> <span class=s1>&#39;counts.&#39;</span><span class=p>,</span> <span class=s1>&#39;be&#39;</span><span class=p>,</span> <span class=s1>&#39;negative&#39;</span><span class=p>,</span> <span class=s1>&#39;similar&#39;</span><span class=p>,</span> <span class=s1>&#39;any&#39;</span><span class=p>,</span> <span class=s1>&#39;languages.&#39;</span><span class=p>,</span> <span class=s1>&#39;counting&#39;</span><span class=p>,</span> <span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=s1>&#39;including&#39;</span><span class=p>,</span> <span class=s1>&#39;other&#39;</span><span class=p>,</span> <span class=s1>&#39;The&#39;</span><span class=p>,</span> <span class=s1>&#39;It&#39;</span><span class=p>,</span> <span class=s1>&#39;unordered&#39;</span><span class=p>,</span> <span class=s1>&#39;where&#39;</span><span class=p>,</span> <span class=s1>&#39;elements&#39;</span><span class=p>,</span> <span class=s1>&#39;or&#39;</span><span class=p>,</span> <span class=s1>&#39;or&#39;</span><span class=p>,</span> <span class=s1>&#39;Counter&#39;</span><span class=p>,</span> <span class=s1>&#39;Counter&#39;</span><span class=p>,</span> <span class=s1>&#39;zero&#39;</span><span class=p>,</span> <span class=s1>&#39;multisets&#39;</span><span class=p>,</span> <span class=s1>&#39;an&#39;</span><span class=p>,</span> <span class=s1>&#39;for&#39;</span><span class=p>,</span> <span class=s1>&#39;subclass&#39;</span><span class=p>,</span> <span class=s1>&#39;and&#39;</span><span class=p>,</span> <span class=s1>&#39;values.&#39;</span><span class=p>,</span> <span class=s1>&#39;integer&#39;</span><span class=p>,</span> <span class=s1>&#39;in&#39;</span><span class=p>,</span> <span class=s1>&#39;to&#39;</span><span class=p>,</span> <span class=s1>&#39;to&#39;</span><span class=p>,</span> <span class=s1>&#39;a&#39;</span><span class=p>,</span> <span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=s1>&#39;dictionary&#39;</span><span class=p>,</span> <span class=s1>&#39;dictionary&#39;</span><span class=p>,</span> <span class=s1>&#39;hashable&#39;</span><span class=p>,</span> <span class=s1>&#39;objects.&#39;</span><span class=p>,</span> <span class=s1>&#39;their&#39;</span><span class=p>,</span> <span class=s1>&#39;stored&#39;</span><span class=p>,</span> <span class=s1>&#39;stored&#39;</span><span class=p>,</span> <span class=s1>&#39;collection&#39;</span><span class=p>,</span> <span class=s1>&#39;allowed&#39;</span><span class=p>,</span> <span class=s1>&#39;Counts&#39;</span><span class=p>,</span> <span class=s1>&#39;class&#39;</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>counter</span>.<span class=nx>most_common</span><span class=p>(</span><span class=m>3</span><span class=p>)</span><span class=err>
+</span><span class=err></span>[<span class=p>(</span><span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;as&#39;</span><span class=p>,</span> <span class=m>2</span><span class=p>)</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span># <span class=nx>支持</span> <span class=nx>dict</span> <span class=nx>的操作</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>counter</span>[<span class=s1>&#39;dbo&#39;</span>] <span class=p>=</span> <span class=m>5</span><span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>counter</span>.<span class=nx>most_common</span><span class=p>(</span><span class=m>3</span><span class=p>)</span><span class=err>
+</span><span class=err></span>[<span class=p>(</span><span class=s1>&#39;dbo&#39;</span><span class=p>,</span> <span class=m>5</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>)</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>del</span> <span class=nx>counter</span>[<span class=s1>&#39;dbo&#39;</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=nx>counter</span>.<span class=nx>most_common</span><span class=p>(</span><span class=m>3</span><span class=p>)</span><span class=err>
+</span><span class=err></span>[<span class=p>(</span><span class=s1>&#39;are&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;is&#39;</span><span class=p>,</span> <span class=m>3</span><span class=p>),</span> <span class=p>(</span><span class=s1>&#39;as&#39;</span><span class=p>,</span> <span class=m>2</span><span class=p>)</span>]<span class=err>
+</span><span class=err></span><span class=p>&gt;&gt;&gt;</span> <span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=3-defaultdict>3. defaultdict</h1><p>通常一个dict就是一个key对应一个value的映射，如果想一个key对应多个value，那
 么需要将这多个value放到另外的容器中比如list、dict、set、tuple等，例如如果
-有序就是list/tuple，如果消除重启就是set/dict等。</p>
-<p>The defaultdict is a subclass of Python’s
+有序就是list/tuple，如果消除重启就是set/dict等。</p><p>The defaultdict is a subclass of Python’s
 dict that accepts a default_factory as its primary argument. The default_factory is usually a Python
-type, such as int or list, but you can also use a function or a lambda too.</p>
-<ul>
-<li>subclass of Python’s dict</li>
-<li>自动初始化key刚开始的值</li>
-<li>指定key对应的多个value要使用的容器类型</li>
-<li>支持自定义默认值</li>
-</ul>
-<h2 id="使用场景-2">使用场景</h2>
-<p>常用的场景如下，第一种是自己实现，第二种是使用defaultdict，可以看到简单了许多。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+type, such as int or list, but you can also use a function or a lambda too.</p><ul><li>subclass of Python’s dict</li><li>自动初始化key刚开始的值</li><li>指定key对应的多个value要使用的容器类型</li><li>支持自定义默认值</li></ul><h2 id=使用场景-2>使用场景</h2><p>常用的场景如下，第一种是自己实现，第二种是使用defaultdict，可以看到简单了许多。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=kn>from</span> <span class=nn>collections</span> <span class=kn>import</span> <span class=n>defaultdict</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class=n>d</span> <span class=o>=</span> <span class=p>{}</span>
+<span class=k>for</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span> <span class=ow>in</span> <span class=n>pairs</span><span class=p>:</span>
+    <span class=k>if</span> <span class=n>key</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>d</span><span class=p>:</span>
+        <span class=n>d</span><span class=p>[</span><span class=n>key</span><span class=p>]</span> <span class=o>=</span> <span class=p>[]</span>
+    <span class=n>d</span><span class=p>[</span><span class=n>key</span><span class=p>]</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
-    <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</code></pre></td></tr></table>
-</div>
-</div><h2 id="自定义默认值">自定义默认值</h2>
-<p>支持自定义默认值。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt;&gt;&gt; from collections import defaultdict
+<span class=n>d</span> <span class=o>=</span> <span class=n>defaultdict</span><span class=p>(</span><span class=nb>list</span><span class=p>)</span>
+<span class=k>for</span> <span class=n>key</span><span class=p>,</span> <span class=n>value</span> <span class=ow>in</span> <span class=n>pairs</span><span class=p>:</span>
+    <span class=n>d</span><span class=p>[</span><span class=n>key</span><span class=p>]</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>value</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><h2 id=自定义默认值>自定义默认值</h2><p>支持自定义默认值。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>&gt;&gt;&gt; from collections import defaultdict
 &gt;&gt;&gt; 
 &gt;&gt;&gt; animal = defaultdict(lambda: &#34;Monkey&#34;)
 &gt;&gt;&gt; 
@@ -438,294 +203,173 @@ Monkey
 &gt;&gt;&gt; animal
 defaultdict(&lt;function &lt;lambda&gt; at 0x7f623e39c158&gt;, {&#39;Sam&#39;: &#39;Tiger&#39;, &#39;Nick&#39;: &#39;Monkey&#39;})
 &gt;&gt;&gt; 
-</code></pre></td></tr></table>
-</div>
-</div><h1 id="4-deque">4. deque</h1>
-<ul>
-<li>double-ended queue</li>
-<li>a replacement container for the Python list</li>
-</ul>
-<p>使用deque(maxlen=N) 构造函数会新建一个固定大小的队列。当新的元素加入并
-且这个队列已满的时候，最老的元素会自动被移除掉。</p>
-<h2 id="使用场景-3">使用场景</h2>
-<p>保留最后N 个元素，比如可以基于 deque 实现简单的tail命令。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
-<span class="n">deque</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
-<span class="n">deque</span><span class="p">([</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">],</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
-<span class="n">deque</span><span class="p">([</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> 
-<span class="o">&gt;&gt;&gt;</span> 
-</code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="nx">cat</span> <span class="nx">tail</span>.<span class="nx">py</span> <span class="err">
-</span><span class="err"></span>#<span class="p">!</span><span class="sr">/usr/</span><span class="nx">bin</span>/<span class="nx">python</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">import</span> <span class="nx">sys</span><span class="err">
-</span><span class="err"></span><span class="nx">import</span> <span class="nx">argparse</span><span class="err">
-</span><span class="err"></span><span class="nx">from</span> <span class="nx">collections</span> <span class="nx">import</span> <span class="nx">deque</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">def</span> <span class="nx">positive_int</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>:<span class="err">
-</span><span class="err"></span>    <span class="nx">ivalue</span> <span class="p">=</span> <span class="nx">int</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>    <span class="k">if</span> <span class="nx">ivalue</span> <span class="p">&lt;=</span> <span class="m">0</span>:<span class="err">
-</span><span class="err"></span>         <span class="nx">raise</span> <span class="nx">argparse</span>.<span class="nx">ArgumentTypeError</span><span class="p">(</span><span class="s2">&#34;%s is an invalid positive int value&#34;</span> % <span class="nx">value</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">ivalue</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">def</span> <span class="nx">get_last</span><span class="p">()</span>:<span class="err">
-</span><span class="err"></span><span class="c">    &#34;&#34;&#34;Returns the last n lines from the file.&#34;&#34;&#34;</span><span class="err">
-</span><span class="err"></span>    <span class="nx">parser</span> <span class="p">=</span> <span class="nx">argparse</span>.<span class="nx">ArgumentParser</span><span class="p">(</span><span class="err">
-</span><span class="err"></span>        <span class="nx">description</span><span class="p">=</span><span class="s2">&#34;A command like tail on Linux.&#34;</span><span class="p">,</span><span class="err">
-</span><span class="err"></span>        <span class="nx">epilog</span><span class="p">=</span><span class="s2">&#34;&#34;</span>&#34;<span class="nx">Example</span>:<span class="err">
-</span><span class="err"></span>                    ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="nx">FILENAME</span> <span class="p">-</span><span class="nx">n</span> <span class="nx">N</span><span class="err">
-</span><span class="err"></span><span class="c">               &#34;&#34;&#34;</span><span class="err">
-</span><span class="err"></span>    <span class="p">)</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span>    <span class="nx">parser</span>.<span class="nx">add_argument</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="nx">help</span><span class="p">=</span><span class="s2">&#34;Filename&#34;</span><span class="p">,</span> <span class="nx">action</span><span class="p">=</span><span class="s2">&#34;store&#34;</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>    <span class="nx">parser</span>.<span class="nx">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="nx">help</span><span class="p">=</span><span class="s2">&#34;Number (default is 5)&#34;</span><span class="p">,</span> <span class="nx">type</span><span class="p">=</span><span class="nx">positive_int</span><span class="p">,</span> <span class="nx">default</span><span class="p">=</span><span class="m">5</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>    <span class="nx">args</span> <span class="p">=</span> <span class="nx">parser</span>.<span class="nx">parse_args</span><span class="p">()</span><span class="err">
-</span><span class="err"></span>    <span class="nx">filename</span> <span class="p">=</span> <span class="nx">args</span>.<span class="nx">filename</span><span class="err">
-</span><span class="err"></span>    <span class="nx">n</span> <span class="p">=</span> <span class="nx">args</span>.<span class="nx">n</span><span class="err">
-</span><span class="err"></span>    <span class="nx">try</span>:<span class="err">
-</span><span class="err"></span>        <span class="nx">with</span> <span class="nx">open</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span> <span class="nx">as</span> <span class="nx">f</span>:<span class="err">
-</span><span class="err"></span>            <span class="nx">lines</span> <span class="p">=</span> <span class="nx">deque</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>        <span class="nx">for</span> <span class="nx">line</span> <span class="nx">in</span> <span class="nx">lines</span>:<span class="err">
-</span><span class="err"></span>            <span class="nx">print</span><span class="p">(</span><span class="nx">line</span><span class="p">),</span><span class="err">
-</span><span class="err"></span>    <span class="nx">except</span> <span class="nx">OSError</span>:<span class="err">
-</span><span class="err"></span>        <span class="nx">print</span><span class="p">(</span><span class="s2">&#34;Error opening file: {}&#34;</span>.<span class="nx">format</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span><span class="err">
-</span><span class="err"></span>        <span class="nx">raise</span><span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="k">if</span> <span class="nx">__name__</span> <span class="p">==</span> <span class="s1">&#39;__main__&#39;</span>:<span class="err">
-</span><span class="err"></span>    <span class="nx">get_last</span><span class="p">()</span><span class="err">
-</span><span class="err"></span><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="err">
-</span><span class="err"></span><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="nx">tail</span>.<span class="nx">py</span> <span class="err">
-</span><span class="err"></span>        <span class="nx">raise</span><span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="k">if</span> <span class="nx">__name__</span> <span class="p">==</span> <span class="s1">&#39;__main__&#39;</span>:<span class="err">
-</span><span class="err"></span>    <span class="nx">get_last</span><span class="p">()</span><span class="err">
-</span><span class="err"></span><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="err">
-</span><span class="err"></span><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="m">10</span><span class="err">
-</span><span class="err"></span>            <span class="nx">lines</span> <span class="p">=</span> <span class="nx">deque</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>        <span class="nx">for</span> <span class="nx">line</span> <span class="nx">in</span> <span class="nx">lines</span>:<span class="err">
-</span><span class="err"></span>            <span class="nx">print</span><span class="p">(</span><span class="nx">line</span><span class="p">),</span><span class="err">
-</span><span class="err"></span>    <span class="nx">except</span> <span class="nx">OSError</span>:<span class="err">
-</span><span class="err"></span>        <span class="nx">print</span><span class="p">(</span><span class="s2">&#34;Error opening file: {}&#34;</span>.<span class="nx">format</span><span class="p">(</span><span class="nx">filename</span><span class="p">))</span><span class="err">
-</span><span class="err"></span>        <span class="nx">raise</span><span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="k">if</span> <span class="nx">__name__</span> <span class="p">==</span> <span class="s1">&#39;__main__&#39;</span>:<span class="err">
-</span><span class="err"></span>    <span class="nx">get_last</span><span class="p">()</span><span class="err">
-</span><span class="err"></span><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2016-11-23
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/python/">python</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2016/11/ubuntu-install-jekyll/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Ubuntu安装jekyll</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2016/10/argparse/">
-            <span class="next-text nav-default">模块使用之argparse</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2016-11-23 00:00:00 \u002b0000 UTC',
-        title: '模块使用之collections',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+</code></pre></td></tr></table></div></div><h1 id=4-deque>4. deque</h1><ul><li>double-ended queue</li><li>a replacement container for the Python list</li></ul><p>使用deque(maxlen=N) 构造函数会新建一个固定大小的队列。当新的元素加入并
+且这个队列已满的时候，最老的元素会自动被移除掉。</p><h2 id=使用场景-3>使用场景</h2><p>保留最后N 个元素，比如可以基于 deque 实现简单的tail命令。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-python data-lang=python><span class=o>&gt;&gt;&gt;</span> <span class=n>q</span> <span class=o>=</span> <span class=n>collections</span><span class=o>.</span><span class=n>deque</span><span class=p>(</span><span class=n>maxlen</span><span class=o>=</span><span class=mi>3</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=s1>&#39;a&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=s1>&#39;b&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=s1>&#39;c&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span>
+<span class=n>deque</span><span class=p>([</span><span class=s1>&#39;a&#39;</span><span class=p>,</span> <span class=s1>&#39;b&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>],</span> <span class=n>maxlen</span><span class=o>=</span><span class=mi>3</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=s1>&#39;d&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span>
+<span class=n>deque</span><span class=p>([</span><span class=s1>&#39;b&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>,</span> <span class=s1>&#39;d&#39;</span><span class=p>],</span> <span class=n>maxlen</span><span class=o>=</span><span class=mi>3</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span><span class=o>.</span><span class=n>appendleft</span><span class=p>(</span><span class=s1>&#39;e&#39;</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> <span class=n>q</span>
+<span class=n>deque</span><span class=p>([</span><span class=s1>&#39;e&#39;</span><span class=p>,</span> <span class=s1>&#39;b&#39;</span><span class=p>,</span> <span class=s1>&#39;c&#39;</span><span class=p>],</span> <span class=n>maxlen</span><span class=o>=</span><span class=mi>3</span><span class=p>)</span>
+<span class=o>&gt;&gt;&gt;</span> 
+<span class=o>&gt;&gt;&gt;</span> 
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ <span class=nx>cat</span> <span class=nx>tail</span>.<span class=nx>py</span> <span class=err>
+</span><span class=err></span>#<span class=p>!</span><span class=sr>/usr/</span><span class=nx>bin</span>/<span class=nx>python</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>import</span> <span class=nx>sys</span><span class=err>
+</span><span class=err></span><span class=nx>import</span> <span class=nx>argparse</span><span class=err>
+</span><span class=err></span><span class=nx>from</span> <span class=nx>collections</span> <span class=nx>import</span> <span class=nx>deque</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>def</span> <span class=nx>positive_int</span><span class=p>(</span><span class=nx>value</span><span class=p>)</span>:<span class=err>
+</span><span class=err></span>    <span class=nx>ivalue</span> <span class=p>=</span> <span class=nx>int</span><span class=p>(</span><span class=nx>value</span><span class=p>)</span><span class=err>
+</span><span class=err></span>    <span class=k>if</span> <span class=nx>ivalue</span> <span class=p>&lt;=</span> <span class=m>0</span>:<span class=err>
+</span><span class=err></span>         <span class=nx>raise</span> <span class=nx>argparse</span>.<span class=nx>ArgumentTypeError</span><span class=p>(</span><span class=s2>&#34;%s is an invalid positive int value&#34;</span> % <span class=nx>value</span><span class=p>)</span><span class=err>
+</span><span class=err></span>    <span class=nx>return</span> <span class=nx>ivalue</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>def</span> <span class=nx>get_last</span><span class=p>()</span>:<span class=err>
+</span><span class=err></span><span class=c>    &#34;&#34;&#34;Returns the last n lines from the file.&#34;&#34;&#34;</span><span class=err>
+</span><span class=err></span>    <span class=nx>parser</span> <span class=p>=</span> <span class=nx>argparse</span>.<span class=nx>ArgumentParser</span><span class=p>(</span><span class=err>
+</span><span class=err></span>        <span class=nx>description</span><span class=p>=</span><span class=s2>&#34;A command like tail on Linux.&#34;</span><span class=p>,</span><span class=err>
+</span><span class=err></span>        <span class=nx>epilog</span><span class=p>=</span><span class=s2>&#34;&#34;</span>&#34;<span class=nx>Example</span>:<span class=err>
+</span><span class=err></span>                    ./<span class=nx>tail</span>.<span class=nx>py</span> <span class=nx>FILENAME</span> <span class=p>-</span><span class=nx>n</span> <span class=nx>N</span><span class=err>
+</span><span class=err></span><span class=c>               &#34;&#34;&#34;</span><span class=err>
+</span><span class=err></span>    <span class=p>)</span><span class=err>
+</span><span class=err>
+</span><span class=err></span>    <span class=nx>parser</span>.<span class=nx>add_argument</span><span class=p>(</span><span class=s1>&#39;filename&#39;</span><span class=p>,</span> <span class=nx>help</span><span class=p>=</span><span class=s2>&#34;Filename&#34;</span><span class=p>,</span> <span class=nx>action</span><span class=p>=</span><span class=s2>&#34;store&#34;</span><span class=p>)</span><span class=err>
+</span><span class=err></span>    <span class=nx>parser</span>.<span class=nx>add_argument</span><span class=p>(</span><span class=s1>&#39;-n&#39;</span><span class=p>,</span> <span class=nx>help</span><span class=p>=</span><span class=s2>&#34;Number (default is 5)&#34;</span><span class=p>,</span> <span class=nx>type</span><span class=p>=</span><span class=nx>positive_int</span><span class=p>,</span> <span class=nx>default</span><span class=p>=</span><span class=m>5</span><span class=p>)</span><span class=err>
+</span><span class=err></span>    <span class=nx>args</span> <span class=p>=</span> <span class=nx>parser</span>.<span class=nx>parse_args</span><span class=p>()</span><span class=err>
+</span><span class=err></span>    <span class=nx>filename</span> <span class=p>=</span> <span class=nx>args</span>.<span class=nx>filename</span><span class=err>
+</span><span class=err></span>    <span class=nx>n</span> <span class=p>=</span> <span class=nx>args</span>.<span class=nx>n</span><span class=err>
+</span><span class=err></span>    <span class=nx>try</span>:<span class=err>
+</span><span class=err></span>        <span class=nx>with</span> <span class=nx>open</span><span class=p>(</span><span class=nx>filename</span><span class=p>)</span> <span class=nx>as</span> <span class=nx>f</span>:<span class=err>
+</span><span class=err></span>            <span class=nx>lines</span> <span class=p>=</span> <span class=nx>deque</span><span class=p>(</span><span class=nx>f</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span><span class=err>
+</span><span class=err></span>        <span class=nx>for</span> <span class=nx>line</span> <span class=nx>in</span> <span class=nx>lines</span>:<span class=err>
+</span><span class=err></span>            <span class=nx>print</span><span class=p>(</span><span class=nx>line</span><span class=p>),</span><span class=err>
+</span><span class=err></span>    <span class=nx>except</span> <span class=nx>OSError</span>:<span class=err>
+</span><span class=err></span>        <span class=nx>print</span><span class=p>(</span><span class=s2>&#34;Error opening file: {}&#34;</span>.<span class=nx>format</span><span class=p>(</span><span class=nx>filename</span><span class=p>))</span><span class=err>
+</span><span class=err></span>        <span class=nx>raise</span><span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=k>if</span> <span class=nx>__name__</span> <span class=p>==</span> <span class=s1>&#39;__main__&#39;</span>:<span class=err>
+</span><span class=err></span>    <span class=nx>get_last</span><span class=p>()</span><span class=err>
+</span><span class=err></span><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ <span class=err>
+</span><span class=err></span><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ ./<span class=nx>tail</span>.<span class=nx>py</span> <span class=nx>tail</span>.<span class=nx>py</span> <span class=err>
+</span><span class=err></span>        <span class=nx>raise</span><span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=k>if</span> <span class=nx>__name__</span> <span class=p>==</span> <span class=s1>&#39;__main__&#39;</span>:<span class=err>
+</span><span class=err></span>    <span class=nx>get_last</span><span class=p>()</span><span class=err>
+</span><span class=err></span><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ <span class=err>
+</span><span class=err></span><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ ./<span class=nx>tail</span>.<span class=nx>py</span> <span class=nx>tail</span>.<span class=nx>py</span> <span class=p>-</span><span class=nx>n</span> <span class=m>10</span><span class=err>
+</span><span class=err></span>            <span class=nx>lines</span> <span class=p>=</span> <span class=nx>deque</span><span class=p>(</span><span class=nx>f</span><span class=p>,</span> <span class=nx>n</span><span class=p>)</span><span class=err>
+</span><span class=err></span>        <span class=nx>for</span> <span class=nx>line</span> <span class=nx>in</span> <span class=nx>lines</span>:<span class=err>
+</span><span class=err></span>            <span class=nx>print</span><span class=p>(</span><span class=nx>line</span><span class=p>),</span><span class=err>
+</span><span class=err></span>    <span class=nx>except</span> <span class=nx>OSError</span>:<span class=err>
+</span><span class=err></span>        <span class=nx>print</span><span class=p>(</span><span class=s2>&#34;Error opening file: {}&#34;</span>.<span class=nx>format</span><span class=p>(</span><span class=nx>filename</span><span class=p>))</span><span class=err>
+</span><span class=err></span>        <span class=nx>raise</span><span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=k>if</span> <span class=nx>__name__</span> <span class=p>==</span> <span class=s1>&#39;__main__&#39;</span>:<span class=err>
+</span><span class=err></span>    <span class=nx>get_last</span><span class=p>()</span><span class=err>
+</span><span class=err></span><span class=nx>dbo</span>@<span class=nx>dbo</span><span class=p>-</span><span class=nx>pc</span>:<span class=p>~</span>$ <span class=err>
+</span></code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2016-11-23</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/python/>python</a></div><nav class=post-nav><a class=prev href=/post/2016/11/ubuntu-install-jekyll/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Ubuntu安装jekyll</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2016/10/argparse/><span class="next-text nav-default">模块使用之argparse</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2016-11-23 00:00:00 \u002b0000 UTC',title:'模块使用之collections',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

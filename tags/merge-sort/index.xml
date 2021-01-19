@@ -1,21 +1,2 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>merge-sort on 南寨小子</title>
-    <link>https://kangxiaoning.github.io/tags/merge-sort/</link>
-    <description>Recent content in merge-sort on 南寨小子</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Sun, 10 Mar 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/merge-sort/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Merge Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019/03/merge-sort/</link>
-      <pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2019/03/merge-sort/</guid>
-      <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
-&lt;p&gt;如下通过伪代码和实际实现来理解 &lt;code&gt;merge sort&lt;/code&gt;。&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>merge-sort on 南寨小子</title><link>https://kangxiaoning.github.io/tags/merge-sort/</link><description>Recent content in merge-sort on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 10 Mar 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/merge-sort/index.xml" rel="self" type="application/rss+xml"/><item><title>Merge Sort</title><link>https://kangxiaoning.github.io/post/2019/03/merge-sort/</link><pubDate>Sun, 10 Mar 2019 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2019/03/merge-sort/</guid><description>&lt;h2 id="11-实现原理">1.1 实现原理&lt;/h2>
+&lt;p>如下通过伪代码和实际实现来理解 &lt;code>merge sort&lt;/code>。&lt;/p></description></item></channel></rss>

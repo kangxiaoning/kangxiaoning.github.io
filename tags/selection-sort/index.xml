@@ -1,27 +1,8 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>selection-sort on 南寨小子</title>
-    <link>https://kangxiaoning.github.io/tags/selection-sort/</link>
-    <description>Recent content in selection-sort on 南寨小子</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Wed, 27 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/selection-sort/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Selection Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019/02/selection-sort/</link>
-      <pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2019/02/selection-sort/</guid>
-      <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
-&lt;p&gt;假设从小到大排序。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;遍历数组，获取每个位置的索引 i&lt;/li&gt;
-&lt;li&gt;在[i, arr_length)范围寻找最小元素的索引 j，并赋值给 min_index&lt;/li&gt;
-&lt;li&gt;将 i 位置和 min_index 位置的元素交换&lt;/li&gt;
-&lt;li&gt;最终每个位置都是排序后的元素&lt;/li&gt;
-&lt;/ol&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>selection-sort on 南寨小子</title><link>https://kangxiaoning.github.io/tags/selection-sort/</link><description>Recent content in selection-sort on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 27 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/selection-sort/index.xml" rel="self" type="application/rss+xml"/><item><title>Selection Sort</title><link>https://kangxiaoning.github.io/post/2019/02/selection-sort/</link><pubDate>Wed, 27 Feb 2019 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2019/02/selection-sort/</guid><description>&lt;h2 id="11-实现原理">1.1 实现原理&lt;/h2>
+&lt;p>假设从小到大排序。&lt;/p>
+&lt;ol>
+&lt;li>遍历数组，获取每个位置的索引 i&lt;/li>
+&lt;li>在[i, arr_length)范围寻找最小元素的索引 j，并赋值给 min_index&lt;/li>
+&lt;li>将 i 位置和 min_index 位置的元素交换&lt;/li>
+&lt;li>最终每个位置都是排序后的元素&lt;/li>
+&lt;/ol></description></item></channel></rss>

@@ -1,47 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>saltstack学习8-Requisite Ordering - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="(四) 状态依赖 1. require 添加require前
-1 2 3 4 5 6 7 8 9  [root@salt-master web]# more httpd.sls make sure httpd is running:service.running:- name:httpdmake sure httpd is installed:pkg.installed:- name:httpd[root@salt-master web]#  " /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/06/requisite-ordering/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="saltstack学习8-Requisite Ordering" />
-<meta property="og:description" content="(四) 状态依赖
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>saltstack学习8-Requisite Ordering - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="(四) 状态依赖 1. require 添加require前
+1 2 3 4 5 6 7 8 9  [root@salt-master web]# more httpd.sls make sure httpd is running:service.running:- name:httpdmake sure httpd is installed:pkg.installed:- name:httpd[root@salt-master web]#"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2016/06/requisite-ordering/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="saltstack学习8-Requisite Ordering"><meta property="og:description" content="(四) 状态依赖
 1. require
 添加require前
 
@@ -65,16 +23,7 @@ make sure httpd is running:
 make sure httpd is installed:
   pkg.installed:
     - name: httpd
-[root@salt-master web]#
-
-
-" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/06/requisite-ordering/" />
-<meta property="article:published_time" content="2016-06-15T00:00:00+00:00" />
-<meta property="article:modified_time" content="2016-06-15T00:00:00+00:00" />
-<meta itemprop="name" content="saltstack学习8-Requisite Ordering">
-<meta itemprop="description" content="(四) 状态依赖
+[root@salt-master web]#"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2016/06/requisite-ordering/"><meta property="article:published_time" content="2016-06-15T00:00:00+00:00"><meta property="article:modified_time" content="2016-06-15T00:00:00+00:00"><meta itemprop=name content="saltstack学习8-Requisite Ordering"><meta itemprop=description content="(四) 状态依赖
 1. require
 添加require前
 
@@ -98,20 +47,7 @@ make sure httpd is running:
 make sure httpd is installed:
   pkg.installed:
     - name: httpd
-[root@salt-master web]#
-
-
-">
-<meta itemprop="datePublished" content="2016-06-15T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2016-06-15T00:00:00+00:00" />
-<meta itemprop="wordCount" content="915">
-
-
-
-<meta itemprop="keywords" content="saltstack,salt," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="saltstack学习8-Requisite Ordering"/>
-<meta name="twitter:description" content="(四) 状态依赖
+[root@salt-master web]#"><meta itemprop=datePublished content="2016-06-15T00:00:00+00:00"><meta itemprop=dateModified content="2016-06-15T00:00:00+00:00"><meta itemprop=wordCount content="915"><meta itemprop=keywords content="saltstack,salt,"><meta name=twitter:card content="summary"><meta name=twitter:title content="saltstack学习8-Requisite Ordering"><meta name=twitter:description content="(四) 状态依赖
 1. require
 添加require前
 
@@ -135,765 +71,496 @@ make sure httpd is running:
 make sure httpd is installed:
   pkg.installed:
     - name: httpd
-[root@salt-master web]#
+[root@salt-master web]#"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>saltstack学习8-Requisite Ordering</h1><div class=post-meta><span class=post-time>2016-06-15</span><div class=post-category><a href=/categories/saltstack/>saltstack</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#四-状态依赖>(四) 状态依赖</a><ul><li><a href=#1-require>1. require</a></li><li><a href=#2-watch>2. watch</a></li><li><a href=#3-onfail>3. onfail</a></li><li><a href=#4-onchanges>4. onchanges</a></li><li><a href=#总结>总结</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=四-状态依赖>(四) 状态依赖</h2><h3 id=1-require>1. require</h3><p><strong>添加require前</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=p>[</span><span class=l>root@salt-master web]# more httpd.sls </span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is running</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>service.running</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is installed</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>pkg.installed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w></span><span class=p>[</span><span class=l>root@salt-master web]#</span><span class=w>
+</span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-ceylon data-lang=ceylon><span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span> <span class=n>salt</span> <span class=err>&#39;</span><span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span><span class=err>&#39;</span> <span class=n>state</span><span class=o>.</span><span class=na>apply</span> <span class=n>web</span><span class=o>.</span><span class=na>httpd</span>
+<span class=n>ABC</span><span class=o>-</span><span class=nl>L0008179:</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>running</span>
+    <span class=nl>Function:</span> <span class=n>service</span><span class=o>.</span><span class=na>running</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>False</span>
+     <span class=nl>Comment:</span> <span class=n>The</span> <span class=n>named</span> <span class=n>service</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>not</span> <span class=n>available</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>25</span><span class=o>:</span><span class=mf>46.757329</span>
+    <span class=nl>Duration:</span> <span class=mf>9.486</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>installed</span>
+    <span class=nl>Function:</span> <span class=n>pkg</span><span class=o>.</span><span class=na>installed</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>The</span> <span class=n>following</span> <span class=n>packages</span> <span class=n>were</span> <span class=n>installed</span><span class=o>/</span><span class=nl>updated:</span> <span class=n>httpd</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>25</span><span class=o>:</span><span class=mf>47.445873</span>
+    <span class=nl>Duration:</span> <span class=mf>4753.846</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+              <span class=o>----------</span>
+              <span class=nl>httpd:</span>
+                  <span class=o>----------</span>
+                  <span class=kt>new</span><span class=o>:</span>
+                      <span class=mf>2.2</span><span class=o>.</span><span class=mi>15</span><span class=o>-</span><span class=mi>45</span><span class=o>.</span><span class=na>el6</span>
+                  <span class=nl>old:</span>
 
+<span class=n>Summary</span> <span class=k>for</span> <span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span>
+<span class=o>------------</span>
+<span class=nl>Succeeded:</span> <span class=mi>1</span> <span class=o>(</span><span class=n>changed</span><span class=o>=</span><span class=mi>1</span><span class=o>)</span>
+<span class=nl>Failed:</span>    <span class=mi>1</span>
+<span class=o>------------</span>
+<span class=n>Total</span> <span class=n>states</span> <span class=nl>run:</span>     <span class=mi>2</span>
+<span class=nl>ERROR:</span> <span class=n>Minions</span> <span class=n>returned</span> <span class=n>with</span> <span class=n>non</span><span class=o>-</span><span class=n>zero</span> <span class=n>exit</span> <span class=n>code</span>
+<span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span>
+</code></pre></td></tr></table></div></div><p><strong>添加require后</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=p>[</span><span class=l>root@salt-master web]# more httpd.sls </span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is running</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>service.running</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>require</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=nt>pkg</span><span class=p>:</span><span class=w> </span><span class=l>make sure httpd is installed</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is installed</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>pkg.installed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>/etc/httpd/conf/httpd.conf</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>file.managed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>source</span><span class=p>:</span><span class=w> </span><span class=l>salt://web/files/httpd.conf</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>user</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>group</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>mod</span><span class=p>:</span><span class=w> </span><span class=m>600</span><span class=w>
+</span><span class=w></span><span class=p>[</span><span class=l>root@salt-master web]#</span><span class=w>
+</span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-ceylon data-lang=ceylon><span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span> <span class=n>salt</span> <span class=err>&#39;</span><span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span><span class=err>&#39;</span> <span class=n>pkg</span><span class=o>.</span><span class=na>remove</span> <span class=n>httpd</span>     
+<span class=n>ABC</span><span class=o>-</span><span class=nl>L0008179:</span>
+    <span class=o>----------</span>
+    <span class=nl>httpd:</span>
+        <span class=o>----------</span>
+        <span class=kt>new</span><span class=o>:</span>
+        <span class=nl>old:</span>
+            <span class=mf>2.2</span><span class=o>.</span><span class=mi>15</span><span class=o>-</span><span class=mi>45</span><span class=o>.</span><span class=na>el6</span>
+<span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span> <span class=n>salt</span> <span class=err>&#39;</span><span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span><span class=err>&#39;</span> <span class=n>state</span><span class=o>.</span><span class=na>apply</span> <span class=n>web</span><span class=o>.</span><span class=na>httpd</span>
+<span class=n>ABC</span><span class=o>-</span><span class=nl>L0008179:</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>installed</span>
+    <span class=nl>Function:</span> <span class=n>pkg</span><span class=o>.</span><span class=na>installed</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>The</span> <span class=n>following</span> <span class=n>packages</span> <span class=n>were</span> <span class=n>installed</span><span class=o>/</span><span class=nl>updated:</span> <span class=n>httpd</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>31</span><span class=o>:</span><span class=mf>55.334250</span>
+    <span class=nl>Duration:</span> <span class=mf>4587.192</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+              <span class=o>----------</span>
+              <span class=nl>httpd:</span>
+                  <span class=o>----------</span>
+                  <span class=kt>new</span><span class=o>:</span>
+                      <span class=mf>2.2</span><span class=o>.</span><span class=mi>15</span><span class=o>-</span><span class=mi>45</span><span class=o>.</span><span class=na>el6</span>
+                  <span class=nl>old:</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>running</span>
+    <span class=nl>Function:</span> <span class=n>service</span><span class=o>.</span><span class=na>running</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>Started</span> <span class=n>Service</span> <span class=n>httpd</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>31</span><span class=o>:</span><span class=mf>59.928566</span>
+    <span class=nl>Duration:</span> <span class=mf>709.912</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
 
-"/>
+<span class=n>Summary</span> <span class=k>for</span> <span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span>
+<span class=o>------------</span>
+<span class=nl>Succeeded:</span> <span class=mi>2</span> <span class=o>(</span><span class=n>changed</span><span class=o>=</span><span class=mi>1</span><span class=o>)</span>
+<span class=nl>Failed:</span>    <span class=mi>0</span>
+<span class=o>------------</span>
+<span class=n>Total</span> <span class=n>states</span> <span class=nl>run:</span>     <span class=mi>2</span>
+<span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span>
+</code></pre></td></tr></table></div></div><h3 id=2-watch>2. watch</h3><p><strong>添加watch前</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=p>[</span><span class=l>root@salt-master web]# more httpd.sls </span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is running</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>service.running</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>require</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=nt>pkg</span><span class=p>:</span><span class=w> </span><span class=l>make sure httpd is installed</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is installed</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>pkg.installed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>/etc/httpd/conf/httpd.conf</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>file.managed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>source</span><span class=p>:</span><span class=w> </span><span class=l>salt://web/files/httpd.conf</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>user</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>group</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>mod</span><span class=p>:</span><span class=w> </span><span class=m>600</span><span class=w>
+</span><span class=w></span><span class=p>[</span><span class=l>root@salt-master web]#</span><span class=w>
+</span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-ceylon data-lang=ceylon><span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span> <span class=n>salt</span> <span class=err>&#39;</span><span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span><span class=err>&#39;</span> <span class=n>state</span><span class=o>.</span><span class=na>apply</span> <span class=n>web</span><span class=o>.</span><span class=na>httpd</span>
+<span class=n>ABC</span><span class=o>-</span><span class=nl>L0008179:</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>installed</span>
+    <span class=nl>Function:</span> <span class=n>pkg</span><span class=o>.</span><span class=na>installed</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>Package</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>already</span> <span class=n>installed</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>54</span><span class=o>:</span><span class=mf>12.135257</span>
+    <span class=nl>Duration:</span> <span class=mf>1153.32</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>running</span>
+    <span class=nl>Function:</span> <span class=n>service</span><span class=o>.</span><span class=na>running</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>The</span> <span class=n>service</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>already</span> <span class=n>running</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>54</span><span class=o>:</span><span class=mf>13.289227</span>
+    <span class=nl>Duration:</span> <span class=mf>51.782</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>httpd</span><span class=o>/</span><span class=n>conf</span><span class=o>/</span><span class=n>httpd</span><span class=o>.</span><span class=na>conf</span>
+    <span class=nl>Function:</span> <span class=n>file</span><span class=o>.</span><span class=na>managed</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>File</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>httpd</span><span class=o>/</span><span class=n>conf</span><span class=o>/</span><span class=n>httpd</span><span class=o>.</span><span class=na>conf</span> <span class=n>updated</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>54</span><span class=o>:</span><span class=mf>13.344997</span>
+    <span class=nl>Duration:</span> <span class=mf>101.827</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+              <span class=o>----------</span>
+              <span class=nl>diff:</span>
+                  <span class=o>---</span>  
+                  <span class=o>+++</span>  
+                  <span class=err>@@</span> <span class=o>-</span><span class=mi>1007</span><span class=o>,</span><span class=mi>5</span> <span class=o>+</span><span class=mi>1007</span><span class=o>,</span><span class=mi>3</span> <span class=err>@@</span>
+                   <span class=err>#</span>    <span class=n>ErrorLog</span> <span class=n>logs</span><span class=o>/</span><span class=n>dummy</span><span class=o>-</span><span class=n>host</span><span class=o>.</span><span class=na>example</span><span class=o>.</span><span class=na>com</span><span class=o>-</span><span class=n>error_log</span>
+                   <span class=err>#</span>    <span class=n>CustomLog</span> <span class=n>logs</span><span class=o>/</span><span class=n>dummy</span><span class=o>-</span><span class=n>host</span><span class=o>.</span><span class=na>example</span><span class=o>.</span><span class=na>com</span><span class=o>-</span><span class=n>access_log</span> <span class=n>common</span>
+                   <span class=err>#</span><span class=o>&lt;/</span><span class=n>VirtualHost</span><span class=o>&gt;</span>
+                  <span class=o>-</span>
+                  <span class=o>-</span><span class=err>#</span> <span class=n>user</span>
 
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">saltstack学习8-Requisite Ordering</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2016-06-15 </span>
-        <div class="post-category">
-            <a href="/categories/saltstack/"> saltstack </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#四-状态依赖">(四) 状态依赖</a>
-          <ul>
-            <li><a href="#1-require">1. require</a></li>
-            <li><a href="#2-watch">2. watch</a></li>
-            <li><a href="#3-onfail">3. onfail</a></li>
-            <li><a href="#4-onchanges">4. onchanges</a></li>
-            <li><a href="#总结">总结</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h2 id="四-状态依赖">(四) 状态依赖</h2>
-<h3 id="1-require">1. require</h3>
-<p><strong>添加require前</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# more httpd.sls </span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is running</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">service.running</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is installed</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]#</span><span class="w">
-</span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">httpd</span>
-<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">running</span>
-    <span class="nl">Function:</span> <span class="n">service</span><span class="o">.</span><span class="na">running</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">False</span>
-     <span class="nl">Comment:</span> <span class="n">The</span> <span class="n">named</span> <span class="n">service</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">not</span> <span class="n">available</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">25</span><span class="o">:</span><span class="mf">46.757329</span>
-    <span class="nl">Duration:</span> <span class="mf">9.486</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">installed</span>
-    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">The</span> <span class="n">following</span> <span class="n">packages</span> <span class="n">were</span> <span class="n">installed</span><span class="o">/</span><span class="nl">updated:</span> <span class="n">httpd</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">25</span><span class="o">:</span><span class="mf">47.445873</span>
-    <span class="nl">Duration:</span> <span class="mf">4753.846</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-              <span class="o">----------</span>
-              <span class="nl">httpd:</span>
-                  <span class="o">----------</span>
-                  <span class="kt">new</span><span class="o">:</span>
-                      <span class="mf">2.2</span><span class="o">.</span><span class="mi">15</span><span class="o">-</span><span class="mi">45</span><span class="o">.</span><span class="na">el6</span>
-                  <span class="nl">old:</span>
-
-<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
-<span class="o">------------</span>
-<span class="nl">Succeeded:</span> <span class="mi">1</span> <span class="o">(</span><span class="n">changed</span><span class="o">=</span><span class="mi">1</span><span class="o">)</span>
-<span class="nl">Failed:</span>    <span class="mi">1</span>
-<span class="o">------------</span>
-<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">2</span>
-<span class="nl">ERROR:</span> <span class="n">Minions</span> <span class="n">returned</span> <span class="n">with</span> <span class="n">non</span><span class="o">-</span><span class="n">zero</span> <span class="n">exit</span> <span class="n">code</span>
-<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>添加require后</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# more httpd.sls </span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is running</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">service.running</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">pkg</span><span class="p">:</span><span class="w"> </span><span class="l">make sure httpd is installed</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is installed</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">/etc/httpd/conf/httpd.conf</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/httpd.conf</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">mod</span><span class="p">:</span><span class="w"> </span><span class="m">600</span><span class="w">
-</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]#</span><span class="w">
-</span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">pkg</span><span class="o">.</span><span class="na">remove</span> <span class="n">httpd</span>     
-<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
-    <span class="o">----------</span>
-    <span class="nl">httpd:</span>
-        <span class="o">----------</span>
-        <span class="kt">new</span><span class="o">:</span>
-        <span class="nl">old:</span>
-            <span class="mf">2.2</span><span class="o">.</span><span class="mi">15</span><span class="o">-</span><span class="mi">45</span><span class="o">.</span><span class="na">el6</span>
-<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">httpd</span>
-<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">installed</span>
-    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">The</span> <span class="n">following</span> <span class="n">packages</span> <span class="n">were</span> <span class="n">installed</span><span class="o">/</span><span class="nl">updated:</span> <span class="n">httpd</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">31</span><span class="o">:</span><span class="mf">55.334250</span>
-    <span class="nl">Duration:</span> <span class="mf">4587.192</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-              <span class="o">----------</span>
-              <span class="nl">httpd:</span>
-                  <span class="o">----------</span>
-                  <span class="kt">new</span><span class="o">:</span>
-                      <span class="mf">2.2</span><span class="o">.</span><span class="mi">15</span><span class="o">-</span><span class="mi">45</span><span class="o">.</span><span class="na">el6</span>
-                  <span class="nl">old:</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">running</span>
-    <span class="nl">Function:</span> <span class="n">service</span><span class="o">.</span><span class="na">running</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">Started</span> <span class="n">Service</span> <span class="n">httpd</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">31</span><span class="o">:</span><span class="mf">59.928566</span>
-    <span class="nl">Duration:</span> <span class="mf">709.912</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-
-<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
-<span class="o">------------</span>
-<span class="nl">Succeeded:</span> <span class="mi">2</span> <span class="o">(</span><span class="n">changed</span><span class="o">=</span><span class="mi">1</span><span class="o">)</span>
-<span class="nl">Failed:</span>    <span class="mi">0</span>
-<span class="o">------------</span>
-<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">2</span>
-<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="2-watch">2. watch</h3>
-<p><strong>添加watch前</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# more httpd.sls </span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is running</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">service.running</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">pkg</span><span class="p">:</span><span class="w"> </span><span class="l">make sure httpd is installed</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is installed</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">/etc/httpd/conf/httpd.conf</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/httpd.conf</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">mod</span><span class="p">:</span><span class="w"> </span><span class="m">600</span><span class="w">
-</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]#</span><span class="w">
-</span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">httpd</span>
-<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">installed</span>
-    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">Package</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">already</span> <span class="n">installed</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mf">12.135257</span>
-    <span class="nl">Duration:</span> <span class="mf">1153.32</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">running</span>
-    <span class="nl">Function:</span> <span class="n">service</span><span class="o">.</span><span class="na">running</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">The</span> <span class="n">service</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">already</span> <span class="n">running</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mf">13.289227</span>
-    <span class="nl">Duration:</span> <span class="mf">51.782</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">httpd</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">httpd</span><span class="o">.</span><span class="na">conf</span>
-    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">httpd</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">httpd</span><span class="o">.</span><span class="na">conf</span> <span class="n">updated</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mf">13.344997</span>
-    <span class="nl">Duration:</span> <span class="mf">101.827</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-              <span class="o">----------</span>
-              <span class="nl">diff:</span>
-                  <span class="o">---</span>  
-                  <span class="o">+++</span>  
-                  <span class="err">@@</span> <span class="o">-</span><span class="mi">1007</span><span class="o">,</span><span class="mi">5</span> <span class="o">+</span><span class="mi">1007</span><span class="o">,</span><span class="mi">3</span> <span class="err">@@</span>
-                   <span class="err">#</span>    <span class="n">ErrorLog</span> <span class="n">logs</span><span class="o">/</span><span class="n">dummy</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">com</span><span class="o">-</span><span class="n">error_log</span>
-                   <span class="err">#</span>    <span class="n">CustomLog</span> <span class="n">logs</span><span class="o">/</span><span class="n">dummy</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">com</span><span class="o">-</span><span class="n">access_log</span> <span class="n">common</span>
-                   <span class="err">#</span><span class="o">&lt;/</span><span class="n">VirtualHost</span><span class="o">&gt;</span>
-                  <span class="o">-</span>
-                  <span class="o">-</span><span class="err">#</span> <span class="n">user</span>
-
-<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
-<span class="o">------------</span>
-<span class="nl">Succeeded:</span> <span class="mi">3</span> <span class="o">(</span><span class="n">changed</span><span class="o">=</span><span class="mi">1</span><span class="o">)</span>
-<span class="nl">Failed:</span>    <span class="mi">0</span>
-<span class="o">------------</span>
-<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">3</span>
-<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
-</code></pre></td></tr></table>
-</div>
-</div><p><strong>添加watch后</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# pwd</span><span class="w">
-</span><span class="w"></span><span class="l">/srv/salt/web</span><span class="w">
-</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]# more httpd.sls </span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is running</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">service.running</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">pkg</span><span class="p">:</span><span class="w"> </span><span class="l">make sure httpd is installed</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">watch</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/httpd/conf/httpd.conf</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">make sure httpd is installed</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">httpd</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">/etc/httpd/conf/httpd.conf</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/httpd.conf</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
-</span><span class="w">    </span>- <span class="nt">mod</span><span class="p">:</span><span class="w"> </span><span class="m">600</span><span class="w">
-</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]#</span><span class="w">
-</span></code></pre></td></tr></table>
-</div>
-</div><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">httpd</span>
-<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">installed</span>
-    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">Package</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">already</span> <span class="n">installed</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mf">47.653847</span>
-    <span class="nl">Duration:</span> <span class="mf">1035.602</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">httpd</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">httpd</span><span class="o">.</span><span class="na">conf</span>
-    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">httpd</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">httpd</span><span class="o">.</span><span class="na">conf</span> <span class="n">updated</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mf">48.692626</span>
-    <span class="nl">Duration:</span> <span class="mf">98.563</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-              <span class="o">----------</span>
-              <span class="nl">diff:</span>
-                  <span class="o">---</span>  
-                  <span class="o">+++</span>  
-                  <span class="err">@@</span> <span class="o">-</span><span class="mi">1008</span><span class="o">,</span><span class="mi">4</span> <span class="o">+</span><span class="mi">1008</span><span class="o">,</span><span class="mi">4</span> <span class="err">@@</span>
-                   <span class="err">#</span>    <span class="n">CustomLog</span> <span class="n">logs</span><span class="o">/</span><span class="n">dummy</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">com</span><span class="o">-</span><span class="n">access_log</span> <span class="n">common</span>
-                   <span class="err">#</span><span class="o">&lt;/</span><span class="n">VirtualHost</span><span class="o">&gt;</span>
+<span class=n>Summary</span> <span class=k>for</span> <span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span>
+<span class=o>------------</span>
+<span class=nl>Succeeded:</span> <span class=mi>3</span> <span class=o>(</span><span class=n>changed</span><span class=o>=</span><span class=mi>1</span><span class=o>)</span>
+<span class=nl>Failed:</span>    <span class=mi>0</span>
+<span class=o>------------</span>
+<span class=n>Total</span> <span class=n>states</span> <span class=nl>run:</span>     <span class=mi>3</span>
+<span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span>
+</code></pre></td></tr></table></div></div><p><strong>添加watch后</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-yaml data-lang=yaml><span class=p>[</span><span class=l>root@salt-master web]# pwd</span><span class=w>
+</span><span class=w></span><span class=l>/srv/salt/web</span><span class=w>
+</span><span class=w></span><span class=p>[</span><span class=l>root@salt-master web]# more httpd.sls </span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is running</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>service.running</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>require</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=nt>pkg</span><span class=p>:</span><span class=w> </span><span class=l>make sure httpd is installed</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>watch</span><span class=p>:</span><span class=w>
+</span><span class=w>      </span>- <span class=nt>file</span><span class=p>:</span><span class=w> </span><span class=l>/etc/httpd/conf/httpd.conf</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>make sure httpd is installed</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>pkg.installed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>httpd</span><span class=w>
+</span><span class=w>
+</span><span class=w></span><span class=nt>/etc/httpd/conf/httpd.conf</span><span class=p>:</span><span class=w>
+</span><span class=w>  </span><span class=nt>file.managed</span><span class=p>:</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>source</span><span class=p>:</span><span class=w> </span><span class=l>salt://web/files/httpd.conf</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>user</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>group</span><span class=p>:</span><span class=w> </span><span class=l>root</span><span class=w>
+</span><span class=w>    </span>- <span class=nt>mod</span><span class=p>:</span><span class=w> </span><span class=m>600</span><span class=w>
+</span><span class=w></span><span class=p>[</span><span class=l>root@salt-master web]#</span><span class=w>
+</span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-ceylon data-lang=ceylon><span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span> <span class=n>salt</span> <span class=err>&#39;</span><span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span><span class=err>&#39;</span> <span class=n>state</span><span class=o>.</span><span class=na>apply</span> <span class=n>web</span><span class=o>.</span><span class=na>httpd</span>
+<span class=n>ABC</span><span class=o>-</span><span class=nl>L0008179:</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>installed</span>
+    <span class=nl>Function:</span> <span class=n>pkg</span><span class=o>.</span><span class=na>installed</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>Package</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>already</span> <span class=n>installed</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>59</span><span class=o>:</span><span class=mf>47.653847</span>
+    <span class=nl>Duration:</span> <span class=mf>1035.602</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>httpd</span><span class=o>/</span><span class=n>conf</span><span class=o>/</span><span class=n>httpd</span><span class=o>.</span><span class=na>conf</span>
+    <span class=nl>Function:</span> <span class=n>file</span><span class=o>.</span><span class=na>managed</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>File</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>httpd</span><span class=o>/</span><span class=n>conf</span><span class=o>/</span><span class=n>httpd</span><span class=o>.</span><span class=na>conf</span> <span class=n>updated</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>59</span><span class=o>:</span><span class=mf>48.692626</span>
+    <span class=nl>Duration:</span> <span class=mf>98.563</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+              <span class=o>----------</span>
+              <span class=nl>diff:</span>
+                  <span class=o>---</span>  
+                  <span class=o>+++</span>  
+                  <span class=err>@@</span> <span class=o>-</span><span class=mi>1008</span><span class=o>,</span><span class=mi>4</span> <span class=o>+</span><span class=mi>1008</span><span class=o>,</span><span class=mi>4</span> <span class=err>@@</span>
+                   <span class=err>#</span>    <span class=n>CustomLog</span> <span class=n>logs</span><span class=o>/</span><span class=n>dummy</span><span class=o>-</span><span class=n>host</span><span class=o>.</span><span class=na>example</span><span class=o>.</span><span class=na>com</span><span class=o>-</span><span class=n>access_log</span> <span class=n>common</span>
+                   <span class=err>#</span><span class=o>&lt;/</span><span class=n>VirtualHost</span><span class=o>&gt;</span>
                    
-                  <span class="o">-</span><span class="err">#</span> <span class="n">user</span> <span class="k">is</span> <span class="n">a</span> <span class="n">good</span> <span class="n">boy</span>
-                  <span class="o">+</span><span class="err">#</span> <span class="n">do</span> <span class="n">something</span> <span class="n">change</span>
-<span class="o">----------</span>
-          <span class="nl">ID:</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">httpd</span> <span class="k">is</span> <span class="n">running</span>
-    <span class="nl">Function:</span> <span class="n">service</span><span class="o">.</span><span class="na">running</span>
-        <span class="nl">Name:</span> <span class="n">httpd</span>
-      <span class="nl">Result:</span> <span class="n">True</span>
-     <span class="nl">Comment:</span> <span class="n">Service</span> <span class="n">restarted</span>
-     <span class="nl">Started:</span> <span class="mi">15</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mf">48.839366</span>
-    <span class="nl">Duration:</span> <span class="mf">815.323</span> <span class="n">ms</span>
-     <span class="nl">Changes:</span>   
-              <span class="o">----------</span>
-              <span class="nl">httpd:</span>
-                  <span class="n">True</span>
+                  <span class=o>-</span><span class=err>#</span> <span class=n>user</span> <span class=k>is</span> <span class=n>a</span> <span class=n>good</span> <span class=n>boy</span>
+                  <span class=o>+</span><span class=err>#</span> <span class=n>do</span> <span class=n>something</span> <span class=n>change</span>
+<span class=o>----------</span>
+          <span class=nl>ID:</span> <span class=n>make</span> <span class=n>sure</span> <span class=n>httpd</span> <span class=k>is</span> <span class=n>running</span>
+    <span class=nl>Function:</span> <span class=n>service</span><span class=o>.</span><span class=na>running</span>
+        <span class=nl>Name:</span> <span class=n>httpd</span>
+      <span class=nl>Result:</span> <span class=n>True</span>
+     <span class=nl>Comment:</span> <span class=n>Service</span> <span class=n>restarted</span>
+     <span class=nl>Started:</span> <span class=mi>15</span><span class=o>:</span><span class=mi>59</span><span class=o>:</span><span class=mf>48.839366</span>
+    <span class=nl>Duration:</span> <span class=mf>815.323</span> <span class=n>ms</span>
+     <span class=nl>Changes:</span>   
+              <span class=o>----------</span>
+              <span class=nl>httpd:</span>
+                  <span class=n>True</span>
 
-<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
-<span class="o">------------</span>
-<span class="nl">Succeeded:</span> <span class="mi">3</span> <span class="o">(</span><span class="n">changed</span><span class="o">=</span><span class="mi">2</span><span class="o">)</span>
-<span class="nl">Failed:</span>    <span class="mi">0</span>
-<span class="o">------------</span>
-<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">3</span>
-<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
-</code></pre></td></tr></table>
-</div>
-</div><h3 id="3-onfail">3. onfail</h3>
-<p>This requisite is used to run a state only if another state has failed.It&rsquo;s especially useful for self-healing infrastructures and for rolling back code deployments after failure.</p>
-<h3 id="4-onchanges">4. onchanges</h3>
-<p>This requisite is used to run a state only if another state created changes. It differs from the watch requisite in that when there are no changes, it does not execute at all.</p>
-<h3 id="总结">总结</h3>
-<p>require 和 watch 用的比较多，后面用法也差不多，用的时候看看手册即可。
-实际中在写sls文件时最好按顺序写，尽量不使用这些改变顺序的条件。</p>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2016-06-15
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/saltstack/">saltstack</a>
-          <a href="/tags/salt/">salt</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2016/06/install-nginx/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">saltstack学习9-nginx配置管理</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2016/06/configuration-management/">
-            <span class="next-text nav-default">saltstack学习7-Configuration Management</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2016-06-15 00:00:00 \u002b0000 UTC',
-        title: 'saltstack学习8-Requisite Ordering',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+<span class=n>Summary</span> <span class=k>for</span> <span class=n>ABC</span><span class=o>-</span><span class=n>L0008179</span>
+<span class=o>------------</span>
+<span class=nl>Succeeded:</span> <span class=mi>3</span> <span class=o>(</span><span class=n>changed</span><span class=o>=</span><span class=mi>2</span><span class=o>)</span>
+<span class=nl>Failed:</span>    <span class=mi>0</span>
+<span class=o>------------</span>
+<span class=n>Total</span> <span class=n>states</span> <span class=nl>run:</span>     <span class=mi>3</span>
+<span class=o>[</span><span class=n>root</span><span class=err>@</span><span class=n>salt</span><span class=o>-</span><span class=n>master</span> <span class=n>web</span><span class=o>]</span><span class=err>#</span>
+</code></pre></td></tr></table></div></div><h3 id=3-onfail>3. onfail</h3><p>This requisite is used to run a state only if another state has failed.It&rsquo;s especially useful for self-healing infrastructures and for rolling back code deployments after failure.</p><h3 id=4-onchanges>4. onchanges</h3><p>This requisite is used to run a state only if another state created changes. It differs from the watch requisite in that when there are no changes, it does not execute at all.</p><h3 id=总结>总结</h3><p>require 和 watch 用的比较多，后面用法也差不多，用的时候看看手册即可。
+实际中在写sls文件时最好按顺序写，尽量不使用这些改变顺序的条件。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2016-06-15</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/saltstack/>saltstack</a>
+<a href=/tags/salt/>salt</a></div><nav class=post-nav><a class=prev href=/post/2016/06/install-nginx/><i class="iconfont icon-left"></i><span class="prev-text nav-default">saltstack学习9-nginx配置管理</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2016/06/configuration-management/><span class="next-text nav-default">saltstack学习7-Configuration Management</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2016-06-15 00:00:00 \u002b0000 UTC',title:'saltstack学习8-Requisite Ordering',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

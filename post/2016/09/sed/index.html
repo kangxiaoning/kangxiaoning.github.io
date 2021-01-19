@@ -1,553 +1,229 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>sed使用总结 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="1. sed 用法 是个文本编辑器，对文本进行逐行处理。
-默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。 如果是删除操作就不会有内容打印。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2016/09/sed/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="sed使用总结" />
-<meta property="og:description" content="1. sed 用法
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>sed使用总结 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="1. sed 用法 是个文本编辑器，对文本进行逐行处理。
+默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。 如果是删除操作就不会有内容打印。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2016/09/sed/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="sed使用总结"><meta property="og:description" content="1. sed 用法
 是个文本编辑器，对文本进行逐行处理。
 默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
-如果是删除操作就不会有内容打印。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2016/09/sed/" />
-<meta property="article:published_time" content="2016-09-15T00:00:00+00:00" />
-<meta property="article:modified_time" content="2016-09-15T00:00:00+00:00" />
-<meta itemprop="name" content="sed使用总结">
-<meta itemprop="description" content="1. sed 用法
+如果是删除操作就不会有内容打印。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2016/09/sed/"><meta property="article:published_time" content="2016-09-15T00:00:00+00:00"><meta property="article:modified_time" content="2016-09-15T00:00:00+00:00"><meta itemprop=name content="sed使用总结"><meta itemprop=description content="1. sed 用法
 是个文本编辑器，对文本进行逐行处理。
 默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
-如果是删除操作就不会有内容打印。">
-<meta itemprop="datePublished" content="2016-09-15T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2016-09-15T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1630">
-
-
-
-<meta itemprop="keywords" content="linux," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="sed使用总结"/>
-<meta name="twitter:description" content="1. sed 用法
+如果是删除操作就不会有内容打印。"><meta itemprop=datePublished content="2016-09-15T00:00:00+00:00"><meta itemprop=dateModified content="2016-09-15T00:00:00+00:00"><meta itemprop=wordCount content="1630"><meta itemprop=keywords content="linux,"><meta name=twitter:card content="summary"><meta name=twitter:title content="sed使用总结"><meta name=twitter:description content="1. sed 用法
 是个文本编辑器，对文本进行逐行处理。
 默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
-如果是删除操作就不会有内容打印。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">sed使用总结</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2016-09-15 </span>
-        <div class="post-category">
-            <a href="/categories/linux/"> Linux </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#1-sed-用法">1. sed 用法</a></li>
-    <li><a href="#2-常用选项">2. 常用选项</a></li>
-    <li><a href="#3-地址定界">3. 地址定界</a></li>
-    <li><a href="#4-编辑命令">4. 编辑命令</a></li>
-    <li><a href="#5-高级编辑命令">5. 高级编辑命令</a></li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h1 id="1-sed-用法">1. sed 用法</h1>
-<p>是个文本编辑器，对文本进行逐行处理。</p>
-<p>默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
-如果是删除操作就不会有内容打印。</p>
-<p><strong>sed:</strong> Stream EDitor, 行编辑器。</p>
-<p><strong>用法</strong></p>
-<pre><code>sed [option]... 'script' inputfile...
-</code></pre>
-<p>用法里的 script 表示 &lsquo;地址命令&rsquo;，在地址定界后紧跟着命令，例如 sed &lsquo;^UUID/d&rsquo; /etc/fstab。</p>
-<h1 id="2-常用选项">2. 常用选项</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">-</span><span class="nx">n</span><span class="p">,--</span><span class="nx">quiet</span><span class="p">,</span> <span class="p">--</span><span class="nx">silent</span>：<span class="nx">不输出模式中的内容至屏幕</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">e</span>: <span class="nx">多点编辑</span>，<span class="nx">可以在一个sed命令中实现多个编辑操作</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">f</span> <span class="sr">/PATH/</span><span class="nx">TO</span>/<span class="nx">SCRIPT_FILE</span>: <span class="nx">从指定文件中读取编辑脚本</span>，<span class="nx">这样就不需要指定多个</span><span class="p">-</span><span class="nx">e</span>，<span class="nx">每行一个</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">r</span>: <span class="nx">支持使用扩展正则表达式</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">i</span>: <span class="nx">原处编辑</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="3-地址定界">3. 地址定界</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="m">1</span>. <span class="nx">不给地址</span>：<span class="nx">即</span> <span class="nx">Zero</span><span class="p">-</span><span class="nx">address</span>，<span class="nx">对全文进行处理</span><span class="err">
-</span><span class="err"></span><span class="m">2</span>. <span class="nx">单地址</span>：<span class="err">
-</span><span class="err"></span>    #: <span class="nx">即</span> <span class="nx">One</span><span class="p">-</span> <span class="nx">address</span>，<span class="nx">比如使用一个数字</span>，<span class="nx">指定某一行</span><span class="err">
-</span><span class="err"></span>    <span class="sr">/pattern/</span>：<span class="nx">被此处模式所能够匹配到的每一行</span><span class="err">
-</span><span class="err"></span><span class="m">3</span>. <span class="nx">地址范围</span>：<span class="err">
-</span><span class="err"></span>    #<span class="p">,</span># <span class="nx">从第几行到第几行</span><span class="err">
-</span><span class="err"></span>    #<span class="p">,+</span># <span class="nx">从哪一行开始往下走几行</span><span class="err">
-</span><span class="err"></span>    <span class="sr">/pat1/</span><span class="p">,</span><span class="sr">/pat2/</span> <span class="nx">从哪一行到哪一行</span><span class="err">
-</span><span class="err"></span>    #<span class="p">,</span><span class="sr">/pat1/</span> <span class="nx">联合使用</span>，<span class="nx">从指定行开始到第一次被pat1匹配的行结束之间的范围</span><span class="err">
-</span><span class="err"></span><span class="m">4</span>. <span class="p">~</span>：<span class="nx">步进</span><span class="err">
-</span><span class="err"></span>    <span class="m">1</span><span class="p">~</span><span class="m">2</span><span class="err">
-</span><span class="err"></span>    <span class="m">2</span><span class="p">~</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="4-编辑命令">4. 编辑命令</h1>
-<p>命令有分类，不给地址的命令，0或1个地址的命令，多个地址的命令等。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">d</span>: <span class="nx">删除</span>，<span class="nx">可跟单地址</span>、<span class="nx">地址范围一起使用</span><span class="err">
-</span><span class="err"></span><span class="nx">p</span>: <span class="nx">显示模式空间中的内容</span>，<span class="nx">可跟单地址</span>、<span class="nx">地址范围一起使用</span>，<span class="nx">默认会显示模式空间中的内容</span><span class="err">
-</span><span class="err"></span><span class="nx">a</span> \<span class="nx">text</span>：<span class="nx">在行后面追加文本</span>；<span class="nx">支持使用</span>\<span class="nx">n实现多行追加</span><span class="err">
-</span><span class="err"></span><span class="nx">i</span> \<span class="nx">text</span>：<span class="nx">在行前面插入文本</span>；<span class="nx">支持使用</span>\<span class="nx">n实现多行插入</span><span class="err">
-</span><span class="err"></span><span class="nx">c</span> \<span class="nx">text</span>：<span class="nx">替换行为单行或多行文本</span><span class="err">
-</span><span class="err"></span><span class="nx">w</span> <span class="sr">/path/</span><span class="nx">to</span>/<span class="nx">somefile</span>: <span class="nx">保存模式空间匹配到的行至指定文件中</span><span class="err">
-</span><span class="err"></span><span class="nx">r</span> <span class="sr">/path/</span><span class="nx">from</span>/<span class="nx">somefile</span>：<span class="nx">读取指定文件的文本流至模式空间中匹配到的行的行后</span><span class="err">
-</span><span class="err"></span><span class="p">=</span>: <span class="nx">为模式空间中的行打印行号</span><span class="err">
-</span><span class="err"></span><span class="p">!</span>: <span class="nx">取反条件</span><span class="err">
-</span><span class="err"></span><span class="nx">s</span><span class="sr">//</span>/：<span class="nx">支持使用其它分隔符</span>，<span class="nx">s</span>@@@，<span class="nx">s</span>###<span class="err">
-</span><span class="err"></span>    <span class="nx">替换标记</span><span class="err">
-</span><span class="err"></span>    <span class="nx">g</span>: <span class="nx">行内全局替换</span><span class="err">
-</span><span class="err"></span>    <span class="nx">p</span>: <span class="nx">显示替换成功的行</span><span class="err">
-</span><span class="err"></span>    <span class="nx">w</span> <span class="sr">/PATH/</span><span class="nx">TO</span>/<span class="nx">SOMEFILE</span>：<span class="nx">将替换成功的结果保存至指定文件中</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>如下使用 p 命令发现符合条件的行显示了2次，因为默认会显示模式空间中的内容，所以某一行被读进
+如果是删除操作就不会有内容打印。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>sed使用总结</h1><div class=post-meta><span class=post-time>2016-09-15</span><div class=post-category><a href=/categories/linux/>Linux</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#1-sed-用法>1. sed 用法</a></li><li><a href=#2-常用选项>2. 常用选项</a></li><li><a href=#3-地址定界>3. 地址定界</a></li><li><a href=#4-编辑命令>4. 编辑命令</a></li><li><a href=#5-高级编辑命令>5. 高级编辑命令</a></li></ul></nav></div></div><div class=post-content><h1 id=1-sed-用法>1. sed 用法</h1><p>是个文本编辑器，对文本进行逐行处理。</p><p>默认不编辑源文件，一次从源文件中读取一行到模式空间（pattern space）中进行编辑，处理后的结果打印至屏幕。
+如果是删除操作就不会有内容打印。</p><p><strong>sed:</strong> Stream EDitor, 行编辑器。</p><p><strong>用法</strong></p><pre><code>sed [option]... 'script' inputfile...
+</code></pre><p>用法里的 script 表示 &lsquo;地址命令&rsquo;，在地址定界后紧跟着命令，例如 sed &lsquo;^UUID/d&rsquo; /etc/fstab。</p><h1 id=2-常用选项>2. 常用选项</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>-</span><span class=nx>n</span><span class=p>,--</span><span class=nx>quiet</span><span class=p>,</span> <span class=p>--</span><span class=nx>silent</span>：<span class=nx>不输出模式中的内容至屏幕</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>e</span>: <span class=nx>多点编辑</span>，<span class=nx>可以在一个sed命令中实现多个编辑操作</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>f</span> <span class=sr>/PATH/</span><span class=nx>TO</span>/<span class=nx>SCRIPT_FILE</span>: <span class=nx>从指定文件中读取编辑脚本</span>，<span class=nx>这样就不需要指定多个</span><span class=p>-</span><span class=nx>e</span>，<span class=nx>每行一个</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>r</span>: <span class=nx>支持使用扩展正则表达式</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>i</span>: <span class=nx>原处编辑</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=3-地址定界>3. 地址定界</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=m>1</span>. <span class=nx>不给地址</span>：<span class=nx>即</span> <span class=nx>Zero</span><span class=p>-</span><span class=nx>address</span>，<span class=nx>对全文进行处理</span><span class=err>
+</span><span class=err></span><span class=m>2</span>. <span class=nx>单地址</span>：<span class=err>
+</span><span class=err></span>    #: <span class=nx>即</span> <span class=nx>One</span><span class=p>-</span> <span class=nx>address</span>，<span class=nx>比如使用一个数字</span>，<span class=nx>指定某一行</span><span class=err>
+</span><span class=err></span>    <span class=sr>/pattern/</span>：<span class=nx>被此处模式所能够匹配到的每一行</span><span class=err>
+</span><span class=err></span><span class=m>3</span>. <span class=nx>地址范围</span>：<span class=err>
+</span><span class=err></span>    #<span class=p>,</span># <span class=nx>从第几行到第几行</span><span class=err>
+</span><span class=err></span>    #<span class=p>,+</span># <span class=nx>从哪一行开始往下走几行</span><span class=err>
+</span><span class=err></span>    <span class=sr>/pat1/</span><span class=p>,</span><span class=sr>/pat2/</span> <span class=nx>从哪一行到哪一行</span><span class=err>
+</span><span class=err></span>    #<span class=p>,</span><span class=sr>/pat1/</span> <span class=nx>联合使用</span>，<span class=nx>从指定行开始到第一次被pat1匹配的行结束之间的范围</span><span class=err>
+</span><span class=err></span><span class=m>4</span>. <span class=p>~</span>：<span class=nx>步进</span><span class=err>
+</span><span class=err></span>    <span class=m>1</span><span class=p>~</span><span class=m>2</span><span class=err>
+</span><span class=err></span>    <span class=m>2</span><span class=p>~</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=4-编辑命令>4. 编辑命令</h1><p>命令有分类，不给地址的命令，0或1个地址的命令，多个地址的命令等。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>d</span>: <span class=nx>删除</span>，<span class=nx>可跟单地址</span>、<span class=nx>地址范围一起使用</span><span class=err>
+</span><span class=err></span><span class=nx>p</span>: <span class=nx>显示模式空间中的内容</span>，<span class=nx>可跟单地址</span>、<span class=nx>地址范围一起使用</span>，<span class=nx>默认会显示模式空间中的内容</span><span class=err>
+</span><span class=err></span><span class=nx>a</span> \<span class=nx>text</span>：<span class=nx>在行后面追加文本</span>；<span class=nx>支持使用</span>\<span class=nx>n实现多行追加</span><span class=err>
+</span><span class=err></span><span class=nx>i</span> \<span class=nx>text</span>：<span class=nx>在行前面插入文本</span>；<span class=nx>支持使用</span>\<span class=nx>n实现多行插入</span><span class=err>
+</span><span class=err></span><span class=nx>c</span> \<span class=nx>text</span>：<span class=nx>替换行为单行或多行文本</span><span class=err>
+</span><span class=err></span><span class=nx>w</span> <span class=sr>/path/</span><span class=nx>to</span>/<span class=nx>somefile</span>: <span class=nx>保存模式空间匹配到的行至指定文件中</span><span class=err>
+</span><span class=err></span><span class=nx>r</span> <span class=sr>/path/</span><span class=nx>from</span>/<span class=nx>somefile</span>：<span class=nx>读取指定文件的文本流至模式空间中匹配到的行的行后</span><span class=err>
+</span><span class=err></span><span class=p>=</span>: <span class=nx>为模式空间中的行打印行号</span><span class=err>
+</span><span class=err></span><span class=p>!</span>: <span class=nx>取反条件</span><span class=err>
+</span><span class=err></span><span class=nx>s</span><span class=sr>//</span>/：<span class=nx>支持使用其它分隔符</span>，<span class=nx>s</span>@@@，<span class=nx>s</span>###<span class=err>
+</span><span class=err></span>    <span class=nx>替换标记</span><span class=err>
+</span><span class=err></span>    <span class=nx>g</span>: <span class=nx>行内全局替换</span><span class=err>
+</span><span class=err></span>    <span class=nx>p</span>: <span class=nx>显示替换成功的行</span><span class=err>
+</span><span class=err></span>    <span class=nx>w</span> <span class=sr>/PATH/</span><span class=nx>TO</span>/<span class=nx>SOMEFILE</span>：<span class=nx>将替换成功的结果保存至指定文件中</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>如下使用 p 命令发现符合条件的行显示了2次，因为默认会显示模式空间中的内容，所以某一行被读进
 去如果没做编辑这一行就会输出来，而使用 p 命令又把符合条件的行又打印了一次，因此符合条件的行
-显示了2次。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]# <span class="nx">sed</span> <span class="s1">&#39;/^UUID/p&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span> <span class="err">
-</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span># <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err"></span># <span class="nx">Created</span> <span class="nx">by</span> <span class="nx">anaconda</span> <span class="nx">on</span> <span class="nx">Mon</span> <span class="nx">Mar</span>  <span class="m">9</span> <span class="m">15</span>:<span class="m">50</span>:<span class="m">52</span> <span class="m">2015</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span># <span class="nx">Accessible</span> <span class="nx">filesystems</span><span class="p">,</span> <span class="nx">by</span> <span class="nx">reference</span><span class="p">,</span> <span class="nx">are</span> <span class="nx">maintained</span> <span class="nx">under</span> <span class="s1">&#39;/dev/disk&#39;</span><span class="err">
-</span><span class="err"></span># <span class="nx">See</span> <span class="nx">man</span> <span class="nx">pages</span> <span class="nx">fstab</span><span class="p">(</span><span class="m">5</span><span class="p">),</span> <span class="nx">findfs</span><span class="p">(</span><span class="m">8</span><span class="p">),</span> <span class="nx">mount</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="nx">and</span>/<span class="nx">or</span> <span class="nx">blkid</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">info</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVroot /</span>                       <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">1</span><span class="err">
-</span><span class="err"></span><span class="nx">UUID</span><span class="p">=</span><span class="m">6</span>eedae<span class="m">50-0</span>d<span class="m">4</span>d<span class="m">-4472</span><span class="p">-</span><span class="nx">bad5</span><span class="m">-1</span>ccb<span class="m">5</span>c<span class="m">0</span>b<span class="m">9</span>a<span class="m">12</span> /<span class="nx">boot</span>                   <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="nx">UUID</span><span class="p">=</span><span class="m">6</span>eedae<span class="m">50-0</span>d<span class="m">4</span>d<span class="m">-4472</span><span class="p">-</span><span class="nx">bad5</span><span class="m">-1</span>ccb<span class="m">5</span>c<span class="m">0</span>b<span class="m">9</span>a<span class="m">12</span> /<span class="nx">boot</span>                   <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVcloud /</span><span class="nx">opt</span>/<span class="nx">cloud</span>              <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVrddata /</span><span class="nx">path</span>/<span class="nx">rd8888</span>            <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVredis /</span><span class="nx">path</span>/<span class="nx">redis</span>             <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span>/<span class="nx">VolGroup00</span><span class="p">-</span><span class="nx">LVswp</span> <span class="nx">swap</span>                    <span class="nx">swap</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">tmpfs</span>                   <span class="sr">/dev/</span><span class="nx">shm</span>                <span class="nx">tmpfs</span>   <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">devpts</span>                  <span class="sr">/dev/</span><span class="nx">pts</span>                <span class="nx">devpts</span>  <span class="nx">gid</span><span class="p">=</span><span class="m">5</span><span class="p">,</span><span class="nx">mode</span><span class="p">=</span><span class="m">620</span>  <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">sysfs</span>                   /<span class="nx">sys</span>                    <span class="nx">sysfs</span>   <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">proc</span>                    /<span class="nx">proc</span>                   <span class="nx">proc</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup1-LVdata1    /</span><span class="nx">data</span>  <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]#<span class="err">
-</span><span class="err">
-</span><span class="err"></span># <span class="nx">禁止打印模式空间内容</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]# <span class="nx">sed</span> <span class="p">-</span><span class="nx">n</span> <span class="s1">&#39;/^UUID/p&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span> <span class="err">
-</span><span class="err"></span><span class="nx">UUID</span><span class="p">=</span><span class="m">6</span>eedae<span class="m">50-0</span>d<span class="m">4</span>d<span class="m">-4472</span><span class="p">-</span><span class="nx">bad5</span><span class="m">-1</span>ccb<span class="m">5</span>c<span class="m">0</span>b<span class="m">9</span>a<span class="m">12</span> /<span class="nx">boot</span>                   <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]# <span class="err">
-</span><span class="err">
-</span><span class="err"></span># <span class="nx">和</span> <span class="p">-</span><span class="nx">n</span> <span class="nx">加</span> <span class="nx">p</span> <span class="nx">实现相反的效果</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]# <span class="nx">sed</span> <span class="s1">&#39;/^UUID/d&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span>     <span class="err">
-</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span># <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span><span class="err"></span># <span class="nx">Created</span> <span class="nx">by</span> <span class="nx">anaconda</span> <span class="nx">on</span> <span class="nx">Mon</span> <span class="nx">Mar</span>  <span class="m">9</span> <span class="m">15</span>:<span class="m">50</span>:<span class="m">52</span> <span class="m">2015</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span># <span class="nx">Accessible</span> <span class="nx">filesystems</span><span class="p">,</span> <span class="nx">by</span> <span class="nx">reference</span><span class="p">,</span> <span class="nx">are</span> <span class="nx">maintained</span> <span class="nx">under</span> <span class="s1">&#39;/dev/disk&#39;</span><span class="err">
-</span><span class="err"></span># <span class="nx">See</span> <span class="nx">man</span> <span class="nx">pages</span> <span class="nx">fstab</span><span class="p">(</span><span class="m">5</span><span class="p">),</span> <span class="nx">findfs</span><span class="p">(</span><span class="m">8</span><span class="p">),</span> <span class="nx">mount</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="nx">and</span>/<span class="nx">or</span> <span class="nx">blkid</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">info</span><span class="err">
-</span><span class="err"></span>#<span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVroot /</span>                       <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">1</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVcloud /</span><span class="nx">opt</span>/<span class="nx">cloud</span>              <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVrddata /</span><span class="nx">path</span>/<span class="nx">rd8888</span>            <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup00-LVredis /</span><span class="nx">path</span>/<span class="nx">redis</span>             <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">1</span> <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span>/<span class="nx">VolGroup00</span><span class="p">-</span><span class="nx">LVswp</span> <span class="nx">swap</span>                    <span class="nx">swap</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">tmpfs</span>                   <span class="sr">/dev/</span><span class="nx">shm</span>                <span class="nx">tmpfs</span>   <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">devpts</span>                  <span class="sr">/dev/</span><span class="nx">pts</span>                <span class="nx">devpts</span>  <span class="nx">gid</span><span class="p">=</span><span class="m">5</span><span class="p">,</span><span class="nx">mode</span><span class="p">=</span><span class="m">620</span>  <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">sysfs</span>                   /<span class="nx">sys</span>                    <span class="nx">sysfs</span>   <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="nx">proc</span>                    /<span class="nx">proc</span>                   <span class="nx">proc</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span><span class="sr">/dev/</span><span class="nx">mapper</span><span class="sr">/VolGroup1-LVdata1    /</span><span class="nx">data</span>  <span class="nx">ext4</span>    <span class="nx">defaults</span>        <span class="m">0</span> <span class="m">0</span><span class="err">
-</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="p">~</span>]#<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>练习1</strong></p>
-<p>删除/boot/grub/grub.conf文件中所有以空白开头的行行首的空白字符</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">sed</span> <span class="s1">&#39;s@^[[:space:]]\+@@&#39;</span> <span class="sr">/etc/</span><span class="nx">grub2</span>.<span class="nx">cfg</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>练习2</strong></p>
-<p>删除/etc/fstab文件中所有以#开头，后面至少跟一个空白字符的行的行首的#和空白字符；</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">sed</span> <span class="s1">&#39;s@^#[[:space:]]\+@@&#39;</span> <span class="sr">/etc/</span><span class="nx">fstab</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p><strong>练习3</strong></p>
-<p>echo一个绝对路径给sed命令，取出其基名；取出其目录名；</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">~</span>]# <span class="nx">echo</span> <span class="s2">&#34;/etc/sysconfig/&#34;</span> <span class="p">|</span> <span class="nx">sed</span> <span class="s1">&#39;s@[^/]\+/\?$@@&#39;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h1 id="5-高级编辑命令">5. 高级编辑命令</h1>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">h</span>: <span class="nx">把模式空间中的内容覆盖至保持空间中</span>；<span class="err">
-</span><span class="err"></span><span class="nx">H</span>：<span class="nx">把模式空间中的内容追加至保持空间中</span>；<span class="err">
-</span><span class="err"></span><span class="nx">g</span>: <span class="nx">从保持空间取出数据覆盖至模式空间</span>；<span class="err">
-</span><span class="err"></span><span class="nx">G</span>：<span class="nx">从保持空间取出内容追加至模式空间</span>；<span class="err">
-</span><span class="err"></span><span class="nx">x</span>: <span class="nx">把模式空间中的内容与保持空间中的内容进行互换</span>；<span class="err">
-</span><span class="err"></span><span class="nx">n</span>: <span class="nx">读取匹配到的行的下一行至模式空间</span>；<span class="err">
-</span><span class="err"></span><span class="nx">N</span>：<span class="nx">追加匹配到的行的下一行至模式空间</span>；<span class="err">
-</span><span class="err"></span><span class="nx">d</span>: <span class="nx">删除模式空间中的行</span>；<span class="err">
-</span><span class="err"></span><span class="nx">D</span>：<span class="nx">删除多行模式空间中的所有行</span>；<span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="p">-</span><span class="nx">n</span> <span class="s1">&#39;n;p&#39;</span> <span class="nx">FILE</span>：<span class="nx">显示偶数行</span><span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;1!G;h;$!d&#39;</span> <span class="nx">FILE</span>：<span class="nx">逆向显示文件内容</span><span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;$!N;$!D&#39;</span> <span class="nx">FILE</span>: <span class="nx">取出文件后两行</span>；<span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;$!d&#39;</span> <span class="nx">FILE</span>：<span class="nx">取出文件最后一行</span>；<span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;G&#39;</span> <span class="nx">FILE</span>: <span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;/^$/d;G&#39;</span> <span class="nx">FILE</span>: <span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="s1">&#39;n;d&#39;</span> <span class="nx">FILE</span>: <span class="nx">显示奇数行</span>；<span class="err">
-</span><span class="err"></span><span class="nx">sed</span> <span class="p">-</span><span class="nx">n</span> <span class="s1">&#39;1!G;h;$p&#39;</span> <span class="nx">FILE</span>: <span class="nx">逆向显示文件中的每一行</span>；<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2016-09-15
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/linux/">linux</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2016/09/awk/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">awk使用总结</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2016/09/config-gitfs/">
-            <span class="next-text nav-default">saltstack学习16-生产配置gitfs</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2016-09-15 00:00:00 \u002b0000 UTC',
-        title: 'sed使用总结',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+显示了2次。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]# <span class=nx>sed</span> <span class=s1>&#39;/^UUID/p&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span> <span class=err>
+</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span># <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err></span># <span class=nx>Created</span> <span class=nx>by</span> <span class=nx>anaconda</span> <span class=nx>on</span> <span class=nx>Mon</span> <span class=nx>Mar</span>  <span class=m>9</span> <span class=m>15</span>:<span class=m>50</span>:<span class=m>52</span> <span class=m>2015</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span># <span class=nx>Accessible</span> <span class=nx>filesystems</span><span class=p>,</span> <span class=nx>by</span> <span class=nx>reference</span><span class=p>,</span> <span class=nx>are</span> <span class=nx>maintained</span> <span class=nx>under</span> <span class=s1>&#39;/dev/disk&#39;</span><span class=err>
+</span><span class=err></span># <span class=nx>See</span> <span class=nx>man</span> <span class=nx>pages</span> <span class=nx>fstab</span><span class=p>(</span><span class=m>5</span><span class=p>),</span> <span class=nx>findfs</span><span class=p>(</span><span class=m>8</span><span class=p>),</span> <span class=nx>mount</span><span class=p>(</span><span class=m>8</span><span class=p>)</span> <span class=nx>and</span>/<span class=nx>or</span> <span class=nx>blkid</span><span class=p>(</span><span class=m>8</span><span class=p>)</span> <span class=nx>for</span> <span class=nx>more</span> <span class=nx>info</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVroot /</span>                       <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>1</span><span class=err>
+</span><span class=err></span><span class=nx>UUID</span><span class=p>=</span><span class=m>6</span>eedae<span class=m>50-0</span>d<span class=m>4</span>d<span class=m>-4472</span><span class=p>-</span><span class=nx>bad5</span><span class=m>-1</span>ccb<span class=m>5</span>c<span class=m>0</span>b<span class=m>9</span>a<span class=m>12</span> /<span class=nx>boot</span>                   <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=nx>UUID</span><span class=p>=</span><span class=m>6</span>eedae<span class=m>50-0</span>d<span class=m>4</span>d<span class=m>-4472</span><span class=p>-</span><span class=nx>bad5</span><span class=m>-1</span>ccb<span class=m>5</span>c<span class=m>0</span>b<span class=m>9</span>a<span class=m>12</span> /<span class=nx>boot</span>                   <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVcloud /</span><span class=nx>opt</span>/<span class=nx>cloud</span>              <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVrddata /</span><span class=nx>path</span>/<span class=nx>rd8888</span>            <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVredis /</span><span class=nx>path</span>/<span class=nx>redis</span>             <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span>/<span class=nx>VolGroup00</span><span class=p>-</span><span class=nx>LVswp</span> <span class=nx>swap</span>                    <span class=nx>swap</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>tmpfs</span>                   <span class=sr>/dev/</span><span class=nx>shm</span>                <span class=nx>tmpfs</span>   <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>devpts</span>                  <span class=sr>/dev/</span><span class=nx>pts</span>                <span class=nx>devpts</span>  <span class=nx>gid</span><span class=p>=</span><span class=m>5</span><span class=p>,</span><span class=nx>mode</span><span class=p>=</span><span class=m>620</span>  <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>sysfs</span>                   /<span class=nx>sys</span>                    <span class=nx>sysfs</span>   <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>proc</span>                    /<span class=nx>proc</span>                   <span class=nx>proc</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup1-LVdata1    /</span><span class=nx>data</span>  <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]#<span class=err>
+</span><span class=err>
+</span><span class=err></span># <span class=nx>禁止打印模式空间内容</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]# <span class=nx>sed</span> <span class=p>-</span><span class=nx>n</span> <span class=s1>&#39;/^UUID/p&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span> <span class=err>
+</span><span class=err></span><span class=nx>UUID</span><span class=p>=</span><span class=m>6</span>eedae<span class=m>50-0</span>d<span class=m>4</span>d<span class=m>-4472</span><span class=p>-</span><span class=nx>bad5</span><span class=m>-1</span>ccb<span class=m>5</span>c<span class=m>0</span>b<span class=m>9</span>a<span class=m>12</span> /<span class=nx>boot</span>                   <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]# <span class=err>
+</span><span class=err>
+</span><span class=err></span># <span class=nx>和</span> <span class=p>-</span><span class=nx>n</span> <span class=nx>加</span> <span class=nx>p</span> <span class=nx>实现相反的效果</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]# <span class=nx>sed</span> <span class=s1>&#39;/^UUID/d&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span>     <span class=err>
+</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span># <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span><span class=err></span># <span class=nx>Created</span> <span class=nx>by</span> <span class=nx>anaconda</span> <span class=nx>on</span> <span class=nx>Mon</span> <span class=nx>Mar</span>  <span class=m>9</span> <span class=m>15</span>:<span class=m>50</span>:<span class=m>52</span> <span class=m>2015</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span># <span class=nx>Accessible</span> <span class=nx>filesystems</span><span class=p>,</span> <span class=nx>by</span> <span class=nx>reference</span><span class=p>,</span> <span class=nx>are</span> <span class=nx>maintained</span> <span class=nx>under</span> <span class=s1>&#39;/dev/disk&#39;</span><span class=err>
+</span><span class=err></span># <span class=nx>See</span> <span class=nx>man</span> <span class=nx>pages</span> <span class=nx>fstab</span><span class=p>(</span><span class=m>5</span><span class=p>),</span> <span class=nx>findfs</span><span class=p>(</span><span class=m>8</span><span class=p>),</span> <span class=nx>mount</span><span class=p>(</span><span class=m>8</span><span class=p>)</span> <span class=nx>and</span>/<span class=nx>or</span> <span class=nx>blkid</span><span class=p>(</span><span class=m>8</span><span class=p>)</span> <span class=nx>for</span> <span class=nx>more</span> <span class=nx>info</span><span class=err>
+</span><span class=err></span>#<span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVroot /</span>                       <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>1</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVcloud /</span><span class=nx>opt</span>/<span class=nx>cloud</span>              <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVrddata /</span><span class=nx>path</span>/<span class=nx>rd8888</span>            <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup00-LVredis /</span><span class=nx>path</span>/<span class=nx>redis</span>             <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>1</span> <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span>/<span class=nx>VolGroup00</span><span class=p>-</span><span class=nx>LVswp</span> <span class=nx>swap</span>                    <span class=nx>swap</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>tmpfs</span>                   <span class=sr>/dev/</span><span class=nx>shm</span>                <span class=nx>tmpfs</span>   <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>devpts</span>                  <span class=sr>/dev/</span><span class=nx>pts</span>                <span class=nx>devpts</span>  <span class=nx>gid</span><span class=p>=</span><span class=m>5</span><span class=p>,</span><span class=nx>mode</span><span class=p>=</span><span class=m>620</span>  <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>sysfs</span>                   /<span class=nx>sys</span>                    <span class=nx>sysfs</span>   <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=nx>proc</span>                    /<span class=nx>proc</span>                   <span class=nx>proc</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span><span class=sr>/dev/</span><span class=nx>mapper</span><span class=sr>/VolGroup1-LVdata1    /</span><span class=nx>data</span>  <span class=nx>ext4</span>    <span class=nx>defaults</span>        <span class=m>0</span> <span class=m>0</span><span class=err>
+</span><span class=err></span>[<span class=nx>root</span>@<span class=nx>ABC</span><span class=p>-</span><span class=nx>L0009803</span> <span class=p>~</span>]#<span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>练习1</strong></p><p>删除/boot/grub/grub.conf文件中所有以空白开头的行行首的空白字符</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>sed</span> <span class=s1>&#39;s@^[[:space:]]\+@@&#39;</span> <span class=sr>/etc/</span><span class=nx>grub2</span>.<span class=nx>cfg</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>练习2</strong></p><p>删除/etc/fstab文件中所有以#开头，后面至少跟一个空白字符的行的行首的#和空白字符；</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>sed</span> <span class=s1>&#39;s@^#[[:space:]]\+@@&#39;</span> <span class=sr>/etc/</span><span class=nx>fstab</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p><strong>练习3</strong></p><p>echo一个绝对路径给sed命令，取出其基名；取出其目录名；</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>~</span>]# <span class=nx>echo</span> <span class=s2>&#34;/etc/sysconfig/&#34;</span> <span class=p>|</span> <span class=nx>sed</span> <span class=s1>&#39;s@[^/]\+/\?$@@&#39;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h1 id=5-高级编辑命令>5. 高级编辑命令</h1><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>h</span>: <span class=nx>把模式空间中的内容覆盖至保持空间中</span>；<span class=err>
+</span><span class=err></span><span class=nx>H</span>：<span class=nx>把模式空间中的内容追加至保持空间中</span>；<span class=err>
+</span><span class=err></span><span class=nx>g</span>: <span class=nx>从保持空间取出数据覆盖至模式空间</span>；<span class=err>
+</span><span class=err></span><span class=nx>G</span>：<span class=nx>从保持空间取出内容追加至模式空间</span>；<span class=err>
+</span><span class=err></span><span class=nx>x</span>: <span class=nx>把模式空间中的内容与保持空间中的内容进行互换</span>；<span class=err>
+</span><span class=err></span><span class=nx>n</span>: <span class=nx>读取匹配到的行的下一行至模式空间</span>；<span class=err>
+</span><span class=err></span><span class=nx>N</span>：<span class=nx>追加匹配到的行的下一行至模式空间</span>；<span class=err>
+</span><span class=err></span><span class=nx>d</span>: <span class=nx>删除模式空间中的行</span>；<span class=err>
+</span><span class=err></span><span class=nx>D</span>：<span class=nx>删除多行模式空间中的所有行</span>；<span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=p>-</span><span class=nx>n</span> <span class=s1>&#39;n;p&#39;</span> <span class=nx>FILE</span>：<span class=nx>显示偶数行</span><span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;1!G;h;$!d&#39;</span> <span class=nx>FILE</span>：<span class=nx>逆向显示文件内容</span><span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;$!N;$!D&#39;</span> <span class=nx>FILE</span>: <span class=nx>取出文件后两行</span>；<span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;$!d&#39;</span> <span class=nx>FILE</span>：<span class=nx>取出文件最后一行</span>；<span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;G&#39;</span> <span class=nx>FILE</span>: <span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;/^$/d;G&#39;</span> <span class=nx>FILE</span>: <span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=s1>&#39;n;d&#39;</span> <span class=nx>FILE</span>: <span class=nx>显示奇数行</span>；<span class=err>
+</span><span class=err></span><span class=nx>sed</span> <span class=p>-</span><span class=nx>n</span> <span class=s1>&#39;1!G;h;$p&#39;</span> <span class=nx>FILE</span>: <span class=nx>逆向显示文件中的每一行</span>；<span class=err>
+</span></code></pre></td></tr></table></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2016-09-15</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/linux/>linux</a></div><nav class=post-nav><a class=prev href=/post/2016/09/awk/><i class="iconfont icon-left"></i><span class="prev-text nav-default">awk使用总结</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2016/09/config-gitfs/><span class="next-text nav-default">saltstack学习16-生产配置gitfs</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2016-09-15 00:00:00 \u002b0000 UTC',title:'sed使用总结',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

@@ -1,504 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Hadoop学习5-运行map-reduce任务 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="(四) 运行map-reduce任务 Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。
-前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="Hadoop学习5-运行map-reduce任务" />
-<meta property="og:description" content="(四) 运行map-reduce任务
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Hadoop学习5-运行map-reduce任务 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="(四) 运行map-reduce任务 Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。
+前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Hadoop学习5-运行map-reduce任务"><meta property="og:description" content="(四) 运行map-reduce任务
 Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。
-前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/" />
-<meta property="article:published_time" content="2015-03-05T00:00:00+00:00" />
-<meta property="article:modified_time" content="2015-03-05T00:00:00+00:00" />
-<meta itemprop="name" content="Hadoop学习5-运行map-reduce任务">
-<meta itemprop="description" content="(四) 运行map-reduce任务
+前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hadoop-map-reduce-task/"><meta property="article:published_time" content="2015-03-05T00:00:00+00:00"><meta property="article:modified_time" content="2015-03-05T00:00:00+00:00"><meta itemprop=name content="Hadoop学习5-运行map-reduce任务"><meta itemprop=description content="(四) 运行map-reduce任务
 Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。
-前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。">
-<meta itemprop="datePublished" content="2015-03-05T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2015-03-05T00:00:00+00:00" />
-<meta itemprop="wordCount" content="947">
-
-
-
-<meta itemprop="keywords" content="hadoop,bigdata," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hadoop学习5-运行map-reduce任务"/>
-<meta name="twitter:description" content="(四) 运行map-reduce任务
+前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。"><meta itemprop=datePublished content="2015-03-05T00:00:00+00:00"><meta itemprop=dateModified content="2015-03-05T00:00:00+00:00"><meta itemprop=wordCount content="947"><meta itemprop=keywords content="hadoop,bigdata,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Hadoop学习5-运行map-reduce任务"><meta name=twitter:description content="(四) 运行map-reduce任务
 Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。
-前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">Hadoop学习5-运行map-reduce任务</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2015-03-05 </span>
-        <div class="post-category">
-            <a href="/categories/hadoop/"> hadoop </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#四-运行map-reduce任务">(四) 运行map-reduce任务</a>
-          <ul>
-            <li></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h2 id="四-运行map-reduce任务">(四) 运行map-reduce任务</h2>
-<p>Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。</p>
-<p>前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。</p>
-<h4 id="1-构造待处理数据">1) 构造待处理数据</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">mkdir</span> <span class="nx">user</span>;<span class="nx">cd</span> <span class="nx">user</span><span class="err">
-</span><span class="err"></span><span class="nx">echo</span> <span class="s2">&#34;user is a java programmer&#34;</span> <span class="p">&gt;</span> <span class="nx">file1</span>.<span class="nx">txt</span><span class="err">
-</span><span class="err"></span><span class="nx">echo</span> <span class="s2">&#34;user is a c programmer&#34;</span> <span class="p">&gt;</span> <span class="nx">file2</span>.<span class="nx">txt</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-将数据传到hdfs">2) 将数据传到HDFS</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">hdfs</span> <span class="nx">dfs</span> <span class="p">-</span><span class="nx">mkdir</span> /<span class="nx">user</span><span class="err">
-</span><span class="err"></span><span class="nx">hdfs</span> <span class="nx">dfs</span> <span class="p">-</span><span class="nx">copyFromLocal</span> <span class="p">-</span><span class="nx">f</span> <span class="sr">/home/</span><span class="nx">hadoop</span><span class="sr">/user/</span>*.<span class="nx">txt</span> /<span class="nx">user</span><span class="err">
-</span><span class="err"></span><span class="nx">hdfs</span> <span class="nx">dfs</span> <span class="p">-</span><span class="nx">ls</span> /<span class="nx">user</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="3-运行mapreduce任务">3) 运行MapReduce任务</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">cd</span> $<span class="nx">HADOOP_HOME</span><span class="err">
-</span><span class="err"></span><span class="nx">bin</span><span class="sr">/hadoop jar share/</span><span class="nx">hadoop</span><span class="sr">/mapreduce/</span><span class="nx">hadoop</span><span class="p">-</span><span class="nx">mapreduce</span><span class="p">-</span><span class="nx">examples</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>.<span class="nx">jar</span> <span class="nx">wordcount</span> <span class="sr">/user /</span><span class="nx">output</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>如下是输出信息，可以观察到先连接到ResourceManager节点请求资源，然后split子任务，提交job，运行map、reduce、Shuffle等，同时打印出消耗的一些资源信息。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">hadoop</span><span class="o">-</span><span class="mf">2.6</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span><span class="err">$</span> <span class="n">bin</span><span class="o">/</span><span class="n">hadoop</span> <span class="n">jar</span> <span class="n">share</span><span class="o">/</span><span class="n">hadoop</span><span class="o">/</span><span class="n">mapreduce</span><span class="o">/</span><span class="n">hadoop</span><span class="o">-</span><span class="n">mapreduce</span><span class="o">-</span><span class="n">examples</span><span class="o">-</span><span class="mf">2.6</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="na">jar</span> <span class="n">wordcount</span> <span class="o">/</span><span class="n">user</span> <span class="o">/</span><span class="n">output</span><span class="o">/</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">45</span> <span class="n">INFO</span> <span class="n">client</span><span class="o">.</span><span class="nl">RMProxy:</span> <span class="n">Connecting</span> <span class="n">to</span> <span class="n">ResourceManager</span> <span class="n">at</span> <span class="n">namenode1</span><span class="o">/</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">16.217</span><span class="o">:</span><span class="mi">8032</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">47</span> <span class="n">INFO</span> <span class="n">input</span><span class="o">.</span><span class="nl">FileInputFormat:</span> <span class="n">Total</span> <span class="n">input</span> <span class="n">paths</span> <span class="n">to</span> <span class="n">process</span> <span class="o">:</span> <span class="mi">2</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">47</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">JobSubmitter:</span> <span class="n">number</span> <span class="kd">of</span> <span class="nl">splits:</span><span class="mi">2</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">48</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">JobSubmitter:</span> <span class="n">Submitting</span> <span class="n">tokens</span> <span class="k">for</span> <span class="nl">job:</span> <span class="n">job_1425305505469_0003</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">48</span> <span class="n">INFO</span> <span class="n">impl</span><span class="o">.</span><span class="nl">YarnClientImpl:</span> <span class="n">Submitted</span> <span class="n">application</span> <span class="n">application_1425305505469_0003</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">48</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span> <span class="n">The</span> <span class="n">url</span> <span class="n">to</span> <span class="n">track</span> <span class="n">the</span> <span class="nl">job:</span> <span class="nl">http:</span><span class="c1">//namenode1:8088/proxy/application_1425305505469_0003/
-</span><span class="c1"></span><span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">04</span><span class="o">:</span><span class="mi">48</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span> <span class="n">Running</span> <span class="nl">job:</span> <span class="n">job_1425305505469_0003</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">02</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span> <span class="n">Job</span> <span class="n">job_1425305505469_0003</span> <span class="n">running</span> <span class="k">in</span> <span class="n">uber</span> <span class="n">mode</span> <span class="o">:</span> <span class="kc">false</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">02</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span>  <span class="n">map</span> <span class="mi">0</span><span class="o">%</span> <span class="n">reduce</span> <span class="mi">0</span><span class="o">%</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">20</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span>  <span class="n">map</span> <span class="mi">100</span><span class="o">%</span> <span class="n">reduce</span> <span class="mi">0</span><span class="o">%</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">33</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span>  <span class="n">map</span> <span class="mi">100</span><span class="o">%</span> <span class="n">reduce</span> <span class="mi">100</span><span class="o">%</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">33</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span> <span class="n">Job</span> <span class="n">job_1425305505469_0003</span> <span class="n">completed</span> <span class="n">successfully</span>
-<span class="mi">15</span><span class="o">/</span><span class="mi">03</span><span class="o">/</span><span class="mi">02</span> <span class="mi">23</span><span class="o">:</span><span class="mi">05</span><span class="o">:</span><span class="mi">33</span> <span class="n">INFO</span> <span class="n">mapreduce</span><span class="o">.</span><span class="nl">Job:</span> <span class="nl">Counters:</span> <span class="mi">49</span>
-        <span class="n">File</span> <span class="n">System</span> <span class="n">Counters</span>
-                <span class="nl">FILE:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">bytes</span> <span class="n">read</span><span class="o">=</span><span class="mi">131</span>
-                <span class="nl">FILE:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">bytes</span> <span class="n">written</span><span class="o">=</span><span class="mi">321936</span>
-                <span class="nl">FILE:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">read</span> <span class="n">operations</span><span class="o">=</span><span class="mi">0</span>
-                <span class="nl">FILE:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">large</span> <span class="n">read</span> <span class="n">operations</span><span class="o">=</span><span class="mi">0</span>
-                <span class="nl">FILE:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">write</span> <span class="n">operations</span><span class="o">=</span><span class="mi">0</span>
-                <span class="nl">HDFS:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">bytes</span> <span class="n">read</span><span class="o">=</span><span class="mi">283</span>
-                <span class="nl">HDFS:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">bytes</span> <span class="n">written</span><span class="o">=</span><span class="mi">48</span>
-                <span class="nl">HDFS:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">read</span> <span class="n">operations</span><span class="o">=</span><span class="mi">9</span>
-                <span class="nl">HDFS:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">large</span> <span class="n">read</span> <span class="n">operations</span><span class="o">=</span><span class="mi">0</span>
-                <span class="nl">HDFS:</span> <span class="n">Number</span> <span class="kd">of</span> <span class="n">write</span> <span class="n">operations</span><span class="o">=</span><span class="mi">2</span>
-        <span class="n">Job</span> <span class="n">Counters</span> 
-                <span class="n">Launched</span> <span class="n">map</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">2</span>
-                <span class="n">Launched</span> <span class="n">reduce</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">1</span>
-                <span class="n">Data</span><span class="o">-</span><span class="n">local</span> <span class="n">map</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">2</span>
-                <span class="n">Total</span> <span class="n">time</span> <span class="n">spent</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">maps</span> <span class="k">in</span> <span class="n">occupied</span> <span class="nf">slots</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">506896</span>
-                <span class="n">Total</span> <span class="n">time</span> <span class="n">spent</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">reduces</span> <span class="k">in</span> <span class="n">occupied</span> <span class="nf">slots</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">163376</span>
-                <span class="n">Total</span> <span class="n">time</span> <span class="n">spent</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">map</span> <span class="nf">tasks</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">31681</span>
-                <span class="n">Total</span> <span class="n">time</span> <span class="n">spent</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">reduce</span> <span class="nf">tasks</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">10211</span>
-                <span class="n">Total</span> <span class="n">vcore</span><span class="o">-</span><span class="n">seconds</span> <span class="n">taken</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">map</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">31681</span>
-                <span class="n">Total</span> <span class="n">vcore</span><span class="o">-</span><span class="n">seconds</span> <span class="n">taken</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">reduce</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">10211</span>
-                <span class="n">Total</span> <span class="n">megabyte</span><span class="o">-</span><span class="n">seconds</span> <span class="n">taken</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">map</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">32441344</span>
-                <span class="n">Total</span> <span class="n">megabyte</span><span class="o">-</span><span class="n">seconds</span> <span class="n">taken</span> <span class="nd">by</span> <span class="n">all</span> <span class="n">reduce</span> <span class="n">tasks</span><span class="o">=</span><span class="mi">10456064</span>
-        <span class="n">Map</span><span class="o">-</span><span class="n">Reduce</span> <span class="n">Framework</span>
-                <span class="n">Map</span> <span class="n">input</span> <span class="n">records</span><span class="o">=</span><span class="mi">2</span>
-                <span class="n">Map</span> <span class="n">output</span> <span class="n">records</span><span class="o">=</span><span class="mi">10</span>
-                <span class="n">Map</span> <span class="n">output</span> <span class="n">bytes</span><span class="o">=</span><span class="mi">105</span>
-                <span class="n">Map</span> <span class="n">output</span> <span class="n">materialized</span> <span class="n">bytes</span><span class="o">=</span><span class="mi">137</span>
-                <span class="n">Input</span> <span class="n">split</span> <span class="n">bytes</span><span class="o">=</span><span class="mi">218</span>
-                <span class="n">Combine</span> <span class="n">input</span> <span class="n">records</span><span class="o">=</span><span class="mi">10</span>
-                <span class="n">Combine</span> <span class="n">output</span> <span class="n">records</span><span class="o">=</span><span class="mi">10</span>
-                <span class="n">Reduce</span> <span class="n">input</span> <span class="n">groups</span><span class="o">=</span><span class="mi">6</span>
-                <span class="n">Reduce</span> <span class="n">shuffle</span> <span class="n">bytes</span><span class="o">=</span><span class="mi">137</span>
-                <span class="n">Reduce</span> <span class="n">input</span> <span class="n">records</span><span class="o">=</span><span class="mi">10</span>
-                <span class="n">Reduce</span> <span class="n">output</span> <span class="n">records</span><span class="o">=</span><span class="mi">6</span>
-                <span class="n">Spilled</span> <span class="n">Records</span><span class="o">=</span><span class="mi">20</span>
-                <span class="n">Shuffled</span> <span class="n">Maps</span> <span class="o">=</span><span class="mi">2</span>
-                <span class="n">Failed</span> <span class="n">Shuffles</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">Merged</span> <span class="n">Map</span> <span class="n">outputs</span><span class="o">=</span><span class="mi">2</span>
-                <span class="n">GC</span> <span class="n">time</span> <span class="nf">elapsed</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">382</span>
-                <span class="n">CPU</span> <span class="n">time</span> <span class="nf">spent</span> <span class="o">(</span><span class="n">ms</span><span class="o">)=</span><span class="mi">2730</span>
-                <span class="n">Physical</span> <span class="nf">memory</span> <span class="o">(</span><span class="n">bytes</span><span class="o">)</span> <span class="n">snapshot</span><span class="o">=</span><span class="mi">512602112</span>
-                <span class="n">Virtual</span> <span class="nf">memory</span> <span class="o">(</span><span class="n">bytes</span><span class="o">)</span> <span class="n">snapshot</span><span class="o">=</span><span class="mi">2747863040</span>
-                <span class="n">Total</span> <span class="n">committed</span> <span class="n">heap</span> <span class="nf">usage</span> <span class="o">(</span><span class="n">bytes</span><span class="o">)=</span><span class="mi">297672704</span>
-        <span class="n">Shuffle</span> <span class="n">Errors</span>
-                <span class="n">BAD_ID</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">CONNECTION</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">IO_ERROR</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">WRONG_LENGTH</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">WRONG_MAP</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">WRONG_REDUCE</span><span class="o">=</span><span class="mi">0</span>
-        <span class="n">File</span> <span class="n">Input</span> <span class="n">Format</span> <span class="n">Counters</span> 
-                <span class="n">Bytes</span> <span class="n">Read</span><span class="o">=</span><span class="mi">65</span>
-        <span class="n">File</span> <span class="n">Output</span> <span class="n">Format</span> <span class="n">Counters</span> 
-                <span class="n">Bytes</span> <span class="n">Written</span><span class="o">=</span><span class="mi">48</span>
-<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">hadoop</span><span class="o">-</span><span class="mf">2.6</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span><span class="err">$</span>
-</code></pre></td></tr></table>
-</div>
-</div><h4 id="4-查看mapreduce运行结果">4) 查看MapReduce运行结果</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>]$ <span class="nx">hdfs</span> <span class="nx">dfs</span> <span class="p">-</span><span class="nx">ls</span> /<span class="nx">output</span><span class="err">
-</span><span class="err"></span><span class="nx">Found</span> <span class="m">2</span> <span class="nx">items</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span>   <span class="m">2</span> <span class="nx">hadoop</span> <span class="nx">supergroup</span>          <span class="m">0</span> <span class="m">2015-03-02</span> <span class="m">23</span>:<span class="m">05</span> <span class="sr">/output/</span><span class="nx">_SUCCESS</span><span class="err">
-</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span>   <span class="m">2</span> <span class="nx">hadoop</span> <span class="nx">supergroup</span>         <span class="m">48</span> <span class="m">2015-03-02</span> <span class="m">23</span>:<span class="m">05</span> <span class="sr">/output/</span><span class="nx">part</span><span class="p">-</span><span class="nx">r</span><span class="m">-00000</span><span class="err">
-</span><span class="err"></span>[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>]$ <span class="err">
-</span><span class="err"></span>[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>]$ <span class="nx">hdfs</span> <span class="nx">dfs</span> <span class="p">-</span><span class="nx">cat</span> <span class="sr">/output/</span><span class="nx">part</span><span class="p">-</span><span class="nx">r</span><span class="m">-00000</span><span class="err">
-</span><span class="err"></span><span class="nx">a</span>       <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="nx">c</span>       <span class="m">1</span><span class="err">
-</span><span class="err"></span><span class="nx">is</span>      <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="nx">java</span>    <span class="m">1</span><span class="err">
-</span><span class="err"></span><span class="nx">user</span>    <span class="m">2</span><span class="err">
-</span><span class="err"></span><span class="nx">programmer</span>      <span class="m">2</span><span class="err">
-</span><span class="err"></span>[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>]$<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="5-通过jobhistory查看任务">5) 通过JobHistory查看任务</h4>
-<p>我们也可以访问MapReduce JobHistory（http://10.20.16.217:19888/）网址，在网页上查看运行过的MR任务情况，默认会保留一段时间，可以设置时长。</p>
-<p><img src="/images/big-data/jobhistory.png" alt="JobHistory"></p>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2015-03-05
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/hadoop/">hadoop</a>
-          <a href="/tags/bigdata/">bigdata</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2015/03/fedration-ha-hbase/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Hadoop学习6-Federation &#43; HA &#43; Hbase搭建</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2015/03/hbase-install/">
-            <span class="next-text nav-default">Hadoop学习4-Hbase双Hmaster集群搭建</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2015-03-05 00:00:00 \u002b0000 UTC',
-        title: 'Hadoop学习5-运行map-reduce任务',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Hadoop学习5-运行map-reduce任务</h1><div class=post-meta><span class=post-time>2015-03-05</span><div class=post-category><a href=/categories/hadoop/>hadoop</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#四-运行map-reduce任务>(四) 运行map-reduce任务</a><ul><li></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=四-运行map-reduce任务>(四) 运行map-reduce任务</h2><p>Hadoop由两部分组成，分别是分布式文件系统HDFS和分布式计算框架MapReduce。HDFS用来存储数据，而MapReduce则是将HDFS上的数据进行分布式计算。</p><p>前面已经搭建了Hadoop分布式集群环境，接下来运行个MapReduce任务，对MapReduce有个直观的认识。使用Hadoop自带的jar包来完成这个测试，该任务用于统计单词出现的次数。</p><h4 id=1-构造待处理数据>1) 构造待处理数据</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>mkdir</span> <span class=nx>user</span>;<span class=nx>cd</span> <span class=nx>user</span><span class=err>
+</span><span class=err></span><span class=nx>echo</span> <span class=s2>&#34;user is a java programmer&#34;</span> <span class=p>&gt;</span> <span class=nx>file1</span>.<span class=nx>txt</span><span class=err>
+</span><span class=err></span><span class=nx>echo</span> <span class=s2>&#34;user is a c programmer&#34;</span> <span class=p>&gt;</span> <span class=nx>file2</span>.<span class=nx>txt</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-将数据传到hdfs>2) 将数据传到HDFS</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>hdfs</span> <span class=nx>dfs</span> <span class=p>-</span><span class=nx>mkdir</span> /<span class=nx>user</span><span class=err>
+</span><span class=err></span><span class=nx>hdfs</span> <span class=nx>dfs</span> <span class=p>-</span><span class=nx>copyFromLocal</span> <span class=p>-</span><span class=nx>f</span> <span class=sr>/home/</span><span class=nx>hadoop</span><span class=sr>/user/</span>*.<span class=nx>txt</span> /<span class=nx>user</span><span class=err>
+</span><span class=err></span><span class=nx>hdfs</span> <span class=nx>dfs</span> <span class=p>-</span><span class=nx>ls</span> /<span class=nx>user</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=3-运行mapreduce任务>3) 运行MapReduce任务</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>cd</span> $<span class=nx>HADOOP_HOME</span><span class=err>
+</span><span class=err></span><span class=nx>bin</span><span class=sr>/hadoop jar share/</span><span class=nx>hadoop</span><span class=sr>/mapreduce/</span><span class=nx>hadoop</span><span class=p>-</span><span class=nx>mapreduce</span><span class=p>-</span><span class=nx>examples</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>0</span>.<span class=nx>jar</span> <span class=nx>wordcount</span> <span class=sr>/user /</span><span class=nx>output</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>如下是输出信息，可以观察到先连接到ResourceManager节点请求资源，然后split子任务，提交job，运行map、reduce、Shuffle等，同时打印出消耗的一些资源信息。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-ceylon data-lang=ceylon><span class=o>[</span><span class=n>hadoop</span><span class=err>@</span><span class=n>namenode1</span> <span class=n>hadoop</span><span class=o>-</span><span class=mf>2.6</span><span class=o>.</span><span class=mi>0</span><span class=o>]</span><span class=err>$</span> <span class=n>bin</span><span class=o>/</span><span class=n>hadoop</span> <span class=n>jar</span> <span class=n>share</span><span class=o>/</span><span class=n>hadoop</span><span class=o>/</span><span class=n>mapreduce</span><span class=o>/</span><span class=n>hadoop</span><span class=o>-</span><span class=n>mapreduce</span><span class=o>-</span><span class=n>examples</span><span class=o>-</span><span class=mf>2.6</span><span class=o>.</span><span class=mi>0</span><span class=o>.</span><span class=na>jar</span> <span class=n>wordcount</span> <span class=o>/</span><span class=n>user</span> <span class=o>/</span><span class=n>output</span><span class=o>/</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>45</span> <span class=n>INFO</span> <span class=n>client</span><span class=o>.</span><span class=nl>RMProxy:</span> <span class=n>Connecting</span> <span class=n>to</span> <span class=n>ResourceManager</span> <span class=n>at</span> <span class=n>namenode1</span><span class=o>/</span><span class=mf>10.20</span><span class=o>.</span><span class=mf>16.217</span><span class=o>:</span><span class=mi>8032</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>47</span> <span class=n>INFO</span> <span class=n>input</span><span class=o>.</span><span class=nl>FileInputFormat:</span> <span class=n>Total</span> <span class=n>input</span> <span class=n>paths</span> <span class=n>to</span> <span class=n>process</span> <span class=o>:</span> <span class=mi>2</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>47</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>JobSubmitter:</span> <span class=n>number</span> <span class=kd>of</span> <span class=nl>splits:</span><span class=mi>2</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>48</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>JobSubmitter:</span> <span class=n>Submitting</span> <span class=n>tokens</span> <span class=k>for</span> <span class=nl>job:</span> <span class=n>job_1425305505469_0003</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>48</span> <span class=n>INFO</span> <span class=n>impl</span><span class=o>.</span><span class=nl>YarnClientImpl:</span> <span class=n>Submitted</span> <span class=n>application</span> <span class=n>application_1425305505469_0003</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>48</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span> <span class=n>The</span> <span class=n>url</span> <span class=n>to</span> <span class=n>track</span> <span class=n>the</span> <span class=nl>job:</span> <span class=nl>http:</span><span class=c1>//namenode1:8088/proxy/application_1425305505469_0003/
+</span><span class=c1></span><span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>04</span><span class=o>:</span><span class=mi>48</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span> <span class=n>Running</span> <span class=nl>job:</span> <span class=n>job_1425305505469_0003</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>02</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span> <span class=n>Job</span> <span class=n>job_1425305505469_0003</span> <span class=n>running</span> <span class=k>in</span> <span class=n>uber</span> <span class=n>mode</span> <span class=o>:</span> <span class=kc>false</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>02</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span>  <span class=n>map</span> <span class=mi>0</span><span class=o>%</span> <span class=n>reduce</span> <span class=mi>0</span><span class=o>%</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>20</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span>  <span class=n>map</span> <span class=mi>100</span><span class=o>%</span> <span class=n>reduce</span> <span class=mi>0</span><span class=o>%</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>33</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span>  <span class=n>map</span> <span class=mi>100</span><span class=o>%</span> <span class=n>reduce</span> <span class=mi>100</span><span class=o>%</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>33</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span> <span class=n>Job</span> <span class=n>job_1425305505469_0003</span> <span class=n>completed</span> <span class=n>successfully</span>
+<span class=mi>15</span><span class=o>/</span><span class=mi>03</span><span class=o>/</span><span class=mi>02</span> <span class=mi>23</span><span class=o>:</span><span class=mi>05</span><span class=o>:</span><span class=mi>33</span> <span class=n>INFO</span> <span class=n>mapreduce</span><span class=o>.</span><span class=nl>Job:</span> <span class=nl>Counters:</span> <span class=mi>49</span>
+        <span class=n>File</span> <span class=n>System</span> <span class=n>Counters</span>
+                <span class=nl>FILE:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>bytes</span> <span class=n>read</span><span class=o>=</span><span class=mi>131</span>
+                <span class=nl>FILE:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>bytes</span> <span class=n>written</span><span class=o>=</span><span class=mi>321936</span>
+                <span class=nl>FILE:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>read</span> <span class=n>operations</span><span class=o>=</span><span class=mi>0</span>
+                <span class=nl>FILE:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>large</span> <span class=n>read</span> <span class=n>operations</span><span class=o>=</span><span class=mi>0</span>
+                <span class=nl>FILE:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>write</span> <span class=n>operations</span><span class=o>=</span><span class=mi>0</span>
+                <span class=nl>HDFS:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>bytes</span> <span class=n>read</span><span class=o>=</span><span class=mi>283</span>
+                <span class=nl>HDFS:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>bytes</span> <span class=n>written</span><span class=o>=</span><span class=mi>48</span>
+                <span class=nl>HDFS:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>read</span> <span class=n>operations</span><span class=o>=</span><span class=mi>9</span>
+                <span class=nl>HDFS:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>large</span> <span class=n>read</span> <span class=n>operations</span><span class=o>=</span><span class=mi>0</span>
+                <span class=nl>HDFS:</span> <span class=n>Number</span> <span class=kd>of</span> <span class=n>write</span> <span class=n>operations</span><span class=o>=</span><span class=mi>2</span>
+        <span class=n>Job</span> <span class=n>Counters</span> 
+                <span class=n>Launched</span> <span class=n>map</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>2</span>
+                <span class=n>Launched</span> <span class=n>reduce</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>1</span>
+                <span class=n>Data</span><span class=o>-</span><span class=n>local</span> <span class=n>map</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>2</span>
+                <span class=n>Total</span> <span class=n>time</span> <span class=n>spent</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>maps</span> <span class=k>in</span> <span class=n>occupied</span> <span class=nf>slots</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>506896</span>
+                <span class=n>Total</span> <span class=n>time</span> <span class=n>spent</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>reduces</span> <span class=k>in</span> <span class=n>occupied</span> <span class=nf>slots</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>163376</span>
+                <span class=n>Total</span> <span class=n>time</span> <span class=n>spent</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>map</span> <span class=nf>tasks</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>31681</span>
+                <span class=n>Total</span> <span class=n>time</span> <span class=n>spent</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>reduce</span> <span class=nf>tasks</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>10211</span>
+                <span class=n>Total</span> <span class=n>vcore</span><span class=o>-</span><span class=n>seconds</span> <span class=n>taken</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>map</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>31681</span>
+                <span class=n>Total</span> <span class=n>vcore</span><span class=o>-</span><span class=n>seconds</span> <span class=n>taken</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>reduce</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>10211</span>
+                <span class=n>Total</span> <span class=n>megabyte</span><span class=o>-</span><span class=n>seconds</span> <span class=n>taken</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>map</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>32441344</span>
+                <span class=n>Total</span> <span class=n>megabyte</span><span class=o>-</span><span class=n>seconds</span> <span class=n>taken</span> <span class=nd>by</span> <span class=n>all</span> <span class=n>reduce</span> <span class=n>tasks</span><span class=o>=</span><span class=mi>10456064</span>
+        <span class=n>Map</span><span class=o>-</span><span class=n>Reduce</span> <span class=n>Framework</span>
+                <span class=n>Map</span> <span class=n>input</span> <span class=n>records</span><span class=o>=</span><span class=mi>2</span>
+                <span class=n>Map</span> <span class=n>output</span> <span class=n>records</span><span class=o>=</span><span class=mi>10</span>
+                <span class=n>Map</span> <span class=n>output</span> <span class=n>bytes</span><span class=o>=</span><span class=mi>105</span>
+                <span class=n>Map</span> <span class=n>output</span> <span class=n>materialized</span> <span class=n>bytes</span><span class=o>=</span><span class=mi>137</span>
+                <span class=n>Input</span> <span class=n>split</span> <span class=n>bytes</span><span class=o>=</span><span class=mi>218</span>
+                <span class=n>Combine</span> <span class=n>input</span> <span class=n>records</span><span class=o>=</span><span class=mi>10</span>
+                <span class=n>Combine</span> <span class=n>output</span> <span class=n>records</span><span class=o>=</span><span class=mi>10</span>
+                <span class=n>Reduce</span> <span class=n>input</span> <span class=n>groups</span><span class=o>=</span><span class=mi>6</span>
+                <span class=n>Reduce</span> <span class=n>shuffle</span> <span class=n>bytes</span><span class=o>=</span><span class=mi>137</span>
+                <span class=n>Reduce</span> <span class=n>input</span> <span class=n>records</span><span class=o>=</span><span class=mi>10</span>
+                <span class=n>Reduce</span> <span class=n>output</span> <span class=n>records</span><span class=o>=</span><span class=mi>6</span>
+                <span class=n>Spilled</span> <span class=n>Records</span><span class=o>=</span><span class=mi>20</span>
+                <span class=n>Shuffled</span> <span class=n>Maps</span> <span class=o>=</span><span class=mi>2</span>
+                <span class=n>Failed</span> <span class=n>Shuffles</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>Merged</span> <span class=n>Map</span> <span class=n>outputs</span><span class=o>=</span><span class=mi>2</span>
+                <span class=n>GC</span> <span class=n>time</span> <span class=nf>elapsed</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>382</span>
+                <span class=n>CPU</span> <span class=n>time</span> <span class=nf>spent</span> <span class=o>(</span><span class=n>ms</span><span class=o>)=</span><span class=mi>2730</span>
+                <span class=n>Physical</span> <span class=nf>memory</span> <span class=o>(</span><span class=n>bytes</span><span class=o>)</span> <span class=n>snapshot</span><span class=o>=</span><span class=mi>512602112</span>
+                <span class=n>Virtual</span> <span class=nf>memory</span> <span class=o>(</span><span class=n>bytes</span><span class=o>)</span> <span class=n>snapshot</span><span class=o>=</span><span class=mi>2747863040</span>
+                <span class=n>Total</span> <span class=n>committed</span> <span class=n>heap</span> <span class=nf>usage</span> <span class=o>(</span><span class=n>bytes</span><span class=o>)=</span><span class=mi>297672704</span>
+        <span class=n>Shuffle</span> <span class=n>Errors</span>
+                <span class=n>BAD_ID</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>CONNECTION</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>IO_ERROR</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>WRONG_LENGTH</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>WRONG_MAP</span><span class=o>=</span><span class=mi>0</span>
+                <span class=n>WRONG_REDUCE</span><span class=o>=</span><span class=mi>0</span>
+        <span class=n>File</span> <span class=n>Input</span> <span class=n>Format</span> <span class=n>Counters</span> 
+                <span class=n>Bytes</span> <span class=n>Read</span><span class=o>=</span><span class=mi>65</span>
+        <span class=n>File</span> <span class=n>Output</span> <span class=n>Format</span> <span class=n>Counters</span> 
+                <span class=n>Bytes</span> <span class=n>Written</span><span class=o>=</span><span class=mi>48</span>
+<span class=o>[</span><span class=n>hadoop</span><span class=err>@</span><span class=n>namenode1</span> <span class=n>hadoop</span><span class=o>-</span><span class=mf>2.6</span><span class=o>.</span><span class=mi>0</span><span class=o>]</span><span class=err>$</span>
+</code></pre></td></tr></table></div></div><h4 id=4-查看mapreduce运行结果>4) 查看MapReduce运行结果</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>hadoop</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>0</span>]$ <span class=nx>hdfs</span> <span class=nx>dfs</span> <span class=p>-</span><span class=nx>ls</span> /<span class=nx>output</span><span class=err>
+</span><span class=err></span><span class=nx>Found</span> <span class=m>2</span> <span class=nx>items</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>rw</span><span class=p>-</span><span class=nx>r</span><span class=p>--</span><span class=nx>r</span><span class=p>--</span>   <span class=m>2</span> <span class=nx>hadoop</span> <span class=nx>supergroup</span>          <span class=m>0</span> <span class=m>2015-03-02</span> <span class=m>23</span>:<span class=m>05</span> <span class=sr>/output/</span><span class=nx>_SUCCESS</span><span class=err>
+</span><span class=err></span><span class=p>-</span><span class=nx>rw</span><span class=p>-</span><span class=nx>r</span><span class=p>--</span><span class=nx>r</span><span class=p>--</span>   <span class=m>2</span> <span class=nx>hadoop</span> <span class=nx>supergroup</span>         <span class=m>48</span> <span class=m>2015-03-02</span> <span class=m>23</span>:<span class=m>05</span> <span class=sr>/output/</span><span class=nx>part</span><span class=p>-</span><span class=nx>r</span><span class=m>-00000</span><span class=err>
+</span><span class=err></span>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>hadoop</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>0</span>]$ <span class=err>
+</span><span class=err></span>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>hadoop</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>0</span>]$ <span class=nx>hdfs</span> <span class=nx>dfs</span> <span class=p>-</span><span class=nx>cat</span> <span class=sr>/output/</span><span class=nx>part</span><span class=p>-</span><span class=nx>r</span><span class=m>-00000</span><span class=err>
+</span><span class=err></span><span class=nx>a</span>       <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=nx>c</span>       <span class=m>1</span><span class=err>
+</span><span class=err></span><span class=nx>is</span>      <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=nx>java</span>    <span class=m>1</span><span class=err>
+</span><span class=err></span><span class=nx>user</span>    <span class=m>2</span><span class=err>
+</span><span class=err></span><span class=nx>programmer</span>      <span class=m>2</span><span class=err>
+</span><span class=err></span>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=nx>hadoop</span><span class=m>-2</span>.<span class=m>6</span>.<span class=m>0</span>]$<span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=5-通过jobhistory查看任务>5) 通过JobHistory查看任务</h4><p>我们也可以访问MapReduce JobHistory（http://10.20.16.217:19888/）网址，在网页上查看运行过的MR任务情况，默认会保留一段时间，可以设置时长。</p><p><img src=/images/big-data/jobhistory.png alt=JobHistory></p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2015-03-05</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/hadoop/>hadoop</a>
+<a href=/tags/bigdata/>bigdata</a></div><nav class=post-nav><a class=prev href=/post/2015/03/fedration-ha-hbase/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Hadoop学习6-Federation + HA + Hbase搭建</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2015/03/hbase-install/><span class="next-text nav-default">Hadoop学习4-Hbase双Hmaster集群搭建</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2015-03-05 00:00:00 \u002b0000 UTC',title:'Hadoop学习5-运行map-reduce任务',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

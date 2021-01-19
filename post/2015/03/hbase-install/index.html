@@ -1,549 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Hadoop学习4-Hbase双Hmaster集群搭建 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="(三) Hbase双Hmaster集群搭建 步骤一、 资源规划 这里以前面搭建好的Hadoop为基础，搭建Hbase集群。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2015/03/hbase-install/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="Hadoop学习4-Hbase双Hmaster集群搭建" />
-<meta property="og:description" content="(三) Hbase双Hmaster集群搭建
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Hadoop学习4-Hbase双Hmaster集群搭建 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="(三) Hbase双Hmaster集群搭建 步骤一、 资源规划 这里以前面搭建好的Hadoop为基础，搭建Hbase集群。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2015/03/hbase-install/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Hadoop学习4-Hbase双Hmaster集群搭建"><meta property="og:description" content="(三) Hbase双Hmaster集群搭建
 步骤一、 资源规划
-这里以前面搭建好的Hadoop为基础，搭建Hbase集群。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hbase-install/" />
-<meta property="article:published_time" content="2015-03-04T00:00:00+00:00" />
-<meta property="article:modified_time" content="2015-03-04T00:00:00+00:00" />
-<meta itemprop="name" content="Hadoop学习4-Hbase双Hmaster集群搭建">
-<meta itemprop="description" content="(三) Hbase双Hmaster集群搭建
+这里以前面搭建好的Hadoop为基础，搭建Hbase集群。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2015/03/hbase-install/"><meta property="article:published_time" content="2015-03-04T00:00:00+00:00"><meta property="article:modified_time" content="2015-03-04T00:00:00+00:00"><meta itemprop=name content="Hadoop学习4-Hbase双Hmaster集群搭建"><meta itemprop=description content="(三) Hbase双Hmaster集群搭建
 步骤一、 资源规划
-这里以前面搭建好的Hadoop为基础，搭建Hbase集群。">
-<meta itemprop="datePublished" content="2015-03-04T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2015-03-04T00:00:00+00:00" />
-<meta itemprop="wordCount" content="880">
-
-
-
-<meta itemprop="keywords" content="hadoop,bigdata," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hadoop学习4-Hbase双Hmaster集群搭建"/>
-<meta name="twitter:description" content="(三) Hbase双Hmaster集群搭建
+这里以前面搭建好的Hadoop为基础，搭建Hbase集群。"><meta itemprop=datePublished content="2015-03-04T00:00:00+00:00"><meta itemprop=dateModified content="2015-03-04T00:00:00+00:00"><meta itemprop=wordCount content="880"><meta itemprop=keywords content="hadoop,bigdata,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Hadoop学习4-Hbase双Hmaster集群搭建"><meta name=twitter:description content="(三) Hbase双Hmaster集群搭建
 步骤一、 资源规划
-这里以前面搭建好的Hadoop为基础，搭建Hbase集群。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">Hadoop学习4-Hbase双Hmaster集群搭建</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2015-03-04 </span>
-        <div class="post-category">
-            <a href="/categories/hadoop/"> hadoop </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#三-hbase双hmaster集群搭建">(三) Hbase双Hmaster集群搭建</a>
-          <ul>
-            <li><a href="#步骤一-资源规划">步骤一、 资源规划</a></li>
-            <li><a href="#步骤二-主机环境变量">步骤二、 主机环境变量</a></li>
-            <li><a href="#步骤三-安装配置hbase">步骤三、 安装配置Hbase</a></li>
-            <li><a href="#步骤四-启动并验证hbase">步骤四、 启动并验证Hbase</a></li>
-            <li><a href="#步骤五-验证hmaster-failover">步骤五、 验证Hmaster failover</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <h2 id="三-hbase双hmaster集群搭建">(三) Hbase双Hmaster集群搭建</h2>
-<h3 id="步骤一-资源规划">步骤一、 资源规划</h3>
-<p>这里以前面搭建好的Hadoop为基础，搭建Hbase集群。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">主机名</th>
-<th style="text-align:left">IP</th>
-<th style="text-align:left">用户</th>
-<th style="text-align:left">Hbase</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">namenode1</td>
-<td style="text-align:left">10.20.16.217</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hmaster</td>
-</tr>
-<tr>
-<td style="text-align:left">namenode2</td>
-<td style="text-align:left">10.20.16.218</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hmaster（backup）</td>
-</tr>
-<tr>
-<td style="text-align:left">datanode1</td>
-<td style="text-align:left">10.20.16.219</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hregionserver</td>
-</tr>
-<tr>
-<td style="text-align:left">datanode2</td>
-<td style="text-align:left">10.20.16.220</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hregionserver</td>
-</tr>
-<tr>
-<td style="text-align:left">datanode3</td>
-<td style="text-align:left">10.20.16.221</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hregionserver</td>
-</tr>
-<tr>
-<td style="text-align:left">datanode4</td>
-<td style="text-align:left">10.20.16.222</td>
-<td style="text-align:left">hadoop:hadoop</td>
-<td style="text-align:left">Hregionserver</td>
-</tr>
-</tbody>
-</table>
-<h3 id="步骤二-主机环境变量">步骤二、 主机环境变量</h3>
-<p>在/etc/profile添加如下环境变量</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">HBASE_HOME</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">hbase</span><span class="m">-0</span>.<span class="m">98</span>.<span class="m">10</span><span class="p">-</span><span class="nx">hadoop2</span><span class="err">
-</span><span class="err"></span><span class="nx">export</span> <span class="nx">PATH</span><span class="p">=</span>$<span class="nx">HBASE_HOME</span>/<span class="nx">bin</span>:$<span class="nx">PATH</span>:<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="步骤三-安装配置hbase">步骤三、 安装配置Hbase</h3>
-<p>下载hbase安装包并上传到namenode1节点，解压后进入conf目录。</p>
-<h4 id="1-hbase-envsh">1) hbase-env.sh</h4>
-<p>在hbase-env.sh最后添加如下环境变量</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">JAVA_HOME</span><span class="p">=</span><span class="sr">/usr/</span><span class="nx">java</span>/<span class="nx">jdk1</span>.<span class="m">7</span>.<span class="m">0</span>_<span class="m">71</span><span class="err">
-</span><span class="err"></span><span class="nx">export</span> <span class="nx">HBASE_MANAGES_ZK</span><span class="p">=</span><span class="nx">false</span><span class="err">
-</span><span class="err"></span><span class="nx">export</span> <span class="nx">HBASE_PID_DIR</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">pids</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-hbase-sitexml">2) hbase-site.xml</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&#34;1.0&#34;?&gt;</span>
-<span class="nt">&lt;configuration&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>hbase.rootdir<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>hdfs://mycluster:8020/hbase<span class="nt">&lt;/value&gt;</span>
-        <span class="nt">&lt;description&gt;</span>The directory shared by region servers.<span class="nt">&lt;/description&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>hbase.zookeeper.property.clientPort<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>2181<span class="nt">&lt;/value&gt;</span>
-        <span class="nt">&lt;description&gt;</span>Property from ZooKeeper&#39;s config zoo.cfg. The port at which the clients will connect.<span class="nt">&lt;/description&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>zookeeper.session.timeout<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>120000<span class="nt">&lt;/value&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>hbase.zookeeper.quorum<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>namenode1,namenode2,datanode1<span class="nt">&lt;/value&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>hbase.tmp.dir<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>/home/hadoop/hbasedata<span class="nt">&lt;/value&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-    <span class="nt">&lt;property&gt;</span>
-        <span class="nt">&lt;name&gt;</span>hbase.cluster.distributed<span class="nt">&lt;/name&gt;</span>
-        <span class="nt">&lt;value&gt;</span>true<span class="nt">&lt;/value&gt;</span>
-    <span class="nt">&lt;/property&gt;</span>
-<span class="nt">&lt;/configuration&gt;</span>
-</code></pre></td></tr></table>
-</div>
-</div><h4 id="3-regionservers">3) regionservers</h4>
-<p>配置regionservers，按照步骤一的规划，配置内容如下</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">datanode1</span><span class="err">
-</span><span class="err"></span><span class="nx">datanode2</span><span class="err">
-</span><span class="err"></span><span class="nx">datanode3</span><span class="err">
-</span><span class="err"></span><span class="nx">datanode4</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="4-backup-masters">4) backup-masters</h4>
-<p>配置Hmaster的高可用，增加backup master的机器列表，每台机器一条记录，如下</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">namenode2</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="5-hdfs-client设置">5) HDFS Client设置</h4>
-<p>为了保证HDFS Client的配置和HDFS Server端的不冲突，并且HDFS Server上对于Hbase的配置变更能及时对Hbase生效，必须使Hbase能获取这些变更的配置信息并使用这些配置，Hbase提供了3种方法（参照<a href="http://user.github.io/blog/2015/03/01/hadoop-foundation.html#hbasehdfs-sitexml">Hbase为什么需要hdfs-site.xml</a>），这里我们使用下面的方法。</p>
-<p>在hbase-env.sh中添加环境变量，指向Hadoop配置文件的目录。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">HBASE_CLASSPATH</span><span class="p">=</span>$<span class="nx">HADOOP_HOME</span><span class="sr">/etc/</span><span class="nx">hadoop</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="6-完成所有节点安装">6) 完成所有节点安装</h4>
-<p>在namenode1执行如下命令完成所有节点的hbase安装。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span> <span class="nx">myhost</span> <span class="nx">in</span> <span class="nx">namenode1</span> <span class="nx">namenode2</span> <span class="nx">datanode</span>{<span class="m">1</span>..<span class="m">4</span>}<span class="err">
-</span><span class="err"></span><span class="nx">do</span><span class="err">
-</span><span class="err"></span><span class="nx">scp</span> <span class="p">-</span><span class="nx">r</span> <span class="sr">/home/</span><span class="nx">hadoop</span><span class="sr">/hbase-0.98.10-hadoop2 hadoop@$myhost:/</span><span class="nx">home</span><span class="sr">/hadoop/</span><span class="err">
-</span><span class="err"></span><span class="nx">done</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="步骤四-启动并验证hbase">步骤四、 启动并验证Hbase</h3>
-<h4 id="1-启动hbase">1) 启动Hbase</h4>
-<p>在Hmaster节点启动。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">start</span><span class="p">-</span><span class="nx">hbase</span>.<span class="nx">sh</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="2-验证进程">2) 验证进程</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">jps</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><p>**示例：**在namenode1输出如下</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="p">~</span>]$ <span class="nx">jps</span><span class="err">
-</span><span class="err"></span><span class="m">53320</span> <span class="nx">JobHistoryServer</span><span class="err">
-</span><span class="err"></span><span class="m">59134</span> <span class="nx">Jps</span><span class="err">
-</span><span class="err"></span><span class="m">52560</span> <span class="nx">JournalNode</span><span class="err">
-</span><span class="err"></span><span class="m">52740</span> <span class="nx">DFSZKFailoverController</span><span class="err">
-</span><span class="err"></span><span class="m">20209</span> <span class="nx">QuorumPeerMain</span><span class="err">
-</span><span class="err"></span><span class="m">52881</span> <span class="nx">ResourceManager</span><span class="err">
-</span><span class="err"></span><span class="m">58684</span> <span class="nx">HMaster</span><span class="err">
-</span><span class="err"></span><span class="m">52349</span> <span class="nx">NameNode</span><span class="err">
-</span><span class="err"></span>[<span class="nx">hadoop</span>@<span class="nx">namenode1</span> <span class="p">~</span>]$<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h4 id="3-验证web-ui">3) 验证web-ui</h4>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Master</td>
-<td>http://10.20.16.217:60010 <br> http://10.20.16.218:60010</td>
-</tr>
-<tr>
-<td>HRegionServer</td>
-<td>http://10.20.16.219:60030 <br> … <br> http://10.20.16.222:60030</td>
-</tr>
-</tbody>
-</table>
-<h3 id="步骤五-验证hmaster-failover">步骤五、 验证Hmaster failover</h3>
-<p>通过上一步的web-ui可以看到Hmaster和Hmaster backup分别在哪台主机，jps查到pid，然后kill -9 pid，等候3秒左右，通过web-ui查看backup是否已经接管Hmaster的服务，如果已经接管则failover成功。</p>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2015-03-04
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/hadoop/">hadoop</a>
-          <a href="/tags/bigdata/">bigdata</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2015/03/hadoop-map-reduce-task/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Hadoop学习5-运行map-reduce任务</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2015/03/hadoop-namenode-auto-failover/">
-            <span class="next-text nav-default">Hadoop学习3-NameNode自动failover</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2015-03-04 00:00:00 \u002b0000 UTC',
-        title: 'Hadoop学习4-Hbase双Hmaster集群搭建',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+这里以前面搭建好的Hadoop为基础，搭建Hbase集群。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Hadoop学习4-Hbase双Hmaster集群搭建</h1><div class=post-meta><span class=post-time>2015-03-04</span><div class=post-category><a href=/categories/hadoop/>hadoop</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#三-hbase双hmaster集群搭建>(三) Hbase双Hmaster集群搭建</a><ul><li><a href=#步骤一-资源规划>步骤一、 资源规划</a></li><li><a href=#步骤二-主机环境变量>步骤二、 主机环境变量</a></li><li><a href=#步骤三-安装配置hbase>步骤三、 安装配置Hbase</a></li><li><a href=#步骤四-启动并验证hbase>步骤四、 启动并验证Hbase</a></li><li><a href=#步骤五-验证hmaster-failover>步骤五、 验证Hmaster failover</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=三-hbase双hmaster集群搭建>(三) Hbase双Hmaster集群搭建</h2><h3 id=步骤一-资源规划>步骤一、 资源规划</h3><p>这里以前面搭建好的Hadoop为基础，搭建Hbase集群。</p><table><thead><tr><th style=text-align:left>主机名</th><th style=text-align:left>IP</th><th style=text-align:left>用户</th><th style=text-align:left>Hbase</th></tr></thead><tbody><tr><td style=text-align:left>namenode1</td><td style=text-align:left>10.20.16.217</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hmaster</td></tr><tr><td style=text-align:left>namenode2</td><td style=text-align:left>10.20.16.218</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hmaster（backup）</td></tr><tr><td style=text-align:left>datanode1</td><td style=text-align:left>10.20.16.219</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hregionserver</td></tr><tr><td style=text-align:left>datanode2</td><td style=text-align:left>10.20.16.220</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hregionserver</td></tr><tr><td style=text-align:left>datanode3</td><td style=text-align:left>10.20.16.221</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hregionserver</td></tr><tr><td style=text-align:left>datanode4</td><td style=text-align:left>10.20.16.222</td><td style=text-align:left>hadoop:hadoop</td><td style=text-align:left>Hregionserver</td></tr></tbody></table><h3 id=步骤二-主机环境变量>步骤二、 主机环境变量</h3><p>在/etc/profile添加如下环境变量</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>export</span> <span class=nx>HBASE_HOME</span><span class=p>=</span><span class=sr>/home/</span><span class=nx>hadoop</span>/<span class=nx>hbase</span><span class=m>-0</span>.<span class=m>98</span>.<span class=m>10</span><span class=p>-</span><span class=nx>hadoop2</span><span class=err>
+</span><span class=err></span><span class=nx>export</span> <span class=nx>PATH</span><span class=p>=</span>$<span class=nx>HBASE_HOME</span>/<span class=nx>bin</span>:$<span class=nx>PATH</span>:<span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=步骤三-安装配置hbase>步骤三、 安装配置Hbase</h3><p>下载hbase安装包并上传到namenode1节点，解压后进入conf目录。</p><h4 id=1-hbase-envsh>1) hbase-env.sh</h4><p>在hbase-env.sh最后添加如下环境变量</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>export</span> <span class=nx>JAVA_HOME</span><span class=p>=</span><span class=sr>/usr/</span><span class=nx>java</span>/<span class=nx>jdk1</span>.<span class=m>7</span>.<span class=m>0</span>_<span class=m>71</span><span class=err>
+</span><span class=err></span><span class=nx>export</span> <span class=nx>HBASE_MANAGES_ZK</span><span class=p>=</span><span class=nx>false</span><span class=err>
+</span><span class=err></span><span class=nx>export</span> <span class=nx>HBASE_PID_DIR</span><span class=p>=</span><span class=sr>/home/</span><span class=nx>hadoop</span>/<span class=nx>pids</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-hbase-sitexml>2) hbase-site.xml</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-xml data-lang=xml><span class=cp>&lt;?xml version=&#34;1.0&#34;?&gt;</span>
+<span class=nt>&lt;configuration&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>hbase.rootdir<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>hdfs://mycluster:8020/hbase<span class=nt>&lt;/value&gt;</span>
+        <span class=nt>&lt;description&gt;</span>The directory shared by region servers.<span class=nt>&lt;/description&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>hbase.zookeeper.property.clientPort<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>2181<span class=nt>&lt;/value&gt;</span>
+        <span class=nt>&lt;description&gt;</span>Property from ZooKeeper&#39;s config zoo.cfg. The port at which the clients will connect.<span class=nt>&lt;/description&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>zookeeper.session.timeout<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>120000<span class=nt>&lt;/value&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>hbase.zookeeper.quorum<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>namenode1,namenode2,datanode1<span class=nt>&lt;/value&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>hbase.tmp.dir<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>/home/hadoop/hbasedata<span class=nt>&lt;/value&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+    <span class=nt>&lt;property&gt;</span>
+        <span class=nt>&lt;name&gt;</span>hbase.cluster.distributed<span class=nt>&lt;/name&gt;</span>
+        <span class=nt>&lt;value&gt;</span>true<span class=nt>&lt;/value&gt;</span>
+    <span class=nt>&lt;/property&gt;</span>
+<span class=nt>&lt;/configuration&gt;</span>
+</code></pre></td></tr></table></div></div><h4 id=3-regionservers>3) regionservers</h4><p>配置regionservers，按照步骤一的规划，配置内容如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>datanode1</span><span class=err>
+</span><span class=err></span><span class=nx>datanode2</span><span class=err>
+</span><span class=err></span><span class=nx>datanode3</span><span class=err>
+</span><span class=err></span><span class=nx>datanode4</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=4-backup-masters>4) backup-masters</h4><p>配置Hmaster的高可用，增加backup master的机器列表，每台机器一条记录，如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>namenode2</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=5-hdfs-client设置>5) HDFS Client设置</h4><p>为了保证HDFS Client的配置和HDFS Server端的不冲突，并且HDFS Server上对于Hbase的配置变更能及时对Hbase生效，必须使Hbase能获取这些变更的配置信息并使用这些配置，Hbase提供了3种方法（参照<a href=http://user.github.io/blog/2015/03/01/hadoop-foundation.html#hbasehdfs-sitexml>Hbase为什么需要hdfs-site.xml</a>），这里我们使用下面的方法。</p><p>在hbase-env.sh中添加环境变量，指向Hadoop配置文件的目录。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>export</span> <span class=nx>HBASE_CLASSPATH</span><span class=p>=</span>$<span class=nx>HADOOP_HOME</span><span class=sr>/etc/</span><span class=nx>hadoop</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=6-完成所有节点安装>6) 完成所有节点安装</h4><p>在namenode1执行如下命令完成所有节点的hbase安装。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>for</span> <span class=nx>myhost</span> <span class=nx>in</span> <span class=nx>namenode1</span> <span class=nx>namenode2</span> <span class=nx>datanode</span>{<span class=m>1</span>..<span class=m>4</span>}<span class=err>
+</span><span class=err></span><span class=nx>do</span><span class=err>
+</span><span class=err></span><span class=nx>scp</span> <span class=p>-</span><span class=nx>r</span> <span class=sr>/home/</span><span class=nx>hadoop</span><span class=sr>/hbase-0.98.10-hadoop2 hadoop@$myhost:/</span><span class=nx>home</span><span class=sr>/hadoop/</span><span class=err>
+</span><span class=err></span><span class=nx>done</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=步骤四-启动并验证hbase>步骤四、 启动并验证Hbase</h3><h4 id=1-启动hbase>1) 启动Hbase</h4><p>在Hmaster节点启动。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>start</span><span class=p>-</span><span class=nx>hbase</span>.<span class=nx>sh</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=2-验证进程>2) 验证进程</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>jps</span><span class=err>
+</span></code></pre></td></tr></table></div></div><p>**示例：**在namenode1输出如下</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=p>~</span>]$ <span class=nx>jps</span><span class=err>
+</span><span class=err></span><span class=m>53320</span> <span class=nx>JobHistoryServer</span><span class=err>
+</span><span class=err></span><span class=m>59134</span> <span class=nx>Jps</span><span class=err>
+</span><span class=err></span><span class=m>52560</span> <span class=nx>JournalNode</span><span class=err>
+</span><span class=err></span><span class=m>52740</span> <span class=nx>DFSZKFailoverController</span><span class=err>
+</span><span class=err></span><span class=m>20209</span> <span class=nx>QuorumPeerMain</span><span class=err>
+</span><span class=err></span><span class=m>52881</span> <span class=nx>ResourceManager</span><span class=err>
+</span><span class=err></span><span class=m>58684</span> <span class=nx>HMaster</span><span class=err>
+</span><span class=err></span><span class=m>52349</span> <span class=nx>NameNode</span><span class=err>
+</span><span class=err></span>[<span class=nx>hadoop</span>@<span class=nx>namenode1</span> <span class=p>~</span>]$<span class=err>
+</span></code></pre></td></tr></table></div></div><h4 id=3-验证web-ui>3) 验证web-ui</h4><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Master</td><td>http://10.20.16.217:60010<br>http://10.20.16.218:60010</td></tr><tr><td>HRegionServer</td><td>http://10.20.16.219:60030<br>…<br>http://10.20.16.222:60030</td></tr></tbody></table><h3 id=步骤五-验证hmaster-failover>步骤五、 验证Hmaster failover</h3><p>通过上一步的web-ui可以看到Hmaster和Hmaster backup分别在哪台主机，jps查到pid，然后kill -9 pid，等候3秒左右，通过web-ui查看backup是否已经接管Hmaster的服务，如果已经接管则failover成功。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2015-03-04</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/hadoop/>hadoop</a>
+<a href=/tags/bigdata/>bigdata</a></div><nav class=post-nav><a class=prev href=/post/2015/03/hadoop-map-reduce-task/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Hadoop学习5-运行map-reduce任务</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2015/03/hadoop-namenode-auto-failover/><span class="next-text nav-default">Hadoop学习3-NameNode自动failover</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2015-03-04 00:00:00 \u002b0000 UTC',title:'Hadoop学习4-Hbase双Hmaster集群搭建',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>

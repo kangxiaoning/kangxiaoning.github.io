@@ -1,21 +1,2 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>bubble-sort on 南寨小子</title>
-    <link>https://kangxiaoning.github.io/tags/bubble-sort/</link>
-    <description>Recent content in bubble-sort on 南寨小子</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
-    <lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/bubble-sort/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Bubble Sort</title>
-      <link>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</link>
-      <pubDate>Thu, 07 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</guid>
-      <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
-&lt;p&gt;重复遍历待排序的列表，比较相邻两个元素，如果顺序错误则交换，直到没有相邻的元素需要交换则说明已经是顺序的。&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>bubble-sort on 南寨小子</title><link>https://kangxiaoning.github.io/tags/bubble-sort/</link><description>Recent content in bubble-sort on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 07 Mar 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/bubble-sort/index.xml" rel="self" type="application/rss+xml"/><item><title>Bubble Sort</title><link>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</link><pubDate>Thu, 07 Mar 2019 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2019/03/bubble-sort/</guid><description>&lt;h2 id="11-实现原理">1.1 实现原理&lt;/h2>
+&lt;p>重复遍历待排序的列表，比较相邻两个元素，如果顺序错误则交换，直到没有相邻的元素需要交换则说明已经是顺序的。&lt;/p></description></item></channel></rss>

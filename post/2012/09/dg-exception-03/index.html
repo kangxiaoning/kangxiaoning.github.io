@@ -1,573 +1,271 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>DataGrard异常-不传输日志 - 南寨小子</title>
-  <meta name="renderer" content="webkit" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-<meta name="theme-color" content="#f8f5ec" />
-<meta name="msapplication-navbutton-color" content="#f8f5ec">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
-
-
-<meta name="author" content="dbo" /><meta name="description" content="DG不传输日志 ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。
-" /><meta name="keywords" content="Hugo, theme, even" />
-
-
-
-
-
-
-<meta name="generator" content="Hugo 0.80.0 with theme even" />
-
-
-<link rel="canonical" href="https://kangxiaoning.github.io/post/2012/09/dg-exception-03/" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
-
-
-<meta property="og:title" content="DataGrard异常-不传输日志" />
-<meta property="og:description" content="
-DG不传输日志
-ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kangxiaoning.github.io/post/2012/09/dg-exception-03/" />
-<meta property="article:published_time" content="2012-09-23T00:00:00+00:00" />
-<meta property="article:modified_time" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="name" content="DataGrard异常-不传输日志">
-<meta itemprop="description" content="
-DG不传输日志
-ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。">
-<meta itemprop="datePublished" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="dateModified" content="2012-09-23T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1425">
-
-
-
-<meta itemprop="keywords" content="Database,Oracle,DG,DataGuard," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="DataGrard异常-不传输日志"/>
-<meta name="twitter:description" content="
-DG不传输日志
-ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。"/>
-
-<!--[if lte IE 9]>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
-<![endif]-->
-
-<!--[if lt IE 9]>
-  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-<![endif]-->
-
-</head>
-<body>
-  <div id="mobile-navbar" class="mobile-navbar">
-  <div class="mobile-header-logo">
-    <a href="/" class="logo">南寨小子</a>
-  </div>
-  <div class="mobile-navbar-icon">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</div>
-<nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
-    <a href="/">
-        <li class="mobile-menu-item">Home</li>
-      </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
-      </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
-      </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
-      </a>
-  </ul>
-
-  
-
-
-</nav>
-
-  <div class="container" id="mobile-panel">
-    <header id="header" class="header">
-        <div class="logo-wrapper">
-  <a href="/" class="logo">南寨小子</a>
-</div>
-
-
-
-
-
-<nav class="site-navbar">
-  <ul id="menu" class="menu">
-    <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
-      </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
-      </li>
-  </ul>
-</nav>
-
-    </header>
-
-    <main id="main" class="main">
-      <div class="content-wrapper">
-        <div id="content" class="content">
-          <article class="post">
-    
-    <header class="post-header">
-      <h1 class="post-title">DataGrard异常-不传输日志</h1>
-
-      <div class="post-meta">
-        <span class="post-time"> 2012-09-23 </span>
-        <div class="post-category">
-            <a href="/categories/database/"> Database </a>
-            </div>
-        
-      </div>
-    </header>
-
-    <div class="post-toc" id="post-toc">
-  <h2 class="post-toc-title">Contents</h2>
-  <div class="post-toc-content always-active">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#dg不传输日志">DG不传输日志</a>
-          <ul>
-            <li><a href="#环境信息">环境信息</a></li>
-            <li><a href="#报错内容">报错内容</a></li>
-            <li><a href="#解决方法">解决方法</a></li>
-            <li><a href="#分析总结">分析总结</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</div>
-    <div class="post-content">
-      <!-- toc -->
-<h2 id="dg不传输日志">DG不传输日志</h2>
-<p>ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。</p>
-<h3 id="环境信息">环境信息</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">drcdb03</span>:<span class="nx">ctsdb1</span> <span class="p">&gt;</span><span class="nx">uname</span> <span class="p">-</span><span class="nx">a</span><span class="err">
-</span><span class="err"></span><span class="nx">HP</span><span class="p">-</span><span class="nx">UX</span> <span class="nx">drcdb03</span> <span class="nx">B</span>.<span class="m">11</span>.<span class="m">23</span> <span class="nx">U</span> <span class="nx">ia64</span> <span class="m">4003443204</span> <span class="nx">unlimited</span><span class="p">-</span><span class="nx">user</span> <span class="nx">license</span><span class="err">
-</span><span class="err"></span><span class="nx">drcdb03</span>:<span class="nx">ctsdb1</span> <span class="p">&gt;</span><span class="nx">sqlplus</span> <span class="s1">&#39;/as sysdba&#39;</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">SQL</span>*<span class="nx">Plus</span>: <span class="nx">Release</span> <span class="m">10</span>.<span class="m">2</span>.<span class="m">0</span>.<span class="m">5</span>.<span class="m">0</span> <span class="p">-</span> <span class="nx">Production</span> <span class="nx">on</span> <span class="nx">Tue</span> <span class="nx">Feb</span> <span class="m">21</span> <span class="m">08</span>:<span class="m">32</span>:<span class="m">36</span> <span class="m">2012</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Copyright</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="m">1982</span><span class="p">,</span> <span class="m">2010</span><span class="p">,</span> <span class="nx">Oracle</span>.  <span class="nx">All</span> <span class="nx">Rights</span> <span class="nx">Reserved</span>.<span class="err">
-</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">Connected</span> <span class="nx">to</span>:<span class="err">
-</span><span class="err"></span><span class="nx">Oracle</span> <span class="nx">Database</span> <span class="m">10</span>g <span class="nx">Enterprise</span> <span class="nx">Edition</span> <span class="nx">Release</span> <span class="m">10</span>.<span class="m">2</span>.<span class="m">0</span>.<span class="m">5</span>.<span class="m">0</span> <span class="p">-</span> <span class="m">64</span>bit <span class="nx">Production</span><span class="err">
-</span><span class="err"></span><span class="nx">With</span> <span class="nx">the</span> <span class="nx">Partitioning</span><span class="p">,</span> <span class="nx">Real</span> <span class="nx">Application</span> <span class="nx">Clusters</span><span class="p">,</span> <span class="nx">OLAP</span><span class="p">,</span> <span class="nx">Data</span> <span class="nx">Mining</span><span class="err">
-</span><span class="err"></span><span class="nx">and</span> <span class="nx">Real</span> <span class="nx">Application</span> <span class="nx">Testing</span> <span class="nx">options</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="nx">SQL</span><span class="p">&gt;</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="报错内容">报错内容</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">  1
-</span><span class="lnt">  2
-</span><span class="lnt">  3
-</span><span class="lnt">  4
-</span><span class="lnt">  5
-</span><span class="lnt">  6
-</span><span class="lnt">  7
-</span><span class="lnt">  8
-</span><span class="lnt">  9
-</span><span class="lnt"> 10
-</span><span class="lnt"> 11
-</span><span class="lnt"> 12
-</span><span class="lnt"> 13
-</span><span class="lnt"> 14
-</span><span class="lnt"> 15
-</span><span class="lnt"> 16
-</span><span class="lnt"> 17
-</span><span class="lnt"> 18
-</span><span class="lnt"> 19
-</span><span class="lnt"> 20
-</span><span class="lnt"> 21
-</span><span class="lnt"> 22
-</span><span class="lnt"> 23
-</span><span class="lnt"> 24
-</span><span class="lnt"> 25
-</span><span class="lnt"> 26
-</span><span class="lnt"> 27
-</span><span class="lnt"> 28
-</span><span class="lnt"> 29
-</span><span class="lnt"> 30
-</span><span class="lnt"> 31
-</span><span class="lnt"> 32
-</span><span class="lnt"> 33
-</span><span class="lnt"> 34
-</span><span class="lnt"> 35
-</span><span class="lnt"> 36
-</span><span class="lnt"> 37
-</span><span class="lnt"> 38
-</span><span class="lnt"> 39
-</span><span class="lnt"> 40
-</span><span class="lnt"> 41
-</span><span class="lnt"> 42
-</span><span class="lnt"> 43
-</span><span class="lnt"> 44
-</span><span class="lnt"> 45
-</span><span class="lnt"> 46
-</span><span class="lnt"> 47
-</span><span class="lnt"> 48
-</span><span class="lnt"> 49
-</span><span class="lnt"> 50
-</span><span class="lnt"> 51
-</span><span class="lnt"> 52
-</span><span class="lnt"> 53
-</span><span class="lnt"> 54
-</span><span class="lnt"> 55
-</span><span class="lnt"> 56
-</span><span class="lnt"> 57
-</span><span class="lnt"> 58
-</span><span class="lnt"> 59
-</span><span class="lnt"> 60
-</span><span class="lnt"> 61
-</span><span class="lnt"> 62
-</span><span class="lnt"> 63
-</span><span class="lnt"> 64
-</span><span class="lnt"> 65
-</span><span class="lnt"> 66
-</span><span class="lnt"> 67
-</span><span class="lnt"> 68
-</span><span class="lnt"> 69
-</span><span class="lnt"> 70
-</span><span class="lnt"> 71
-</span><span class="lnt"> 72
-</span><span class="lnt"> 73
-</span><span class="lnt"> 74
-</span><span class="lnt"> 75
-</span><span class="lnt"> 76
-</span><span class="lnt"> 77
-</span><span class="lnt"> 78
-</span><span class="lnt"> 79
-</span><span class="lnt"> 80
-</span><span class="lnt"> 81
-</span><span class="lnt"> 82
-</span><span class="lnt"> 83
-</span><span class="lnt"> 84
-</span><span class="lnt"> 85
-</span><span class="lnt"> 86
-</span><span class="lnt"> 87
-</span><span class="lnt"> 88
-</span><span class="lnt"> 89
-</span><span class="lnt"> 90
-</span><span class="lnt"> 91
-</span><span class="lnt"> 92
-</span><span class="lnt"> 93
-</span><span class="lnt"> 94
-</span><span class="lnt"> 95
-</span><span class="lnt"> 96
-</span><span class="lnt"> 97
-</span><span class="lnt"> 98
-</span><span class="lnt"> 99
-</span><span class="lnt">100
-</span><span class="lnt">101
-</span><span class="lnt">102
-</span><span class="lnt">103
-</span><span class="lnt">104
-</span><span class="lnt">105
-</span><span class="lnt">106
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">--</span><span class="nx">DG库alert日志</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">注意到从2月1号22</span>：<span class="m">57</span>分开始，<span class="nx">DG库收不到primary库的任何信息</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">22</span>:<span class="m">56</span>:<span class="m">51</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Redo</span> <span class="nx">Shipping</span> <span class="nx">Client</span> <span class="nx">Connected</span> <span class="nx">as</span> <span class="nx">PUBLIC</span><span class="err">
-</span><span class="err"></span><span class="p">--</span> <span class="nx">Connected</span> <span class="nx">User</span> <span class="nx">is</span> <span class="nx">Valid</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">203</span>]: <span class="nx">Assigned</span> <span class="nx">to</span> <span class="nx">RFS</span> <span class="nx">process</span> <span class="m">1942</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">203</span>]: <span class="nx">Identified</span> <span class="nx">database</span> <span class="nx">type</span> <span class="nx">as</span> <span class="s1">&#39;physical standby&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">203</span>]: <span class="nx">Archived</span> <span class="nx">Log</span>: <span class="s1">&#39;+FRA/ctsdbdg/archivelog/2012_02_01/thread_2_seq_18139.8554.774140213&#39;</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">22</span>:<span class="m">57</span>:<span class="m">07</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Log</span> <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdbdg/</span><span class="nx">archivelog</span><span class="sr">/2012_02_01/</span><span class="nx">thread_2_seq_18139</span>.<span class="m">8554</span>.<span class="m">774140213</span><span class="err">
-</span><span class="err"></span><span class="nx">Media</span> <span class="nx">Recovery</span> <span class="nx">Waiting</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">18071</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">02</span>:<span class="m">56</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">181</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">03</span>:<span class="m">33</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">180</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">06</span>:<span class="m">14</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">182</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">18</span>:<span class="m">40</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">183</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">53</span>:<span class="m">08</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">184</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">05</span>:<span class="m">19</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">185</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">05</span>:<span class="m">19</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">186</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">05</span>:<span class="m">19</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">187</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">05</span>:<span class="m">22</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">188</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">26</span>:<span class="m">10</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">190</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">26</span>:<span class="m">10</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">194</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">36</span>:<span class="m">53</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">196</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">46</span>:<span class="m">53</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">197</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">47</span>:<span class="m">17</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">198</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">47</span>:<span class="m">20</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">199</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">47</span>:<span class="m">37</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">200</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">47</span>:<span class="m">59</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">201</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">58</span>:<span class="m">23</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">202</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">01</span>:<span class="m">08</span>:<span class="m">49</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">RFS</span>[<span class="m">203</span>]: <span class="nx">Possible</span> <span class="nx">network</span> <span class="nx">disconnect</span> <span class="nx">with</span> <span class="nx">primary</span> <span class="nx">database</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">07</span>:<span class="m">35</span>:<span class="m">30</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Shutting</span> <span class="nx">down</span> <span class="nx">instance</span> <span class="p">(</span><span class="nx">immediate</span><span class="p">)</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">07</span>:<span class="m">35</span>:<span class="m">30</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Shutting</span> <span class="nx">down</span> <span class="nx">instance</span>: <span class="nx">further</span> <span class="nx">logons</span> <span class="nx">disabled</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">07</span>:<span class="m">35</span>:<span class="m">30</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">primary日志</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">正常情况下</span>，<span class="nx">应该能看到下面红色内容</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">10</span>:<span class="m">54</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">1876</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">47</span> <span class="nx">seq</span># <span class="m">1876</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_47</span>.<span class="m">352</span>.<span class="m">756667957</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">47</span> <span class="nx">seq</span># <span class="m">1876</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_47</span>.<span class="m">28884</span>.<span class="m">756667965</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">10</span>:<span class="m">54</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">1876</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_2</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">15</span>:<span class="m">59</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Completed</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">754</span>.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8719338101721</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">25</span>:<span class="m">55</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Beginning</span> <span class="nx">log</span> <span class="nx">switch</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">755</span>.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8719338187781</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">25</span>:<span class="m">55</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">1877</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">48</span> <span class="nx">seq</span># <span class="m">1877</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_48</span>.<span class="m">261</span>.<span class="m">756667939</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">48</span> <span class="nx">seq</span># <span class="m">1877</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_48</span>.<span class="m">33159</span>.<span class="m">756667949</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">22</span> <span class="m">12</span>:<span class="m">25</span>:<span class="m">55</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">LNS</span>: <span class="nx">Standby</span> <span class="nx">redo</span> <span class="nx">logfile</span> <span class="nx">selected</span> <span class="nx">for</span> <span class="nx">thread</span> <span class="m">1</span> <span class="nx">sequence</span> <span class="m">1877</span> <span class="nx">for</span> <span class="nx">destination</span> <span class="nx">LOG_ARCHIVE_DEST_2</span><span class="err">
-</span><span class="err">
-</span><span class="err"></span><span class="p">--</span><span class="nx">异常时间段日志</span>，<span class="nx">oracle没有将日志归档到远程</span>，<span class="nx">怀疑未识别到远程目录</span><span class="err">
-</span><span class="err"></span><span class="nx">Wed</span> <span class="nx">Feb</span> <span class="m">01</span> <span class="m">23</span>:<span class="m">51</span>:<span class="m">29</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Completed</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>d.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904764300</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">01</span>:<span class="m">30</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Beginning</span> <span class="nx">log</span> <span class="nx">switch</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>e.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904789187</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">01</span>:<span class="m">30</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">18078</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">53</span> <span class="nx">seq</span># <span class="m">18078</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_53</span>.<span class="m">463</span>.<span class="m">756666159</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">53</span> <span class="nx">seq</span># <span class="m">18078</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_53</span>.<span class="m">4601</span>.<span class="m">756666169</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">04</span>:<span class="m">51</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Incremental</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>d.<span class="m">36</span>b.<span class="m">0</span>]<span class="p">,</span> <span class="nx">current</span> <span class="nx">log</span> <span class="nx">tail</span> <span class="nx">at</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>e.<span class="nx">e11f</span>.<span class="m">0</span>]<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">06</span>:<span class="m">34</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Completed</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>e.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904789187</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">16</span>:<span class="m">22</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Beginning</span> <span class="nx">log</span> <span class="nx">switch</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>f.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904912850</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">16</span>:<span class="m">22</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">18079</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">54</span> <span class="nx">seq</span># <span class="m">18079</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_54</span>.<span class="m">462</span>.<span class="m">756666177</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">54</span> <span class="nx">seq</span># <span class="m">18079</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_54</span>.<span class="m">33252</span>.<span class="m">756666187</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">21</span>:<span class="m">11</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Completed</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>f.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904912850</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">31</span>:<span class="m">26</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Beginning</span> <span class="nx">log</span> <span class="nx">switch</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">46</span>a<span class="m">0</span>.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904945086</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">31</span>:<span class="m">26</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Thread</span> <span class="m">1</span> <span class="nx">advanced</span> <span class="nx">to</span> <span class="nx">log</span> <span class="nx">sequence</span> <span class="m">18080</span> <span class="p">(</span><span class="nx">LGWR</span> <span class="nx">switch</span><span class="p">)</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">55</span> <span class="nx">seq</span># <span class="m">18080</span> <span class="nx">mem</span># <span class="m">0</span>: <span class="p">+</span><span class="nx">DATA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_55</span>.<span class="m">461</span>.<span class="m">756666195</span><span class="err">
-</span><span class="err"></span>  <span class="nx">Current</span> <span class="nx">log</span># <span class="m">55</span> <span class="nx">seq</span># <span class="m">18080</span> <span class="nx">mem</span># <span class="m">1</span>: <span class="p">+</span><span class="nx">FRA</span><span class="sr">/ctsdb/</span><span class="nx">onlinelog</span>/<span class="nx">group_55</span>.<span class="m">9237</span>.<span class="m">756666205</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">34</span>:<span class="m">58</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Incremental</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">469</span>f.<span class="m">627</span>.<span class="m">0</span>]<span class="p">,</span> <span class="nx">current</span> <span class="nx">log</span> <span class="nx">tail</span> <span class="nx">at</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">46</span>a<span class="m">0</span>.<span class="nx">c4</span>.<span class="m">0</span>]<span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">36</span>:<span class="m">29</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span><span class="err"></span><span class="nx">Completed</span> <span class="nx">checkpoint</span> <span class="nx">up</span> <span class="nx">to</span> <span class="nx">RBA</span> [<span class="m">0</span>x<span class="m">46</span>a<span class="m">0</span>.<span class="m">2</span>.<span class="m">10</span>]<span class="p">,</span> <span class="nx">SCN</span>: <span class="m">8705904945086</span><span class="err">
-</span><span class="err"></span><span class="nx">Thu</span> <span class="nx">Feb</span> <span class="m">02</span> <span class="m">00</span>:<span class="m">46</span>:<span class="m">24</span> <span class="nx">EAT</span> <span class="m">2012</span><span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="解决方法">解决方法</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">--</span><span class="nx">在生产库执行下面两个命令就可以了</span><span class="err">
-</span><span class="err"></span><span class="m">1</span>. <span class="nx">命令1的目的是使primary解析通向DG库的地址</span><span class="err">
-</span><span class="err"></span>    <span class="nx">alter</span> <span class="nx">system</span> <span class="nx">set</span> <span class="nx">log_archive_dest_2</span> <span class="p">=</span> <span class="s1">&#39;service=&#34;(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.250.31)(PORT = 1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ctsdb)))&#34; LGWR ASYNC NOAFFIRM  REOPEN=60  db_unique_name=ctsdbdg&#39;</span> ;<span class="err">
-</span><span class="err"></span><span class="m">2</span>. <span class="nx">命令2的目的是恢复原来的参数设置</span><span class="err">
-</span><span class="err"></span>    <span class="nx">alter</span> <span class="nx">system</span> <span class="nx">set</span> <span class="nx">log_archive_dest_2</span> <span class="p">=</span> <span class="s1">&#39;service=ctsdbdg LGWR ASYNC NOAFFIRM  REOPEN=60 max_failure=3 net_timeout=30 valid_for=(online_logfiles,primary_role) db_unique_name=ctsdbdg&#39;</span> ;<span class="err">
-</span></code></pre></td></tr></table>
-</div>
-</div><h3 id="分析总结">分析总结</h3>
-<ol>
-<li>观察DG库alert日志，发现从2月1号22：57分开始，DG库收不到primary库的任何信息</li>
-<li>观察primary库alert日志，发现LNS进程未发送任何信息给DG库</li>
-<li>通过上面信息，可以判断，肯定是primary和DG的通信有异常</li>
-<li>常见的通信异常原因有防火墙不通、TNS配置错误等，但是验证这些都是正常的</li>
-<li>排除常见原因，目前的可能就是primary根本没有解析到连接DG库的连接串</li>
-<li>因此我通过直接给出IP和端口的方法，让primary硬解析地址，使primary和DG通信</li>
-<li>重新设置dest2参数，切换日志，可以观察到DG库已经收到primary的信息，开始在standby log上同步日志并apply日志</li>
-<li>同样也可以观察到primary库已经启动LNS进程，传输log到DG库</li>
-<li>至此，这个问题就处理完了</li>
-</ol>
-    </div>
-
-    <div class="post-copyright">
-  <p class="copyright-item">
-    <span class="item-title">Author</span>
-    <span class="item-content">dbo</span>
-  </p>
-  <p class="copyright-item">
-    <span class="item-title">LastMod</span>
-    <span class="item-content">
-        2012-09-23
-        
-    </span>
-  </p>
-  
-  
-</div>
-<footer class="post-footer">
-      <div class="post-tags">
-          <a href="/tags/database/">Database</a>
-          <a href="/tags/oracle/">Oracle</a>
-          <a href="/tags/dg/">DG</a>
-          <a href="/tags/dataguard/">DataGuard</a>
-          </div>
-      <nav class="post-nav">
-        <a class="prev" href="/post/2012/09/dg-exception-01/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">DataGrard异常-ORA-38868</span>
-            <span class="prev-text nav-mobile">Prev</span>
-          </a>
-        <a class="next" href="/post/2012/07/goldengate-exception-01/">
-            <span class="next-text nav-default">GoldenGate-概念解释</span>
-            <span class="next-text nav-mobile">Next</span>
-            <i class="iconfont icon-right"></i>
-          </a>
-      </nav>
-    </footer>
-  </article>
-        </div>
-        <div id="gitalk-container"></div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      var gitalk = new Gitalk({
-        id: '2012-09-23 00:00:00 \u002b0000 UTC',
-        title: 'DataGrard异常-不传输日志',
-        clientID: '70d4f3aa0365e70058f7',
-        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
-        repo: 'gitment-comments',
-        owner: 'kangxiaoning',
-        admin: ['kangxiaoning'],
-        body: decodeURI(location.href)
-      });
-      gitalk.render('gitalk-container');
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
-
-  
-
-  
-
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="social-links">
-      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
-  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
-</div>
-
-<div class="copyright">
-  <span class="power-by">
-    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
-  </span>
-  <span class="division">|</span>
-  <span class="theme-info">
-    Theme - 
-    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
-  </span>
-
-  
-
-  <span class="copyright-year">
-    &copy; 
-    2012 - 
-    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
-  </span>
-</div>
-
-    </footer>
-
-    <div class="back-to-top" id="back-to-top">
-      <i class="iconfont icon-up"></i>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
-
-
-
-<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
-
-
-
-
-
-
-
-
-</body>
-</html>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>DataGrard异常-不传输日志 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="DG不传输日志 ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2012/09/dg-exception-03/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="DataGrard异常-不传输日志"><meta property="og:description" content="DG不传输日志
+ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2012/09/dg-exception-03/"><meta property="article:published_time" content="2012-09-23T00:00:00+00:00"><meta property="article:modified_time" content="2012-09-23T00:00:00+00:00"><meta itemprop=name content="DataGrard异常-不传输日志"><meta itemprop=description content="DG不传输日志
+ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。"><meta itemprop=datePublished content="2012-09-23T00:00:00+00:00"><meta itemprop=dateModified content="2012-09-23T00:00:00+00:00"><meta itemprop=wordCount content="1425"><meta itemprop=keywords content="Database,Oracle,DG,DataGuard,"><meta name=twitter:card content="summary"><meta name=twitter:title content="DataGrard异常-不传输日志"><meta name=twitter:description content="DG不传输日志
+ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>DataGrard异常-不传输日志</h1><div class=post-meta><span class=post-time>2012-09-23</span><div class=post-category><a href=/categories/database/>Database</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#dg不传输日志>DG不传输日志</a><ul><li><a href=#环境信息>环境信息</a></li><li><a href=#报错内容>报错内容</a></li><li><a href=#解决方法>解决方法</a></li><li><a href=#分析总结>分析总结</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><h2 id=dg不传输日志>DG不传输日志</h2><p>ctsdb的DG库2月1号同步出现异常，不传输日志到standby库。</p><h3 id=环境信息>环境信息</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=nx>drcdb03</span>:<span class=nx>ctsdb1</span> <span class=p>&gt;</span><span class=nx>uname</span> <span class=p>-</span><span class=nx>a</span><span class=err>
+</span><span class=err></span><span class=nx>HP</span><span class=p>-</span><span class=nx>UX</span> <span class=nx>drcdb03</span> <span class=nx>B</span>.<span class=m>11</span>.<span class=m>23</span> <span class=nx>U</span> <span class=nx>ia64</span> <span class=m>4003443204</span> <span class=nx>unlimited</span><span class=p>-</span><span class=nx>user</span> <span class=nx>license</span><span class=err>
+</span><span class=err></span><span class=nx>drcdb03</span>:<span class=nx>ctsdb1</span> <span class=p>&gt;</span><span class=nx>sqlplus</span> <span class=s1>&#39;/as sysdba&#39;</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>SQL</span>*<span class=nx>Plus</span>: <span class=nx>Release</span> <span class=m>10</span>.<span class=m>2</span>.<span class=m>0</span>.<span class=m>5</span>.<span class=m>0</span> <span class=p>-</span> <span class=nx>Production</span> <span class=nx>on</span> <span class=nx>Tue</span> <span class=nx>Feb</span> <span class=m>21</span> <span class=m>08</span>:<span class=m>32</span>:<span class=m>36</span> <span class=m>2012</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Copyright</span> <span class=p>(</span><span class=nx>c</span><span class=p>)</span> <span class=m>1982</span><span class=p>,</span> <span class=m>2010</span><span class=p>,</span> <span class=nx>Oracle</span>.  <span class=nx>All</span> <span class=nx>Rights</span> <span class=nx>Reserved</span>.<span class=err>
+</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>Connected</span> <span class=nx>to</span>:<span class=err>
+</span><span class=err></span><span class=nx>Oracle</span> <span class=nx>Database</span> <span class=m>10</span>g <span class=nx>Enterprise</span> <span class=nx>Edition</span> <span class=nx>Release</span> <span class=m>10</span>.<span class=m>2</span>.<span class=m>0</span>.<span class=m>5</span>.<span class=m>0</span> <span class=p>-</span> <span class=m>64</span>bit <span class=nx>Production</span><span class=err>
+</span><span class=err></span><span class=nx>With</span> <span class=nx>the</span> <span class=nx>Partitioning</span><span class=p>,</span> <span class=nx>Real</span> <span class=nx>Application</span> <span class=nx>Clusters</span><span class=p>,</span> <span class=nx>OLAP</span><span class=p>,</span> <span class=nx>Data</span> <span class=nx>Mining</span><span class=err>
+</span><span class=err></span><span class=nx>and</span> <span class=nx>Real</span> <span class=nx>Application</span> <span class=nx>Testing</span> <span class=nx>options</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=nx>SQL</span><span class=p>&gt;</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=报错内容>报错内容</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>--</span><span class=nx>DG库alert日志</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>注意到从2月1号22</span>：<span class=m>57</span>分开始，<span class=nx>DG库收不到primary库的任何信息</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>22</span>:<span class=m>56</span>:<span class=m>51</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Redo</span> <span class=nx>Shipping</span> <span class=nx>Client</span> <span class=nx>Connected</span> <span class=nx>as</span> <span class=nx>PUBLIC</span><span class=err>
+</span><span class=err></span><span class=p>--</span> <span class=nx>Connected</span> <span class=nx>User</span> <span class=nx>is</span> <span class=nx>Valid</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>203</span>]: <span class=nx>Assigned</span> <span class=nx>to</span> <span class=nx>RFS</span> <span class=nx>process</span> <span class=m>1942</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>203</span>]: <span class=nx>Identified</span> <span class=nx>database</span> <span class=nx>type</span> <span class=nx>as</span> <span class=s1>&#39;physical standby&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>203</span>]: <span class=nx>Archived</span> <span class=nx>Log</span>: <span class=s1>&#39;+FRA/ctsdbdg/archivelog/2012_02_01/thread_2_seq_18139.8554.774140213&#39;</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>22</span>:<span class=m>57</span>:<span class=m>07</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Log</span> <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdbdg/</span><span class=nx>archivelog</span><span class=sr>/2012_02_01/</span><span class=nx>thread_2_seq_18139</span>.<span class=m>8554</span>.<span class=m>774140213</span><span class=err>
+</span><span class=err></span><span class=nx>Media</span> <span class=nx>Recovery</span> <span class=nx>Waiting</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>18071</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>02</span>:<span class=m>56</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>181</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>03</span>:<span class=m>33</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>180</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>06</span>:<span class=m>14</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>182</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>18</span>:<span class=m>40</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>183</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>53</span>:<span class=m>08</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>184</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>05</span>:<span class=m>19</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>185</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>05</span>:<span class=m>19</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>186</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>05</span>:<span class=m>19</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>187</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>05</span>:<span class=m>22</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>188</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>26</span>:<span class=m>10</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>190</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>26</span>:<span class=m>10</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>194</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>36</span>:<span class=m>53</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>196</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>46</span>:<span class=m>53</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>197</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>47</span>:<span class=m>17</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>198</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>47</span>:<span class=m>20</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>199</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>47</span>:<span class=m>37</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>200</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>47</span>:<span class=m>59</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>201</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>58</span>:<span class=m>23</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>202</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>01</span>:<span class=m>08</span>:<span class=m>49</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>RFS</span>[<span class=m>203</span>]: <span class=nx>Possible</span> <span class=nx>network</span> <span class=nx>disconnect</span> <span class=nx>with</span> <span class=nx>primary</span> <span class=nx>database</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>07</span>:<span class=m>35</span>:<span class=m>30</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Shutting</span> <span class=nx>down</span> <span class=nx>instance</span> <span class=p>(</span><span class=nx>immediate</span><span class=p>)</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>07</span>:<span class=m>35</span>:<span class=m>30</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Shutting</span> <span class=nx>down</span> <span class=nx>instance</span>: <span class=nx>further</span> <span class=nx>logons</span> <span class=nx>disabled</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>07</span>:<span class=m>35</span>:<span class=m>30</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>primary日志</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>正常情况下</span>，<span class=nx>应该能看到下面红色内容</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>10</span>:<span class=m>54</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>1876</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>47</span> <span class=nx>seq</span># <span class=m>1876</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_47</span>.<span class=m>352</span>.<span class=m>756667957</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>47</span> <span class=nx>seq</span># <span class=m>1876</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_47</span>.<span class=m>28884</span>.<span class=m>756667965</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>10</span>:<span class=m>54</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>1876</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_2</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>15</span>:<span class=m>59</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Completed</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>754</span>.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8719338101721</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>25</span>:<span class=m>55</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Beginning</span> <span class=nx>log</span> <span class=nx>switch</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>755</span>.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8719338187781</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>25</span>:<span class=m>55</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>1877</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>48</span> <span class=nx>seq</span># <span class=m>1877</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_48</span>.<span class=m>261</span>.<span class=m>756667939</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>48</span> <span class=nx>seq</span># <span class=m>1877</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_48</span>.<span class=m>33159</span>.<span class=m>756667949</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>22</span> <span class=m>12</span>:<span class=m>25</span>:<span class=m>55</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>LNS</span>: <span class=nx>Standby</span> <span class=nx>redo</span> <span class=nx>logfile</span> <span class=nx>selected</span> <span class=nx>for</span> <span class=nx>thread</span> <span class=m>1</span> <span class=nx>sequence</span> <span class=m>1877</span> <span class=nx>for</span> <span class=nx>destination</span> <span class=nx>LOG_ARCHIVE_DEST_2</span><span class=err>
+</span><span class=err>
+</span><span class=err></span><span class=p>--</span><span class=nx>异常时间段日志</span>，<span class=nx>oracle没有将日志归档到远程</span>，<span class=nx>怀疑未识别到远程目录</span><span class=err>
+</span><span class=err></span><span class=nx>Wed</span> <span class=nx>Feb</span> <span class=m>01</span> <span class=m>23</span>:<span class=m>51</span>:<span class=m>29</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Completed</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>d.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904764300</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>01</span>:<span class=m>30</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Beginning</span> <span class=nx>log</span> <span class=nx>switch</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>e.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904789187</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>01</span>:<span class=m>30</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>18078</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>53</span> <span class=nx>seq</span># <span class=m>18078</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_53</span>.<span class=m>463</span>.<span class=m>756666159</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>53</span> <span class=nx>seq</span># <span class=m>18078</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_53</span>.<span class=m>4601</span>.<span class=m>756666169</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>04</span>:<span class=m>51</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Incremental</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>d.<span class=m>36</span>b.<span class=m>0</span>]<span class=p>,</span> <span class=nx>current</span> <span class=nx>log</span> <span class=nx>tail</span> <span class=nx>at</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>e.<span class=nx>e11f</span>.<span class=m>0</span>]<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>06</span>:<span class=m>34</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Completed</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>e.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904789187</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>16</span>:<span class=m>22</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Beginning</span> <span class=nx>log</span> <span class=nx>switch</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>f.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904912850</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>16</span>:<span class=m>22</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>18079</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>54</span> <span class=nx>seq</span># <span class=m>18079</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_54</span>.<span class=m>462</span>.<span class=m>756666177</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>54</span> <span class=nx>seq</span># <span class=m>18079</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_54</span>.<span class=m>33252</span>.<span class=m>756666187</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>21</span>:<span class=m>11</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Completed</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>f.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904912850</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>31</span>:<span class=m>26</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Beginning</span> <span class=nx>log</span> <span class=nx>switch</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>46</span>a<span class=m>0</span>.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904945086</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>31</span>:<span class=m>26</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Thread</span> <span class=m>1</span> <span class=nx>advanced</span> <span class=nx>to</span> <span class=nx>log</span> <span class=nx>sequence</span> <span class=m>18080</span> <span class=p>(</span><span class=nx>LGWR</span> <span class=nx>switch</span><span class=p>)</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>55</span> <span class=nx>seq</span># <span class=m>18080</span> <span class=nx>mem</span># <span class=m>0</span>: <span class=p>+</span><span class=nx>DATA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_55</span>.<span class=m>461</span>.<span class=m>756666195</span><span class=err>
+</span><span class=err></span>  <span class=nx>Current</span> <span class=nx>log</span># <span class=m>55</span> <span class=nx>seq</span># <span class=m>18080</span> <span class=nx>mem</span># <span class=m>1</span>: <span class=p>+</span><span class=nx>FRA</span><span class=sr>/ctsdb/</span><span class=nx>onlinelog</span>/<span class=nx>group_55</span>.<span class=m>9237</span>.<span class=m>756666205</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>34</span>:<span class=m>58</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Incremental</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>469</span>f.<span class=m>627</span>.<span class=m>0</span>]<span class=p>,</span> <span class=nx>current</span> <span class=nx>log</span> <span class=nx>tail</span> <span class=nx>at</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>46</span>a<span class=m>0</span>.<span class=nx>c4</span>.<span class=m>0</span>]<span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>36</span>:<span class=m>29</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span><span class=err></span><span class=nx>Completed</span> <span class=nx>checkpoint</span> <span class=nx>up</span> <span class=nx>to</span> <span class=nx>RBA</span> [<span class=m>0</span>x<span class=m>46</span>a<span class=m>0</span>.<span class=m>2</span>.<span class=m>10</span>]<span class=p>,</span> <span class=nx>SCN</span>: <span class=m>8705904945086</span><span class=err>
+</span><span class=err></span><span class=nx>Thu</span> <span class=nx>Feb</span> <span class=m>02</span> <span class=m>00</span>:<span class=m>46</span>:<span class=m>24</span> <span class=nx>EAT</span> <span class=m>2012</span><span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=解决方法>解决方法</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-vim data-lang=vim><span class=p>--</span><span class=nx>在生产库执行下面两个命令就可以了</span><span class=err>
+</span><span class=err></span><span class=m>1</span>. <span class=nx>命令1的目的是使primary解析通向DG库的地址</span><span class=err>
+</span><span class=err></span>    <span class=nx>alter</span> <span class=nx>system</span> <span class=nx>set</span> <span class=nx>log_archive_dest_2</span> <span class=p>=</span> <span class=s1>&#39;service=&#34;(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.250.31)(PORT = 1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=ctsdb)))&#34; LGWR ASYNC NOAFFIRM  REOPEN=60  db_unique_name=ctsdbdg&#39;</span> ;<span class=err>
+</span><span class=err></span><span class=m>2</span>. <span class=nx>命令2的目的是恢复原来的参数设置</span><span class=err>
+</span><span class=err></span>    <span class=nx>alter</span> <span class=nx>system</span> <span class=nx>set</span> <span class=nx>log_archive_dest_2</span> <span class=p>=</span> <span class=s1>&#39;service=ctsdbdg LGWR ASYNC NOAFFIRM  REOPEN=60 max_failure=3 net_timeout=30 valid_for=(online_logfiles,primary_role) db_unique_name=ctsdbdg&#39;</span> ;<span class=err>
+</span></code></pre></td></tr></table></div></div><h3 id=分析总结>分析总结</h3><ol><li>观察DG库alert日志，发现从2月1号22：57分开始，DG库收不到primary库的任何信息</li><li>观察primary库alert日志，发现LNS进程未发送任何信息给DG库</li><li>通过上面信息，可以判断，肯定是primary和DG的通信有异常</li><li>常见的通信异常原因有防火墙不通、TNS配置错误等，但是验证这些都是正常的</li><li>排除常见原因，目前的可能就是primary根本没有解析到连接DG库的连接串</li><li>因此我通过直接给出IP和端口的方法，让primary硬解析地址，使primary和DG通信</li><li>重新设置dest2参数，切换日志，可以观察到DG库已经收到primary的信息，开始在standby log上同步日志并apply日志</li><li>同样也可以观察到primary库已经启动LNS进程，传输log到DG库</li><li>至此，这个问题就处理完了</li></ol></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2012-09-23</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/database/>Database</a>
+<a href=/tags/oracle/>Oracle</a>
+<a href=/tags/dg/>DG</a>
+<a href=/tags/dataguard/>DataGuard</a></div><nav class=post-nav><a class=prev href=/post/2012/09/dg-exception-01/><i class="iconfont icon-left"></i><span class="prev-text nav-default">DataGrard异常-ORA-38868</span>
+<span class="prev-text nav-mobile">Prev</span></a>
+<a class=next href=/post/2012/07/goldengate-exception-01/><span class="next-text nav-default">GoldenGate-概念解释</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2012-09-23 00:00:00 \u002b0000 UTC',title:'DataGrard异常-不传输日志',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>
