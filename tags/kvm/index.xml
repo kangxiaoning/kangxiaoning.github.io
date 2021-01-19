@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kvm on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/kvm/</link>
+    <description>Recent content in kvm on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 14 Feb 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/kvm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>KVM虚拟化实验-两台VM互相通信</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-14-kvm-qemu-fundation-3/</link>
+      <pubDate>Tue, 14 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-14-kvm-qemu-fundation-3/</guid>
+      <description>&lt;h1 id=&#34;1-实验环境&#34;&gt;1. 实验环境&lt;/h1&gt;
+&lt;p&gt;通过在vmware workstation上启动centos 7的虚拟机，以该虚拟机作为HOST进行KVM
+实验，以一个精简的linux作为guest的OS镜像启动KVM虚拟机。&lt;/p&gt;
+&lt;p&gt;经过实验发现，在vmware workstation上如果不打开“虚拟化CPU性能计数器”，在启
+动kvm的vm时会导致host（vmw虚拟的）死机，卡在CPU计数器那里。&lt;/p&gt;
+&lt;p&gt;如下是死机时kvm vm的日志，可以看到在一个计数器那里卡住了。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>KVM虚拟化基础二</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-13-kvm-qemu-fundation-2/</link>
+      <pubDate>Mon, 13 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-13-kvm-qemu-fundation-2/</guid>
+      <description>&lt;h1 id=&#34;1-命令使用帮助&#34;&gt;1. 命令使用帮助&lt;/h1&gt;
+&lt;h2 id=&#34;11-qemu-img&#34;&gt;1.1 qemu-img&lt;/h2&gt;
+&lt;p&gt;不同格式支持的选项不一样，通过如下方式查看支持的选项。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>KVM虚拟化基础一</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-12-kvm-qemu-fundation-1/</link>
+      <pubDate>Sun, 12 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-12-kvm-qemu-fundation-1/</guid>
+      <description>&lt;h1 id=&#34;1-kvm组件&#34;&gt;1. KVM组件&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;KVM主要两类组件组成&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Xen虚拟化基础二</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-08-xen-fundation-2/</link>
+      <pubDate>Wed, 08 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-08-xen-fundation-2/</guid>
+      <description>&lt;h1 id=&#34;xen虚拟状态&#34;&gt;xen虚拟状态&lt;/h1&gt;
+&lt;pre&gt;&lt;code&gt;r: 
+b: 阻塞
+p: 暂停
+s: 停止
+c: 崩溃
+d: dying, 正在关闭的过程中
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>Xen虚拟化基础一</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-07-xen-fundation/</link>
+      <pubDate>Tue, 07 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-07-xen-fundation/</guid>
+      <description>&lt;h1 id=&#34;xen组成部分&#34;&gt;Xen组成部分&lt;/h1&gt;
+&lt;h2 id=&#34;1-xen-hypervisor&#34;&gt;(1) Xen Hypervisor&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;分配CPU、Memory、Interrupt
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>虚拟化基础</title>
+      <link>https://kangxiaoning.github.io/post/2017-02-06-virtualization-fundation/</link>
+      <pubDate>Mon, 06 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-02-06-virtualization-fundation/</guid>
+      <description>&lt;h1 id=&#34;cpu虚拟化&#34;&gt;cpu虚拟化&lt;/h1&gt;
+&lt;h2 id=&#34;模拟emulation&#34;&gt;模拟：emulation&lt;/h2&gt;
+&lt;h2 id=&#34;虚拟virtulization&#34;&gt;虚拟：virtulization&lt;/h2&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

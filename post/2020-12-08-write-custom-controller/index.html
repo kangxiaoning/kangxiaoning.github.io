@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>编写custom controller - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="编写custom controller" />
+<meta property="og:description" content="上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/" />
+<meta property="article:published_time" content="2020-12-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-12-09T00:00:00+00:00" />
+<meta itemprop="name" content="编写custom controller">
+<meta itemprop="description" content="上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。">
+<meta itemprop="datePublished" content="2020-12-09T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-12-09T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1115">
+
+
+
+<meta itemprop="keywords" content="kubernetes,CRD,code-generator,controller," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="编写custom controller"/>
+<meta name="twitter:description" content="上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">编写custom controller</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-12-09 </span>
+        <div class="post-category">
+            <a href="/categories/kubernetes/"> kubernetes </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#controller工作原理">controller工作原理</a></li>
+        <li><a href="#编写controller代码">编写controller代码</a></li>
+        <li><a href="#controller流程验证">controller流程验证</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。</p>
+<h2 id="controller工作原理">controller工作原理</h2>
+<p>引用社区一张图，描述了controller的工作流程。</p>
+<p><img src="/images/kubernetes/client-go-controller-interaction.jpeg" alt="client-go controller interaction"></p>
+<h2 id="编写controller代码">编写controller代码</h2>
+<p>借助前面生成的代码，基本只需要编写业务逻辑相关的代码了，具体包括三部分。</p>
+<ol>
+<li>signals，shutdown gracefully，直接copy<a href="https://github.com/kubernetes/sample-controller/tree/master/pkg/signals">社区示例</a>即可。</li>
+<li>controller.go，具体逻辑实现，包括注册handler以便处理对应事件，从informer本地cache获取event，启动Control Loop针对不同的事件执行具体的业务逻辑。</li>
+<li>main.go，创建informer及client，构造controller，最后启动informer及controller.Run。</li>
+</ol>
+<p>本示例代码在<a href="https://github.com/user/learn-kubernetes-crd">github</a>可供参考。</p>
+<p>通过如下命令编译。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">go mod vendor
+go build -o machine-controller .
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="controller流程验证">controller流程验证</h2>
+<p>验证过程如下。</p>
+<ol>
+<li>运行controller</li>
+</ol>
+<p>由于此时还没有对应资源，watch会失败。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> ./machine-controller  -kubeconfig<span class="o">=</span><span class="nv">$HOME</span>/.kube/config
+I1209 16:34:47.229297   <span class="m">23302</span> controller.go:103<span class="o">]</span> Setting up event handlers
+I1209 16:34:47.229562   <span class="m">23302</span> controller.go:133<span class="o">]</span> Starting Machine controller
+I1209 16:34:47.229638   <span class="m">23302</span> controller.go:136<span class="o">]</span> Waiting <span class="k">for</span> informer caches to sync
+E1209 16:34:47.258218   <span class="m">23302</span> reflector.go:127<span class="o">]</span> github.com/user/learn-kubernetes-crd/pkg/client/informers/externalversions/factory.go:117: Failed to watch *v1.Machine: failed to list *v1.Machine: the server could not find the requested resource <span class="o">(</span>get machines.crd.alpha.io<span class="o">)</span>
+E1209 16:34:48.546412   <span class="m">23302</span> reflector.go:127<span class="o">]</span> github.com/user/learn-kubernetes-crd/pkg/client/informers/externalversions/factory.go:117: Failed to watch *v1.Machine: failed to list *v1.Machine: the server could not find the requested resource <span class="o">(</span>get machines.crd.alpha.io<span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>创建CRD</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> kubectl apply -f crd/alpha-machine.yaml
+customresourcedefinition.apiextensions.k8s.io/machines.crd.alpha.io created
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>controller watch到CRD，不再报错，启动了worker</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">I1209 16:36:07.728882   23302 controller.go:141] Starting workers
+I1209 16:36:07.728931   23302 controller.go:147] Started workers
+</code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>创建machine实例</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> kubectl apply -f example/example-machine.yaml
+machine.crd.alpha.io/example-alpha created
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>controller监听到add事件，执行了add事件对应的handler</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">I1209 16:37:49.982159   <span class="m">23302</span> controller.go:254<span class="o">]</span> <span class="o">[</span>Alpha<span class="o">]</span> Try to process machine: <span class="p">&amp;</span>v1.Machine<span class="o">{</span>TypeMeta:v1.TypeMeta<span class="o">{</span>Kind:<span class="s2">&#34;&#34;</span>, APIVersion:<span class="s2">&#34;&#34;</span><span class="o">}</span>, ObjectMeta:v1.ObjectMeta<span class="o">{</span>Name:<span class="s2">&#34;example-alpha&#34;</span>, GenerateName:<span class="s2">&#34;&#34;</span>, Namespace:<span class="s2">&#34;default&#34;</span>, SelfLink:<span class="s2">&#34;/apis/crd.alpha.io/v1/namespaces/default/machines/example-alpha&#34;</span>, UID:<span class="s2">&#34;0386f928-2e59-4699-bba9-ee9a6ae66aec&#34;</span>, ResourceVersion:<span class="s2">&#34;109312&#34;</span>, Generation:1, CreationTimestamp:v1.Time<span class="o">{</span>Time:time.Time<span class="o">{</span>wall:0x0, ext:63743099869, loc:<span class="o">(</span>*time.Location<span class="o">)(</span>0x2aaa6c0<span class="o">)}}</span>, DeletionTimestamp:<span class="o">(</span>*v1.Time<span class="o">)(</span>nil<span class="o">)</span>, DeletionGracePeriodSeconds:<span class="o">(</span>*int64<span class="o">)(</span>nil<span class="o">)</span>, Labels:map<span class="o">[</span>string<span class="o">]</span>string<span class="o">(</span>nil<span class="o">)</span>, Annotations:map<span class="o">[</span>string<span class="o">]</span>string<span class="o">{</span><span class="s2">&#34;kubectl.kubernetes.io/last-applied-configuration&#34;</span>:<span class="s2">&#34;{\&#34;apiVersion\&#34;:\&#34;crd.alpha.io/v1\&#34;,\&#34;kind\&#34;:\&#34;Machine\&#34;,\&#34;metadata\&#34;:{\&#34;annotations\&#34;:{},\&#34;name\&#34;:\&#34;example-alpha\&#34;,\&#34;namespace\&#34;:\&#34;default\&#34;},\&#34;spec\&#34;:{\&#34;cpu\&#34;:2,\&#34;memory\&#34;:4,\&#34;storage\&#34;:10}}\n&#34;</span><span class="o">}</span>, OwnerReferences:<span class="o">[]</span>v1.OwnerReference<span class="o">(</span>nil<span class="o">)</span>, Finalizers:<span class="o">[]</span>string<span class="o">(</span>nil<span class="o">)</span>, ClusterName:<span class="s2">&#34;&#34;</span>, ManagedFields:<span class="o">[]</span>v1.ManagedFieldsEntry<span class="o">{</span>v1.ManagedFieldsEntry<span class="o">{</span>Manager:<span class="s2">&#34;kubectl-client-side-apply&#34;</span>, Operation:<span class="s2">&#34;Update&#34;</span>, APIVersion:<span class="s2">&#34;crd.alpha.io/v1&#34;</span>, Time:<span class="o">(</span>*v1.Time<span class="o">)(</span>0xc000610580<span class="o">)</span>, FieldsType:<span class="s2">&#34;FieldsV1&#34;</span>, FieldsV1:<span class="o">(</span>*v1.FieldsV1<span class="o">)(</span>0xc000610560<span class="o">)}}}</span>, Spec:v1.MachineSpec<span class="o">{</span>Cpu:2, Memory:0, Storage:10<span class="o">}}</span> ...
+I1209 16:37:49.982406   <span class="m">23302</span> controller.go:207<span class="o">]</span> Successfully synced <span class="s1">&#39;default/example-alpha&#39;</span>
+I1209 16:37:49.982480   <span class="m">23302</span> event.go:282<span class="o">]</span> Event<span class="o">(</span>v1.ObjectReference<span class="o">{</span>Kind:<span class="s2">&#34;Machine&#34;</span>, Namespace:<span class="s2">&#34;default&#34;</span>, Name:<span class="s2">&#34;example-alpha&#34;</span>, UID:<span class="s2">&#34;0386f928-2e59-4699-bba9-ee9a6ae66aec&#34;</span>, APIVersion:<span class="s2">&#34;crd.alpha.io/v1&#34;</span>, ResourceVersion:<span class="s2">&#34;109312&#34;</span>, FieldPath:<span class="s2">&#34;&#34;</span><span class="o">})</span>: type: <span class="s1">&#39;Normal&#39;</span> reason: <span class="s1">&#39;Synced&#39;</span> Machine synced successfully
+</code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>更新machine实例</li>
+</ol>
+<p>此处将cpu从2修改为4.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> vim example/example-machine.yaml
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> ✗ kubectl apply -f example/example-machine.yaml
+machine.crd.alpha.io/example-alpha configured
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> ✗
+</code></pre></td></tr></table>
+</div>
+</div><p>controller监听到update事件，执行了相应的handler</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">I1209 16:40:08.962490   <span class="m">23302</span> controller.go:254<span class="o">]</span> <span class="o">[</span>Alpha<span class="o">]</span> Try to process machine: <span class="p">&amp;</span>v1.Machine<span class="o">{</span>TypeMeta:v1.TypeMeta<span class="o">{</span>Kind:<span class="s2">&#34;&#34;</span>, APIVersion:<span class="s2">&#34;&#34;</span><span class="o">}</span>, ObjectMeta:v1.ObjectMeta<span class="o">{</span>Name:<span class="s2">&#34;example-alpha&#34;</span>, GenerateName:<span class="s2">&#34;&#34;</span>, Namespace:<span class="s2">&#34;default&#34;</span>, SelfLink:<span class="s2">&#34;/apis/crd.alpha.io/v1/namespaces/default/machines/example-alpha&#34;</span>, UID:<span class="s2">&#34;0386f928-2e59-4699-bba9-ee9a6ae66aec&#34;</span>, ResourceVersion:<span class="s2">&#34;109618&#34;</span>, Generation:2, CreationTimestamp:v1.Time<span class="o">{</span>Time:time.Time<span class="o">{</span>wall:0x0, ext:63743099869, loc:<span class="o">(</span>*time.Location<span class="o">)(</span>0x2aaa6c0<span class="o">)}}</span>, DeletionTimestamp:<span class="o">(</span>*v1.Time<span class="o">)(</span>nil<span class="o">)</span>, DeletionGracePeriodSeconds:<span class="o">(</span>*int64<span class="o">)(</span>nil<span class="o">)</span>, Labels:map<span class="o">[</span>string<span class="o">]</span>string<span class="o">(</span>nil<span class="o">)</span>, Annotations:map<span class="o">[</span>string<span class="o">]</span>string<span class="o">{</span><span class="s2">&#34;kubectl.kubernetes.io/last-applied-configuration&#34;</span>:<span class="s2">&#34;{\&#34;apiVersion\&#34;:\&#34;crd.alpha.io/v1\&#34;,\&#34;kind\&#34;:\&#34;Machine\&#34;,\&#34;metadata\&#34;:{\&#34;annotations\&#34;:{},\&#34;name\&#34;:\&#34;example-alpha\&#34;,\&#34;namespace\&#34;:\&#34;default\&#34;},\&#34;spec\&#34;:{\&#34;cpu\&#34;:4,\&#34;memory\&#34;:4,\&#34;storage\&#34;:10}}\n&#34;</span><span class="o">}</span>, OwnerReferences:<span class="o">[]</span>v1.OwnerReference<span class="o">(</span>nil<span class="o">)</span>, Finalizers:<span class="o">[]</span>string<span class="o">(</span>nil<span class="o">)</span>, ClusterName:<span class="s2">&#34;&#34;</span>, ManagedFields:<span class="o">[]</span>v1.ManagedFieldsEntry<span class="o">{</span>v1.ManagedFieldsEntry<span class="o">{</span>Manager:<span class="s2">&#34;kubectl-client-side-apply&#34;</span>, Operation:<span class="s2">&#34;Update&#34;</span>, APIVersion:<span class="s2">&#34;crd.alpha.io/v1&#34;</span>, Time:<span class="o">(</span>*v1.Time<span class="o">)(</span>0xc0001822a0<span class="o">)</span>, FieldsType:<span class="s2">&#34;FieldsV1&#34;</span>, FieldsV1:<span class="o">(</span>*v1.FieldsV1<span class="o">)(</span>0xc000182280<span class="o">)}}}</span>, Spec:v1.MachineSpec<span class="o">{</span>Cpu:4, Memory:0, Storage:10<span class="o">}}</span> ...
+I1209 16:40:08.962661   <span class="m">23302</span> controller.go:207<span class="o">]</span> Successfully synced <span class="s1">&#39;default/example-alpha&#39;</span>
+I1209 16:40:08.962689   <span class="m">23302</span> event.go:282<span class="o">]</span> Event<span class="o">(</span>v1.ObjectReference<span class="o">{</span>Kind:<span class="s2">&#34;Machine&#34;</span>, Namespace:<span class="s2">&#34;default&#34;</span>, Name:<span class="s2">&#34;example-alpha&#34;</span>, UID:<span class="s2">&#34;0386f928-2e59-4699-bba9-ee9a6ae66aec&#34;</span>, APIVersion:<span class="s2">&#34;crd.alpha.io/v1&#34;</span>, ResourceVersion:<span class="s2">&#34;109618&#34;</span>, FieldPath:<span class="s2">&#34;&#34;</span><span class="o">})</span>: type: <span class="s1">&#39;Normal&#39;</span> reason: <span class="s1">&#39;Synced&#39;</span> Machine synced successfully
+</code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li>删除machine实例</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> ✗ kubectl delete -f example/example-machine.yaml
+machine.crd.alpha.io <span class="s2">&#34;example-alpha&#34;</span> deleted
+➜  learn-kubernetes-crd git:<span class="o">(</span>main<span class="o">)</span> ✗
+</code></pre></td></tr></table>
+</div>
+</div><p>controller监听到delete事件，执行了相应的handler</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">I1209 16:41:55.310657   <span class="m">23302</span> controller.go:167<span class="o">]</span> get <span class="s2">&#34;default/example-alpha&#34;</span>
+W1209 16:41:55.310696   <span class="m">23302</span> controller.go:237<span class="o">]</span> Machine: default/example-alpha does not exist in <span class="nb">local</span> cache, will delete it from Alpha ...
+I1209 16:41:55.310702   <span class="m">23302</span> controller.go:240<span class="o">]</span> <span class="o">[</span>Alpha<span class="o">]</span> Deleting machine: default/example-alpha ...
+I1209 16:41:55.310708   <span class="m">23302</span> controller.go:207<span class="o">]</span> Successfully synced <span class="s1">&#39;default/example-alpha&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如上是编写custom controller的大概步骤，通过工作原理结合代码实现，可以更深刻的理解kubernetes Control Loop的工作原理和设计理念，在kubernetes核心资源无法满足需求时，可以通过CRD+Controller或operator来满足。</p>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-12-09
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/kubernetes/">kubernetes</a>
+          <a href="/tags/crd/">CRD</a>
+          <a href="/tags/code-generator/">code-generator</a>
+          <a href="/tags/controller/">controller</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2020-12-07-learn-kubernetes-crd/">
+            <span class="next-text nav-default">通过code-generator生成kubernetes CRD代码</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2020-12-09 00:00:00 \u002b0000 UTC',
+        title: '编写custom controller',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

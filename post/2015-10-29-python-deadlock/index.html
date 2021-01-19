@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>python模拟死锁 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="1. 死锁原因 在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。
+当出现如下情况时发生死锁
+ 某个线程执行到 lock_1 方法的 mutexB.acquire(1) 语句时，另一线线程执行 lock_2 方法的 mutexA.acquire(1) 一个线程“迭代”请求同一个资源，直接就会造成死锁 " /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="python模拟死锁" />
+<meta property="og:description" content="1. 死锁原因
+在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。
+当出现如下情况时发生死锁
+
+某个线程执行到 lock_1 方法的 mutexB.acquire(1) 语句时，另一线线程执行 lock_2 方法的 mutexA.acquire(1)
+一个线程“迭代”请求同一个资源，直接就会造成死锁
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2015-10-29-python-deadlock/" />
+<meta property="article:published_time" content="2015-10-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2015-10-29T00:00:00+00:00" />
+<meta itemprop="name" content="python模拟死锁">
+<meta itemprop="description" content="1. 死锁原因
+在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。
+当出现如下情况时发生死锁
+
+某个线程执行到 lock_1 方法的 mutexB.acquire(1) 语句时，另一线线程执行 lock_2 方法的 mutexA.acquire(1)
+一个线程“迭代”请求同一个资源，直接就会造成死锁
+">
+<meta itemprop="datePublished" content="2015-10-29T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2015-10-29T00:00:00+00:00" />
+<meta itemprop="wordCount" content="561">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="python模拟死锁"/>
+<meta name="twitter:description" content="1. 死锁原因
+在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。
+当出现如下情况时发生死锁
+
+某个线程执行到 lock_1 方法的 mutexB.acquire(1) 语句时，另一线线程执行 lock_2 方法的 mutexA.acquire(1)
+一个线程“迭代”请求同一个资源，直接就会造成死锁
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">python模拟死锁</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-10-29 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-死锁原因">1. 死锁原因</a></li>
+    <li><a href="#2-场景一">2. 场景一</a>
+      <ul>
+        <li><a href="#21-脚本">2.1 脚本</a></li>
+        <li><a href="#22-执行命令">2.2 执行命令</a></li>
+        <li><a href="#23-结果">2.3 结果</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-场景二">3. 场景二</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="1-死锁原因">1. 死锁原因</h1>
+<p>在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。尽管死锁很少发生，但一旦发生就会造成应用的停止响应。</p>
+<p><strong>当出现如下情况时发生死锁</strong></p>
+<ol>
+<li>某个线程执行到 lock_1 方法的 mutexB.acquire(1) 语句时，另一线线程执行 lock_2 方法的 mutexA.acquire(1)</li>
+<li>一个线程“迭代”请求同一个资源，直接就会造成死锁</li>
+</ol>
+<h1 id="2-场景一">2. 场景一</h1>
+<p><strong>如下例子</strong><br>
+第一个方法 lock_1 先获取 mutexA 锁，访问全局变量 globalvarA ，然后 acquire mutexB 锁<br>
+第二个方法 lock_2 先获取 mutexB 锁，访问全局变量 globakvarB ，然后 acquire mutexA 锁</p>
+<p>由于线程是无序的，因此可能发生这种情况。</p>
+<h2 id="21-脚本">2.1 脚本</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># encoding: UTF-8</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">MyThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lock_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">globalvarA</span><span class="p">,</span> <span class="n">globalvarB</span>
+        <span class="k">if</span> <span class="n">mutexA</span><span class="o">.</span><span class="n">acquire</span><span class="p">():</span>
+             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39; got globalvarA&#39;</span>
+             <span class="k">print</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+             
+             <span class="k">if</span> <span class="n">mutexB</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+                 <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39; got globalvarB&#39;</span>
+                 <span class="k">print</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                 <span class="n">mutexB</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+             <span class="n">mutexA</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">lock_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">globalvarA</span><span class="p">,</span> <span class="n">globalvarB</span>
+        <span class="k">if</span> <span class="n">mutexB</span><span class="o">.</span><span class="n">acquire</span><span class="p">():</span>
+             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39; got globalvarB&#39;</span>
+             <span class="k">print</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+             
+             <span class="k">if</span> <span class="n">mutexA</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+                 <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39; got globalvarA&#39;</span>
+                 <span class="k">print</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                 <span class="n">mutexA</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+             <span class="n">mutexB</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+ 
+    
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock_1</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock_2</span><span class="p">()</span>
+<span class="n">globalvarA</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">globalvarB</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">mutexA</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+<span class="n">mutexB</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">MyThread</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="22-执行命令">2.2 执行命令</h2>
+<p>可能需要多次执行，因为线程的无序。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">python34</span> <span class="nx">deadlock</span>.<span class="nx">py</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h2 id="23-结果">2.3 结果</h2>
+<p>执行如上命令后，观察到已经进入死锁，光标在闪烁，无法获取下一个lock。
+此时在OS上观察，可以看到进程还在。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@ <span class="p">~</span>]# <span class="nx">ps</span> <span class="p">-</span><span class="nx">ef</span><span class="p">|</span><span class="nx">grep</span> <span class="p">-</span><span class="nx">v</span> <span class="nx">grep</span><span class="p">|</span><span class="nx">grep</span> <span class="nx">dead</span><span class="err">
+</span><span class="err"></span><span class="nx">root</span>     <span class="m">19272</span> <span class="m">18226</span>  <span class="m">0</span> <span class="m">11</span>:<span class="m">53</span> <span class="nx">pts</span>/<span class="m">1</span>    <span class="m">00</span>:<span class="m">00</span>:<span class="m">00</span> <span class="nx">python34</span> <span class="nx">deadlock</span>.<span class="nx">py</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@ <span class="p">~</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="3-场景二">3. 场景二</h1>
+<p>一个线程“迭代”请求同一个资源，直接就会造成死锁。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">MyThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">num</span> 
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>  
+            <span class="n">num</span> <span class="o">=</span> <span class="n">num</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39; set num to &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="k">print</span> <span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+            <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+<span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">MyThread</span><span class="p">()</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2015-10-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-11-15-private-ca/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">创建私有CA及签发证书</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2015-10-15-linux-ps-prompt/">
+            <span class="next-text nav-default">修改命令行提示符 PS1</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2015-10-29 00:00:00 \u002b0000 UTC',
+        title: 'python模拟死锁',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

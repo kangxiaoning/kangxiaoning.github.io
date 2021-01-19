@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Hadoop学习2-集群搭建 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="二、环境搭建 (一) Hadoop集群搭建 hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。
+采用QJM方式实现NameNode的HA。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Hadoop学习2-集群搭建" />
+<meta property="og:description" content="二、环境搭建
+(一) Hadoop集群搭建
+hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。
+采用QJM方式实现NameNode的HA。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2015-03-02-hadoop-install/" />
+<meta property="article:published_time" content="2015-03-02T00:00:00+00:00" />
+<meta property="article:modified_time" content="2015-03-02T00:00:00+00:00" />
+<meta itemprop="name" content="Hadoop学习2-集群搭建">
+<meta itemprop="description" content="二、环境搭建
+(一) Hadoop集群搭建
+hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。
+采用QJM方式实现NameNode的HA。">
+<meta itemprop="datePublished" content="2015-03-02T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2015-03-02T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3356">
+
+
+
+<meta itemprop="keywords" content="hadoop,bigdata," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hadoop学习2-集群搭建"/>
+<meta name="twitter:description" content="二、环境搭建
+(一) Hadoop集群搭建
+hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。
+采用QJM方式实现NameNode的HA。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Hadoop学习2-集群搭建</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2015-03-02 </span>
+        <div class="post-category">
+            <a href="/categories/hadoop/"> hadoop </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#二环境搭建">二、环境搭建</a>
+      <ul>
+        <li><a href="#一-hadoop集群搭建">(一) Hadoop集群搭建</a>
+          <ul>
+            <li><a href="#步骤一-资源规划">步骤一、 资源规划</a></li>
+            <li><a href="#步骤二-主机环境配置">步骤二、 主机环境配置</a></li>
+            <li><a href="#步骤三-配置ssh信任">步骤三、 配置SSH信任</a></li>
+            <li><a href="#步骤四-安装jdk和hadoop">步骤四、 安装JDK和Hadoop</a></li>
+            <li><a href="#步骤五-hadoop配置">步骤五、 Hadoop配置</a></li>
+            <li><a href="#步骤六-格式化namenode">步骤六、 格式化NameNode</a></li>
+            <li><a href="#步骤七-启动hadoop集群">步骤七、 启动hadoop集群</a></li>
+            <li><a href="#步骤八-active转换和failover验证">步骤八、 Active转换和Failover验证</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="二环境搭建">二、环境搭建</h1>
+<h2 id="一-hadoop集群搭建">(一) Hadoop集群搭建</h2>
+<p>hadoop 2.6.0依赖glibc-2.14，而RHEL 6.5默认是2.12的版本，需要手动编译升级glibc才能正常启动hadoop，因此这里直接用RHEL 7.0。</p>
+<p>采用QJM方式实现NameNode的HA。</p>
+<h3 id="步骤一-资源规划">步骤一、 资源规划</h3>
+<h4 id="1-环境信息">1) 环境信息</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">操作系统</th>
+<th style="text-align:left">RHEL 7.0 64位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">JDK</td>
+<td style="text-align:left">1.7</td>
+</tr>
+<tr>
+<td style="text-align:left">Hadoop</td>
+<td style="text-align:left">2.6.0</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2-资源分配">2) 资源分配</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">主机名</th>
+<th style="text-align:left">IP</th>
+<th style="text-align:left">用户</th>
+<th style="text-align:left">Hadoop Cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">namenode1</td>
+<td style="text-align:left">10.20.16.217</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">NameNode、ResourceManager、JournalNode、JobHistoryServer</td>
+</tr>
+<tr>
+<td style="text-align:left">namenode2</td>
+<td style="text-align:left">10.20.16.218</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">NameNode、JournalNode</td>
+</tr>
+<tr>
+<td style="text-align:left">datanode1</td>
+<td style="text-align:left">10.20.16.219</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">DataNode、NodeManager、JournalNode</td>
+</tr>
+<tr>
+<td style="text-align:left">datanode2</td>
+<td style="text-align:left">10.20.16.220</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">DataNode、NodeManager</td>
+</tr>
+<tr>
+<td style="text-align:left">datanode3</td>
+<td style="text-align:left">10.20.16.221</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">DataNode、NodeManager</td>
+</tr>
+<tr>
+<td style="text-align:left">datanode4</td>
+<td style="text-align:left">10.20.16.222</td>
+<td style="text-align:left">hadoop:hadoop</td>
+<td style="text-align:left">DataNode、NodeManager</td>
+</tr>
+</tbody>
+</table>
+<h3 id="步骤二-主机环境配置">步骤二、 主机环境配置</h3>
+<h4 id="1-创建用户">1) 创建用户</h4>
+<p>在<strong>所有主机</strong>执行如下命令，创建用户并设置密码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">groupadd</span> <span class="nx">hadoop</span><span class="err">
+</span><span class="err"></span><span class="nx">useradd</span> <span class="p">-</span><span class="nx">g</span> <span class="nx">hadoop</span> <span class="nx">hadoop</span><span class="err">
+</span><span class="err"></span><span class="nx">passwd</span> <span class="nx">hadoop</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-关闭ssh登录提示">2) 关闭ssh登录提示</h4>
+<p>此步骤可省略，不影响环境正常运行。hadoop集群各节点会通过SSH（Secure Shell）通信，比如NameNode是通过SSH来启动和停止各个DataNode上的各种守护进程的，因此在start/stop集群时，命令行会打印ssh登录提示信息，为了只看到干净的hadoop信息，这里关闭ssh登录提示。以root用户在<strong>所有主机</strong>执行如下命令。</p>
+<p><strong>关闭提示</strong></p>
+<p>/etc/ssh/sshd_config文件修改如下内容</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">PrintMotd</span> <span class="nx">no</span><span class="err">
+</span><span class="err"></span><span class="nx">PrintLastLog</span> <span class="nx">no</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p><strong>清空提示信息</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">&gt;</span><span class="sr">/etc/</span><span class="nx">issue</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;</span><span class="sr">/etc/</span><span class="nx">motd</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-修改主机名">3) 修改主机名</h4>
+<p>按步骤一规划，<strong>所有主机</strong>执行如下命令修改主机名。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">hostname</span> <span class="nx">xxx</span><span class="err">
+</span><span class="err"></span><span class="sr">/etc/</span><span class="nx">sysconfig</span>/<span class="nx">network添加HOSTNAME</span><span class="p">=</span><span class="nx">xxx</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4-配置dns">4) 配置DNS</h4>
+<p><strong>所有主机</strong>的/etc/hosts文件添加如下内容。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">217</span> <span class="nx">namenode1</span><span class="err">
+</span><span class="err"></span><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">218</span> <span class="nx">namenode2</span><span class="err">
+</span><span class="err"></span><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">219</span> <span class="nx">datanode1</span><span class="err">
+</span><span class="err"></span><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">220</span> <span class="nx">datanode2</span><span class="err">
+</span><span class="err"></span><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">221</span> <span class="nx">datanode3</span><span class="err">
+</span><span class="err"></span><span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">222</span> <span class="nx">datanode4</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="步骤三-配置ssh信任">步骤三、 配置SSH信任</h3>
+<h4 id="1-ssh信任原理">1) SSH信任原理</h4>
+<p>SSH信任原理如下图，因为NameNode和DataNode需要使用SSH无密码双向登录，因此需要配置信任关系。</p>
+<p><img src="/images/big-data/ssh-trust.png" alt="SSH Trust"></p>
+<h4 id="2-配置过程">2) 配置过程</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">--</span><span class="nx">在namenode1执行</span><span class="err">
+</span><span class="err"></span><span class="nx">su</span> <span class="p">-</span> <span class="nx">hadoop</span><span class="err">
+</span><span class="err"></span><span class="nx">ssh</span><span class="p">-</span><span class="nx">keygen</span> <span class="p">-</span><span class="nx">t</span> <span class="nx">rsa</span> <span class="p">-</span><span class="nx">N</span> <span class="s2">&#34;&#34;</span><span class="err">
+</span><span class="err"></span><span class="nx">cat</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="p">&gt;&gt;</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">authorized_keys</span><span class="err">
+</span><span class="err"></span><span class="nx">chmod</span> <span class="m">600</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">authorized_keys</span><span class="err">
+</span><span class="err"></span><span class="p">--</span><span class="nx">在所有主机以root用户配置RSA</span>，<span class="sr">/etc/</span><span class="nx">ssh</span>/<span class="nx">sshd_config启用如下选项</span><span class="err">
+</span><span class="err"></span><span class="nx">RSAAuthentication</span> <span class="nx">yes</span><span class="err">
+</span><span class="err"></span><span class="nx">PubkeyAuthentication</span> <span class="nx">yes</span><span class="err">
+</span><span class="err"></span><span class="nx">AuthorizedKeysFile</span>      .<span class="nx">ssh</span>/<span class="nx">authorized_keys</span><span class="err">
+</span><span class="err"></span><span class="p">--</span><span class="nx">启用RSA后</span>，<span class="nx">用root重启ssh服务</span><span class="err">
+</span><span class="err"></span><span class="nx">systemctl</span> <span class="nx">restart</span>  <span class="nx">sshd</span>.<span class="nx">service</span><span class="err">
+</span><span class="err"></span><span class="p">--</span><span class="nx">在namenode1执行</span>，<span class="nx">复制公钥到其它节点</span><span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="nx">hadoop</span>@<span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">218</span>:<span class="p">~</span>/<span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="nx">hadoop</span>@<span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">219</span>:<span class="p">~</span>/<span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="nx">hadoop</span>@<span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">220</span>:<span class="p">~</span>/<span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="nx">hadoop</span>@<span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">221</span>:<span class="p">~</span>/<span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">~</span><span class="sr">/.ssh/</span><span class="nx">id_rsa</span>.<span class="nx">pub</span> <span class="nx">hadoop</span>@<span class="m">10</span>.<span class="m">20</span>.<span class="m">16</span>.<span class="m">222</span>:<span class="p">~</span>/<span class="err">
+</span><span class="err"></span><span class="p">--</span><span class="nx">在其它节点操作</span><span class="err">
+</span><span class="err"></span><span class="nx">su</span> <span class="p">-</span> <span class="nx">hadoop</span><span class="err">
+</span><span class="err"></span><span class="nx">mkdir</span> <span class="p">~</span><span class="sr">/.ssh;chmod 700 ~/</span>.<span class="nx">ssh</span>;<span class="nx">ls</span> <span class="p">-</span><span class="nx">la</span><span class="p">|</span><span class="nx">grep</span> <span class="nx">ssh</span><span class="err">
+</span><span class="err"></span><span class="nx">cat</span> <span class="p">~</span><span class="sr">/id_rsa.pub &gt;&gt; ~/</span>.<span class="nx">ssh</span><span class="sr">/authorized_keys;chmod 600 ~/</span>.<span class="nx">ssh</span><span class="sr">/authorized_keys;ls –l ~/</span>.<span class="nx">ssh</span><span class="err">
+</span><span class="err"></span><span class="p">--</span><span class="nx">在namenode1验证</span><span class="err">
+</span><span class="err"></span><span class="nx">ssh</span> <span class="nx">namenode2</span> <span class="nx">date</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p><strong>参照如上操作将namenode2到datanodex节点、datanodex到namenode1/namenode2配置完。</strong></p>
+<h3 id="步骤四-安装jdk和hadoop">步骤四、 安装JDK和Hadoop</h3>
+<p>所有机器安装JDK，namenode1安装hadoop，配置完成后将hadoop复制到其它节点即可。</p>
+<h4 id="1-jdk安装">1) JDK安装</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">rpm</span> –<span class="nx">ivh</span> <span class="nx">jdk</span><span class="m">-7</span>u<span class="m">71</span><span class="p">-</span><span class="nx">linux</span><span class="p">-</span><span class="nx">x64</span>.<span class="nx">rpm</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-hadoop安装">2) hadoop安装</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">su</span> – <span class="nx">hadoop</span><span class="err">
+</span><span class="err"></span><span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span>.<span class="nx">tar</span>.<span class="nx">gz</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-配置环境变量">3) 配置环境变量</h4>
+<p>可以添加在. bashrc(当前用户)或者/etc/profile(系统)，我在/etc/profile添加如下环境变量。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">JAVA_HOME</span><span class="p">=</span><span class="sr">/usr/</span><span class="nx">java</span>/<span class="nx">jdk1</span>.<span class="m">7</span>.<span class="m">0</span>_<span class="m">71</span><span class="err">
+</span><span class="err"></span><span class="nx">export</span> <span class="nx">CLASSPATH</span><span class="p">=</span>.:$<span class="nx">JAVA_HOME</span><span class="sr">/jre/</span><span class="nx">lib</span><span class="sr">/rt.jar:$JAVA_HOME/</span><span class="nx">lib</span><span class="sr">/dt.jar:$JAVA_HOME/</span><span class="nx">lib</span>/<span class="nx">tools</span>.<span class="nx">jar</span><span class="err">
+</span><span class="err"></span><span class="nx">export</span> <span class="nx">PATH</span><span class="p">=</span>$<span class="nx">PATH</span>:$<span class="nx">JAVA_HOME</span>/<span class="nx">bin</span><span class="err">
+</span><span class="err"></span><span class="nx">export</span> <span class="nx">HADOOP_HOME</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span><span class="err">
+</span><span class="err"></span><span class="nx">export</span> <span class="nx">PATH</span><span class="p">=</span>$<span class="nx">PATH</span>:$<span class="nx">JAVA_HOME</span><span class="sr">/bin:$HADOOP_HOME/</span><span class="nx">bin</span>:$<span class="nx">HADOOP_HOME</span>/<span class="nx">sbin</span>:<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="步骤五-hadoop配置">步骤五、 Hadoop配置</h3>
+<p>在namenode1节点的$HADOOP_HOME/etc/hadoop目录下，按如下配置编辑对应的文件，然后将整个hadoop目录复制到其它节点。</p>
+<p>参考http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/ClusterSetup.html定制自己的环境变量，生产环境可以根据需求调整一些参数而不使用默认值。</p>
+<h4 id="1-core-sitexml">1) core-site.xml</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&#34;text/xsl&#34; href=&#34;configuration.xsl&#34;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>hadoop.tmp.dir<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>/home/hadoop/tmp<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Abase for other temporary directories.<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>fs.defaultFS<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>hdfs://mycluster:8020<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;/configuration&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="2-hdfs-sitexml">2) hdfs-site.xml</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&#34;text/xsl&#34; href=&#34;configuration.xsl&#34;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.nameservices<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>mycluster<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.ha.namenodes.mycluster<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>nn1,nn2<span class="nt">&lt;/value&gt;</span>
+     <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>dfs.webhdfs.enabled<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>true<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>dfs.namenode.name.dir<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>file:///home/hadoop/hadoopdata/hdfs/namenode<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>dfs.datanode.data.dir<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>file:///home/hadoop/hadoopdata/hdfs/datanode<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>
+  <span class="nt">&lt;property&gt;</span>
+    <span class="nt">&lt;name&gt;</span>dfs.replication<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;value&gt;</span>2<span class="nt">&lt;/value&gt;</span>
+  <span class="nt">&lt;/property&gt;</span>                           
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.namenode.rpc-address.mycluster.nn1<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>namenode1:8020<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.namenode.rpc-address.mycluster.nn2<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>namenode2:8020<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.namenode.http-address.mycluster.nn1<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>namenode1:50070<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.namenode.http-address.mycluster.nn2<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>namenode2:50070<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.namenode.shared.edits.dir<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>qjournal://namenode1:8485;namenode2:8485;datanode1:8485/mycluster<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.journalnode.edits.dir<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>/home/hadoop/journal/node/local/data<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.ha.automatic-failover.enabled<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>false<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.client.failover.proxy.provider.mycluster<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.ha.fencing.methods<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>sshfence<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+      <span class="nt">&lt;name&gt;</span>dfs.ha.fencing.ssh.private-key-files<span class="nt">&lt;/name&gt;</span>
+      <span class="nt">&lt;value&gt;</span>/home/hadoop/.ssh/id_rsa<span class="nt">&lt;/value&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="3-mapred-sitexml">3) mapred-site.xml</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&#34;1.0&#34;?&gt;</span>
+<span class="cp">&lt;?xml-stylesheet type=&#34;text/xsl&#34; href=&#34;configuration.xsl&#34;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="c">&lt;!--Configurations for MapReduce Applications:--&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>mapreduce.framework.name<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>yarn<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Execution framework set to Hadoop YARN.<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="c">&lt;!--Configurations for MapReduce JobHistory Server:--&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>mapreduce.jobhistory.address<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>namenode1:10020<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>MapReduce JobHistory Server host:port Default port is 10020<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>mapreduce.jobhistory.webapp.address<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>namenode1:19888<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>MapReduce JobHistory Server Web UI host:port Default port is 19888<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>mapreduce.jobhistory.intermediate-done-dir<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>/home/hadoop/mr-history/tmp<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Directory where history files are written by MapReduce jobs. Defalut is &#34;/mr-history/tmp&#34;<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>mapreduce.jobhistory.done-dir<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>/home/hadoop/mr-history/tmp<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Directory where history files are managed by the MR JobHistory Server. Default value is &#34;/mr-history/done&#34;<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="4-yarn-sitexml">4) yarn-site.xml</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+    <span class="c">&lt;!--Configurations for ResourceManager and NodeManager:--&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.log-aggregation-enable<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>false<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Configuration to enable or disable log aggregation<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="c">&lt;!--Congrations for ResourceManager:--&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.resourcemanager.hostname<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>namenode1<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>ResourceManager host. Single hostname that can be set in place of setting all yarn.resourcemanager*address resources. Results in default ports for ResourceManager components. <span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.resourcemanager.scheduler.class<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>ResourceManager Scheduler class CapacityScheduler (recommended), FairScheduler (also recommended), or FifoScheduler.The default value is &#34;org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler&#34;.<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.scheduler.minimum-allocation-mb<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>64<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Minimum limit of memory to allocate to each container request at the Resource Manager.NOTES:In MBs<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.scheduler.maximum-allocation-mb<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>256<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Maximum limit of memory to allocate to each container request at the Resource Manager. NOTES:In MBs<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="c">&lt;!--Congrations for History Server:--&gt;</span>
+    <span class="c">&lt;!--Configurations for Configurations for NodeManager:--&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.nodemanager.resource.memory-mb<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>4096<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Resource i.e. available physical memory, in MB, for given NodeManager. The default value is 8192. NOTES:Defines total available resources on the NodeManager to be made available to running containers<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;property&gt;</span>
+        <span class="nt">&lt;name&gt;</span>yarn.nodemanager.aux-services<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;value&gt;</span>mapreduce_shuffle<span class="nt">&lt;/value&gt;</span>
+        <span class="nt">&lt;description&gt;</span>Shuffle service that needs to be set for Map Reduce applications.<span class="nt">&lt;/description&gt;</span>
+    <span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="5-hadoop-envsh">5) hadoop-env.sh</h4>
+<p>在$HADOOP_HOME/etc/hadoop/hadoop-env.sh添加JAVA_HOME和PID目录环境变量</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">JAVA_HOME</span><span class="p">=</span><span class="sr">/usr/</span><span class="nx">java</span>/<span class="nx">jdk1</span>.<span class="m">7</span>.<span class="m">0</span>_<span class="m">71</span><span class="err">
+</span><span class="err"></span><span class="nx">export</span> <span class="nx">HADOOP_PID_DIR</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">pids</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>在namenode1执行如下命令，创建pid目录。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span> <span class="nx">myhost</span> <span class="nx">in</span> <span class="nx">namenode1</span> <span class="nx">namenode2</span> <span class="nx">datanode</span>{<span class="m">1</span>..<span class="m">4</span>}<span class="err">
+</span><span class="err"></span><span class="nx">do</span><span class="err">
+</span><span class="err"></span><span class="nx">ssh</span> $<span class="nx">myhost</span> <span class="nx">mkdir</span> <span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">pids</span><span class="err">
+</span><span class="err"></span><span class="nx">done</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="6-yarn-envsh">6) yarn-env.sh</h4>
+<p>不设置XXXX_ PID_DIR会导致stop-dfs.sh/stop-yarn.sh失效，因为pid默认存放在/tmp目录下，系统会定期清理/tmp目录，而stop脚本是根据pid文件停止进程的，如果被清理了会导致stop脚本失效。</p>
+<p>在$HADOOP_HOME/etc/hadoop/yarn-env.sh添加PID目录环境变量</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">export</span> <span class="nx">YARN_PID_DIR</span><span class="p">=</span><span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="nx">pids</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="7-slaves">7) slaves</h4>
+<p>在slaves文件添加如下内容：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">datanode1</span><span class="err">
+</span><span class="err"></span><span class="nx">datanode2</span><span class="err">
+</span><span class="err"></span><span class="nx">datanode3</span><span class="err">
+</span><span class="err"></span><span class="nx">datanode4</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="8-完成所有节点安装">8) 完成所有节点安装</h4>
+<p>在namenode1节点，以hadoop用户执行如下命令，将hadoop软件复制到剩余节点。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">for</span> <span class="nx">myhost</span> <span class="nx">in</span> <span class="nx">namenode2</span> <span class="nx">datanode</span>{<span class="m">1</span>..<span class="m">4</span>}<span class="err">
+</span><span class="err"></span><span class="nx">do</span><span class="err">
+</span><span class="err"></span><span class="nx">scp</span> <span class="p">-</span><span class="nx">r</span> <span class="nx">hadoop</span><span class="m">-2</span>.<span class="m">6</span>.<span class="m">0</span> <span class="nx">hadoop</span>@$<span class="nx">myhost</span>:<span class="sr">/home/</span><span class="nx">hadoop</span>/<span class="err">
+</span><span class="err"></span><span class="nx">done</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="步骤六-格式化namenode">步骤六、 格式化NameNode</h3>
+<p>QJM实现HDFS的HA，NameNode要记录namespace modifications到JournalNodes，在格式化前会检查JournalNode的状态，因此要先启动JournalNode再进行格式化，原理参见基础理论部分。</p>
+<h4 id="1-启动journalnode">1) 启动JournalNode</h4>
+<p>这里直接通过start-dfs.sh启动JournalNode，命令如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">start</span><span class="p">-</span><span class="nx">dfs</span>.<span class="nx">sh</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-格式化namenode1">2) 格式化namenode1</h4>
+<p>目前格式化不能将集群内所有NameNode都处理掉，因此我们通过先格式化namenode1，然后将namenode目录(参见hdfs-site.xml的dfs.namenode.name.dir配置)cp到namenode2节点，这样可以保证两个namenode节点的信息是一样的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">hdfs</span> <span class="nx">namenode</span> –<span class="nx">format</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-拷贝元数据到namenode2">3) 拷贝元数据到namenode2</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">scp</span> –<span class="nx">r</span> <span class="sr">/home/</span><span class="nx">hadoop</span><span class="sr">/hadoopdata/</span><span class="nx">hdfs</span><span class="sr">/namenode hadoop@namenode2:/</span><span class="nx">home</span><span class="sr">/hadoop/</span><span class="nx">hadoopdata</span>/<span class="nx">hdfs</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="步骤七-启动hadoop集群">步骤七、 启动hadoop集群</h3>
+<h4 id="1-启动hdfs">1) 启动HDFS</h4>
+<p>格式化前启动过一次HDFS，这里先停止，再启动。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">stop</span><span class="p">-</span><span class="nx">dfs</span>.<span class="nx">sh</span><span class="err">
+</span><span class="err"></span><span class="nx">start</span><span class="p">-</span><span class="nx">dfs</span>.<span class="nx">sh</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-启动yarn">2) 启动YARN</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">start</span><span class="p">-</span><span class="nx">yarn</span>.<span class="nx">sh</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-启动mapreduce-jobhistory">3) 启动MapReduce JobHistory</h4>
+<p>MapReduce JobHistory可以查看已经运行完的Mapreduce作业记录，比如用了多少个Map、用了多少个Reduce、作业提交时间、作业启动时间、作业完成时间等信息。默认情况下，HadoopMapReduce JobHistory是没有启动的，我们可以通过下面的命令来启动。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">mr</span><span class="p">-</span><span class="nx">jobhistory</span><span class="p">-</span><span class="nx">daemon</span>.<span class="nx">sh</span> <span class="nx">start</span> <span class="nx">historyserver</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4-验证进程">4) 验证进程</h4>
+<p>在所有节点执行jps命令，各节点启动的进程应该和步骤一规划的节点一致。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">jps
+</code></pre></td></tr></table>
+</div>
+</div><p>**示例：**namenode1输出如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="o">~]</span><span class="err">$</span> <span class="n">jps</span>
+<span class="mi">11309</span> <span class="n">Jps</span>
+<span class="mi">10713</span> <span class="n">NameNode</span>
+<span class="mi">10916</span> <span class="n">JournalNode</span>
+<span class="mi">11065</span> <span class="n">ResourceManager</span>
+<span class="mi">53320</span> <span class="n">JobHistoryServer</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="o">~]</span><span class="err">$</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="5-验证web-ui">5) 验证web-ui</h4>
+<p>启动后正常的话，如下地址是可以访问的，如下都是默认端口。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">NameNode</td>
+<td style="text-align:left">http://10.20.16.217:50070</td>
+</tr>
+<tr>
+<td style="text-align:left">ResourceManager</td>
+<td style="text-align:left">http://10.20.16.217:8088</td>
+</tr>
+<tr>
+<td style="text-align:left">MapReduce JobHistory Server</td>
+<td style="text-align:left">http://10.20.16.217:19888</td>
+</tr>
+</tbody>
+</table>
+<h3 id="步骤八-active转换和failover验证">步骤八、 Active转换和Failover验证</h3>
+<p>QJM方式的HA搭建完成后，两个namenode启动后都是standby状态，需要将一个节点转换成active状态，这里转换active和failover一并测试，工作原理参照<a href="http://user.github.io/blog/2015/03/01/hadoop-foundation.html#qjm-ha">QJM HA的原理</a>，验证过程如下。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn1</span>
+<span class="n">standby</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn2</span>
+<span class="n">standby</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">transitionToActive</span> <span class="n">nn1</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn1</span>
+<span class="n">active</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn2</span>
+<span class="n">standby</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> 
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">failover</span> <span class="n">nn1</span> <span class="n">nn2</span>
+<span class="n">Failover</span> <span class="n">from</span> <span class="n">nn1</span> <span class="n">to</span> <span class="n">nn2</span> <span class="n">successful</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn1</span>
+<span class="n">standby</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span> <span class="n">hdfs</span> <span class="n">haadmin</span> <span class="o">-</span><span class="n">getServiceState</span> <span class="n">nn2</span>
+<span class="n">active</span>
+<span class="o">[</span><span class="n">hadoop</span><span class="err">@</span><span class="n">namenode1</span> <span class="n">current</span><span class="o">]</span><span class="err">$</span>
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2015-03-02
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/hadoop/">hadoop</a>
+          <a href="/tags/bigdata/">bigdata</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2015-03-03-hadoop-namenode-auto-failover/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Hadoop学习3-NameNode自动failover</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2015-03-01-hadoop-foundation/">
+            <span class="next-text nav-default">Hadoop学习1-基础理论</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2015-03-02 00:00:00 \u002b0000 UTC',
+        title: 'Hadoop学习2-集群搭建',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

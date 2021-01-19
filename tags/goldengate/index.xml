@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GoldenGate on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/goldengate/</link>
+    <description>Recent content in GoldenGate on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 04 Jul 2012 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/goldengate/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GoldenGate-概念解释</title>
+      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-01/</link>
+      <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-01/</guid>
+      <description>&lt;!-- toc --&gt;
+&lt;h1 id=&#34;概念解释&#34;&gt;概念解释&lt;/h1&gt;
+&lt;p&gt;对一些基本术语做出解释，部分概念摘自官方文档或者MOS，未作翻译，目的是保持概念的准确性。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>GoldenGate-版本下发异常</title>
+      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-02/</link>
+      <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-02/</guid>
+      <description>&lt;!-- toc --&gt;
+&lt;h1 id=&#34;案例整理&#34;&gt;案例整理&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;目的&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;对工作中遇到的问题进行总结，记录处理问题的思路和关键步骤，后续遇到类似问题便于参考及迅速处理。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>GoldenGate-突发异常</title>
+      <link>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-03/</link>
+      <pubDate>Wed, 04 Jul 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2012-07-04-goldengate-exception-03/</guid>
+      <description>&lt;!-- toc --&gt;
+&lt;h2 id=&#34;突发异常&#34;&gt;突发异常&lt;/h2&gt;
+&lt;p&gt;这部分总结GoldenGate正常运行过程中，突然发生的异常问题。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

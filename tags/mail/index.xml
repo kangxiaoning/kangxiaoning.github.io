@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>mail on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/mail/</link>
+    <description>Recent content in mail on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 15 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/mail/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>邮件服务原理</title>
+      <link>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</link>
+      <pubDate>Fri, 15 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2019-02-15-mail-server/</guid>
+      <description>&lt;h1 id=&#34;术语&#34;&gt;术语&lt;/h1&gt;
+&lt;h2 id=&#34;smtp-simple-mail-transfer-protocol&#34;&gt;SMTP (Simple Mail Transfer Protocol)&lt;/h2&gt;
+&lt;p&gt;发送电子邮件，需要遵循一定的通讯规则，SMTP 协议就是用来定义这种通讯规则的。&lt;/p&gt;
+&lt;h2 id=&#34;pop3post-office-protocol-3&#34;&gt;POP3（Post Office Protocol 3)&lt;/h2&gt;
+&lt;p&gt;主要用于支持使用客户端远程管理在服务器上的电子邮件。该协议是在 RFC-1939 中定义的，是 Internet 上的大多数人用来接收邮件的机制。POP3 采用 Client/Server 工作模式，默认使用 TCP 110 端口。&lt;/p&gt;
+&lt;h2 id=&#34;imap-internet-message-access-protocol&#34;&gt;IMAP (Internet Message Access Protocol)&lt;/h2&gt;
+&lt;p&gt;相对于 pop3 协议所有邮件的管理都需要下载下来进而管理，IMAP 提供了用户远程访问邮件服务器的途径，因而通过 IMAP 用户可以直接管理邮件服务器上的邮件，比如创建目录，分类管理等。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

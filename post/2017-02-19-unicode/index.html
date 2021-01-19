@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>python unicode编码 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2017-02-19-unicode/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="python unicode编码" />
+<meta property="og:description" content="遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2017-02-19-unicode/" />
+<meta property="article:published_time" content="2017-02-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-02-19T00:00:00+00:00" />
+<meta itemprop="name" content="python unicode编码">
+<meta itemprop="description" content="遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。">
+<meta itemprop="datePublished" content="2017-02-19T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-02-19T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2962">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="python unicode编码"/>
+<meta name="twitter:description" content="遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">python unicode编码</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-02-19 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-unicode">1. Unicode</a>
+      <ul>
+        <li><a href="#11-字符集">1.1 字符集</a></li>
+        <li><a href="#12-unicode编码">1.2 Unicode编码</a></li>
+        <li><a href="#13-utf实现方式">1.3 UTF实现方式</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-python编码">2. python编码</a>
+      <ul>
+        <li><a href="#21-unicode-string">2.1 Unicode string</a></li>
+        <li><a href="#22-encoding">2.2 Encoding</a></li>
+        <li><a href="#23-代码文件的编码">2.3 代码文件的编码</a></li>
+        <li><a href="#24-python编码实验">2.4 python编码实验</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>遇到编码问题，查阅了一些资料，有了一些理解，简单记录下。</p>
+<h1 id="1-unicode">1. Unicode</h1>
+<p>首先，Unicode有个通用字符集</p>
+<p>其次，每个字符有个编号（编码，即code points），规范为U+hhhh，其中每个h代表一个十六进制数字</p>
+<p>最后，有多种实现方式，即一个字符的编号可以用多种方式来表示，例如UTF-8、UTF-16中对同一个**字符编号（code point）**的表示不一样</p>
+<h2 id="11-字符集">1.1 字符集</h2>
+<p>参考 <a href="https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E5%AD%97%E7%AC%A6%E9%9B%86">通用字符集</a></p>
+<p>Unicode的学名是”Universal Multiple-Octet Coded Character Set”，简称为UCS。UCS可以看作是”Unicode Character Set”的缩写。</p>
+<p>可以看出，Unicode定义了一个字符集，包括世界上大部分的文字符号。</p>
+<h2 id="12-unicode编码">1.2 Unicode编码</h2>
+<p>一个字符的Unicode编码是确定的，但是不同实现方式对同一个字符的编码值不一样，所以同一个字符用不同的实现方式编码/解码就会出现乱码。</p>
+<p>如果一个仅包含基本7位ASCII字符的Unicode文件，如果每个字符都使用2字节的原Unicode编码传输，其第一字节的8位始终为0。
+这就造成了比较大的浪费。对于这种情况，可以使用UTF-8编码，这是一种变长编码，它将基本7位ASCII字符仍用7位编码表示，占用一个字节
+（首位补0）。而遇到与其他Unicode字符混合的情况，将按一定算法转换，每个字符使用1-3个字节编码，并利用首位为0或1进行识别。这样对
+以7位ASCII字符为主的西文文档就大幅节省了编码长度。</p>
+<h2 id="13-utf实现方式">1.3 UTF实现方式</h2>
+<p>一个字符的Unicode编码是确定的，在实际传输/存储中，出于节省空间的目的，对Unicode编码的实现方式有所不同。
+Unicode的实现方式称为Unicode转换格式（Unicode Transformation Format，简称为UTF）。</p>
+<p>Unicode的实现方式包括UTF-7、Punycode、CESU-8、SCSU、UTF-32、GB18030等，这些实现方式有些仅在一定的国家和地区使用，有些则
+属于未来的规划方式。目前通用的实现方式是UTF-16小端序（LE）、UTF-16大端序（BE）和UTF-8。</p>
+<h1 id="2-python编码">2. python编码</h1>
+<p>参考 <a href="https://docs.python.org/2/howto/unicode.html">Unicode HOWTO</a></p>
+<h2 id="21-unicode-string">2.1 Unicode string</h2>
+<p>a Unicode string is a sequence of code points, which are numbers from 0 to 0x10ffff.
+A code point is an integer value, usually denoted in base 16.</p>
+<h2 id="22-encoding">2.2 Encoding</h2>
+<p>a Unicode string is a sequence of code points, which are numbers from 0 to 0x10ffff.
+This sequence needs to be represented as a set of bytes (meaning, values from 0–255) in memory.
+The rules for translating a Unicode string into a sequence of bytes are called an <strong>encoding</strong>.</p>
+<p>Python’s default encoding is the ‘ascii’ encoding.</p>
+<p>The rules for converting a Unicode string into the ASCII encoding are simple; for each code point:</p>
+<pre><code>1. If the code point is &lt; 128, each byte is the same as the value of the code point.
+2. If the code point is 128 or greater, the Unicode string can’t be represented in this encoding. 
+   (Python raises a UnicodeEncodeError exception in this case.)
+</code></pre>
+<h2 id="23-代码文件的编码">2.3 代码文件的编码</h2>
+<p><code># -*- coding=utf-8 -*- </code> 用来指定.py的源码文件用utf-8规则编码，这样就可以在源码文件中正常显示中文这样的非ASCII字符。</p>
+<p>文件的编码表示该文件能表示哪些字符（字符集），比如指定了ASCII那就不能表示中文，因为ASCII字符集中没有中文字符。</p>
+<h2 id="24-python编码实验">2.4 python编码实验</h2>
+<p>通过前面的知识知道，一个字符的Unicode编码是确定的，即code point是固定的，因此各种字符编码之间的转换可以对标code point进行。</p>
+<p>因为任何一个字符，都可以在Unicode编码中（例如UTF-8）对应一个编码（数字），所以不同字符集之间的转换，只要都对应到Unicode中的code point即可完成。</p>
+<p>例如要把GBK编码的字符转换成UTF-8编码来保存/传输，可以先转换成Unicode中的编码（code point），然后找到该code point在UTF-8中对应的编码即可。</p>
+<p>即 GBK &ndash;&gt; Unicode &ndash;&gt; UTF-8</p>
+<p>GBK &ndash;&gt; Unicode 称为解码，即解码成为unicode，Unicode &ndash;&gt; UTF-8 称为编码，即编码为UTF-8格式。</p>
+<p>所以unicode相当于是明文，GBK、UTF-8相当是各种加密算法，从一种密文(GBK)转换成另一种密文(UTF-8)，必须先转换成明文（unicode），再用对应的
+加密算法(UTF-8)加密生成对应的密文。</p>
+<p>如下实验在secureCRT终端进行，编码设置为UTF-8（相当于在.py文件中设置了 -<em>- coding=utf-8 -</em>-），因此可以正常显示中文。</p>
+<p>通过sys.getdefaultencoding()得到当前系统默认编码是ascii，python里的str.encode和str.decode不指定时都使用系统默认编码。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span><span class="lnt">94
+</span><span class="lnt">95
+</span><span class="lnt">96
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">6</span>.<span class="m">6</span> <span class="p">(</span><span class="nx">r266</span>:<span class="m">84292</span><span class="p">,</span> <span class="nx">Jan</span> <span class="m">22</span> <span class="m">2014</span><span class="p">,</span> <span class="m">01</span>:<span class="m">49</span>:<span class="m">05</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7</span> <span class="m">20120313</span> <span class="p">(</span><span class="nx">Red</span> <span class="nx">Hat</span> <span class="m">4</span>.<span class="m">4</span>.<span class="m">7-4</span><span class="p">)</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getdefaultencoding</span><span class="p">()</span> # <span class="nx">系统默认编码</span><span class="err">
+</span><span class="err"></span><span class="s1">&#39;ascii&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span> <span class="p">=</span> <span class="nx">u</span><span class="s1">&#39;中国&#39;</span> # <span class="nx">unicode类型</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">type</span> <span class="s1">&#39;unicode&#39;</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> # <span class="nx">对unicode调用decode相当于先encode再decode</span><span class="err">
+</span><span class="err"></span><span class="nx">u</span><span class="s1">&#39;\u4e2d\u56fd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span><span class="err">
+</span><span class="err"></span><span class="nx">u</span><span class="s1">&#39;\u4e2d\u56fd&#39;</span> # <span class="nx">unicode里</span><span class="s2">&#34;中国&#34;</span><span class="nx">的code</span> <span class="nx">point</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">print</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">中国</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> # <span class="nx">转换为utf</span><span class="m">-8</span>编码<span class="err">
+</span><span class="err"></span><span class="s1">&#39;\xe4\xb8\xad\xe5\x9b\xbd&#39;</span> # <span class="nx">utf</span><span class="m">-8</span>中对<span class="s2">&#34;中国&#34;</span><span class="nx">的表示</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">()</span> # <span class="nx">对unicode类型调用decode</span>，<span class="nx">报错不能encode</span>，<span class="nx">因为当前编码是UTF</span><span class="m">-8</span>，<span class="nx">没有显式指定时使用系统默认的ascii</span>，<span class="nx">因此报错</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeEncodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">encode</span> <span class="nx">characters</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0-1</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;/usr/lib64/python2.6/encodings/utf_8.py&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">16</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">decode</span><span class="err">
+</span><span class="err"></span>    <span class="nx">return</span> <span class="nx">codecs</span>.<span class="nx">utf_8_decode</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="nx">errors</span><span class="p">,</span> <span class="nx">True</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeEncodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">encode</span> <span class="nx">characters</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0-1</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeEncodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">encode</span> <span class="nx">characters</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0-1</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="s1">&#39;\xe4\xb8\xad\xe5\x9b\xbd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>.<span class="nx">decode</span><span class="p">()</span> # <span class="nx">正确encode后又报decode错误</span>，<span class="nx">因为当前编码是UTF</span><span class="m">-8</span>，<span class="nx">没有显式指定时使用系统默认的ascii</span>，<span class="nx">因此报错</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">byte</span> <span class="m">0</span>xe<span class="m">4</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> # <span class="nx">encode和decode都显式指定后</span>，<span class="nx">unicode正确转换为unicode</span><span class="err">
+</span><span class="err"></span><span class="nx">u</span><span class="s1">&#39;\u4e2d\u56fd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err">
+</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span> <span class="p">=</span> <span class="s1">&#39;中国&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span><span class="err">
+</span><span class="err"></span><span class="s1">&#39;\xe4\xb8\xad\xe5\x9b\xbd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">print</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">中国</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">type</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> # <span class="nx">str</span> <span class="nx">类型</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">type</span> <span class="s1">&#39;str&#39;</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;GBK&#39;</span><span class="p">)</span> # <span class="nx">UTF</span><span class="m">-8</span> <span class="nx">转换为</span> <span class="nx">GBK</span>，<span class="nx">需要先解码成unicode</span>，<span class="nx">再进行encode编码</span>，<span class="nx">但是解码没有显式指定规则</span>，<span class="nx">导致使用默认的ascii</span>，<span class="nx">解码失败</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">byte</span> <span class="m">0</span>xe<span class="m">4</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">()</span> # <span class="nx">不指定密钥和显式指定为ascii报一样的错</span>，<span class="nx">说明不指定时使用了默认的ascii</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">byte</span> <span class="m">0</span>xe<span class="m">4</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">byte</span> <span class="m">0</span>xe<span class="m">4</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;gbk&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;gbk&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">bytes</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">2-3</span>: <span class="nx">illegal</span> <span class="nx">multibyte</span> <span class="nx">sequence</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> # <span class="nx">解码为unicode</span>，<span class="nx">指定正确密钥</span>（<span class="nx">UTF</span><span class="m">-8</span>）<span class="nx">后成功解码</span><span class="err">
+</span><span class="err"></span><span class="nx">u</span><span class="s1">&#39;\u4e2d\u56fd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">UnicodeDecodeError</span>: <span class="s1">&#39;ascii&#39;</span> <span class="nx">codec</span> <span class="nx">can</span>&#39;<span class="nx">t</span> <span class="nx">decode</span> <span class="nx">byte</span> <span class="m">0</span>xe<span class="m">4</span> <span class="nx">in</span> <span class="nx">position</span> <span class="m">0</span>: <span class="nx">ordinal</span> <span class="nx">not</span> <span class="nx">in</span> <span class="nx">range</span><span class="p">(</span><span class="m">128</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> # <span class="nx">UTF</span><span class="m">-8</span>转换为UTF<span class="m">-8</span><span class="err">
+</span><span class="err"></span><span class="s1">&#39;\xe4\xb8\xad\xe5\x9b\xbd&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span>.<span class="nx">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>.<span class="nx">encode</span><span class="p">(</span><span class="s1">&#39;GBK&#39;</span><span class="p">)</span> # <span class="nx">UTF</span><span class="m">-8</span>转换为GBK，<span class="nx">可以看到GBK和UTF</span><span class="m">-8</span>对同一个字符的表示编码不一样<span class="err">
+</span><span class="err"></span><span class="s1">&#39;\xd6\xd0\xb9\xfa&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2017-02-19
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2017-02-22-traceback/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">模块使用之trackback</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2017-02-14-kvm-qemu-fundation-3/">
+            <span class="next-text nav-default">KVM虚拟化实验-两台VM互相通信</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2017-02-19 00:00:00 \u002b0000 UTC',
+        title: 'python unicode编码',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

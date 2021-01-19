@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ansible on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/ansible/</link>
+    <description>Recent content in ansible on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 12 Jun 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/ansible/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ansible管理windows</title>
+      <link>https://kangxiaoning.github.io/post/2017-06-12-ansible-manage-windows/</link>
+      <pubDate>Mon, 12 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-06-12-ansible-manage-windows/</guid>
+      <description>&lt;p&gt;crontl端是Centos 7.2，被管理端是windows 2008R2。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://www.cnblogs.com/kingleft/p/6391652.html&#34;&gt;参考文章&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible tower动手实战营</title>
+      <link>https://kangxiaoning.github.io/post/2017-06-08-ansible-tower/</link>
+      <pubDate>Thu, 08 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2017-06-08-ansible-tower/</guid>
+      <description>&lt;p&gt;参加redhat为期半天的ansible tower实践营，虽然有ansible使用经验，也收获了一些东西。&lt;/p&gt;
+&lt;p&gt;培训速度比较快，没来的及做一些笔记，重点信息记录如下。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习6-条件判断</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-29-ansible-when/</link>
+      <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-29-ansible-when/</guid>
+      <description>&lt;h1 id=&#34;六-条件判断&#34;&gt;六、 条件判断&lt;/h1&gt;
+&lt;h2 id=&#34;一-when&#34;&gt;(一) when&lt;/h2&gt;
+&lt;p&gt;可用于task，role和include，在满足条件时task才会被执行。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习7-循环</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/</link>
+      <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/</guid>
+      <description>&lt;h1 id=&#34;七-循环&#34;&gt;七、 循环&lt;/h1&gt;
+&lt;p&gt;循环语法有多种，最常用的是 with_items ，如下练习了两种语法。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习8-API</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-31-ansible-api/</link>
+      <pubDate>Fri, 29 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-31-ansible-api/</guid>
+      <description>&lt;h1 id=&#34;八-api&#34;&gt;八、 API&lt;/h1&gt;
+&lt;p&gt;有时候需要编写 python 代码调用 ansible 的 API，如下是个 ping 的示例。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习5-变量</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-28-ansible-variable/</link>
+      <pubDate>Thu, 28 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-28-ansible-variable/</guid>
+      <description>&lt;h1 id=&#34;五-变量&#34;&gt;五、 变量&lt;/h1&gt;
+&lt;p&gt;所有变量都可以在playbook或者jinja2模板中通过{{ varname }}使用。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习4-roles</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-27-ansible-role/</link>
+      <pubDate>Wed, 27 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-27-ansible-role/</guid>
+      <description>&lt;h1 id=&#34;四-roles&#34;&gt;四、 roles&lt;/h1&gt;
+&lt;h2 id=&#34;一-roles介绍&#34;&gt;(一) roles介绍&lt;/h2&gt;
+&lt;p&gt;roles基于已定义的文件结构，自动加载vars_files、tasks、handlers等，
+只需要将相关内容放置规定的目录下即可。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习3-playbook</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-26-ansible-playbook/</link>
+      <pubDate>Tue, 26 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-26-ansible-playbook/</guid>
+      <description>&lt;h1 id=&#34;三-playbooks&#34;&gt;三、 playbooks&lt;/h1&gt;
+&lt;h2 id=&#34;一-playbook&#34;&gt;(一) playbook&lt;/h2&gt;
+&lt;p&gt;template的src参数可以写相对路径，也可以写绝对路径。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习2-ad-hoc</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-25-ansible-ad-hoc/</link>
+      <pubDate>Mon, 25 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-25-ansible-ad-hoc/</guid>
+      <description>&lt;h1 id=&#34;二命令行方式&#34;&gt;二、命令行方式&lt;/h1&gt;
+&lt;p&gt;ansible默认使用SSH对设备进行管理，所以远程控制可以基于密码或者SSH信任登陆主机。&lt;/p&gt;
+&lt;p&gt;如下都是指定了 -k 选项，表示希望输入密码，如果要实现无密码访问使用 ssh-keygen 和
+ssh-copy-id 来实现公钥下发即可，此处略过这些配置。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>ansible学习1-实验环境</title>
+      <link>https://kangxiaoning.github.io/post/2016-07-24-ansible-env/</link>
+      <pubDate>Sun, 24 Jul 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2016-07-24-ansible-env/</guid>
+      <description>&lt;h1 id=&#34;一-实验环境&#34;&gt;一、 实验环境&lt;/h1&gt;
+&lt;h2 id=&#34;一-架构&#34;&gt;(一) 架构&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://kangxiaoning.github.io/images/ansible/ansible-arch.png&#34; alt=&#34;Ansible Architecture&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;二-资源规划&#34;&gt;(二) 资源规划&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;角色&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;IP&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;Ansible&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.20.23.180&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;被管理主机&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.20.19.101&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;被管理主机&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.20.19.102&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;被管理主机&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.20.19.103&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;被管理主机&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.20.19.105&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

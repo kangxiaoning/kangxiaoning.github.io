@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>模块使用之weakref - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="练习 weakref 使用，掌握 weakref 使用场景和目的。
+示例参考
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016-10-24-weakref/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="模块使用之weakref" />
+<meta property="og:description" content="练习 weakref 使用，掌握 weakref 使用场景和目的。
+示例参考" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016-10-24-weakref/" />
+<meta property="article:published_time" content="2016-10-24T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-10-24T00:00:00+00:00" />
+<meta itemprop="name" content="模块使用之weakref">
+<meta itemprop="description" content="练习 weakref 使用，掌握 weakref 使用场景和目的。
+示例参考">
+<meta itemprop="datePublished" content="2016-10-24T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-10-24T00:00:00+00:00" />
+<meta itemprop="wordCount" content="855">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="模块使用之weakref"/>
+<meta name="twitter:description" content="练习 weakref 使用，掌握 weakref 使用场景和目的。
+示例参考"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">模块使用之weakref</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-10-24 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-概念">1. 概念</a></li>
+    <li><a href="#21-weakrefref">2.1 weakref.ref</a></li>
+    <li><a href="#22-weakrefproxy">2.2 weakref.proxy</a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>练习 weakref 使用，掌握 weakref 使用场景和目的。</p>
+<p><a href="http://sleepd.blog.51cto.com/3034090/1073044">示例参考</a></p>
+<h1 id="1-概念">1. 概念</h1>
+<p>首先需要了解的是在 Python 里每个对象都有一个引用计数，当这个引用计数为
+0 时，Python 的garbage collection(GC)是可以安全销毁这个对象的，
+比如对一个对象创建引用则计数加 1,删除引用则计数减 1 。</p>
+<p>weakref 模块允许对一个对象创建弱引用，弱引用不像正常引用，弱引用不会
+增加引用计数，也就是说当一个对象上只有弱引用时，GC是可以销毁该对象的。</p>
+<p>A primary use for weak references is to implement caches
+or mappings holding large objects, where it’s desired that
+a large object not be kept alive solely because it appears
+in a cache or mapping.</p>
+<h1 id="21-weakrefref">2.1 weakref.ref</h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">dbo</span>@<span class="nx">dbo</span><span class="p">-</span><span class="nx">pc</span>:<span class="p">~</span>$ <span class="nx">python</span><span class="err">
+</span><span class="err"></span><span class="nx">Python</span> <span class="m">2</span>.<span class="m">7</span>.<span class="m">12</span> <span class="p">(</span><span class="nx">default</span><span class="p">,</span> <span class="nx">Jul</span>  <span class="m">1</span> <span class="m">2016</span><span class="p">,</span> <span class="m">15</span>:<span class="m">12</span>:<span class="m">24</span><span class="p">)</span> <span class="err">
+</span><span class="err"></span>[<span class="nx">GCC</span> <span class="m">5</span>.<span class="m">4</span>.<span class="m">0</span> <span class="m">20160609</span>] <span class="nx">on</span> <span class="nx">linux2</span><span class="err">
+</span><span class="err"></span><span class="nx">Type</span> <span class="s2">&#34;help&#34;</span><span class="p">,</span> <span class="s2">&#34;copyright&#34;</span><span class="p">,</span> <span class="s2">&#34;credits&#34;</span> <span class="nx">or</span> <span class="s2">&#34;license&#34;</span> <span class="nx">for</span> <span class="nx">more</span> <span class="nx">information</span>.<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">weakref</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">import</span> <span class="nx">sys</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">class</span> <span class="nx">DBO</span><span class="p">(</span><span class="nx">object</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>...     <span class="nx">pass</span><span class="err">
+</span><span class="err"></span>... <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">dbo1</span> <span class="p">=</span> <span class="nx">DBO</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="m">2</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">weakref_dbo</span> <span class="p">=</span> <span class="nx">weakref</span>.<span class="nx">ref</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span>  # <span class="nx">创建弱引用</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span>  # <span class="nx">弱引用没有增加引用计数</span><span class="err">
+</span><span class="err"></span><span class="m">2</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">weakref_dbo</span>  # <span class="nx">弱引用指向的对象</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">to</span> <span class="s1">&#39;DBO&#39;</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">03166</span>ed<span class="m">0</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">dbo2</span> <span class="p">=</span> <span class="nx">weakref_dbo</span><span class="p">()</span>  # <span class="nx">获取弱引用指向的对象</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">dbo1</span> <span class="nx">is</span> <span class="nx">dbo2</span>  # <span class="nx">dbo1和dbo2引用的是同一个对象</span><span class="err">
+</span><span class="err"></span><span class="nx">True</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span>  # <span class="nx">对象上的引用计数加</span> <span class="m">1</span><span class="err">
+</span><span class="err"></span><span class="m">3</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo2</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="m">3</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">dbo1</span> <span class="p">=</span> <span class="nx">None</span>  # <span class="nx">删除引用</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span>  # <span class="nx">这里不明白为什么是这个数字</span><span class="err">
+</span><span class="err"></span><span class="m">2545</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">None</span><span class="p">)</span>  # <span class="nx">None</span> <span class="nx">的计数是</span> <span class="m">2546</span>，<span class="nx">python2</span> <span class="nx">和</span> <span class="nx">python3</span> <span class="nx">不一样</span><span class="err">
+</span><span class="err"></span><span class="m">2546</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">weakref_dbo</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">to</span> <span class="s1">&#39;DBO&#39;</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">03166</span>ed<span class="m">0</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">dbo2</span> <span class="p">=</span> <span class="nx">None</span>  # <span class="nx">删除引用</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">weakref_dbo</span>  # <span class="nx">当对象引用计数为0时</span>，<span class="nx">弱引用失效</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">dead</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">dbo1</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="m">2546</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="22-weakrefproxy">2.2 weakref.proxy</h1>
+<p>proxy 像是弱引用对象，它们的行为就是它们所引用的对象的行为，这样就不必
+首先调用弱引用对象来访问背后的对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="p">&gt;&gt;&gt;</span> <span class="nx">from</span> <span class="nx">socket</span> <span class="nx">import</span> *<span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span> <span class="p">=</span> <span class="nx">socket</span><span class="p">(</span><span class="nx">AF_INET</span><span class="p">,</span> <span class="nx">SOCK_STREAM</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span> <span class="p">=</span> <span class="nx">weakref</span>.<span class="nx">ref</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">to</span> <span class="s1">&#39;_socketobject&#39;</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0310</span>b<span class="m">910</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">s</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">socket</span>.<span class="nx">_socketobject</span> <span class="nx">object</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0310</span>b<span class="m">910</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">proxy_s</span> <span class="p">=</span> <span class="nx">weakref</span>.<span class="nx">proxy</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">proxy_s</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakproxy</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">03117208</span> <span class="nx">to</span> <span class="nx">_socketobject</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0310</span>b<span class="m">910</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span>.<span class="nx">close</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">AttributeError</span>: <span class="s1">&#39;weakref&#39;</span> <span class="nx">object</span> <span class="nx">has</span> <span class="nx">no</span> <span class="nx">attribute</span> <span class="s1">&#39;close&#39;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span><span class="p">()</span>.<span class="nx">close</span><span class="p">()</span>  #  <span class="nx">不能直接调用对象方法</span>，<span class="nx">要加上</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">proxy_s</span>.<span class="nx">close</span><span class="p">()</span>  #  <span class="nx">可以直接调用对象方法</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="m">2</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">to</span> <span class="s1">&#39;_socketobject&#39;</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0310</span>b<span class="m">910</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">r</span> <span class="p">=</span> <span class="nx">ref_s</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">r</span>.<span class="nx">close</span><span class="p">()</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">sys</span>.<span class="nx">getrefcount</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="m">3</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span><span class="err">
+</span><span class="err"></span><span class="p">&lt;</span><span class="nx">weakref</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0316</span>d<span class="m">3</span>c<span class="m">0</span>; <span class="nx">to</span> <span class="s1">&#39;_socketobject&#39;</span> <span class="nx">at</span> <span class="m">0</span>x<span class="m">7</span>f<span class="m">9</span>b<span class="m">0310</span>b<span class="m">910</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">del</span> <span class="nx">ref_s</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="nx">ref_s</span><span class="err">
+</span><span class="err"></span><span class="nx">Traceback</span> <span class="p">(</span><span class="nx">most</span> <span class="nx">recent</span> <span class="nx">call</span> <span class="nx">last</span><span class="p">)</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">File</span> <span class="s2">&#34;&lt;stdin&gt;&#34;</span><span class="p">,</span> <span class="nx">line</span> <span class="m">1</span><span class="p">,</span> <span class="nx">in</span> <span class="p">&lt;</span><span class="nx">module</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">NameError</span>: <span class="nx">name</span> <span class="s1">&#39;ref_s&#39;</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">defined</span><span class="err">
+</span><span class="err"></span><span class="p">&gt;&gt;&gt;</span> <span class="err">
+</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-10-24
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-10-25-argparse/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">模块使用之argparse</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016-10-22-ubuntu-install-lantern/">
+            <span class="next-text nav-default">Ubuntu安装lantern</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-10-24 00:00:00 \u002b0000 UTC',
+        title: '模块使用之weakref',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

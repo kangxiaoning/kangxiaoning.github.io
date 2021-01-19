@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Quick Sort - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="快速排序被称为二十世纪对世界影响最大的算法之一。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2019-04-07-quick-sort/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Quick Sort" />
+<meta property="og:description" content="快速排序被称为二十世纪对世界影响最大的算法之一。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2019-04-07-quick-sort/" />
+<meta property="article:published_time" content="2019-04-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-04-07T00:00:00+00:00" />
+<meta itemprop="name" content="Quick Sort">
+<meta itemprop="description" content="快速排序被称为二十世纪对世界影响最大的算法之一。">
+<meta itemprop="datePublished" content="2019-04-07T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-04-07T00:00:00+00:00" />
+<meta itemprop="wordCount" content="4035">
+
+
+
+<meta itemprop="keywords" content="sort,quick-sort," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Quick Sort"/>
+<meta name="twitter:description" content="快速排序被称为二十世纪对世界影响最大的算法之一。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Quick Sort</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-04-07 </span>
+        <div class="post-category">
+            <a href="/categories/algorithm/"> algorithm </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-quick-sort">1. Quick Sort</a>
+      <ul>
+        <li><a href="#11-实现原理">1.1 实现原理</a></li>
+        <li><a href="#12-实现代码">1.2 实现代码</a>
+          <ul>
+            <li><a href="#python">Python</a></li>
+            <li><a href="#go">Go</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-分析">2. 分析</a>
+          <ul>
+            <li><a href="#21-python-执行结果">2.1 Python 执行结果</a></li>
+            <li><a href="#go-执行结果">Go 执行结果</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>快速排序被称为二十世纪对世界影响最大的算法之一。</p>
+<h1 id="1-quick-sort">1. Quick Sort</h1>
+<h2 id="11-实现原理">1.1 实现原理</h2>
+<p>和 merge sort 一样，quick sort 也是一种分治算法。</p>
+<p>quick sort 每次从当前数组中选择一个中心点 x，然后进行 partition 操作，partition 操作使 x 处于排序后的位置，也就是小于 x 的元素放在 x 前面，大于 x 的元素放在 x 后面。</p>
+<p>中心点不同的选择方法使 quick sort 有多个版本：</p>
+<ol>
+<li>总是选择第一个元素为中心点</li>
+<li>总是选择最后一个元素为中心点</li>
+<li>随机选择中心点</li>
+<li>选择中间元素为中心点的</li>
+</ol>
+<p>merge sort 是将整个数组一分为二，之后靠 merge 逐渐排序；而 quick sort 每次从当前考虑的数组中选择一个元素，以这个元素为基点，之后将基点元素挪到排好序的位置。</p>
+<p>实现二路快速排序、三路快速排序。</p>
+<p><img src="/images/quick-sort/1ea505b.jpg" alt="sort"></p>
+<h2 id="12-实现代码">1.2 实现代码</h2>
+<p>如下用 python 和 Go 语言分别实现排序算法，由于 Python 语言对递归有限制，因此如下需要调整最大递归深度，不然程序还未执行完就会达到最大递归限制。</p>
+<h3 id="python">Python</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">helper</span>
+<span class="kn">from</span> <span class="nn">insertion_sort</span> <span class="kn">import</span> <span class="n">insertion_sort_v3</span>
+
+
+<span class="c1"># recursion count</span>
+<span class="n">recursion_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">quick_sort</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">__quick_sort</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">quick_sort_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">__quick_sort_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="c1"># 对arr[l...r]部分进行快速排序</span>
+<span class="k">def</span> <span class="nf">__quick_sort</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="c1"># if l &gt;= r:</span>
+    <span class="c1">#     return</span>
+
+    <span class="c1"># 优化：对于小规模数组采用插入排序</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">-</span> <span class="n">l</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">insertion_sort_v3</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># recursion count</span>
+    <span class="k">global</span> <span class="n">recursion_cnt</span>
+    <span class="n">recursion_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">__partition</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">__quick_sort</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">__quick_sort</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">__quick_sort_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="c1"># 优化：对于小规模数组采用插入排序</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">-</span> <span class="n">l</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">insertion_sort_v3</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># recursion count</span>
+    <span class="k">global</span> <span class="n">recursion_cnt</span>
+    <span class="n">recursion_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">__partition_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">__quick_sort_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">__quick_sort_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="c1"># 对arr[l...r]部分进行partition操作</span>
+<span class="c1"># 返回p，使得arr[l...p-1] &lt; arr[p], arr[p+1...r] &gt; arr[p]</span>
+<span class="k">def</span> <span class="nf">__partition</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># 优化：随机在arr[l...r]选择一个数值作为标定点pivot</span>
+    <span class="n">random_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+
+    <span class="c1"># 注意闭区间和开区间</span>
+    <span class="c1"># arr[l+1...j] &lt; v, arr[j+1...i) &gt;= v</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="c1"># i的取值范围是[l...r]闭区间</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">j</span>
+
+
+<span class="k">def</span> <span class="nf">__partition_v2</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># 优化：随机在arr[l...r]选择一个数值作为标定点pivot</span>
+    <span class="n">random_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+
+    <span class="c1"># arr[l+1...i) &lt;= v; arr(j...r] &gt;= v</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">r</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">r</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="n">j</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">j</span>
+
+
+<span class="k">def</span> <span class="nf">quick_sort_3ways</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">__quick_sort_3ways</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="c1"># 将 arr 分为3部分，小于v的部分，等于v的部分，大于v的部分</span>
+<span class="c1"># arr[l+1...lt]&lt;v, arr[lt+1...i-1]==v, arr[gt...r]&gt;v</span>
+<span class="c1">#   [ &lt;v ]    [ ==v ]          [ &gt;v ]</span>
+<span class="c1">#      ^         ^               ^</span>
+<span class="c1">#      |         |               |</span>
+<span class="c1"># &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt; =====         &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span>
+<span class="c1"># --------------------------------------</span>
+<span class="c1"># |v| | | | | | ==v | |......| | | | | |</span>
+<span class="c1"># --------------------------------------</span>
+<span class="c1">#  |         |       |        |       |</span>
+<span class="c1">#  v         v       v        v       v</span>
+<span class="c1">#  l         lt      i       gt       r</span>
+
+
+<span class="k">def</span> <span class="nf">__quick_sort_3ways</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="c1"># 优化：对于小规模数组采用插入排序</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">-</span> <span class="n">l</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="n">insertion_sort_v3</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># 优化：随机在arr[l...r]选择一个数值作为标定点pivot</span>
+    <span class="n">random_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">random_idx</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+
+    <span class="c1"># partition</span>
+    <span class="c1"># 初始化状态要满足3部分的定义</span>
+    <span class="n">lt</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="n">gt</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">gt</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">lt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">lt</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">gt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">gt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">gt</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">lt</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">lt</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+    <span class="c1"># swap 后 lt指向等于v的第一个元素，小于v的最大idx为lt-1</span>
+    <span class="n">lt</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">__quick_sort_3ways</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">lt</span><span class="p">)</span>
+    <span class="n">__quick_sort_3ways</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">gt</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">merge_sort</span> <span class="kn">import</span> <span class="n">merge_sort</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">100000</span>
+    <span class="n">arr1</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">generate_random_array</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">arr2</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr3</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr4</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">merge_sort</span><span class="p">,</span> <span class="n">arr1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort</span><span class="p">,</span> <span class="n">arr2</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_v2</span><span class="p">,</span> <span class="n">arr3</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_3ways</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">Test for nearly ordered array&#34;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+    <span class="n">swap_times</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">arr1</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">generate_nearly_ordered_array</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">swap_times</span><span class="p">)</span>
+    <span class="n">arr2</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr3</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr4</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">merge_sort</span><span class="p">,</span> <span class="n">arr1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort</span><span class="p">,</span> <span class="n">arr2</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_v2</span><span class="p">,</span> <span class="n">arr3</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_3ways</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">Test for random array in 0-10&#34;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+    <span class="n">arr1</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">generate_random_array</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">arr2</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr3</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">arr4</span> <span class="o">=</span> <span class="n">arr1</span><span class="p">[:]</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">merge_sort</span><span class="p">,</span> <span class="n">arr1</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort</span><span class="p">,</span> <span class="n">arr2</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_v2</span><span class="p">,</span> <span class="n">arr3</span><span class="p">)</span>
+    <span class="n">helper</span><span class="o">.</span><span class="n">test_sort</span><span class="p">(</span><span class="n">quick_sort_3ways</span><span class="p">,</span> <span class="n">arr4</span><span class="p">)</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="go">Go</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go">  <span class="kn">package</span> <span class="nx">sort</span>
+
+  <span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;math/rand&#34;</span>
+    <span class="s">&#34;time&#34;</span>
+  <span class="p">)</span>
+
+  <span class="kd">func</span> <span class="nf">QuickSortV1</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">r</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="nf">quickSortV1</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">quickSortV1</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nx">l</span> <span class="o">&gt;=</span> <span class="nx">r</span> <span class="p">{</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="nx">p</span> <span class="o">:=</span> <span class="nf">partitionV1</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+    <span class="nf">quickSortV1</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nf">quickSortV1</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">QuickSortV2</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">r</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="nf">quickSortV2</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">quickSortV2</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 优化一：对于小规模数组使用 InsertionSort
+</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">r</span><span class="o">-</span><span class="nx">l</span> <span class="o">&lt;=</span> <span class="mi">15</span> <span class="p">{</span>
+      <span class="nf">InsertionSort</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="nx">p</span> <span class="o">:=</span> <span class="nf">partitionV1</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+    <span class="nf">quickSortV2</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nf">quickSortV2</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">QuickSortV3</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">r</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="nf">quickSortV3</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">quickSortV3</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 优化一：对于小规模数组使用 InsertionSort
+</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">r</span><span class="o">-</span><span class="nx">l</span> <span class="o">&lt;=</span> <span class="mi">15</span> <span class="p">{</span>
+      <span class="nf">InsertionSort</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="nx">p</span> <span class="o">:=</span> <span class="nf">partitionV2</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+    <span class="nf">quickSortV3</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nf">quickSortV3</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">partitionV1</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="nx">v</span> <span class="o">:=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="nx">j</span> <span class="o">:=</span> <span class="nx">l</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">r</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">v</span> <span class="p">{</span>
+        <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nx">j</span><span class="o">++</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nx">j</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">partitionV2</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="c1">// 优化二：采用数组范围内的随机元素作为基点，而不是第一个元素作为基点
+</span><span class="c1"></span>    <span class="c1">//         在数组近乎有序的情况下，发生 O(n^2)的概念几乎为 0
+</span><span class="c1"></span>    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">())</span>
+    <span class="nx">randomIndex</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">r</span><span class="o">-</span><span class="nx">l</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">l</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="nx">v</span> <span class="o">:=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="nx">j</span> <span class="o">:=</span> <span class="nx">l</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nx">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">r</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">v</span> <span class="p">{</span>
+        <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nx">j</span><span class="o">++</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nx">j</span>
+  <span class="p">}</span>
+
+  <span class="c1">// 双路快速排序
+</span><span class="c1"></span>  <span class="kd">func</span> <span class="nf">QuickSort2Ways</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">r</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="nf">quickSort2Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="kd">func</span> <span class="nf">quickSort2Ways</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 优化一：对于小规模数组使用 InsertionSort
+</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">r</span><span class="o">-</span><span class="nx">l</span> <span class="o">&lt;=</span> <span class="mi">15</span> <span class="p">{</span>
+      <span class="nf">InsertionSort</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="nx">p</span> <span class="o">:=</span> <span class="nf">partition2Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+    <span class="nf">quickSort2Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nf">quickSort2Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="c1">// 双路快速排序 partition
+</span><span class="c1"></span>  <span class="c1">// 返回 p，使得 slice[l...p-1] &lt;= slice[p]; slice[p+1] &gt;= slice[p]
+</span><span class="c1"></span>  <span class="kd">func</span> <span class="nf">partition2Ways</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="c1">// 优化二：采用数组范围内的随机元素作为基点，而不是第一个元素作为基点
+</span><span class="c1"></span>    <span class="c1">//         在数组近乎有序的情况下，发生 O(n^2)的概念几乎为 0
+</span><span class="c1"></span>    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">())</span>
+    <span class="nx">randomIndex</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">r</span><span class="o">-</span><span class="nx">l</span><span class="p">)</span> <span class="o">+</span> <span class="nx">l</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+
+    <span class="nx">v</span> <span class="o">:=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+
+    <span class="c1">// slice[l+1...i) &lt;= v
+</span><span class="c1"></span>    <span class="c1">// slice(j...r] &gt;= v
+</span><span class="c1"></span>    <span class="nx">i</span> <span class="o">:=</span> <span class="nx">l</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="nx">j</span> <span class="o">:=</span> <span class="nx">r</span>
+    <span class="k">for</span> <span class="p">{</span>
+      <span class="c1">// slice[i] &lt; v 而不是 slice[i] &lt;= v，否则会造成不平衡
+</span><span class="c1"></span>      <span class="k">for</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">r</span> <span class="o">&amp;&amp;</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">v</span> <span class="p">{</span>
+        <span class="nx">i</span><span class="o">++</span>
+      <span class="p">}</span>
+
+      <span class="k">for</span> <span class="nx">r</span> <span class="o">&gt;=</span> <span class="nx">l</span><span class="o">+</span><span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">&gt;</span> <span class="nx">v</span> <span class="p">{</span>
+        <span class="nx">j</span><span class="o">--</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="nx">i</span> <span class="p">&gt;</span> <span class="nx">j</span> <span class="p">{</span>
+        <span class="k">break</span>
+      <span class="p">}</span>
+
+      <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+      <span class="nx">i</span><span class="o">++</span>
+      <span class="nx">j</span><span class="o">--</span>
+    <span class="p">}</span>
+
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nx">j</span>
+  <span class="p">}</span>
+
+  <span class="c1">// 三路排序，处理重复数据较多的数组效率较高
+</span><span class="c1"></span>  <span class="kd">func</span> <span class="nf">QuickSort3Ways</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">r</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="nf">quickSort3Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="c1">// 递归的三路排序
+</span><span class="c1"></span>  <span class="kd">func</span> <span class="nf">quickSort3Ways</span><span class="p">(</span><span class="nx">slice</span> <span class="p">[]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">l</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 对于小规模数组，使用 InsertionSort 进行优化
+</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">r</span><span class="o">-</span><span class="nx">l</span> <span class="o">&lt;=</span> <span class="mi">15</span> <span class="p">{</span>
+      <span class="nf">InsertionSort</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="c1">// 随机在 slice[l...r]的范围中，选择一个数值作为基点 pivot
+</span><span class="c1"></span>    <span class="nx">rand</span><span class="p">.</span><span class="nf">Seed</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">().</span><span class="nf">UnixNano</span><span class="p">())</span>
+    <span class="nx">randomIndex</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Intn</span><span class="p">(</span><span class="nx">r</span><span class="o">-</span><span class="nx">l</span><span class="p">)</span> <span class="o">+</span> <span class="nx">l</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">randomIndex</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+
+    <span class="nx">v</span> <span class="o">:=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="c1">// slice[l+1...lt] &lt; v
+</span><span class="c1"></span>    <span class="nx">lt</span> <span class="o">:=</span> <span class="nx">l</span>
+    <span class="c1">// slice[gt...r] &gt; v
+</span><span class="c1"></span>    <span class="nx">gt</span> <span class="o">:=</span> <span class="nx">r</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1">// slice[lt+1...i] == v
+</span><span class="c1"></span>    <span class="nx">i</span> <span class="o">:=</span> <span class="nx">l</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">gt</span> <span class="p">{</span>
+      <span class="c1">// &lt; v
+</span><span class="c1"></span>      <span class="k">if</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">v</span> <span class="p">{</span>
+        <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">lt</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">lt</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+        <span class="nx">i</span><span class="o">++</span>
+        <span class="nx">lt</span><span class="o">++</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">&gt;</span> <span class="nx">v</span> <span class="p">{</span> <span class="c1">// &gt; v
+</span><span class="c1"></span>        <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">gt</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">gt</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+        <span class="nx">gt</span><span class="o">--</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">i</span><span class="o">++</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">lt</span><span class="p">]</span> <span class="p">=</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">lt</span><span class="p">],</span> <span class="nx">slice</span><span class="p">[</span><span class="nx">l</span><span class="p">]</span>
+    <span class="c1">// 对小于 v 的部分和大于 v 的部分继续处理，等于 v 的部分不用处理
+</span><span class="c1"></span>    <span class="nf">quickSort3Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">lt</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nf">quickSort3Ways</span><span class="p">(</span><span class="nx">slice</span><span class="p">,</span> <span class="nx">gt</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="2-分析">2. 分析</h2>
+<p>quick sort 和 merge sort 都属于 O(nlog^n)级别的算法，由于 quick sort 在分割的时候不像 merge sort 是二分法，在有序数组中有可能会退化为 O(n^2)复杂度，解决办法是不要以第一个元素为中心点，随机选择中心点作为优化手段。</p>
+<p>对 quick sort 进行优化后，处理有序数组性能也很好，在 go 实现的优化可以看到效果。</p>
+<p>双路排序对处理有大量重复元素的数组，比较前面的版本效率高。</p>
+<p>三路排序对处理有大量重复元素的数组，比二路快速排序效率更高。</p>
+<h3 id="21-python-执行结果">2.1 Python 执行结果</h3>
+<p>如下是在随机数组的情况下与 merge sort 的比较，可见已经优于 merge sort，但是仍有局限性，后续逐步优化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">
+<span class="p">|</span> merge_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.667196751 s <span class="p">|</span>
+<span class="p">|</span> quick_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.365603924 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_v2       <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.378817081 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_3ways    <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.644885063 s <span class="p">|</span>
+
+Test <span class="k">for</span> nearly ordered array
+<span class="p">|</span> merge_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.495433092 s <span class="p">|</span>
+<span class="p">|</span> quick_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.317402840 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_v2       <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.255207300 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_3ways    <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.679428101 s <span class="p">|</span>
+
+Test <span class="k">for</span> random array in 0-10
+<span class="p">|</span> merge_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.572530985 s <span class="p">|</span>
+<span class="p">|</span> quick_sort          <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 23.834493876 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_v2       <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.280807972 s <span class="p">|</span>
+<span class="p">|</span> quick_sort_3ways    <span class="p">|</span> <span class="nv">n</span> <span class="o">=</span> <span class="m">100000</span>   <span class="p">|</span> <span class="nv">elapsed</span> <span class="o">=</span> 0.100182056 s <span class="p">|</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="go-执行结果">Go 执行结果</h3>
+<p>测试代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-go" data-lang="go">  <span class="kn">package</span> <span class="nx">main</span>
+
+  <span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;fmt&#34;</span>
+
+    <span class="s">&#34;github.com/user/algorithm-go/sort&#34;</span>
+  <span class="p">)</span>
+
+  <span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// SelectionSort
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;SelectionSort&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="o">:=</span> <span class="mi">100</span>
+    <span class="nx">slice</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">SelectionSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">1000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">SelectionSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">10000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">SelectionSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="c1">// InsertionSort
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;InsertionSort&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">InsertionSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">1000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">InsertionSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">10000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">InsertionSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="c1">// BubbleSort
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;BubbleSort&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">BubbleSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">1000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">BubbleSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">10000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">BubbleSort</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+
+    <span class="c1">// MergeSort
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;MergeSort&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortBU</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">1000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortBU</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortBU</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+
+    <span class="c1">// QuickSort
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;QuickSort&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice3</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV3</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort3Ways</span><span class="p">,</span> <span class="nx">slice3</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">1000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice3</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV3</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort3Ways</span><span class="p">,</span> <span class="nx">slice3</span><span class="p">)</span>
+
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">10000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice3</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV3</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort3Ways</span><span class="p">,</span> <span class="nx">slice3</span><span class="p">)</span>
+
+    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;random range [0, 10]&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">100000</span>
+    <span class="nx">slice</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateSlice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice3</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice4</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice5</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice6</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">slice7</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV1</span><span class="p">,</span> <span class="nx">slice</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV2</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV3</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort2Ways</span><span class="p">,</span> <span class="nx">slice3</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort3Ways</span><span class="p">,</span> <span class="nx">slice4</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV1</span><span class="p">,</span> <span class="nx">slice5</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV2</span><span class="p">,</span> <span class="nx">slice6</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortBU</span><span class="p">,</span> <span class="nx">slice7</span><span class="p">)</span>
+
+    <span class="c1">// Nearly Ordered Array
+</span><span class="c1"></span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Nearly Ordered&#34;</span><span class="p">)</span>
+    <span class="nx">n</span> <span class="p">=</span> <span class="mi">10000</span>
+    <span class="nx">slice1</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">GenerateNearlyOrderedArray</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="nx">slice2</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice3</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice4</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice5</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice6</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice7</span> <span class="p">=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice8</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice9</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice10</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice11</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">slice12</span> <span class="o">:=</span> <span class="nx">sort</span><span class="p">.</span><span class="nf">CopyIntSlice</span><span class="p">(</span><span class="nx">slice1</span><span class="p">)</span>
+
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">SelectionSort</span><span class="p">,</span> <span class="nx">slice1</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">InsertionSortV1</span><span class="p">,</span> <span class="nx">slice2</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">InsertionSortV2</span><span class="p">,</span> <span class="nx">slice3</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">BubbleSort</span><span class="p">,</span> <span class="nx">slice4</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV1</span><span class="p">,</span> <span class="nx">slice5</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortV2</span><span class="p">,</span> <span class="nx">slice6</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">MergeSortBU</span><span class="p">,</span> <span class="nx">slice7</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV1</span><span class="p">,</span> <span class="nx">slice8</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV2</span><span class="p">,</span> <span class="nx">slice9</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSortV3</span><span class="p">,</span> <span class="nx">slice10</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort2Ways</span><span class="p">,</span> <span class="nx">slice11</span><span class="p">)</span>
+    <span class="nx">sort</span><span class="p">.</span><span class="nf">TestSort</span><span class="p">(</span><span class="nx">sort</span><span class="p">.</span><span class="nx">QuickSort3Ways</span><span class="p">,</span> <span class="nx">slice12</span><span class="p">)</span>
+
+  <span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>测试结果</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">  SelectionSort
+  | SelectionSort       | n = 100      | elapsed = 0.000008288 s |
+  | SelectionSort       | n = 1000     | elapsed = 0.000474452 s |
+  | SelectionSort       | n = 10000    | elapsed = 0.045202499 s |
+  InsertionSort
+  | InsertionSortV1     | n = 100      | elapsed = 0.000003772 s |
+  | InsertionSortV1     | n = 1000     | elapsed = 0.000311271 s |
+  | InsertionSortV1     | n = 10000    | elapsed = 0.030824360 s |
+  BubbleSort
+  | BubbleSort          | n = 100      | elapsed = 0.000032551 s |
+  | BubbleSort          | n = 1000     | elapsed = 0.000760292 s |
+  | BubbleSort          | n = 10000    | elapsed = 0.096668627 s |
+  MergeSort
+  | MergeSortV1         | n = 100      | elapsed = 0.000034191 s |
+  | MergeSortV2         | n = 100      | elapsed = 0.000007728 s |
+  | MergeSortBU         | n = 100      | elapsed = 0.000053871 s |
+  | MergeSortV1         | n = 1000     | elapsed = 0.000084017 s |
+  | MergeSortV2         | n = 1000     | elapsed = 0.000108660 s |
+  | MergeSortBU         | n = 1000     | elapsed = 0.000150581 s |
+  | MergeSortV1         | n = 100000   | elapsed = 0.010038708 s |
+  | MergeSortV2         | n = 100000   | elapsed = 0.007969723 s |
+  | MergeSortBU         | n = 100000   | elapsed = 0.010964638 s |
+  QuickSort
+  | QuickSortV1         | n = 100      | elapsed = 0.000003813 s |
+  | QuickSortV2         | n = 100      | elapsed = 0.000002455 s |
+  | QuickSortV3         | n = 100      | elapsed = 0.000087430 s |
+  | QuickSort3Ways      | n = 100      | elapsed = 0.000096242 s |
+  | QuickSortV1         | n = 1000     | elapsed = 0.000045404 s |
+  | QuickSortV2         | n = 1000     | elapsed = 0.000036210 s |
+  | QuickSortV3         | n = 1000     | elapsed = 0.001147973 s |
+  | QuickSort3Ways      | n = 1000     | elapsed = 0.000950699 s |
+  | QuickSortV1         | n = 10000    | elapsed = 0.000561646 s |
+  | QuickSortV2         | n = 10000    | elapsed = 0.000482214 s |
+  | QuickSortV3         | n = 10000    | elapsed = 0.009888825 s |
+  | QuickSort3Ways      | n = 10000    | elapsed = 0.009039572 s |
+  random range [0, 10]
+  | QuickSortV1         | n = 100000   | elapsed = 0.271689948 s |
+  | QuickSortV2         | n = 100000   | elapsed = 0.271026755 s |
+  | QuickSortV3         | n = 100000   | elapsed = 1.105608190 s |
+  | QuickSort2Ways      | n = 100000   | elapsed = 0.071499773 s |
+  | QuickSort3Ways      | n = 100000   | elapsed = 0.001184860 s |
+  | MergeSortV1         | n = 100000   | elapsed = 0.009622791 s |
+  | MergeSortV2         | n = 100000   | elapsed = 0.007217264 s |
+  | MergeSortBU         | n = 100000   | elapsed = 0.009842908 s |
+  Nearly Ordered
+  | SelectionSort       | n = 10000    | elapsed = 0.045281230 s |
+  | InsertionSortV1     | n = 10000    | elapsed = 0.000007830 s |
+  | InsertionSortV2     | n = 10000    | elapsed = 0.000009989 s |
+  | BubbleSort          | n = 10000    | elapsed = 0.039688970 s |
+  | MergeSortV1         | n = 10000    | elapsed = 0.000019621 s |
+  | MergeSortV2         | n = 10000    | elapsed = 0.000035396 s |
+  | MergeSortBU         | n = 10000    | elapsed = 0.000564395 s |
+  | QuickSortV1         | n = 10000    | elapsed = 0.027618373 s |
+  | QuickSortV2         | n = 10000    | elapsed = 0.026870449 s |
+  | QuickSortV3         | n = 10000    | elapsed = 0.009634277 s |
+  | QuickSort2Ways      | n = 10000    | elapsed = 0.008996301 s |
+  | QuickSort3Ways      | n = 10000    | elapsed = 0.009415410 s |
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2019-04-07
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/sort/">sort</a>
+          <a href="/tags/quick-sort/">quick-sort</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2019-04-20-rust-config/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Rust 开发环境配置</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2019-03-10-merge-sort/">
+            <span class="next-text nav-default">Merge Sort</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2019-04-07 00:00:00 \u002b0000 UTC',
+        title: 'Quick Sort',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

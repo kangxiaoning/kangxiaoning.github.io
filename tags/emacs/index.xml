@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>emacs on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/emacs/</link>
+    <description>Recent content in emacs on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 14 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/emacs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>spacemacs 快捷键</title>
+      <link>https://kangxiaoning.github.io/post/2019-02-14-spacemacs-commands/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2019-02-14-spacemacs-commands/</guid>
+      <description>&lt;p&gt;记录 spacemacs 常用快捷键，持续更新。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>模块使用之argparse - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命 令行参数数据类型进行约束。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016-10-25-argparse/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="模块使用之argparse" />
+<meta property="og:description" content="练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
+令行参数数据类型进行约束。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016-10-25-argparse/" />
+<meta property="article:published_time" content="2016-10-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-10-25T00:00:00+00:00" />
+<meta itemprop="name" content="模块使用之argparse">
+<meta itemprop="description" content="练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
+令行参数数据类型进行约束。">
+<meta itemprop="datePublished" content="2016-10-25T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-10-25T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1349">
+
+
+
+<meta itemprop="keywords" content="python," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="模块使用之argparse"/>
+<meta name="twitter:description" content="练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
+令行参数数据类型进行约束。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">模块使用之argparse</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-10-25 </span>
+        <div class="post-category">
+            <a href="/categories/python/"> python </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-实现tail命令功能">1. 实现tail命令功能</a></li>
+    <li><a href="#2-测试参数">2. 测试参数</a></li>
+    <li><a href="#3-实用脚本">3. 实用脚本</a>
+      <ul>
+        <li><a href="#31-根据参数解析文件">3.1 根据参数解析文件</a></li>
+        <li><a href="#32-效果">3.2 效果</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>练习 argparse 用法，从命令行获取参数值，并将值应用到具体函数中，可对命
+令行参数数据类型进行约束。</p>
+<h1 id="1-实现tail命令功能">1. 实现tail命令功能</h1>
+<p>这里编写一个类似 tail 命令的脚本，当我们给出不同选项的时候做出不同的响应。</p>
+<p><strong>要求</strong></p>
+<ol>
+<li>不指定 -n 则默认显示文件后 5 行</li>
+<li>如果指定了 -n 并且给定了正整数 N，则显示最后 N 行</li>
+<li>如果 -n 后不是正整数，进行提示并退出</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="ch">#!/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="k">def</span> <span class="nf">positive_int</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="n">ivalue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ivalue</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+         <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&#34;</span><span class="si">%s</span><span class="s2"> is an invalid positive int value&#34;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ivalue</span>
+
+<span class="k">def</span> <span class="nf">get_last</span><span class="p">():</span>
+    <span class="s2">&#34;&#34;&#34;Returns the last n lines from the file.&#34;&#34;&#34;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&#34;A command like tail on Linux.&#34;</span><span class="p">,</span>
+        <span class="n">epilog</span><span class="o">=</span><span class="s2">&#34;&#34;&#34;Example:
+</span><span class="s2">                    ./tail.py FILENAME -n N
+</span><span class="s2">               &#34;&#34;&#34;</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Filename&#34;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&#34;store&#34;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&#34;Number (default is 5)&#34;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">positive_int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">n</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">),</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;Error opening file: {}&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">raise</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">get_last</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="2-测试参数">2. 测试参数</h1>
+<p>给定各种非法参数，测试结果显示 argparse 可以给出友好提示，默认支持
+help 选项。还有很多其它选项，需要的时候查看文档即可。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">h</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">A</span> <span class="nx">command</span> <span class="nx">like</span> <span class="nx">tail</span> <span class="nx">on</span> <span class="nx">Linux</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">positional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">filename</span>    <span class="nx">Filename</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">optional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">h</span><span class="p">,</span> <span class="p">--</span><span class="nx">help</span>  <span class="nx">show</span> <span class="nx">this</span> <span class="nx">help</span> <span class="nx">message</span> <span class="nx">and</span> <span class="nx">exit</span><span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>        <span class="nx">Number</span> <span class="p">(</span><span class="nx">default</span> <span class="nx">is</span> <span class="m">5</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Example</span>: ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="nx">FILENAME</span> <span class="p">-</span><span class="nx">n</span> <span class="nx">N</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">--</span><span class="nx">help</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">A</span> <span class="nx">command</span> <span class="nx">like</span> <span class="nx">tail</span> <span class="nx">on</span> <span class="nx">Linux</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">positional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">filename</span>    <span class="nx">Filename</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">optional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">h</span><span class="p">,</span> <span class="p">--</span><span class="nx">help</span>  <span class="nx">show</span> <span class="nx">this</span> <span class="nx">help</span> <span class="nx">message</span> <span class="nx">and</span> <span class="nx">exit</span><span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>        <span class="nx">Number</span> <span class="p">(</span><span class="nx">default</span> <span class="nx">is</span> <span class="m">5</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Example</span>: ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="nx">FILENAME</span> <span class="p">-</span><span class="nx">n</span> <span class="nx">N</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]#<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">too</span> <span class="nx">few</span> <span class="nx">arguments</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="s1">&#39;abc&#39;</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">argument</span> <span class="p">-</span><span class="nx">n</span>: <span class="nx">invalid</span> <span class="nx">positive_int</span> <span class="nx">value</span>: <span class="s1">&#39;abc&#39;</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="m">-1000</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">argument</span> <span class="p">-</span><span class="nx">n</span>: <span class="m">-1000</span> <span class="nx">is</span> <span class="nx">an</span> <span class="nx">invalid</span> <span class="nx">positive</span> <span class="nx">int</span> <span class="nx">value</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="m">10</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">too</span> <span class="nx">few</span> <span class="nx">arguments</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="m">10</span> <span class="nx">install</span>.<span class="nx">log</span> <span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">iwl3945</span><span class="p">-</span><span class="nx">firmware</span><span class="m">-15</span>.<span class="m">32</span>.<span class="m">2</span>.<span class="m">9-4</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">ql2200</span><span class="p">-</span><span class="nx">firmware</span><span class="m">-2</span>.<span class="m">02</span>.<span class="m">08-3</span>.<span class="m">1</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">rt73usb</span><span class="p">-</span><span class="nx">firmware</span><span class="m">-1</span>.<span class="m">8-7</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">ipw2100</span><span class="p">-</span><span class="nx">firmware</span><span class="m">-1</span>.<span class="m">3-11</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">ipw2200</span><span class="p">-</span><span class="nx">firmware</span><span class="m">-3</span>.<span class="m">1-4</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">rootfiles</span><span class="m">-8</span>.<span class="m">1-6</span>.<span class="m">1</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">oraclelinux</span><span class="p">-</span><span class="nx">release</span><span class="p">-</span><span class="nx">notes</span><span class="m">-6</span>Server<span class="m">-14</span>.<span class="nx">x86_64</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">man</span><span class="p">-</span><span class="nx">pages</span><span class="m">-3</span>.<span class="m">22-20</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span><span class="nx">Installing</span> <span class="nx">words</span><span class="m">-3</span>.<span class="m">0-17</span>.<span class="nx">el6</span>.<span class="nx">noarch</span><span class="err">
+</span><span class="err"></span>*** <span class="nx">FINISHED</span> <span class="nx">INSTALLING</span> <span class="nx">PACKAGES</span> ***<span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="s1">&#39;abc&#39;</span> <span class="nx">install</span>.<span class="nx">log</span>   <span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">argument</span> <span class="p">-</span><span class="nx">n</span>: <span class="nx">invalid</span> <span class="nx">positive_int</span> <span class="nx">value</span>: <span class="s1">&#39;abc&#39;</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# ./<span class="nx">tail</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">n</span> <span class="m">-1000</span> <span class="nx">install</span>.<span class="nx">log</span>        <span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">tail</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] [<span class="p">-</span><span class="nx">n</span> <span class="nx">N</span>] <span class="nx">filename</span><span class="err">
+</span><span class="err"></span><span class="nx">tail</span>.<span class="nx">py</span>: <span class="nx">error</span>: <span class="nx">argument</span> <span class="p">-</span><span class="nx">n</span>: <span class="m">-1000</span> <span class="nx">is</span> <span class="nx">an</span> <span class="nx">invalid</span> <span class="nx">positive</span> <span class="nx">int</span> <span class="nx">value</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0009803</span> <span class="nx">py201</span>]# <span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h1 id="3-实用脚本">3. 实用脚本</h1>
+<h2 id="31-根据参数解析文件">3.1 根据参数解析文件</h2>
+<p>从 ltm 的 bigip.conf 中提取需要的信息，指定文件名，指定多个 ssl
+profile 名字。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="ch">#!/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+
+<span class="k">def</span> <span class="nf">_get_vs_by_ssl</span><span class="p">(</span><span class="n">ssl_profile</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ssl_profile</span><span class="p">)</span>
+    <span class="n">new_ssl_profile</span> <span class="o">=</span> <span class="s1">&#39;/Common/&#39;</span> <span class="o">+</span> <span class="n">ssl_profile</span> <span class="o">+</span><span class="s1">&#39; {&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">conf</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># 将配置文件转换为一行字符串</span>
+        <span class="n">bigip_conf</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># 提取 virtual_server 相关配置，每个 VS 是 list 中一个 item</span>
+        <span class="n">virtual_servers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(ltm virtual /Common/.*?\n}\n)&#39;</span><span class="p">,</span> <span class="n">bigip_conf</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">vs</span> <span class="ow">in</span> <span class="n">virtual_servers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_ssl_profile</span> <span class="ow">in</span> <span class="n">vs</span> <span class="ow">and</span> <span class="s2">&#34;context clientside&#34;</span> <span class="ow">in</span> <span class="n">vs</span><span class="p">:</span>
+                <span class="n">vs</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;{0} {1} {2}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ssl_profile</span><span class="p">,</span> <span class="n">vs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/Common/&#39;</span><span class="p">),</span><span class="n">vs</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/Common/&#39;</span><span class="p">)))</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;</span><span class="se">\n</span><span class="s2">Result: {0} match &#39;{1}&#39; ssl profile count：{2}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ssl_profile</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">,</span>
+                                     <span class="c1"># 指定缩进格式</span>
+                                     <span class="n">description</span><span class="o">=</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&#34;&#34;&#34;
+</span><span class="s2">                                     Description:
+</span><span class="s2">                                       Get virtual server name、vip、ssl profile
+</span><span class="s2">                                       name from ltm bigip conf(default name is
+</span><span class="s2">                                       bigip.conf).
+</span><span class="s2">                                     &#34;&#34;&#34;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;the name of bigip.conf&#39;</span>
+                        <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;--ssl_profile&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;add ssl profile name split by space&#39;</span><span class="p">,</span>
+                        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;ssl_profile&#39;</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">)</span>  <span class="c1"># nargs 表示命令行参数可以出现的次数，这里表示多次</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">filename</span>
+    <span class="n">ssl_profile_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ssl_profile</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ssl_profile_list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ssl_profile</span> <span class="ow">in</span> <span class="n">ssl_profile_list</span><span class="p">:</span>
+        <span class="n">_get_vs_by_ssl</span><span class="p">(</span><span class="n">ssl_profile</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="32-效果">3.2 效果</h2>
+<p>可以按预期参数使用并得到结果。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0031511</span> <span class="nx">bigip</span>]# ./<span class="nx">get_vip_by_ssl_v1</span>.<span class="nx">py</span> <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="p">-</span><span class="nx">s</span> <span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">dbo</span>.<span class="nx">com</span>.<span class="nx">cn</span> <span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_2048_1116</span> <span class="nx">all</span>.<span class="nx">stock</span>.<span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span><span class="err">
+</span><span class="err"></span><span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">VS_PACLOUD_443_PRDR2016031405789</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">122</span>:<span class="m">443</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;dbo.com&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º1</span><span class="err">
+</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;dbo.com.cn&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º0</span><span class="err">
+</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;dbo.com&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º0</span><span class="err">
+</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;yun.dbo.com_2048_1116&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º0</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">stock</span>.<span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">VS_PACLOUD_443_PRDR2016042907546</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">188</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">stock</span>.<span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">VS_PACLOUD_443_STGR2016042907544</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">64</span>:<span class="m">443</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;all.stock.dbo.com&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º2</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800144</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">244</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2015120403490</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">250</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800133</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">129</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800134</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">60</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800135</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">254</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800136</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">154</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016072800137</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">192</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016031405770</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">26</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_PRDR2016071209500</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">139</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016071209539</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">53</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016072209921</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">142</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016072209915</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">215</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016072209918</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">164</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016072209919</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">128</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016070509415</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">184</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_443_STGR2016061608953</span> <span class="m">10</span>.<span class="m">49</span>.<span class="m">161</span>.<span class="m">92</span>:<span class="m">443</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_5050_STGR2016072209920</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">142</span>:<span class="m">5050</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_5050_STGR2016072209872</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">184</span>:<span class="m">5050</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_8000_STGR2016072209870</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">184</span>:<span class="m">8000</span><span class="err">
+</span><span class="err"></span><span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> <span class="nx">VS_PACLOUD_9090_STGR2016072209871</span> <span class="m">192</span>.<span class="m">64</span>.<span class="m">190</span>.<span class="m">184</span>:<span class="m">9090</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Result</span>: <span class="nx">lfa_dmz_bigip</span>.<span class="nx">conf</span> <span class="nx">match</span> <span class="s1">&#39;all.yun.dbo.com_SSL_profile&#39;</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">count</span>£<span class="nx">º20</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0031511</span> <span class="nx">bigip</span>]# ./<span class="nx">get_vip_by_ssl_v1</span>.<span class="nx">py</span> <span class="p">-</span><span class="nx">h</span><span class="err">
+</span><span class="err"></span><span class="nx">usage</span>: <span class="nx">get_vip_by_ssl_v1</span>.<span class="nx">py</span> [<span class="p">-</span><span class="nx">h</span>] <span class="p">-</span><span class="nx">s</span> <span class="nx">SSL_PROFILE</span> [<span class="nx">SSL_PROFILE</span> ...] <span class="nx">filename</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">Description</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">Get</span> <span class="nx">virtual</span> <span class="nx">server</span> <span class="nx">name</span>¡¢<span class="nx">vip</span>¡¢<span class="nx">ssl</span> <span class="nx">profile</span><span class="err">
+</span><span class="err"></span>  <span class="nx">name</span> <span class="nx">from</span> <span class="nx">ltm</span> <span class="nx">bigip</span> <span class="nx">conf</span><span class="p">(</span><span class="nx">default</span> <span class="nx">name</span> <span class="nx">is</span><span class="err">
+</span><span class="err"></span>  <span class="nx">bigip</span>.<span class="nx">conf</span><span class="p">)</span>.<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">positional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="nx">filename</span>              <span class="nx">the</span> <span class="nx">name</span> <span class="nx">of</span> <span class="nx">bigip</span>.<span class="nx">conf</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">optional</span> <span class="nx">arguments</span>:<span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">h</span><span class="p">,</span> <span class="p">--</span><span class="nx">help</span>            <span class="nx">show</span> <span class="nx">this</span> <span class="nx">help</span> <span class="nx">message</span> <span class="nx">and</span> <span class="nx">exit</span><span class="err">
+</span><span class="err"></span>  <span class="p">-</span><span class="nx">s</span> <span class="nx">SSL_PROFILE</span> [<span class="nx">SSL_PROFILE</span> ...]<span class="p">,</span> <span class="p">--</span><span class="nx">ssl_profile</span> <span class="nx">SSL_PROFILE</span> [<span class="nx">SSL_PROFILE</span> ...]<span class="err">
+</span><span class="err"></span>                        <span class="nx">add</span> <span class="nx">ssl</span> <span class="nx">profile</span> <span class="nx">name</span> <span class="nx">split</span> <span class="nx">by</span> <span class="nx">space</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0031511</span> <span class="nx">bigip</span>]# <span class="nx">cat</span> <span class="nx">main_v1</span>.<span class="nx">sh</span> <span class="err">
+</span><span class="err"></span>#<span class="p">!</span><span class="sr">/bin/</span><span class="nx">bash</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nx">for</span> <span class="nx">filename</span> <span class="nx">in</span> $<span class="p">(</span><span class="nx">ls</span> *.<span class="nx">conf</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nx">do</span><span class="err">
+</span><span class="err"></span>    ./<span class="nx">get_vip_by_ssl_v1</span>.<span class="nx">py</span> $<span class="nx">filename</span> <span class="p">-</span><span class="nx">s</span> <span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">dbo</span>.<span class="nx">com</span>.<span class="nx">cn</span> \<span class="err">
+</span><span class="err"></span>    <span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_2048_1116</span> <span class="nx">all</span>.<span class="nx">stock</span>.<span class="nx">dbo</span>.<span class="nx">com</span> <span class="nx">all</span>.<span class="nx">yun</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_profile</span> \<span class="err">
+</span><span class="err"></span>    <span class="nx">any</span>.<span class="m">4008000000</span>.<span class="nx">com</span> <span class="nx">dbo</span>.<span class="nx">com</span>. <span class="nx">www</span>.<span class="m">4008000000</span>.<span class="nx">com</span> <span class="nx">mobile</span>.<span class="nx">health</span>.<span class="nx">dbo</span>.<span class="nx">com_SSL_Profile</span><span class="err">
+</span><span class="err"></span>    <span class="nx">echo</span> <span class="s2">&#34;---------------------------------------------------&#34;</span><span class="err">
+</span><span class="err"></span><span class="nx">done</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">ABC</span><span class="p">-</span><span class="nx">L0031511</span> <span class="nx">bigip</span>]#<span class="err">
+</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-10-25
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-11-23-collections/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">模块使用之collections</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016-10-24-weakref/">
+            <span class="next-text nav-default">模块使用之weakref</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-10-25 00:00:00 \u002b0000 UTC',
+        title: '模块使用之argparse',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

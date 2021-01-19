@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://kangxiaoning.github.io/sitemap.xml

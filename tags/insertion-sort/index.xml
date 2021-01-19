@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>insertion-sort on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/insertion-sort/</link>
+    <description>Recent content in insertion-sort on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 28 Feb 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/insertion-sort/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Insertion Sort</title>
+      <link>https://kangxiaoning.github.io/post/2019-02-28-insertion-sort/</link>
+      <pubDate>Thu, 28 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2019-02-28-insertion-sort/</guid>
+      <description>&lt;h2 id=&#34;11-实现原理&#34;&gt;1.1 实现原理&lt;/h2&gt;
+&lt;p&gt;假设从小到大排序。
+和整理扑克牌原理一样，除了第一张牌之外，后面每张牌在前面寻找合适的插入位置。
+假设从 0 开始编号，第 1 层循环从 1 开始，获取每个元素，第二层循环寻找该元素合适的位置并插入。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

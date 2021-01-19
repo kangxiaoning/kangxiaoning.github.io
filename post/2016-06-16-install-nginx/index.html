@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>saltstack学习9-nginx配置管理 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="(五) 源码安装nginx及服务管理 1. 任务目标 目标： 源码安装nginx。
+条件： 准备nginx源码包、pcre源码包。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016-06-16-install-nginx/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="saltstack学习9-nginx配置管理" />
+<meta property="og:description" content="(五) 源码安装nginx及服务管理
+1. 任务目标
+目标： 源码安装nginx。
+条件： 准备nginx源码包、pcre源码包。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016-06-16-install-nginx/" />
+<meta property="article:published_time" content="2016-06-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-06-16T00:00:00+00:00" />
+<meta itemprop="name" content="saltstack学习9-nginx配置管理">
+<meta itemprop="description" content="(五) 源码安装nginx及服务管理
+1. 任务目标
+目标： 源码安装nginx。
+条件： 准备nginx源码包、pcre源码包。">
+<meta itemprop="datePublished" content="2016-06-16T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-06-16T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1503">
+
+
+
+<meta itemprop="keywords" content="saltstack,salt," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="saltstack学习9-nginx配置管理"/>
+<meta name="twitter:description" content="(五) 源码安装nginx及服务管理
+1. 任务目标
+目标： 源码安装nginx。
+条件： 准备nginx源码包、pcre源码包。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">saltstack学习9-nginx配置管理</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-06-16 </span>
+        <div class="post-category">
+            <a href="/categories/saltstack/"> saltstack </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#五-源码安装nginx及服务管理">(五) 源码安装nginx及服务管理</a>
+          <ul>
+            <li><a href="#1-任务目标">1. 任务目标</a></li>
+            <li><a href="#2-编写安装脚本">2. 编写安装脚本</a></li>
+            <li><a href="#3-编写sls文件">3. 编写SLS文件</a></li>
+            <li><a href="#4-应用状态">4. 应用状态</a></li>
+            <li><a href="#5-重复执行">5. 重复执行</a></li>
+            <li><a href="#6-完善sls-增加服务管理">6. 完善SLS-增加服务管理</a></li>
+            <li><a href="#7-应用状态">7. 应用状态</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="五-源码安装nginx及服务管理">(五) 源码安装nginx及服务管理</h2>
+<h3 id="1-任务目标">1. 任务目标</h3>
+<p><strong>目标：</strong> 源码安装nginx。</p>
+<p><strong>条件：</strong> 准备nginx源码包、pcre源码包。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]# <span class="nx">pwd</span><span class="err">
+</span><span class="err"></span><span class="sr">/srv/</span><span class="nx">salt</span>/<span class="nx">web</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]# <span class="nx">ls</span> <span class="p">-</span><span class="nx">l</span><span class="err">
+</span><span class="err"></span><span class="nx">total</span> <span class="m">12</span><span class="err">
+</span><span class="err"></span><span class="nx">drwxr</span><span class="p">-</span><span class="nx">xr</span><span class="p">-</span><span class="nx">x</span> <span class="m">2</span> <span class="nx">root</span> <span class="nx">root</span> <span class="m">4096</span> <span class="nx">Jun</span> <span class="m">24</span> <span class="m">13</span>:<span class="m">48</span> <span class="nx">files</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span> <span class="m">1</span> <span class="nx">root</span> <span class="nx">root</span>  <span class="m">379</span> <span class="nx">Jun</span> <span class="m">23</span> <span class="m">15</span>:<span class="m">58</span> <span class="nx">httpd</span>.<span class="nx">sls</span><span class="err">
+</span><span class="err"></span><span class="p">-</span><span class="nx">rw</span><span class="p">-</span><span class="nx">r</span><span class="p">--</span><span class="nx">r</span><span class="p">--</span> <span class="m">1</span> <span class="nx">root</span> <span class="nx">root</span>  <span class="m">897</span> <span class="nx">Jun</span> <span class="m">24</span> <span class="m">12</span>:<span class="m">44</span> <span class="nx">nginx</span>.<span class="nx">sls</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]# <span class="nx">tree</span> <span class="nx">files</span>/<span class="err">
+</span><span class="err"></span><span class="nx">files</span>/<span class="err">
+</span><span class="err"></span>├── <span class="nx">httpd</span>.<span class="nx">conf</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">nginx</span><span class="m">-1</span>.<span class="m">10</span>.<span class="m">1</span>.<span class="nx">tar</span>.<span class="nx">gz</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">nginx</span>.<span class="nx">conf</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">nginx_init</span>.<span class="nx">sh</span><span class="err">
+</span><span class="err"></span>├── <span class="nx">nginx_install</span>.<span class="nx">sh</span><span class="err">
+</span><span class="err"></span>└── <span class="nx">pcre</span><span class="m">-8</span>.<span class="m">30</span>.<span class="nx">tar</span>.<span class="nx">bz2</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="m">0</span> <span class="nx">directories</span><span class="p">,</span> <span class="m">6</span> <span class="nx">files</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]# <span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-编写安装脚本">2. 编写安装脚本</h3>
+<p>这里计划用cmd.script来执行编译安装，因此需要准备一个shell安装脚本。</p>
+<p><strong>提示：</strong></p>
+<p>cmd.run也可以完成编译安装，要将编译安装命令写到SLS文件，会导致SLS文件臃肿，阅读性变差，因此使用cmd.script来完成。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim">[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]# <span class="nx">cat</span> <span class="nx">files</span>/<span class="nx">nginx_install</span>.<span class="nx">sh</span> <span class="err">
+</span><span class="err"></span>#<span class="p">!</span><span class="sr">/bin/</span><span class="nx">bash</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">if</span> [ $<span class="nx">PWD</span> <span class="p">=</span> <span class="s2">&#34;/usr/local/src&#34;</span> ]; <span class="nx">then</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;The current working directory is $PWD.&#34;</span><span class="err">
+</span><span class="err"></span><span class="k">else</span><span class="err">
+</span><span class="err"></span>  <span class="nx">cd</span> <span class="sr">/usr/</span><span class="nx">local</span>/<span class="nx">src</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;The current working directory is $PWD.&#34;</span><span class="err">
+</span><span class="err"></span><span class="nx">fi</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">if</span> [ <span class="p">-</span><span class="nx">f</span> <span class="s2">&#34;pcre-8.30.tar.bz2&#34;</span> ]; <span class="nx">then</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;Extract pcre source file.\n&#34;</span><span class="err">
+</span><span class="err"></span>  <span class="nx">tar</span> <span class="nx">xjvf</span> <span class="nx">pcre</span><span class="m">-8</span>.<span class="m">30</span>.<span class="nx">tar</span>.<span class="nx">bz2</span><span class="err">
+</span><span class="err"></span><span class="k">else</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;No such file !\n&#34;</span><span class="err">
+</span><span class="err"></span><span class="nx">fi</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">if</span> [ <span class="p">-</span><span class="nx">f</span> <span class="s2">&#34;nginx-1.10.1.tar.gz&#34;</span> ]; <span class="nx">then</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;Extract nginx source file.\n&#34;</span><span class="err">
+</span><span class="err"></span>  <span class="nx">tar</span> <span class="nx">xzvf</span> <span class="nx">nginx</span><span class="m">-1</span>.<span class="m">10</span>.<span class="m">1</span>.<span class="nx">tar</span>.<span class="nx">gz</span><span class="err">
+</span><span class="err"></span>  <span class="nx">cd</span> <span class="nx">nginx</span><span class="m">-1</span>.<span class="m">10</span>.<span class="m">1</span><span class="err">
+</span><span class="err"></span>  .<span class="sr">/configure --prefix=/</span><span class="nx">usr</span><span class="sr">/local/</span><span class="nx">nginx</span> \<span class="err">
+</span><span class="err"></span>    <span class="p">--</span><span class="nx">with</span><span class="p">-</span><span class="nx">http_ssl_module</span> <span class="p">--</span><span class="nx">with</span><span class="p">-</span><span class="nx">http_stub_status_module</span> \<span class="err">
+</span><span class="err"></span>    <span class="p">--</span><span class="nx">with</span><span class="p">-</span><span class="nx">file</span><span class="p">-</span><span class="nx">aio</span> \<span class="err">
+</span><span class="err"></span>    <span class="p">--</span><span class="nx">with</span><span class="p">-</span><span class="nx">http_dav_module</span> \<span class="err">
+</span><span class="err"></span>    <span class="p">--</span><span class="nx">with</span><span class="p">-</span><span class="nx">pcre</span><span class="p">=</span><span class="sr">/usr/</span><span class="nx">local</span><span class="sr">/src/</span><span class="nx">pcre</span><span class="m">-8</span>.<span class="m">30</span><span class="err">
+</span><span class="err"></span>  <span class="nx">make</span><span class="err">
+</span><span class="err"></span>  <span class="nx">make</span> <span class="nx">install</span><span class="err">
+</span><span class="err"></span>  <span class="k">if</span> [ $? <span class="p">-</span><span class="nx">eq</span> <span class="m">0</span> ]; <span class="nx">then</span><span class="err">
+</span><span class="err"></span>    <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;nginx is compiled and installed successfully !&#34;</span><span class="err">
+</span><span class="err"></span>  <span class="k">else</span><span class="err">
+</span><span class="err"></span>    <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;Error occurred during compiled and installed !&#34;</span> <span class="err">
+</span><span class="err"></span>  <span class="nx">fi</span><span class="err">
+</span><span class="err"></span><span class="k">else</span><span class="err">
+</span><span class="err"></span>  <span class="nx">echo</span> <span class="p">-</span><span class="nx">e</span> <span class="s2">&#34;No such file !\n&#34;</span><span class="err">
+</span><span class="err"></span><span class="nx">fi</span><span class="err">
+</span><span class="err"></span>[<span class="nx">root</span>@<span class="nx">salt</span><span class="p">-</span><span class="nx">master</span> <span class="nx">web</span>]#<span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-编写sls文件">3. 编写SLS文件</h3>
+<h4 id="a-onlyif">a) onlyif</h4>
+<p>A command to run as a check, run the named command only if the command passed to the onlyif option returns true.</p>
+<h4 id="b-unless">b) unless</h4>
+<p>A command to run as a check, only run the named command if the command passed to the unless option returns false.</p>
+<h4 id="c-sls-实现源码安装nginx">c) SLS-实现源码安装nginx</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# cat nginx.sls </span><span class="w">
+</span><span class="w"></span><span class="nt">dependence_package_install</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">pkgs</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">gcc</span><span class="w">
+</span><span class="w">      </span>- <span class="l">make</span><span class="w">
+</span><span class="w">      </span>- <span class="l">openssl</span><span class="w">
+</span><span class="w">      </span>- <span class="l">openssl-devel</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">pcre_source_file</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/pcre-8.30.tar.bz2</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/pcre-8.30.tar.bz2</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">755</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_install_script</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/nginx_install.sh</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx_install.sh</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_source_install</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/nginx-1.10.1.tar.gz</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx-1.10.1.tar.gz</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">755</span><span class="w">
+</span><span class="w">  </span><span class="nt">cmd.run</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">bash nginx_install.sh </span><span class="w">
+</span><span class="w">    </span>- <span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">unless</span><span class="p">:</span><span class="w"> </span><span class="l">test -d /usr/local/nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">pcre_source_file </span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_source_install</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_install_script</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">pkg</span><span class="p">:</span><span class="w"> </span><span class="l">dependence_package_install</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]# </span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4-应用状态">4. 应用状态</h3>
+<p>执行结果包含了tar命令输出、configure、make、make install输出等，内容比较长，因此这里省略tar、configure、make、make install命令的输出，只截取部分内容观察。</p>
+<p><img src="/images/saltstack/install-nginx-result-1.png" alt="install nginx result 1"></p>
+<p><img src="/images/saltstack/install-nginx-result-2.png" alt="install nginx result 1"></p>
+<p><img src="/images/saltstack/install-nginx-result-3.png" alt="install nginx result 1"></p>
+<h3 id="5-重复执行">5. 重复执行</h3>
+<p>重复执行不会再次编译安装nginx，因为unless语句起了作用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">nginx</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">dependence_package_install</span>
+    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">All</span> <span class="n">specified</span> <span class="n">packages</span> <span class="n">are</span> <span class="n">already</span> <span class="n">installed</span>
+     <span class="nl">Started:</span> <span class="mi">14</span><span class="o">:</span><span class="mi">45</span><span class="o">:</span><span class="mf">08.212651</span>
+    <span class="nl">Duration:</span> <span class="mf">1029.801</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">pcre_source_file</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">pcre</span><span class="o">-</span><span class="mf">8.30</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">bz2</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">pcre</span><span class="o">-</span><span class="mf">8.30</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">bz2</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">14</span><span class="o">:</span><span class="mi">45</span><span class="o">:</span><span class="mf">09.245403</span>
+    <span class="nl">Duration:</span> <span class="mf">101.934</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_install_script</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">14</span><span class="o">:</span><span class="mi">45</span><span class="o">:</span><span class="mf">09.347635</span>
+    <span class="nl">Duration:</span> <span class="mf">47.457</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_source_install</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="mf">1.10</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">gz</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="mf">1.10</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">gz</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">14</span><span class="o">:</span><span class="mi">45</span><span class="o">:</span><span class="mf">09.395394</span>
+    <span class="nl">Duration:</span> <span class="mf">82.56</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_source_install</span>
+    <span class="nl">Function:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">Name:</span> <span class="n">bash</span> <span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">unless</span> <span class="n">execution</span> <span class="n">succeeded</span>
+     <span class="nl">Started:</span> <span class="mi">14</span><span class="o">:</span><span class="mi">45</span><span class="o">:</span><span class="mf">09.480612</span>
+    <span class="nl">Duration:</span> <span class="mf">9.566</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+
+<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
+<span class="o">------------</span>
+<span class="nl">Succeeded:</span> <span class="mi">5</span>
+<span class="nl">Failed:</span>    <span class="mi">0</span>
+<span class="o">------------</span>
+<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">5</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="6-完善sls-增加服务管理">6. 完善SLS-增加服务管理</h3>
+<p>完善前面的nginx.sls文件，添加对配置文件的管理和运行状态的管理。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@salt-master web]# cat nginx.sls </span><span class="w">
+</span><span class="w"></span><span class="nt">dependence_package_install</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">pkg.installed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">pkgs</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="l">gcc</span><span class="w">
+</span><span class="w">      </span>- <span class="l">make</span><span class="w">
+</span><span class="w">      </span>- <span class="l">openssl</span><span class="w">
+</span><span class="w">      </span>- <span class="l">openssl-devel</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">pcre_source_file</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/pcre-8.30.tar.bz2</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/pcre-8.30.tar.bz2</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">755</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_install_script</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/nginx_install.sh</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx_install.sh</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_source_install</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src/nginx-1.10.1.tar.gz</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx-1.10.1.tar.gz</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">755</span><span class="w">
+</span><span class="w">  </span><span class="nt">cmd.run</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">bash nginx_install.sh </span><span class="w">
+</span><span class="w">    </span>- <span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/src</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">unless</span><span class="p">:</span><span class="w"> </span><span class="l">test -d /usr/local/nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">pcre_source_file </span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_source_install</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_install_script</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">pkg</span><span class="p">:</span><span class="w"> </span><span class="l">dependence_package_install</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_init</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">/etc/init.d/nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx_init.sh</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">755</span><span class="w">
+</span><span class="w">  </span><span class="nt">cmd.run</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">chkconfig --add nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">unless</span><span class="p">:</span><span class="w"> </span><span class="l">chkconfig --list | grep nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_init</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">/usr/local/nginx/conf/nginx.conf</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">file.managed</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l">salt://web/files/nginx.conf</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">root</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">644</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">nginx_service_running</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">service.running</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">enable</span><span class="p">:</span><span class="w"> </span><span class="kc">True</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">reload</span><span class="p">:</span><span class="w"> </span><span class="kc">True</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">require</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_init</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">cmd</span><span class="p">:</span><span class="w"> </span><span class="l">nginx_source_install</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/nginx/conf/nginx.conf</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">watch</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/local/nginx/conf/nginx.conf</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@salt-master web]#</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="7-应用状态">7. 应用状态</h3>
+<p>通过结果可以看到新状态已经生效。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">state</span><span class="o">.</span><span class="na">apply</span> <span class="n">web</span><span class="o">.</span><span class="na">nginx</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">dependence_package_install</span>
+    <span class="nl">Function:</span> <span class="n">pkg</span><span class="o">.</span><span class="na">installed</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">All</span> <span class="n">specified</span> <span class="n">packages</span> <span class="n">are</span> <span class="n">already</span> <span class="n">installed</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">10.803871</span>
+    <span class="nl">Duration:</span> <span class="mf">1023.369</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">pcre_source_file</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">pcre</span><span class="o">-</span><span class="mf">8.30</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">bz2</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">pcre</span><span class="o">-</span><span class="mf">8.30</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">bz2</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">11.830142</span>
+    <span class="nl">Duration:</span> <span class="mf">102.707</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_install_script</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">11.933147</span>
+    <span class="nl">Duration:</span> <span class="mf">42.768</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_source_install</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="mf">1.10</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">gz</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="mf">1.10</span><span class="o">.</span><span class="mi">1</span><span class="o">.</span><span class="na">tar</span><span class="o">.</span><span class="na">gz</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">11.976198</span>
+    <span class="nl">Duration:</span> <span class="mf">84.793</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_source_install</span>
+    <span class="nl">Function:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">Name:</span> <span class="n">bash</span> <span class="n">nginx_install</span><span class="o">.</span><span class="na">sh</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">unless</span> <span class="n">execution</span> <span class="n">succeeded</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">12.064452</span>
+    <span class="nl">Duration:</span> <span class="mf">9.804</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_init</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+        <span class="nl">Name:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">nginx</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">init</span><span class="o">.</span><span class="na">d</span><span class="o">/</span><span class="n">nginx</span> <span class="n">updated</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">12.074673</span>
+    <span class="nl">Duration:</span> <span class="mf">74.145</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+              <span class="o">----------</span>
+              <span class="nl">diff:</span>
+                  <span class="n">New</span> <span class="n">file</span>
+              <span class="nl">mode:</span>
+                  <span class="mi">0755</span>
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_init</span>
+    <span class="nl">Function:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">Name:</span> <span class="n">chkconfig</span> <span class="o">--</span><span class="n">add</span> <span class="n">nginx</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">Command</span> <span class="s">&#34;chkconfig --add nginx&#34;</span> <span class="n">run</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">12.149623</span>
+    <span class="nl">Duration:</span> <span class="mf">76.736</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+              <span class="o">----------</span>
+              <span class="nl">pid:</span>
+                  <span class="mi">7332</span>
+              <span class="nl">retcode:</span>
+                  <span class="mi">0</span>
+              <span class="nl">stderr:</span>
+              <span class="nl">stdout:</span>
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">nginx</span><span class="o">.</span><span class="na">conf</span>
+    <span class="nl">Function:</span> <span class="n">file</span><span class="o">.</span><span class="na">managed</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">File</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">nginx</span><span class="o">.</span><span class="na">conf</span> <span class="k">is</span> <span class="k">in</span> <span class="n">the</span> <span class="n">correct</span> <span class="n">state</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">12.226842</span>
+    <span class="nl">Duration:</span> <span class="mf">49.31</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+<span class="o">----------</span>
+          <span class="nl">ID:</span> <span class="n">nginx_service_running</span>
+    <span class="nl">Function:</span> <span class="n">service</span><span class="o">.</span><span class="na">running</span>
+        <span class="nl">Name:</span> <span class="n">nginx</span>
+      <span class="nl">Result:</span> <span class="n">True</span>
+     <span class="nl">Comment:</span> <span class="n">Service</span> <span class="n">nginx</span> <span class="n">has</span> <span class="n">been</span> <span class="n">enabled</span><span class="o">,</span> <span class="n">and</span> <span class="k">is</span> <span class="n">running</span>
+     <span class="nl">Started:</span> <span class="mi">18</span><span class="o">:</span><span class="mi">33</span><span class="o">:</span><span class="mf">12.278082</span>
+    <span class="nl">Duration:</span> <span class="mf">215.502</span> <span class="n">ms</span>
+     <span class="nl">Changes:</span>   
+              <span class="o">----------</span>
+              <span class="nl">nginx:</span>
+                  <span class="n">True</span>
+
+<span class="n">Summary</span> <span class="k">for</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span>
+<span class="o">------------</span>
+<span class="nl">Succeeded:</span> <span class="mi">9</span> <span class="o">(</span><span class="n">changed</span><span class="o">=</span><span class="mi">3</span><span class="o">)</span>
+<span class="nl">Failed:</span>    <span class="mi">0</span>
+<span class="o">------------</span>
+<span class="n">Total</span> <span class="n">states</span> <span class="nl">run:</span>     <span class="mi">9</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">salt</span><span class="o">-</span><span class="n">master</span> <span class="n">web</span><span class="o">]</span><span class="err">#</span>
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-06-16
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/saltstack/">saltstack</a>
+          <a href="/tags/salt/">salt</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-06-17-python-excel-xlwt/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">模块使用之xlwt</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016-06-15-requisite-ordering/">
+            <span class="next-text nav-default">saltstack学习8-Requisite Ordering</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-06-16 00:00:00 \u002b0000 UTC',
+        title: 'saltstack学习9-nginx配置管理',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

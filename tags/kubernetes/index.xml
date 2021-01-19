@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on 南寨小子</title>
+    <link>https://kangxiaoning.github.io/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on 南寨小子</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Wed, 09 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>编写custom controller</title>
+      <link>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</link>
+      <pubDate>Wed, 09 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2020-12-08-write-custom-controller/</guid>
+      <description>&lt;p&gt;上篇文章介绍了通过code-generator生成CRD的代码，即让kubernetes支持自定义资源，接下来为我们为这个CRD编写controller。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>通过code-generator生成kubernetes CRD代码</title>
+      <link>https://kangxiaoning.github.io/post/2020-12-07-learn-kubernetes-crd/</link>
+      <pubDate>Mon, 07 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kangxiaoning.github.io/post/2020-12-07-learn-kubernetes-crd/</guid>
+      <description>&lt;p&gt;这里以添加一个 kind 为 &lt;code&gt;Machine&lt;/code&gt; ，group 为 &lt;code&gt;crd.alpha.io&lt;/code&gt; ，类型为 &lt;code&gt;v1&lt;/code&gt; 的 CRD 为例。&lt;/p&gt;
+&lt;p&gt;该 CRD 的定义如下。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

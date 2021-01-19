@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>saltstack学习5-job管理 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="五、 Job管理 (一) 当前运行job管理 1. 常用function 1 2 3  saltutil.runningsaltutil.find_job &amp;lt;job id&amp;gt;saltutil.kill_job  " /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016-06-12-saltstack-job/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="saltstack学习5-job管理" />
+<meta property="og:description" content="五、 Job管理
+(一) 当前运行job管理
+1. 常用function
+
+
+1
+2
+3
+
+
+saltutil.running
+saltutil.find_job &lt;job id&gt;
+saltutil.kill_job
+
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016-06-12-saltstack-job/" />
+<meta property="article:published_time" content="2016-06-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-06-12T00:00:00+00:00" />
+<meta itemprop="name" content="saltstack学习5-job管理">
+<meta itemprop="description" content="五、 Job管理
+(一) 当前运行job管理
+1. 常用function
+
+
+1
+2
+3
+
+
+saltutil.running
+saltutil.find_job &lt;job id&gt;
+saltutil.kill_job
+
+
+">
+<meta itemprop="datePublished" content="2016-06-12T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-06-12T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2172">
+
+
+
+<meta itemprop="keywords" content="saltstack,salt," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="saltstack学习5-job管理"/>
+<meta name="twitter:description" content="五、 Job管理
+(一) 当前运行job管理
+1. 常用function
+
+
+1
+2
+3
+
+
+saltutil.running
+saltutil.find_job &lt;job id&gt;
+saltutil.kill_job
+
+
+"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">saltstack学习5-job管理</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-06-12 </span>
+        <div class="post-category">
+            <a href="/categories/saltstack/"> saltstack </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#五-job管理">五、 Job管理</a>
+      <ul>
+        <li><a href="#一-当前运行job管理">(一) 当前运行job管理</a>
+          <ul>
+            <li><a href="#1-常用function">1. 常用function</a></li>
+            <li><a href="#2-模拟job">2. 模拟job</a></li>
+            <li><a href="#3-查看job方法一">3. 查看job方法一</a></li>
+            <li><a href="#4-查看job方法二">4. 查看job方法二</a></li>
+            <li><a href="#5-kill_job">5. Kill_job</a></li>
+            <li><a href="#6-查看job结果">6. 查看job结果</a></li>
+          </ul>
+        </li>
+        <li><a href="#二-定义schedule">(二) 定义schedule</a>
+          <ul>
+            <li><a href="#1-在pillar定义schedule">1. 在pillar定义schedule</a></li>
+            <li><a href="#2-refresh使schedule生效">2. Refresh使schedule生效</a></li>
+            <li><a href="#3-验证一">3. 验证一</a></li>
+            <li><a href="#4-验证二">4. 验证二</a></li>
+          </ul>
+        </li>
+        <li><a href="#三-管理schedule">(三) 管理schedule</a>
+          <ul>
+            <li><a href="#1-list">1. list</a></li>
+            <li><a href="#2-disable_job">2. disable_job</a></li>
+            <li><a href="#3-delete">3. delete</a></li>
+            <li><a href="#4-enable_job">4. enable_job</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="五-job管理">五、 Job管理</h1>
+<h2 id="一-当前运行job管理">(一) 当前运行job管理</h2>
+<h3 id="1-常用function">1. 常用function</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">saltutil</span>.<span class="nx">running</span><span class="err">
+</span><span class="err"></span><span class="nx">saltutil</span>.<span class="nx">find_job</span> <span class="p">&lt;</span><span class="nx">job</span> <span class="nx">id</span><span class="p">&gt;</span><span class="err">
+</span><span class="err"></span><span class="nx">saltutil</span>.<span class="nx">kill_job</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-模拟job">2. 模拟job</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">salt</span> <span class="s1">&#39;*&#39;</span> <span class="nx">cmd</span>.<span class="nx">run</span> <span class="s1">&#39;sleep 30;df -h&#39;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-查看job方法一">3. 查看job方法一</h3>
+<p>另开一个终端，执行查看命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="o">~]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">saltutil</span><span class="o">.</span><span class="na">running</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="o">|</span><span class="n">_</span>
+      <span class="o">----------</span>
+      <span class="nl">arg:</span>
+          <span class="o">-</span> <span class="n">sleep</span> <span class="mi">30</span><span class="o">;</span><span class="n">df</span> <span class="o">-</span><span class="n">h</span>
+      <span class="nl">fun:</span>
+          <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+      <span class="nl">jid:</span>
+          <span class="mi">20160606093615924150</span>
+      <span class="nl">pid:</span>
+          <span class="mi">15899</span>
+      <span class="nl">ret:</span>
+      <span class="nl">tgt:</span>
+          <span class="o">*</span>
+      <span class="nl">tgt_type:</span>
+          <span class="n">glob</span>
+      <span class="nl">to:</span>
+          <span class="mi">5</span>
+      <span class="nl">user:</span>
+          <span class="n">root</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="o">|</span><span class="n">_</span>
+      <span class="o">----------</span>
+      <span class="nl">arg:</span>
+          <span class="o">-</span> <span class="n">sleep</span> <span class="mi">30</span><span class="o">;</span><span class="n">df</span> <span class="o">-</span><span class="n">h</span>
+      <span class="nl">fun:</span>
+          <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+      <span class="nl">jid:</span>
+          <span class="mi">20160606093615924150</span>
+      <span class="nl">pid:</span>
+          <span class="mi">8361</span>
+      <span class="nl">ret:</span>
+      <span class="nl">tgt:</span>
+          <span class="o">*</span>
+      <span class="nl">tgt_type:</span>
+          <span class="n">glob</span>
+      <span class="nl">to:</span>
+          <span class="mi">5</span>
+      <span class="nl">user:</span>
+          <span class="n">root</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">|</span><span class="n">_</span>
+      <span class="o">----------</span>
+      <span class="nl">arg:</span>
+          <span class="o">-</span> <span class="n">sleep</span> <span class="mi">30</span><span class="o">;</span><span class="n">df</span> <span class="o">-</span><span class="n">h</span>
+      <span class="nl">fun:</span>
+          <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+      <span class="nl">jid:</span>
+          <span class="mi">20160606093615924150</span>
+      <span class="nl">pid:</span>
+          <span class="mi">19998</span>
+      <span class="nl">ret:</span>
+      <span class="nl">tgt:</span>
+          <span class="o">*</span>
+      <span class="nl">tgt_type:</span>
+          <span class="n">glob</span>
+      <span class="nl">to:</span>
+          <span class="mi">5</span>
+      <span class="nl">user:</span>
+          <span class="n">root</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="o">|</span><span class="n">_</span>
+      <span class="o">----------</span>
+      <span class="nl">arg:</span>
+          <span class="o">-</span> <span class="n">sleep</span> <span class="mi">30</span><span class="o">;</span><span class="n">df</span> <span class="o">-</span><span class="n">h</span>
+      <span class="nl">fun:</span>
+          <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+      <span class="nl">jid:</span>
+          <span class="mi">20160606093615924150</span>
+      <span class="nl">pid:</span>
+          <span class="mi">1188</span>
+      <span class="nl">ret:</span>
+      <span class="nl">tgt:</span>
+          <span class="o">*</span>
+      <span class="nl">tgt_type:</span>
+          <span class="n">glob</span>
+      <span class="nl">to:</span>
+          <span class="mi">5</span>
+      <span class="nl">user:</span>
+          <span class="n">root</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="o">~]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4-查看job方法二">4. 查看job方法二</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="o">~]</span><span class="err">#</span> <span class="n">salt</span><span class="o">-</span><span class="n">run</span> <span class="n">jobs</span><span class="o">.</span><span class="na">active</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Found</span> <span class="n">minion</span> <span class="n">id</span> <span class="n">from</span> <span class="n">generate_minion_id</span><span class="o">():</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">Crypto</span><span class="o">/</span><span class="n">Util</span><span class="o">/</span><span class="n">randpool</span><span class="o">.</span><span class="na">py</span><span class="o">:</span><span class="mi">40</span><span class="o">:</span> <span class="nl">RandomPool_DeprecationWarning:</span> <span class="n">This</span> <span class="n">application</span> <span class="n">uses</span> <span class="n">RandomPool</span><span class="o">,</span> <span class="n">which</span> <span class="k">is</span> <span class="n">BROKEN</span> <span class="k">in</span> <span class="n">older</span> <span class="n">releases</span><span class="o">.</span>  <span class="n">See</span> <span class="nl">http:</span><span class="c1">//www.pycrypto.org/randpool-broken
+</span><span class="c1"></span>  <span class="n">RandomPool_DeprecationWarning</span><span class="o">)</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Found</span> <span class="n">minion</span> <span class="n">id</span> <span class="n">from</span> <span class="n">generate_minion_id</span><span class="o">():</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span>
+<span class="mi">20160606094459341087</span><span class="o">:</span>
+    <span class="o">----------</span>
+    <span class="nl">Arguments:</span>
+        <span class="o">-</span> <span class="n">sleep</span> <span class="mi">30</span><span class="o">;</span><span class="n">df</span> <span class="o">-</span><span class="n">h</span>
+    <span class="nl">Function:</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+    <span class="nl">Returned:</span>
+    <span class="nl">Running:</span>
+        <span class="o">|</span><span class="n">_</span>
+          <span class="o">----------</span>
+          <span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+              <span class="mi">8583</span>
+        <span class="o">|</span><span class="n">_</span>
+          <span class="o">----------</span>
+          <span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+              <span class="mi">20224</span>
+        <span class="o">|</span><span class="n">_</span>
+          <span class="o">----------</span>
+          <span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+              <span class="mi">1421</span>
+        <span class="o">|</span><span class="n">_</span>
+          <span class="o">----------</span>
+          <span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+              <span class="mi">16121</span>
+    <span class="nl">StartTime:</span>
+        <span class="mi">2016</span><span class="o">,</span> <span class="n">Jun</span> <span class="mi">06</span> <span class="mi">09</span><span class="o">:</span><span class="mi">44</span><span class="o">:</span><span class="mf">59.341087</span>
+    <span class="nl">Target:</span>
+        <span class="o">*</span>
+    <span class="n">Target</span><span class="o">-</span><span class="nl">type:</span>
+        <span class="n">glob</span>
+    <span class="nl">User:</span>
+        <span class="n">root</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Runner</span> <span class="nl">completed:</span> <span class="mi">20160606094500633196</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="o">~]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="5-kill_job">5. Kill_job</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">[root@ABC-L0008180 ~]# salt &#39;*&#39; saltutil.kill_job 20160606094143801004
+ABC-L0006740:
+    Signal 9 sent to job 20160606094143801004 at pid 16007
+ABC-L0008178:
+    Signal 9 sent to job 20160606094143801004 at pid 8469
+ABC-L0008179:
+    Signal 9 sent to job 20160606094143801004 at pid 20108
+ABC-L0008181:
+    Signal 9 sent to job 20160606094143801004 at pid 1305
+[root@ABC-L0008180 ~]#
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="6-查看job结果">6. 查看job结果</h3>
+<p>从master的jobs cache中查询指定job的运行结果。</p>
+<p>默认情况下，job运行结果在cache中保存24小时</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span><span class="o">-</span><span class="n">run</span> <span class="n">jobs</span><span class="o">.</span><span class="na">lookup_jid</span> <span class="mi">20160606093615924150</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Found</span> <span class="n">minion</span> <span class="n">id</span> <span class="n">from</span> <span class="n">generate_minion_id</span><span class="o">():</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">6</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">Crypto</span><span class="o">/</span><span class="n">Util</span><span class="o">/</span><span class="n">randpool</span><span class="o">.</span><span class="na">py</span><span class="o">:</span><span class="mi">40</span><span class="o">:</span> <span class="nl">RandomPool_DeprecationWarning:</span> <span class="n">This</span> <span class="n">application</span> <span class="n">uses</span> <span class="n">RandomPool</span><span class="o">,</span> <span class="n">which</span> <span class="k">is</span> <span class="n">BROKEN</span> <span class="k">in</span> <span class="n">older</span> <span class="n">releases</span><span class="o">.</span>  <span class="n">See</span> <span class="nl">http:</span><span class="c1">//www.pycrypto.org/randpool-broken
+</span><span class="c1"></span>  <span class="n">RandomPool_DeprecationWarning</span><span class="o">)</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Found</span> <span class="n">minion</span> <span class="n">id</span> <span class="n">from</span> <span class="n">generate_minion_id</span><span class="o">():</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Found</span> <span class="n">minion</span> <span class="n">id</span> <span class="n">from</span> <span class="n">generate_minion_id</span><span class="o">():</span> <span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="n">Filesystem</span>                      <span class="n">Size</span>  <span class="n">Used</span> <span class="n">Avail</span> <span class="n">Use</span><span class="o">%</span> <span class="n">Mounted</span> <span class="n">on</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVroot</span>    <span class="mi">26G</span>  <span class="mf">4.5G</span>   <span class="mi">20G</span>  <span class="mi">19</span><span class="o">%</span> <span class="o">/</span>
+    <span class="n">tmpfs</span>                           <span class="mf">1.9G</span>   <span class="mi">16</span><span class="n">K</span>  <span class="mf">1.9G</span>   <span class="mi">1</span><span class="o">%</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vda1</span>                       <span class="mi">194M</span>   <span class="mi">35M</span>  <span class="mi">150M</span>  <span class="mi">19</span><span class="o">%</span> <span class="o">/</span><span class="n">boot</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVcloud</span>  <span class="mf">5.0G</span>  <span class="mi">471M</span>  <span class="mf">4.3G</span>  <span class="mi">10</span><span class="o">%</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">cloud</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVvar</span>     <span class="mi">15G</span>  <span class="mi">358M</span>   <span class="mi">14G</span>   <span class="mi">3</span><span class="o">%</span> <span class="o">/</span><span class="n">var</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="n">Filesystem</span>                      <span class="n">Size</span>  <span class="n">Used</span> <span class="n">Avail</span> <span class="n">Use</span><span class="o">%</span> <span class="n">Mounted</span> <span class="n">on</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVroot</span>    <span class="mi">26G</span>  <span class="mf">3.9G</span>   <span class="mi">21G</span>  <span class="mi">17</span><span class="o">%</span> <span class="o">/</span>
+    <span class="n">tmpfs</span>                           <span class="mf">1.9G</span>   <span class="mi">12</span><span class="n">K</span>  <span class="mf">1.9G</span>   <span class="mi">1</span><span class="o">%</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vda1</span>                       <span class="mi">194M</span>   <span class="mi">35M</span>  <span class="mi">150M</span>  <span class="mi">19</span><span class="o">%</span> <span class="o">/</span><span class="n">boot</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVcloud</span>  <span class="mf">5.0G</span>  <span class="mi">471M</span>  <span class="mf">4.3G</span>  <span class="mi">10</span><span class="o">%</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">cloud</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVvar</span>     <span class="mi">15G</span>  <span class="mi">359M</span>   <span class="mi">14G</span>   <span class="mi">3</span><span class="o">%</span> <span class="o">/</span><span class="n">var</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="n">Filesystem</span>                      <span class="n">Size</span>  <span class="n">Used</span> <span class="n">Avail</span> <span class="n">Use</span><span class="o">%</span> <span class="n">Mounted</span> <span class="n">on</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVroot</span>    <span class="mi">26G</span>  <span class="mf">4.4G</span>   <span class="mi">20G</span>  <span class="mi">18</span><span class="o">%</span> <span class="o">/</span>
+    <span class="n">tmpfs</span>                           <span class="mf">1.9G</span>   <span class="mi">16</span><span class="n">K</span>  <span class="mf">1.9G</span>   <span class="mi">1</span><span class="o">%</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vda1</span>                       <span class="mi">194M</span>   <span class="mi">35M</span>  <span class="mi">150M</span>  <span class="mi">19</span><span class="o">%</span> <span class="o">/</span><span class="n">boot</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVcloud</span>  <span class="mf">5.0G</span>  <span class="mi">471M</span>  <span class="mf">4.3G</span>  <span class="mi">10</span><span class="o">%</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">cloud</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVvar</span>     <span class="mi">15G</span>  <span class="mi">366M</span>   <span class="mi">14G</span>   <span class="mi">3</span><span class="o">%</span> <span class="o">/</span><span class="n">var</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="n">Filesystem</span>                      <span class="n">Size</span>  <span class="n">Used</span> <span class="n">Avail</span> <span class="n">Use</span><span class="o">%</span> <span class="n">Mounted</span> <span class="n">on</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVroot</span>    <span class="mi">26G</span>  <span class="mf">3.9G</span>   <span class="mi">21G</span>  <span class="mi">16</span><span class="o">%</span> <span class="o">/</span>
+    <span class="n">tmpfs</span>                           <span class="mf">1.9G</span>   <span class="mi">12</span><span class="n">K</span>  <span class="mf">1.9G</span>   <span class="mi">1</span><span class="o">%</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">shm</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vda1</span>                       <span class="mi">194M</span>   <span class="mi">35M</span>  <span class="mi">150M</span>  <span class="mi">19</span><span class="o">%</span> <span class="o">/</span><span class="n">boot</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVcloud</span>  <span class="mf">5.0G</span>  <span class="mi">471M</span>  <span class="mf">4.3G</span>  <span class="mi">10</span><span class="o">%</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">cloud</span>
+    <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">VolGroup00</span><span class="o">-</span><span class="n">LVvar</span>     <span class="mi">15G</span>  <span class="mi">353M</span>   <span class="mi">14G</span>   <span class="mi">3</span><span class="o">%</span> <span class="o">/</span><span class="n">var</span>
+<span class="o">[</span><span class="n">INFO</span>    <span class="o">]</span> <span class="n">Runner</span> <span class="nl">completed:</span> <span class="mi">20160606113302078794</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二-定义schedule">(二) 定义schedule</h2>
+<h3 id="1-在pillar定义schedule">1. 在pillar定义schedule</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">pwd</span>
+<span class="o">/</span><span class="n">srv</span><span class="o">/</span><span class="n">pillar</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">more</span> <span class="n">top</span><span class="o">.</span><span class="na">sls</span> 
+<span class="nl">base:</span>
+  <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0006740</span><span class="err">&#39;</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">cluster</span><span class="o">.</span><span class="na">cluster1</span>
+  <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">cluster</span><span class="o">.</span><span class="na">cluster2</span>
+  <span class="sc">&#39;*&#39;</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">schedule</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">more</span> <span class="n">schedule</span><span class="o">.</span><span class="na">sls</span> 
+<span class="nl">schedule:</span>
+  <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+    <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+    <span class="nl">seconds:</span> <span class="mi">5</span>
+    <span class="nl">args:</span>
+      <span class="o">-</span> <span class="err">&#39;</span><span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span><span class="err">&#39;</span>
+    <span class="nl">kwargs:</span>
+      <span class="nl">stateful:</span> <span class="n">False</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2-refresh使schedule生效">2. Refresh使schedule生效</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">saltutil</span><span class="o">.</span><span class="na">refresh_pillar</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="3-验证一">3. 验证一</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">pillar</span><span class="o">.</span><span class="na">get</span> <span class="n">schedule</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="o">----------</span>
+    <span class="nl">__mine_interval:</span>
+        <span class="o">----------</span>
+        <span class="nl">enabled:</span>
+            <span class="n">True</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">mine</span><span class="o">.</span><span class="na">update</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">2</span>
+        <span class="nl">minutes:</span>
+            <span class="mi">60</span>
+        <span class="nl">name:</span>
+            <span class="n">__mine_interval</span>
+        <span class="nl">return_job:</span>
+            <span class="n">False</span>
+    <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="o">----------</span>
+        <span class="nl">args:</span>
+            <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">kwargs:</span>
+            <span class="o">----------</span>
+            <span class="nl">stateful:</span>
+                <span class="n">False</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">1</span>
+        <span class="nl">name:</span>
+            <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span>
+            <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="o">----------</span>
+    <span class="nl">__mine_interval:</span>
+        <span class="o">----------</span>
+        <span class="nl">enabled:</span>
+            <span class="n">True</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">mine</span><span class="o">.</span><span class="na">update</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">2</span>
+        <span class="nl">minutes:</span>
+            <span class="mi">60</span>
+        <span class="nl">name:</span>
+            <span class="n">__mine_interval</span>
+        <span class="nl">return_job:</span>
+            <span class="n">False</span>
+    <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="o">----------</span>
+        <span class="nl">args:</span>
+            <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">kwargs:</span>
+            <span class="o">----------</span>
+            <span class="nl">stateful:</span>
+                <span class="n">False</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">1</span>
+        <span class="nl">name:</span>
+            <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span>
+            <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="o">----------</span>
+    <span class="nl">__mine_interval:</span>
+        <span class="o">----------</span>
+        <span class="nl">enabled:</span>
+            <span class="n">True</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">mine</span><span class="o">.</span><span class="na">update</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">2</span>
+        <span class="nl">minutes:</span>
+            <span class="mi">60</span>
+        <span class="nl">name:</span>
+            <span class="n">__mine_interval</span>
+        <span class="nl">return_job:</span>
+            <span class="n">False</span>
+    <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="o">----------</span>
+        <span class="nl">args:</span>
+            <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">kwargs:</span>
+            <span class="o">----------</span>
+            <span class="nl">stateful:</span>
+                <span class="n">False</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">1</span>
+        <span class="nl">name:</span>
+            <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span>
+            <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">__mine_interval:</span>
+        <span class="o">----------</span>
+        <span class="nl">enabled:</span>
+            <span class="n">True</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">mine</span><span class="o">.</span><span class="na">update</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">2</span>
+        <span class="nl">minutes:</span>
+            <span class="mi">60</span>
+        <span class="nl">name:</span>
+            <span class="n">__mine_interval</span>
+        <span class="nl">return_job:</span>
+            <span class="n">False</span>
+    <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="o">----------</span>
+        <span class="nl">args:</span>
+            <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="kt">function</span><span class="o">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span>
+            <span class="n">True</span>
+        <span class="nl">kwargs:</span>
+            <span class="o">----------</span>
+            <span class="nl">stateful:</span>
+                <span class="n">False</span>
+        <span class="nl">maxrunning:</span>
+            <span class="mi">1</span>
+        <span class="nl">name:</span>
+            <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span>
+            <span class="mi">5</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4-验证二">4. 验证二</h3>
+<p><img src="/images/saltstack/saltstack-job-schedule.png" alt="job schedule check"></p>
+<h2 id="三-管理schedule">(三) 管理schedule</h2>
+<p>使用sys.doc查看模块帮助。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-vim" data-lang="vim"><span class="nx">salt</span> <span class="s1">&#39;*&#39;</span> <span class="nx">sys</span>.<span class="nx">doc</span> <span class="nx">schedule</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><h3 id="1-list">1. list</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">list</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">true</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">true</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">true</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">true</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="2-disable_job">2. disable_job</h3>
+<p>通过查看minion端/tmp/user.txt可以证明disable生效。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">disable_job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Disabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Disabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Disabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Disabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">list</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="3-delete">3. delete</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">delete</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Deleted</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="n">from</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Deleted</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="n">from</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Deleted</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="n">from</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Deleted</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="n">from</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">list</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">save</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Schedule</span> <span class="o">(</span><span class="n">non</span><span class="o">-</span><span class="n">pillar</span> <span class="n">items</span><span class="o">)</span> <span class="n">saved</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Schedule</span> <span class="o">(</span><span class="n">non</span><span class="o">-</span><span class="n">pillar</span> <span class="n">items</span><span class="o">)</span> <span class="n">saved</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Schedule</span> <span class="o">(</span><span class="n">non</span><span class="o">-</span><span class="n">pillar</span> <span class="n">items</span><span class="o">)</span> <span class="n">saved</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Schedule</span> <span class="o">(</span><span class="n">non</span><span class="o">-</span><span class="n">pillar</span> <span class="n">items</span><span class="o">)</span> <span class="n">saved</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="sc">&#39;*&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">list</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0006740:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008181:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008178:</span>
+    <span class="nl">schedule:</span>
+      <span class="n">user</span><span class="o">-</span><span class="nl">cmd:</span>
+        <span class="nl">args:</span>
+        <span class="o">-</span> <span class="n">uptime</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">user</span><span class="o">.</span><span class="na">txt</span>
+        <span class="nl">enabled:</span> <span class="kc">false</span>
+        <span class="kt">function</span><span class="o">:</span> <span class="n">cmd</span><span class="o">.</span><span class="na">run</span>
+        <span class="nl">jid_include:</span> <span class="kc">true</span>
+        <span class="nl">kwargs:</span>
+          <span class="nl">stateful:</span> <span class="kc">false</span>
+        <span class="nl">maxrunning:</span> <span class="mi">1</span>
+        <span class="nl">name:</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+        <span class="nl">seconds:</span> <span class="mi">5</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="4-enable_job">4. enable_job</h3>
+<p>通过查看minion端/tmp/user.txt可以证明enable生效。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">enable_job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Enabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span> <span class="n">salt</span> <span class="err">&#39;</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008179</span><span class="err">&#39;</span> <span class="n">schedule</span><span class="o">.</span><span class="na">disable_job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span>      
+<span class="n">ABC</span><span class="o">-</span><span class="nl">L0008179:</span>
+    <span class="o">----------</span>
+    <span class="nl">comment:</span>
+        <span class="n">Disabled</span> <span class="n">Job</span> <span class="n">user</span><span class="o">-</span><span class="n">cmd</span> <span class="k">in</span> <span class="n">schedule</span><span class="o">.</span>
+    <span class="nl">result:</span>
+        <span class="n">True</span>
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0008180</span> <span class="n">pillar</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-06-12
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/saltstack/">saltstack</a>
+          <a href="/tags/salt/">salt</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-06-13-yaml-jinja2/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">saltstack学习6-YAML和Jinja2</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016-06-10-remote-execution/">
+            <span class="next-text nav-default">saltstack学习4-Remote Execution</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-06-12 00:00:00 \u002b0000 UTC',
+        title: 'saltstack学习5-job管理',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

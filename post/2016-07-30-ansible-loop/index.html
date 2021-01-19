@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>ansible学习7-循环 - 南寨小子</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="dbo" /><meta name="description" content="七、 循环 循环语法有多种，最常用的是 with_items ，如下练习了两种语法。
+" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="ansible学习7-循环" />
+<meta property="og:description" content="七、 循环
+循环语法有多种，最常用的是 with_items ，如下练习了两种语法。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kangxiaoning.github.io/post/2016-07-30-ansible-loop/" />
+<meta property="article:published_time" content="2016-07-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-07-29T00:00:00+00:00" />
+<meta itemprop="name" content="ansible学习7-循环">
+<meta itemprop="description" content="七、 循环
+循环语法有多种，最常用的是 with_items ，如下练习了两种语法。">
+<meta itemprop="datePublished" content="2016-07-29T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-07-29T00:00:00+00:00" />
+<meta itemprop="wordCount" content="916">
+
+
+
+<meta itemprop="keywords" content="ansible," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ansible学习7-循环"/>
+<meta name="twitter:description" content="七、 循环
+循环语法有多种，最常用的是 with_items ，如下练习了两种语法。"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">南寨小子</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">南寨小子</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">ansible学习7-循环</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2016-07-29 </span>
+        <div class="post-category">
+            <a href="/categories/ansible/"> ansible </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#七-循环">七、 循环</a>
+      <ul>
+        <li><a href="#一-with_items">(一) with_items</a></li>
+        <li><a href="#二-with_dict">(二) with_dict</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="七-循环">七、 循环</h1>
+<p>循环语法有多种，最常用的是 with_items ，如下练习了两种语法。</p>
+<h2 id="一-with_items">(一) with_items</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]# more playbooks/learning_with_items.yml </span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span>- <span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l">db</span><span class="w">
+</span><span class="w">  </span><span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="kc">False</span><span class="w">
+</span><span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">print loop result</span><span class="w">
+</span><span class="w">      </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l">msg={% raw %}{{ item }}{% endraw %}</span><span class="w">
+</span><span class="w">      </span><span class="nt">with_items</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- <span class="l">gcc</span><span class="w">
+</span><span class="w">        </span>- <span class="l">make</span><span class="w">
+</span><span class="w">        </span>- <span class="l">openssl</span><span class="w">
+</span><span class="w">        </span>- <span class="l">openssl-dev</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">print loop result</span><span class="w">
+</span><span class="w">      </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l">msg=&#34;name is {% raw %}{{ item.name }}{% endraw %}, group is {% raw %}{{ item.group }}{% endraw %}&#34;</span><span class="w">
+</span><span class="w">      </span><span class="nt">with_items</span><span class="p">:</span><span class="w">
+</span><span class="w">        </span>- {<span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;zhangsan&#34;</span><span class="nt">, group</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;dba&#34;</span><span class="w"> </span>}<span class="w">
+</span><span class="w">        </span>- {<span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;lisi&#34;</span><span class="nt">, group</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;oinstall&#34;</span><span class="w"> </span>}<span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]#</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0022911</span> <span class="n">ansible</span><span class="o">]</span><span class="err">#</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="n">playbooks</span><span class="o">/</span><span class="n">learning_with_items</span><span class="o">.</span><span class="na">yml</span> <span class="o">-</span><span class="n">i</span> <span class="n">dev_hosts</span> <span class="o">-</span><span class="n">u</span> <span class="n">root</span> <span class="o">-</span><span class="n">k</span>
+<span class="n">SSH</span> <span class="nl">password:</span> 
+
+<span class="n">PLAY</span> <span class="o">[</span><span class="n">db</span><span class="o">]</span> <span class="o">**********************************************************************</span>
+
+<span class="n">TASK</span> <span class="o">[</span><span class="n">print</span> <span class="n">loop</span> <span class="n">result</span><span class="o">]</span> <span class="o">*******************************************************</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">gcc</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">gcc</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">make</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">make</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">gcc</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;gcc&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">-</span><span class="n">dev</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">-</span><span class="n">dev</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">make</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;make&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">=</span><span class="n">openssl</span><span class="o">-</span><span class="n">dev</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span><span class="o">,</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;openssl-dev&#34;</span>
+<span class="o">}</span>
+
+<span class="n">TASK</span> <span class="o">[</span><span class="n">print</span> <span class="n">loop</span> <span class="n">result</span><span class="o">]</span> <span class="o">*******************************************************</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">dba</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">zhangsan</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;dba&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;zhangsan&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is zhangsan, group is dba&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">dba</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">zhangsan</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;dba&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;zhangsan&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is zhangsan, group is dba&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">oinstall</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">lisi</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;oinstall&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;lisi&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is lisi, group is oinstall&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">oinstall</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">lisi</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;oinstall&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;lisi&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is lisi, group is oinstall&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">dba</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">zhangsan</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;dba&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;zhangsan&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is zhangsan, group is dba&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="n">u</span><span class="err">&#39;</span><span class="n">group</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">oinstall</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">lisi</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;group&#34;</span><span class="o">:</span> <span class="s">&#34;oinstall&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;lisi&#34;</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;name is lisi, group is oinstall&#34;</span>
+<span class="o">}</span>
+
+<span class="n">PLAY</span> <span class="n">RECAP</span> <span class="o">*********************************************************************</span>
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">2</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">2</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">2</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0022911</span> <span class="n">ansible</span><span class="o">]</span><span class="err">#</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="二-with_dict">(二) with_dict</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]# more playbooks/myvars/users.yml </span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">users</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">alice</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Alice Appleworth</span><span class="w">
+</span><span class="w">    </span><span class="nt">telephone</span><span class="p">:</span><span class="w"> </span><span class="m">123-456-7890</span><span class="w">
+</span><span class="w">  </span><span class="nt">bob</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Bob Bananarama</span><span class="w">
+</span><span class="w">    </span><span class="nt">telephone</span><span class="p">:</span><span class="w"> </span><span class="m">987-654-3210</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]#</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]# more playbooks/learning_with_dict.yml </span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span>- <span class="nt">hosts</span><span class="p">:</span><span class="w"> </span><span class="l">db</span><span class="w">
+</span><span class="w">  </span><span class="nt">gather_facts</span><span class="p">:</span><span class="w"> </span><span class="kc">False</span><span class="w">
+</span><span class="w">  </span><span class="nt">vars_files</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="l">myvars/users.yml</span><span class="w">
+</span><span class="w">  </span><span class="nt">tasks</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Print phone records</span><span class="w">
+</span><span class="w">      </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l">msg=&#34;User {% raw %}{{ item.key }}{% endraw %} is {% raw %}{{ item.value.name }}{% endraw %} ({% raw %}{{ item.value.telephone }}{% endraw %})&#34;</span><span class="w">
+</span><span class="w">      </span><span class="nt">with_dict</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;{% raw %}{{ users }}{% endraw %}&#34;</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@ABC-L0022911 ansible]#</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-ceylon" data-lang="ceylon"><span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0022911</span> <span class="n">ansible</span><span class="o">]</span><span class="err">#</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="n">playbooks</span><span class="o">/</span><span class="n">learning_with_dict</span><span class="o">.</span><span class="na">yml</span> <span class="o">-</span><span class="n">i</span> <span class="n">dev_hosts</span> <span class="o">-</span><span class="n">u</span> <span class="n">root</span> <span class="o">-</span><span class="n">k</span>
+<span class="n">SSH</span> <span class="nl">password:</span> 
+
+<span class="n">PLAY</span> <span class="o">[</span><span class="n">db</span><span class="o">]</span> <span class="o">**********************************************************************</span>
+
+<span class="n">TASK</span> <span class="o">[</span><span class="n">Print</span> <span class="n">phone</span> <span class="n">records</span><span class="o">]</span> <span class="o">*****************************************************</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Bob</span> <span class="n">Bananarama</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">987</span><span class="o">-</span><span class="mi">654</span><span class="o">-</span><span class="mi">3210</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">bob</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;bob&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Bob Bananarama&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;987-654-3210&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User bob is Bob Bananarama (987-654-3210)&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Bob</span> <span class="n">Bananarama</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">987</span><span class="o">-</span><span class="mi">654</span><span class="o">-</span><span class="mi">3210</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">bob</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;bob&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Bob Bananarama&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;987-654-3210&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User bob is Bob Bananarama (987-654-3210)&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Alice</span> <span class="n">Appleworth</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">123</span><span class="o">-</span><span class="mi">456</span><span class="o">-</span><span class="mi">7890</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">alice</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;alice&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Alice Appleworth&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;123-456-7890&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User alice is Alice Appleworth (123-456-7890)&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Alice</span> <span class="n">Appleworth</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">123</span><span class="o">-</span><span class="mi">456</span><span class="o">-</span><span class="mi">7890</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">alice</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;alice&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Alice Appleworth&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;123-456-7890&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User alice is Alice Appleworth (123-456-7890)&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Bob</span> <span class="n">Bananarama</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">987</span><span class="o">-</span><span class="mi">654</span><span class="o">-</span><span class="mi">3210</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">bob</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;bob&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Bob Bananarama&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;987-654-3210&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User bob is Bob Bananarama (987-654-3210)&#34;</span>
+<span class="o">}</span>
+<span class="nl">ok:</span> <span class="o">[</span><span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span><span class="o">]</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">item</span><span class="o">={</span><span class="err">&#39;</span><span class="kt">value</span><span class="err">&#39;</span><span class="o">:</span> <span class="o">{</span><span class="n">u</span><span class="err">&#39;</span><span class="n">name</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">Alice</span> <span class="n">Appleworth</span><span class="err">&#39;</span><span class="o">,</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">telephone</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="mi">123</span><span class="o">-</span><span class="mi">456</span><span class="o">-</span><span class="mi">7890</span><span class="err">&#39;</span><span class="o">},</span> <span class="err">&#39;</span><span class="n">key</span><span class="err">&#39;</span><span class="o">:</span> <span class="n">u</span><span class="err">&#39;</span><span class="n">alice</span><span class="err">&#39;</span><span class="o">})</span> <span class="o">=&gt;</span> <span class="o">{</span>
+    <span class="s">&#34;item&#34;</span><span class="o">:</span> <span class="o">{</span>
+        <span class="s">&#34;key&#34;</span><span class="o">:</span> <span class="s">&#34;alice&#34;</span><span class="o">,</span> 
+        <span class="s">&#34;value&#34;</span><span class="o">:</span> <span class="o">{</span>
+            <span class="s">&#34;name&#34;</span><span class="o">:</span> <span class="s">&#34;Alice Appleworth&#34;</span><span class="o">,</span> 
+            <span class="s">&#34;telephone&#34;</span><span class="o">:</span> <span class="s">&#34;123-456-7890&#34;</span>
+        <span class="o">}</span>
+    <span class="o">},</span> 
+    <span class="s">&#34;msg&#34;</span><span class="o">:</span> <span class="s">&#34;User alice is Alice Appleworth (123-456-7890)&#34;</span>
+<span class="o">}</span>
+
+<span class="n">PLAY</span> <span class="n">RECAP</span> <span class="o">*********************************************************************</span>
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">19.102</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">1</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">19.103</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">1</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+<span class="mf">10.20</span><span class="o">.</span><span class="mf">24.171</span>               <span class="o">:</span> <span class="n">ok</span><span class="o">=</span><span class="mi">1</span>    <span class="n">changed</span><span class="o">=</span><span class="mi">0</span>    <span class="n">unreachable</span><span class="o">=</span><span class="mi">0</span>    <span class="n">failed</span><span class="o">=</span><span class="mi">0</span>   
+
+<span class="o">[</span><span class="n">root</span><span class="err">@</span><span class="n">ABC</span><span class="o">-</span><span class="n">L0022911</span> <span class="n">ansible</span><span class="o">]</span><span class="err">#</span>
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">dbo</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2016-07-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/ansible/">ansible</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2016-07-29-ansible-when/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">ansible学习6-条件判断</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2016-07-31-ansible-api/">
+            <span class="next-text nav-default">ansible学习8-API</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2016-07-29 00:00:00 \u002b0000 UTC',
+        title: 'ansible学习7-循环',
+        clientID: '70d4f3aa0365e70058f7',
+        clientSecret: 'f90c781aefe41487ab5ddf2b6475f67dc3628751',
+        repo: 'gitment-comments',
+        owner: 'kangxiaoning',
+        admin: ['kangxiaoning'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="kxnmei@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://github.com/kangxiaoning" class="iconfont icon-github" title="github"></a>
+  <a href="https://kangxiaoning.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2012 - 
+    2021<span class="heart"><i class="iconfont icon-heart"></i></span><span>dbo</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
