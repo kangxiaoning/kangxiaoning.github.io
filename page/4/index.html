@@ -45,7 +45,7 @@
 <meta property="og:description" content="Hugo theme even example site." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kangxiaoning.github.io/" />
-<meta property="og:updated_time" content="2020-12-09T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-19T00:00:00+00:00" />
 <meta itemprop="name" content="南寨小子">
 <meta itemprop="description" content="Hugo theme even example site.">
 <meta name="twitter:card" content="summary"/>
@@ -121,6 +121,28 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <section id="posts" class="posts">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/2017-06-12-ansible-manage-windows/">ansible管理windows</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2017-06-12 </span>
+      <div class="post-category">
+          <a href="/categories/ansible/"> ansible </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <p>crontl端是Centos 7.2，被管理端是windows 2008R2。</p>
+<p><a href="http://www.cnblogs.com/kingleft/p/6391652.html">参考文章</a></p>
+    </div>
+    <div class="read-more">
+      <a href="/post/2017-06-12-ansible-manage-windows/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
     <article class="post">
   <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/post/2017-06-08-ansible-tower/">ansible tower动手实战营</a></h1>
@@ -229,79 +251,6 @@
     </div>
     <div class="read-more">
       <a href="/post/2017-05-04-ubuntu-install-youdao/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/2017-04-15-parse-ip/">golang验证IP是否有效</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2017-04-15 </span>
-      <div class="post-category">
-          <a href="/categories/golang/"> golang </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      <div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
-
-<span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;fmt&#34;</span>
-	<span class="s">&#34;net&#34;</span>
-	<span class="s">&#34;os&#34;</span>
-<span class="p">)</span>
-
-<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="p">{</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Usage: %s ip-addr\n&#34;</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-		<span class="nx">os</span><span class="p">.</span><span class="nf">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-	<span class="p">}</span>
-	<span class="nx">name</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-	<span class="nx">addr</span> <span class="o">:=</span> <span class="nx">net</span><span class="p">.</span><span class="nf">ParseIP</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span>
-	<span class="k">if</span> <span class="nx">addr</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Invalid address: &#34;</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span>
-	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;The address is &#34;</span><span class="p">,</span> <span class="nx">addr</span><span class="p">.</span><span class="nf">String</span><span class="p">())</span>
-	<span class="p">}</span>
-	<span class="nx">os</span><span class="p">.</span><span class="nf">Exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="p">}</span>
-
-</code></pre></td></tr></table>
-</div>
-</div>
-    </div>
-    <div class="read-more">
-      <a href="/post/2017-04-15-parse-ip/" class="read-more-link">Read more...</a>
     </div>
   </div>
 </article>

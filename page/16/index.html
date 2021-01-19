@@ -45,7 +45,7 @@
 <meta property="og:description" content="Hugo theme even example site." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kangxiaoning.github.io/" />
-<meta property="og:updated_time" content="2020-12-09T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-19T00:00:00+00:00" />
 <meta itemprop="name" content="南寨小子">
 <meta itemprop="description" content="Hugo theme even example site.">
 <meta name="twitter:card" content="summary"/>
@@ -121,6 +121,30 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <section id="posts" class="posts">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/2016-06-14-configuration-management/">saltstack学习7-Configuration Management</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2016-06-14 </span>
+      <div class="post-category">
+          <a href="/categories/saltstack/"> saltstack </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <h2 id="三-状态管理">(三) 状态管理</h2>
+<p><img src="/images/saltstack/state-syntax.png" alt="state syntax"></p>
+<h3 id="1-内核参数">1. 内核参数</h3>
+<p>编写SLS文件，描述指定targeting的主机参数状态，如果不是这个状态则会修改成这个状态，如果已经是这个状态则略过。</p>
+    </div>
+    <div class="read-more">
+      <a href="/post/2016-06-14-configuration-management/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
     <article class="post">
   <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/post/2016-06-13-yaml-jinja2/">saltstack学习6-YAML和Jinja2</a></h1>
@@ -228,29 +252,6 @@
     </div>
     <div class="read-more">
       <a href="/post/2016-06-08-saltstack-grains-pillar/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/2016-06-07-saltstack-auth/">saltstack学习2-认证管理</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2016-06-07 </span>
-      <div class="post-category">
-          <a href="/categories/saltstack/"> saltstack </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      <h1 id="二-认证管理">二、 认证管理</h1>
-<h2 id="一-添加删除key">(一) 添加/删除key</h2>
-<p>第一次使用需要在master端添加受管理的minion，通过salt-key完成，可添加单个minion，也可一次添加所有minion，通过salt-key –h查看帮助获取添加、删除、拒绝等使用方法。</p>
-    </div>
-    <div class="read-more">
-      <a href="/post/2016-06-07-saltstack-auth/" class="read-more-link">Read more...</a>
     </div>
   </div>
 </article>

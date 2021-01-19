@@ -3,7 +3,63 @@
   
   <url>
     <loc>https://kangxiaoning.github.io/categories/</loc>
-    <lastmod>2020-12-09T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/tags/empty/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/tags/go/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/categories/go/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/post/2021-01-23-empty-struct/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/post/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/tags/struct/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/tags/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://kangxiaoning.github.io/</loc>
+    <lastmod>2021-01-19T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -38,27 +94,6 @@
   
   <url>
     <loc>https://kangxiaoning.github.io/categories/kubernetes/</loc>
-    <lastmod>2020-12-09T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kangxiaoning.github.io/post/</loc>
-    <lastmod>2020-12-09T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kangxiaoning.github.io/tags/</loc>
-    <lastmod>2020-12-09T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kangxiaoning.github.io/</loc>
     <lastmod>2020-12-09T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -410,13 +445,6 @@
   <url>
     <loc>https://kangxiaoning.github.io/post/2017-05-04-ubuntu-install-youdao/</loc>
     <lastmod>2017-05-04T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  
-  <url>
-    <loc>https://kangxiaoning.github.io/tags/go/</loc>
-    <lastmod>2017-04-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

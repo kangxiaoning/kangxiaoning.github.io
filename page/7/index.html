@@ -45,7 +45,7 @@
 <meta property="og:description" content="Hugo theme even example site." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kangxiaoning.github.io/" />
-<meta property="og:updated_time" content="2020-12-09T00:00:00+00:00" />
+<meta property="og:updated_time" content="2021-01-19T00:00:00+00:00" />
 <meta itemprop="name" content="南寨小子">
 <meta itemprop="description" content="Hugo theme even example site.">
 <meta name="twitter:card" content="summary"/>
@@ -121,6 +121,32 @@
       <div class="content-wrapper">
         <div id="content" class="content">
           <section id="posts" class="posts">
+    <article class="post">
+  <header class="post-header">
+    <h1 class="post-title"><a class="post-link" href="/post/2017-02-14-kvm-qemu-fundation-3/">KVM虚拟化实验-两台VM互相通信</a></h1>
+    <div class="post-meta">
+      <span class="post-time"> 2017-02-14 </span>
+      <div class="post-category">
+          <a href="/categories/virtualization/"> virtualization </a>
+          </div>
+    </div>
+  </header>
+  
+  <div class="post-content">
+    <div class="post-summary">
+      <h1 id="1-实验环境">1. 实验环境</h1>
+<p>通过在vmware workstation上启动centos 7的虚拟机，以该虚拟机作为HOST进行KVM
+实验，以一个精简的linux作为guest的OS镜像启动KVM虚拟机。</p>
+<p>经过实验发现，在vmware workstation上如果不打开“虚拟化CPU性能计数器”，在启
+动kvm的vm时会导致host（vmw虚拟的）死机，卡在CPU计数器那里。</p>
+<p>如下是死机时kvm vm的日志，可以看到在一个计数器那里卡住了。</p>
+    </div>
+    <div class="read-more">
+      <a href="/post/2017-02-14-kvm-qemu-fundation-3/" class="read-more-link">Read more...</a>
+    </div>
+  </div>
+</article>
+
     <article class="post">
   <header class="post-header">
     <h1 class="post-title"><a class="post-link" href="/post/2017-02-13-kvm-qemu-fundation-2/">KVM虚拟化基础二</a></h1>
@@ -214,29 +240,6 @@ d: dying, 正在关闭的过程中
     </div>
     <div class="read-more">
       <a href="/post/2017-02-07-xen-fundation/" class="read-more-link">Read more...</a>
-    </div>
-  </div>
-</article>
-
-    <article class="post">
-  <header class="post-header">
-    <h1 class="post-title"><a class="post-link" href="/post/2017-02-06-virtualization-fundation/">虚拟化基础</a></h1>
-    <div class="post-meta">
-      <span class="post-time"> 2017-02-06 </span>
-      <div class="post-category">
-          <a href="/categories/virtualization/"> virtualization </a>
-          </div>
-    </div>
-  </header>
-  
-  <div class="post-content">
-    <div class="post-summary">
-      <h1 id="cpu虚拟化">cpu虚拟化</h1>
-<h2 id="模拟emulation">模拟：emulation</h2>
-<h2 id="虚拟virtulization">虚拟：virtulization</h2>
-    </div>
-    <div class="read-more">
-      <a href="/post/2017-02-06-virtualization-fundation/" class="read-more-link">Read more...</a>
     </div>
   </div>
 </article>
