@@ -9,10 +9,10 @@
     <lastBuildDate>Tue, 19 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/categories/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Golang Empty Struct</title>
-      <link>https://kangxiaoning.github.io/post/2021-01-23-empty-struct/</link>
+      <link>https://kangxiaoning.github.io/post/2021-01-19-empty-struct/</link>
       <pubDate>Tue, 19 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://kangxiaoning.github.io/post/2021-01-23-empty-struct/</guid>
+      <guid>https://kangxiaoning.github.io/post/2021-01-19-empty-struct/</guid>
       <description>&lt;p&gt;理解&lt;code&gt;empty struct&lt;/code&gt; 的行为，以及使用场景。&lt;/p&gt;</description>
     </item>
     
