@@ -52,7 +52,7 @@
 如下通过伪代码和实际实现来理解 merge sort。">
 <meta itemprop="datePublished" content="2019-03-10T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2019-03-10T00:00:00+00:00" />
-<meta itemprop="wordCount" content="1910">
+<meta itemprop="wordCount" content="1894">
 
 
 
@@ -183,9 +183,9 @@ Call mergeSort(arr, l, m)
 Call mergeSort(arr, m+1, r)
 4. Merge the two halves sorted in step 2 and 3:
 Call merge(arr, l, m, r)</p>
-<p>{% asset_img 37deb43.jpg %}</p>
+<p><img src="/images/algorithm/merge-sort/37deb43.jpg" alt="sort"></p>
 <p>如下是 Python 实现的 merge_sort 打印的处理过程，便于加深理解原理。</p>
-<p>{% asset_img 1.png %}</p>
+<p><img src="/images/algorithm/merge-sort/1.png" alt="sort"></p>
 <h2 id="12-实现代码">1.2 实现代码</h2>
 <h3 id="python">Python</h3>
 <div class="highlight"><div class="chroma">
@@ -514,9 +514,9 @@ Call merge(arr, l, m, r)</p>
 <li>空间复杂度 O(n)</li>
 </ol>
 <h3 id="python-执行结果">Python 执行结果</h3>
-<p>{% asset_img 2.png %}</p>
+<p><img src="/images/algorithm/merge-sort/2.png" alt="sort"></p>
 <p>对比测试-python</p>
-<p>{% asset_img 3.png %}</p>
+<p><img src="/images/algorithm/merge-sort/3.png" alt="sort"></p>
 <h3 id="go-执行结果">Go 执行结果</h3>
 <p>经过 InsertionSort 优化后的 MergeSort 性能有所提高。</p>
 <p>测试代码</p>
