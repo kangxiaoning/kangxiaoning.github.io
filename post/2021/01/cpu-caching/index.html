@@ -1,0 +1,454 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>CPU缓存对性能的影响 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="对一个由数组构成的二维矩阵进行遍历，按行快还是按列快？
+如果用链表来实现这个数据结构，遍历效率与数组相比如何？
+引用ardanlabs示例来做个实验，看下结果是否与预期一致。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/01/cpu-caching/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="CPU缓存对性能的影响"><meta property="og:description" content="对一个由数组构成的二维矩阵进行遍历，按行快还是按列快？
+如果用链表来实现这个数据结构，遍历效率与数组相比如何？
+引用ardanlabs示例来做个实验，看下结果是否与预期一致。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/01/cpu-caching/"><meta property="article:published_time" content="2021-01-24T00:00:00+00:00"><meta property="article:modified_time" content="2021-01-24T00:00:00+00:00"><meta itemprop=name content="CPU缓存对性能的影响"><meta itemprop=description content="对一个由数组构成的二维矩阵进行遍历，按行快还是按列快？
+如果用链表来实现这个数据结构，遍历效率与数组相比如何？
+引用ardanlabs示例来做个实验，看下结果是否与预期一致。"><meta itemprop=datePublished content="2021-01-24T00:00:00+00:00"><meta itemprop=dateModified content="2021-01-24T00:00:00+00:00"><meta itemprop=wordCount content="2317"><meta itemprop=keywords content="go,cache,"><meta name=twitter:card content="summary"><meta name=twitter:title content="CPU缓存对性能的影响"><meta name=twitter:description content="对一个由数组构成的二维矩阵进行遍历，按行快还是按列快？
+如果用链表来实现这个数据结构，遍历效率与数组相比如何？
+引用ardanlabs示例来做个实验，看下结果是否与预期一致。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>CPU缓存对性能的影响</h1><div class=post-meta><span class=post-time>2021-01-24</span><div class=post-category><a href=/categories/golang/>golang</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#问题验证>问题验证</a><ul><li><a href=#实验代码>实验代码</a><ul><li><a href=#cachinggo>caching.go</a></li><li><a href=#caching_testgo>caching_test.go</a></li></ul></li><li><a href=#验证结果>验证结果</a><ul><li><a href=#执行环境>执行环境</a></li><li><a href=#执行结果>执行结果</a></li><li><a href=#结果分析>结果分析</a></li></ul></li></ul></li><li><a href=#cpu-缓存>CPU 缓存</a><ul><li><a href=#缓存架构>缓存架构</a></li><li><a href=#cache-line>Cache line</a></li><li><a href=#缓存延迟>缓存延迟</a><ul><li><a href=#intel-i7-cpu-latencies-from-video>Intel i7 CPU Latencies From Video</a></li><li><a href=#industry-defined-latencies>Industry Defined Latencies</a></li></ul></li></ul></li><li><a href=#总结>总结</a></li><li><a href=#参考>参考</a></li></ul></nav></div></div><div class=post-content><p>对一个由数组构成的二维矩阵进行遍历，按行快还是按列快？</p><p>如果用链表来实现这个数据结构，遍历效率与数组相比如何？</p><p>引用<a href=https://github.com/ardanlabs/gotraining/tree/master/topics/go/testing/benchmarks/caching>ardanlabs示例</a>来做个实验，看下结果是否与预期一致。</p><h1 id=问题验证>问题验证</h1><h2 id=实验代码>实验代码</h2><p>涉及两个文件，内容如下。</p><h3 id=cachinggo>caching.go</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-go data-lang=go><span class=c1>// All material is licensed under the Apache License Version 2.0, January 2004
+</span><span class=c1>// http://www.apache.org/licenses/LICENSE-2.0
+</span><span class=c1></span>
+<span class=c1>// Package caching provides code to show why Data Oriented Design matters. How
+</span><span class=c1>// data layouts matter more to performance than algorithm efficiency.
+</span><span class=c1></span><span class=kn>package</span> <span class=nx>caching</span>
+
+<span class=kn>import</span> <span class=s>&#34;fmt&#34;</span>
+
+<span class=c1>// Create a square matrix of 16,777,216 bytes.
+</span><span class=c1></span><span class=kd>const</span> <span class=p>(</span>
+	<span class=nx>rows</span> <span class=p>=</span> <span class=mi>4</span> <span class=o>*</span> <span class=mi>1024</span>
+	<span class=nx>cols</span> <span class=p>=</span> <span class=mi>4</span> <span class=o>*</span> <span class=mi>1024</span>
+<span class=p>)</span>
+
+<span class=c1>// matrix represents a matrix with a large number of
+</span><span class=c1>// columns per row.
+</span><span class=c1></span><span class=kd>var</span> <span class=nx>matrix</span> <span class=p>[</span><span class=nx>rows</span><span class=p>][</span><span class=nx>cols</span><span class=p>]</span><span class=kt>byte</span>
+
+<span class=c1>// data represents a data node for our linked list.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>data</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>v</span> <span class=kt>byte</span>
+	<span class=nx>p</span> <span class=o>*</span><span class=nx>data</span>
+<span class=p>}</span>
+
+<span class=c1>// list points to the head of the list.
+</span><span class=c1></span><span class=kd>var</span> <span class=nx>list</span> <span class=o>*</span><span class=nx>data</span>
+
+<span class=kd>func</span> <span class=nf>init</span><span class=p>()</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>last</span> <span class=o>*</span><span class=nx>data</span>
+
+	<span class=c1>// Create a link list with the same number of elements.
+</span><span class=c1></span>	<span class=k>for</span> <span class=nx>row</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>row</span> <span class=p>&lt;</span> <span class=nx>rows</span><span class=p>;</span> <span class=nx>row</span><span class=o>++</span> <span class=p>{</span>
+		<span class=k>for</span> <span class=nx>col</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>col</span> <span class=p>&lt;</span> <span class=nx>cols</span><span class=p>;</span> <span class=nx>col</span><span class=o>++</span> <span class=p>{</span>
+
+			<span class=c1>// Create a new node and link it in.
+</span><span class=c1></span>			<span class=kd>var</span> <span class=nx>d</span> <span class=nx>data</span>
+			<span class=k>if</span> <span class=nx>list</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+				<span class=nx>list</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>d</span>
+			<span class=p>}</span>
+			<span class=k>if</span> <span class=nx>last</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+				<span class=nx>last</span><span class=p>.</span><span class=nx>p</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>d</span>
+			<span class=p>}</span>
+			<span class=nx>last</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>d</span>
+
+			<span class=c1>// Add a value to all even elements.
+</span><span class=c1></span>			<span class=k>if</span> <span class=nx>row</span><span class=o>%</span><span class=mi>2</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>{</span>
+				<span class=nx>matrix</span><span class=p>[</span><span class=nx>row</span><span class=p>][</span><span class=nx>col</span><span class=p>]</span> <span class=p>=</span> <span class=mh>0xFF</span>
+				<span class=nx>d</span><span class=p>.</span><span class=nx>v</span> <span class=p>=</span> <span class=mh>0xFF</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+
+	<span class=c1>// Count the number of elements in the link list.
+</span><span class=c1></span>	<span class=kd>var</span> <span class=nx>ctr</span> <span class=kt>int</span>
+	<span class=nx>d</span> <span class=o>:=</span> <span class=nx>list</span>
+	<span class=k>for</span> <span class=nx>d</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=nx>ctr</span><span class=o>++</span>
+		<span class=nx>d</span> <span class=p>=</span> <span class=nx>d</span><span class=p>.</span><span class=nx>p</span>
+	<span class=p>}</span>
+
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Elements in the link list&#34;</span><span class=p>,</span> <span class=nx>ctr</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Elements in the matrix&#34;</span><span class=p>,</span> <span class=nx>rows</span><span class=o>*</span><span class=nx>cols</span><span class=p>)</span>
+<span class=p>}</span>
+
+<span class=c1>// LinkedListTraverse traverses the linked list linearly.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>LinkedListTraverse</span><span class=p>()</span> <span class=kt>int</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>ctr</span> <span class=kt>int</span>
+
+	<span class=nx>d</span> <span class=o>:=</span> <span class=nx>list</span>
+	<span class=k>for</span> <span class=nx>d</span> <span class=o>!=</span> <span class=kc>nil</span> <span class=p>{</span>
+		<span class=k>if</span> <span class=nx>d</span><span class=p>.</span><span class=nx>v</span> <span class=o>==</span> <span class=mh>0xFF</span> <span class=p>{</span>
+			<span class=nx>ctr</span><span class=o>++</span>
+		<span class=p>}</span>
+
+		<span class=nx>d</span> <span class=p>=</span> <span class=nx>d</span><span class=p>.</span><span class=nx>p</span>
+	<span class=p>}</span>
+
+	<span class=k>return</span> <span class=nx>ctr</span>
+<span class=p>}</span>
+
+<span class=c1>// ColumnTraverse traverses the matrix linearly down each column.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>ColumnTraverse</span><span class=p>()</span> <span class=kt>int</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>ctr</span> <span class=kt>int</span>
+
+	<span class=k>for</span> <span class=nx>col</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>col</span> <span class=p>&lt;</span> <span class=nx>cols</span><span class=p>;</span> <span class=nx>col</span><span class=o>++</span> <span class=p>{</span>
+		<span class=k>for</span> <span class=nx>row</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>row</span> <span class=p>&lt;</span> <span class=nx>rows</span><span class=p>;</span> <span class=nx>row</span><span class=o>++</span> <span class=p>{</span>
+			<span class=k>if</span> <span class=nx>matrix</span><span class=p>[</span><span class=nx>row</span><span class=p>][</span><span class=nx>col</span><span class=p>]</span> <span class=o>==</span> <span class=mh>0xFF</span> <span class=p>{</span>
+				<span class=nx>ctr</span><span class=o>++</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+
+	<span class=k>return</span> <span class=nx>ctr</span>
+<span class=p>}</span>
+
+<span class=c1>// RowTraverse traverses the matrix linearly down each row.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>RowTraverse</span><span class=p>()</span> <span class=kt>int</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>ctr</span> <span class=kt>int</span>
+
+	<span class=k>for</span> <span class=nx>row</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>row</span> <span class=p>&lt;</span> <span class=nx>rows</span><span class=p>;</span> <span class=nx>row</span><span class=o>++</span> <span class=p>{</span>
+		<span class=k>for</span> <span class=nx>col</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>col</span> <span class=p>&lt;</span> <span class=nx>cols</span><span class=p>;</span> <span class=nx>col</span><span class=o>++</span> <span class=p>{</span>
+			<span class=k>if</span> <span class=nx>matrix</span><span class=p>[</span><span class=nx>row</span><span class=p>][</span><span class=nx>col</span><span class=p>]</span> <span class=o>==</span> <span class=mh>0xFF</span> <span class=p>{</span>
+				<span class=nx>ctr</span><span class=o>++</span>
+			<span class=p>}</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+
+	<span class=k>return</span> <span class=nx>ctr</span>
+<span class=p>}</span>
+
+</code></pre></td></tr></table></div></div><h3 id=caching_testgo>caching_test.go</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-go data-lang=go><span class=c1>// All material is licensed under the Apache License Version 2.0, January 2004
+</span><span class=c1>// http://www.apache.org/licenses/LICENSE-2.0
+</span><span class=c1></span>
+<span class=c1>// go test -run none -bench . -benchtime 3s
+</span><span class=c1></span>
+<span class=c1>// Tests to show how Data Oriented Design matters.
+</span><span class=c1></span><span class=kn>package</span> <span class=nx>caching</span>
+
+<span class=kn>import</span> <span class=s>&#34;testing&#34;</span>
+
+<span class=kd>var</span> <span class=nx>fa</span> <span class=kt>int</span>
+
+<span class=c1>// Capture the time it takes to perform a link list traversal.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>BenchmarkLinkListTraverse</span><span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>testing</span><span class=p>.</span><span class=nx>B</span><span class=p>)</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>a</span> <span class=kt>int</span>
+
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>N</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>a</span> <span class=p>=</span> <span class=nf>LinkedListTraverse</span><span class=p>()</span>
+	<span class=p>}</span>
+
+	<span class=nx>fa</span> <span class=p>=</span> <span class=nx>a</span>
+<span class=p>}</span>
+
+<span class=c1>// Capture the time it takes to perform a column traversal.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>BenchmarkColumnTraverse</span><span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>testing</span><span class=p>.</span><span class=nx>B</span><span class=p>)</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>a</span> <span class=kt>int</span>
+
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>N</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>a</span> <span class=p>=</span> <span class=nf>ColumnTraverse</span><span class=p>()</span>
+	<span class=p>}</span>
+
+	<span class=nx>fa</span> <span class=p>=</span> <span class=nx>a</span>
+<span class=p>}</span>
+
+<span class=c1>// Capture the time it takes to perform a row traversal.
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>BenchmarkRowTraverse</span><span class=p>(</span><span class=nx>b</span> <span class=o>*</span><span class=nx>testing</span><span class=p>.</span><span class=nx>B</span><span class=p>)</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>a</span> <span class=kt>int</span>
+
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>b</span><span class=p>.</span><span class=nx>N</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>a</span> <span class=p>=</span> <span class=nf>RowTraverse</span><span class=p>()</span>
+	<span class=p>}</span>
+
+	<span class=nx>fa</span> <span class=p>=</span> <span class=nx>a</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><h2 id=验证结果>验证结果</h2><p>如下在我自己的macos执行，执行 <code>go test -run none -bench . -benchtime 3s</code>得到结果。</p><h3 id=执行环境>执行环境</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>➜  caching go version
+go version go1.15.6 darwin/amd64
+➜  caching
+</code></pre></td></tr></table></div></div><h3 id=执行结果>执行结果</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-bash data-lang=bash>➜  caching go <span class=nb>test</span> -run none -bench . -benchtime 3s
+Elements in the link list <span class=m>16777216</span>
+Elements in the matrix <span class=m>16777216</span>
+goos: darwin
+goarch: amd64
+BenchmarkLinkListTraverse-8   	     124	  <span class=m>26957449</span> ns/op
+BenchmarkColumnTraverse-8     	      19	 <span class=m>184569138</span> ns/op
+BenchmarkRowTraverse-8        	     280	  <span class=m>12718729</span> ns/op
+PASS
+ok  	_/tmp/caching	24.731s
+➜  caching
+➜  caching go <span class=nb>test</span> -run none -bench . -benchtime 3s
+Elements in the link list <span class=m>16777216</span>
+Elements in the matrix <span class=m>16777216</span>
+goos: darwin
+goarch: amd64
+BenchmarkLinkListTraverse-8   	     128	  <span class=m>27910632</span> ns/op
+BenchmarkColumnTraverse-8     	      16	 <span class=m>188220938</span> ns/op
+BenchmarkRowTraverse-8        	     280	  <span class=m>12802400</span> ns/op
+PASS
+ok  	_/tmp/caching	20.477s
+➜  caching
+</code></pre></td></tr></table></div></div><h3 id=结果分析>结果分析</h3><ul><li>按行遍历最快</li><li>链表遍历其次</li><li>按列遍历最慢</li></ul><p><code>RowTraverse</code>与<code>ColumnTraverse</code>从代码上看，只是内外层循环换了下，竟然有这么大的差距，背后的原理是什么？</p><p>这就需要从<code>cpu cache</code>原理来解释了。</p><h1 id=cpu-缓存>CPU 缓存</h1><p>如下是<code>4 Core i7-9xx</code>CPU的缓存架构，其它CPU的缓存架构也大致类似。</p><h2 id=缓存架构>缓存架构</h2><p>下图表示这个CPU有4个物理core，每个物理core有独立的L1/L2缓存，L1缓存又分为指令缓存(L1 I-Cache)与数据缓存(L1 D-Cache)，4个物理core共用L3缓存。</p><p>缓存的设计是个很复杂的领域，这里我们只需要知道，当CPU读写一个地址时，会先从cache里找，按L1/L2/L3的次序来，cache没有命中称为cache miss，此时则会从内存里加载。虽然内存很快，但是相对于L1/L2/L3缓存，在存取速度上也是有数量级的差距，因此是否能利用到缓存，对程序的性能影响很大。</p><h2 id=cache-line>Cache line</h2><p>类似扇区是磁盘的最小寻址单元，page是Linux管理内存的最小单位一样，缓存也有一个最小管理单位，即<code>cache line</code>，是从内存加载到缓存的最小单位，大小通常为32Bytes或64Bytes。</p><p><img src=/images/golang/cache-hierarchy.png alt=CPU缓存架构></p><h2 id=缓存延迟>缓存延迟</h2><p>对于CPU来说，L1/L2/L3/Main Memory的延迟差距很大，也是影响性能的关键因素，可参考如下动画感受下CPU从不同级别缓存访问数据的延迟。</p><p><a href=https://github.com/ardanlabs/gotraining/raw/master/topics/go/language/arrays/cpu_cache.m4v>缓存延迟动画</a></p><p>也可参考如下的量化指标。</p><h3 id=intel-i7-cpu-latencies-from-video>Intel i7 CPU Latencies From Video</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>3GHz(3 clock cycles/ns) * 4 instructions per cycle = 12 instructions per ns!
+
+1 ns ............. 1 ns .............. 12 instructions  (one) 
+1 µs .......... 1000 ns .......... 12,000 instructions  (thousand)
+1 ms ..... 1,000,000 ns ...... 12,000,000 instructions  (million)
+1 s .. 1,000,000,000 ns .. 12,000,000,000 instructions  (billion)
+
+L1 - 64KB Cache (Per Core)
+	4 cycles of latency at 1.3 ns
+	Stalls for 16 instructions
+
+L2 - 256KB Cache (Per Core)
+	12 cycles of latency at 4 ns
+	Stalls for 48 instructions
+
+L3 - 8MB Cache
+	40 cycles of latency at 13.3 ns
+	Stalls for 160 instructions
+
+Main Memory
+	100 cycle of latency at 33.3 ns
+	Stalled for 400 instructions
+</code></pre></td></tr></table></div></div><h3 id=industry-defined-latencies>Industry Defined Latencies</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>L1 cache reference ......................... 0.5 ns ...................  6 ins
+Branch mispredict ............................ 5 ns ................... 60 ins
+L2 cache reference ........................... 7 ns ................... 84 ins
+Mutex lock/unlock ........................... 25 ns .................. 300 ins
+Main memory reference ...................... 100 ns ................. 1200 ins           
+Compress 1K bytes with Zippy ............. 3,000 ns (3 µs) ........... 36k ins
+Send 2K bytes over 1 Gbps network ....... 20,000 ns (20 µs) ........  240k ins
+SSD random read ........................ 150,000 ns (150 µs) ........ 1.8M ins
+Read 1 MB sequentially from memory ..... 250,000 ns (250 µs) .......... 3M ins
+Round trip within same datacenter ...... 500,000 ns (0.5 ms) .......... 6M ins
+Read 1 MB sequentially from SSD* ..... 1,000,000 ns (1 ms) ........... 12M ins
+Disk seek ........................... 10,000,000 ns (10 ms) ......... 120M ins
+Read 1 MB sequentially from disk .... 20,000,000 ns (20 ms) ......... 240M ins
+Send packet CA-&gt;Netherlands-&gt;CA .... 150,000,000 ns (150 ms) ........ 1.8B ins
+</code></pre></td></tr></table></div></div><h1 id=总结>总结</h1><p>我们知道<code>Spatial Locality</code>和<code>Temporal Locality</code>局部性原理是缓存价值所在，结合上述代码，我们可以解释为什么3种遍历效率差距这么大。</p><ul><li><p><strong>Spatial Locality</strong> :
+Spatial Locality means that all those instructions which are stored nearby to the recently executed instruction have high chances of execution. It refers to the use of data elements(instructions) which are relatively close in storage locations.</p></li><li><p><strong>Temporal Locality</strong> :
+Temporal Locality means that a instruction which is recently executed have high chances of execution again. So the instruction is kept in cache memory such that it can be fetched easily and takes no time in searching for the same instruction.</p></li></ul><p>如下图所示，因为数组在内存中是连续分配的，因此当以<code>cache line</code>为单位将数据从内存加载到缓存时<code>RowTraverse</code>这种方式可最大限度利用到缓存，效率最高；而<code>ColumnTraverse</code>由于是按列遍历，要操作的下一个元素有很大的概率不在cache，效率比较低；<code>LinkedListTraverse</code>相对<code>ColumnTraverse</code>，数据连续分布在一个page里的机率较大，相邻元素在同一个<code>cache line</code>的概率相对较高，因此效率介于<code>RowTraverse</code>和<code>ColumnTraverse</code>之间。</p><p>这里需要注意的是<code>cach miss</code>对<code>TLB</code>也有影响，因此寻找内存数据的时间也因缓存失效增加了访问内存的延迟。</p><p><img src=/images/golang/cpu-caching.png alt=内存布局></p><h1 id=参考>参考</h1><ul><li><a href=https://github.com/ardanlabs/gotraining/blob/master/topics/go/language/arrays/README.md>https://github.com/ardanlabs/gotraining/blob/master/topics/go/language/arrays/README.md</a></li></ul></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2021-01-24</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/go/>go</a>
+<a href=/tags/cache/>cache</a></div><nav class=post-nav><a class=next href=/post/2021/01/string-and-slice/><span class="next-text nav-default">Golang String literal and string slice</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2021-01-24 00:00:00 \u002b0000 UTC',title:'CPU缓存对性能的影响',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script></body></html>
