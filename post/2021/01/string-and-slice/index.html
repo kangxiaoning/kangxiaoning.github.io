@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Golang String literal and string slice - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/01/string-and-slice/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Golang String literal and string slice"><meta property="og:description" content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/01/string-and-slice/"><meta property="article:published_time" content="2021-01-21T00:00:00+00:00"><meta property="article:modified_time" content="2021-01-21T00:00:00+00:00"><meta itemprop=name content="Golang String literal and string slice"><meta itemprop=description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta itemprop=datePublished content="2021-01-21T00:00:00+00:00"><meta itemprop=dateModified content="2021-01-21T00:00:00+00:00"><meta itemprop=wordCount content="1244"><meta itemprop=keywords content="go,string,slice,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Golang String literal and string slice"><meta name=twitter:description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Golang String literal and string slice</h1><div class=post-meta><span class=post-time>2021-01-21</span><div class=post-category><a href=/categories/golang/>golang</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#数据结构>数据结构</a><ul><li><a href=#源码定义httpsgithubcomgolanggoblobmastersrcreflectvaluegol1977><a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a></a></li></ul></li><li><a href=#直观认识>直观认识</a><ul><li><a href=#slice>Slice</a></li><li><a href=#string>String</a></li><li><a href=#代码验证>代码验证</a></li></ul></li><li><a href=#可用操作>可用操作</a></li><li><a href=#nil-slice-和-empty-slice>nil slice 和 empty slice</a><ul><li><a href=#定义>定义</a></li><li><a href=#结构图示>结构图示</a></li><li><a href=#代码验证-1>代码验证</a></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></div></div><div class=post-content><p><code>Golang</code>里的<code>string</code>和<code>slice</code>都属于<code>reference type</code>，即这种类型会有一个指针，指向<code>underlying</code>的数组。<code>Golang</code>的赋值、函数调用、<code>for loop</code>等操作是<code>pass by value</code>的，涉及到数据的copy，<code>reference</code>类型只是对他的header进行copy，并不会copy <code>underlying</code>的数组，从而达到共用内存，提升效率的目的。</p><h1 id=数据结构>数据结构</h1><p>从Golang编译器<a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a>可以看到<code>string</code>和<code>slice</code>的定义，我们平时写代码用到的<code>string</code>和<code>slice</code>正是下面这两个<code>Header</code>结构，这也是为什么<code>slice</code>在函数间传递比较高效的原因，因为只会copy <code>3-word</code>大小的内存，和<code>underlying</code>数据大小无关。</p><h2 id=源码定义httpsgithubcomgolanggoblobmastersrcreflectvaluegol1977><a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a></h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Golang String literal and string slice - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/01/string-and-slice/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Golang String literal and string slice"><meta property="og:description" content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/01/string-and-slice/"><meta property="article:published_time" content="2021-01-21T00:00:00+00:00"><meta property="article:modified_time" content="2021-01-21T00:00:00+00:00"><meta itemprop=name content="Golang String literal and string slice"><meta itemprop=description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><meta itemprop=datePublished content="2021-01-21T00:00:00+00:00"><meta itemprop=dateModified content="2021-01-21T00:00:00+00:00"><meta itemprop=wordCount content="1717"><meta itemprop=keywords content="go,string,slice,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Golang String literal and string slice"><meta name=twitter:description content="Golang里的string和slice都属于reference type，即这种类型会有一个指针，指向underlying的数组。Golang的赋值、函数调用、for loop等操作是pass by value的，涉及到数据的copy，reference类型只是对他的header进行copy，并不会copy underlying的数组，从而达到共用内存，提升效率的目的。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Golang String literal and string slice</h1><div class=post-meta><span class=post-time>2021-01-21</span><div class=post-category><a href=/categories/golang/>golang</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#数据结构>数据结构</a><ul><li><a href=#源码定义httpsgithubcomgolanggoblobmastersrcreflectvaluegol1977><a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a></a></li></ul></li><li><a href=#直观认识>直观认识</a><ul><li><a href=#slice>Slice</a></li><li><a href=#string>String</a></li><li><a href=#代码验证>代码验证</a></li></ul></li><li><a href=#可用操作>可用操作</a><ul><li><a href=#append-扩容比例>append 扩容比例</a></li></ul></li><li><a href=#nil-slice-和-empty-slice>nil slice 和 empty slice</a><ul><li><a href=#定义>定义</a></li><li><a href=#结构图示>结构图示</a></li><li><a href=#代码验证-1>代码验证</a></li></ul></li><li><a href=#参考>参考</a></li></ul></nav></div></div><div class=post-content><p><code>Golang</code>里的<code>string</code>和<code>slice</code>都属于<code>reference type</code>，即这种类型会有一个指针，指向<code>underlying</code>的数组。<code>Golang</code>的赋值、函数调用、<code>for loop</code>等操作是<code>pass by value</code>的，涉及到数据的copy，<code>reference</code>类型只是对他的header进行copy，并不会copy <code>underlying</code>的数组，从而达到共用内存，提升效率的目的。</p><h1 id=数据结构>数据结构</h1><p>从Golang编译器<a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a>可以看到<code>string</code>和<code>slice</code>的定义，我们平时写代码用到的<code>string</code>和<code>slice</code>正是下面这两个<code>Header</code>结构，这也是为什么<code>slice</code>在函数间传递比较高效的原因，因为只会copy <code>3-word</code>大小的内存，和<code>underlying</code>数据大小无关。</p><h2 id=源码定义httpsgithubcomgolanggoblobmastersrcreflectvaluegol1977><a href=https://github.com/golang/go/blob/master/src/reflect/value.go#L1977>源码定义</a></h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -88,7 +88,107 @@
 </span><span class=lnt>2
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>16
 24
-</code></pre></td></tr></table></div></div><h1 id=可用操作>可用操作</h1><p>如下是支持<code>slice</code>的build-in函数。</p><ul><li>make(): helps to allocate and initialize the slice</li><li>cap(): returns capacity of the slice</li><li>len(): returns length of the slice</li><li>append(): appends an element at the end of the slice</li><li>copy(): copies elements from source slice to destination</li></ul><h1 id=nil-slice-和-empty-slice>nil slice 和 empty slice</h1><h2 id=定义>定义</h2><ul><li><code>var slice1 []string</code>声明了一个<code>zero value</code>的slice，值为<code>nil</code>。</li><li><code>slice2 := []string{}</code>初始化一个<code>empty</code>的slice，指向一个<code>empty struct</code>的backing。</li></ul><h2 id=结构图示>结构图示</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</code></pre></td></tr></table></div></div><h1 id=可用操作>可用操作</h1><p>如下是支持<code>slice</code>的build-in函数。</p><ul><li>make(): helps to allocate and initialize the slice</li><li>cap(): returns capacity of the slice</li><li>len(): returns length of the slice</li><li>append(): appends an element at the end of the slice</li><li>copy(): copies elements from source slice to destination</li></ul><h2 id=append-扩容比例>append 扩容比例</h2><p><code>append</code>操作会根据基数执行不同程度的扩容，可以通过如下代码验证。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=s>&#34;fmt&#34;</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+
+	<span class=kd>var</span> <span class=nx>data</span> <span class=p>[]</span><span class=kt>string</span>
+	<span class=nx>lastCap</span> <span class=o>:=</span> <span class=nb>cap</span><span class=p>(</span><span class=nx>data</span><span class=p>)</span>
+
+	<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=o>&lt;=</span> <span class=mf>1e5</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+		<span class=nx>value</span> <span class=o>:=</span> <span class=nx>fmt</span><span class=p>.</span><span class=nf>Sprintf</span><span class=p>(</span><span class=s>&#34;%d&#34;</span><span class=p>,</span> <span class=nx>i</span><span class=p>)</span>
+		<span class=nx>data</span> <span class=p>=</span> <span class=nb>append</span><span class=p>(</span><span class=nx>data</span><span class=p>,</span> <span class=nx>value</span><span class=p>)</span>
+
+		<span class=k>if</span> <span class=nx>lastCap</span> <span class=o>!=</span> <span class=nb>cap</span><span class=p>(</span><span class=nx>data</span><span class=p>)</span> <span class=p>{</span>
+			<span class=nx>capChg</span> <span class=o>:=</span> <span class=nb>float64</span><span class=p>(</span><span class=nb>cap</span><span class=p>(</span><span class=nx>data</span><span class=p>)</span><span class=o>-</span><span class=nx>lastCap</span><span class=p>)</span> <span class=o>/</span> <span class=nb>float64</span><span class=p>(</span><span class=nx>lastCap</span><span class=p>)</span> <span class=o>*</span> <span class=mi>100</span>
+			<span class=nx>lastCap</span> <span class=p>=</span> <span class=nb>cap</span><span class=p>(</span><span class=nx>data</span><span class=p>)</span>
+			<span class=nx>fmt</span><span class=p>.</span><span class=nf>Printf</span><span class=p>(</span><span class=s>&#34;Addr[%-12p]  Index[%-5d]  Cap[%6d - %3.f%%]\n&#34;</span><span class=p>,</span> <span class=o>&amp;</span><span class=nx>data</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=nx>i</span><span class=p>,</span> <span class=nb>cap</span><span class=p>(</span><span class=nx>data</span><span class=p>),</span> <span class=nx>capChg</span><span class=p>)</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table></div></div><p>Output</p><p>可以看到在数组容量在1024及以内，每次是2倍扩容，之后会有25%、33%、50%等不同比例的扩容。扩容涉及分配新数组，copy原来数组内容到新数组，如下可以看到每次扩容地址都有变化，因此如果在一开始就知道容量，通过<code>make</code>指定容量初始是比较优化的做法。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>Addr[0xc000010200]  Index[0    ]  Cap[     1 - +Inf%]
+Addr[0xc00000c060]  Index[1    ]  Cap[     2 - 100%]
+Addr[0xc000020080]  Index[2    ]  Cap[     4 - 100%]
+Addr[0xc00007a000]  Index[4    ]  Cap[     8 - 100%]
+Addr[0xc00007c000]  Index[8    ]  Cap[    16 - 100%]
+Addr[0xc00007e000]  Index[16   ]  Cap[    32 - 100%]
+Addr[0xc000078400]  Index[32   ]  Cap[    64 - 100%]
+Addr[0xc000100000]  Index[64   ]  Cap[   128 - 100%]
+Addr[0xc000075000]  Index[128  ]  Cap[   256 - 100%]
+Addr[0xc000102000]  Index[256  ]  Cap[   512 - 100%]
+Addr[0xc000104000]  Index[512  ]  Cap[  1024 - 100%]
+Addr[0xc00010a000]  Index[1024 ]  Cap[  1280 -  25%]
+Addr[0xc000116000]  Index[1280 ]  Cap[  1704 -  33%]
+Addr[0xc00012a000]  Index[1704 ]  Cap[  2560 -  50%]
+Addr[0xc000138000]  Index[2560 ]  Cap[  3584 -  40%]
+Addr[0xc00014a000]  Index[3584 ]  Cap[  4608 -  29%]
+Addr[0xc000160000]  Index[4608 ]  Cap[  6144 -  33%]
+Addr[0xc000180000]  Index[6144 ]  Cap[  7680 -  25%]
+Addr[0xc000200000]  Index[7680 ]  Cap[  9728 -  27%]
+Addr[0xc000226000]  Index[9728 ]  Cap[ 12288 -  26%]
+Addr[0xc000256000]  Index[12288]  Cap[ 15360 -  25%]
+Addr[0xc000292000]  Index[15360]  Cap[ 19456 -  27%]
+Addr[0xc0002de000]  Index[19456]  Cap[ 24576 -  26%]
+Addr[0xc00033e000]  Index[24576]  Cap[ 30720 -  25%]
+Addr[0xc0003b6000]  Index[30720]  Cap[ 38400 -  25%]
+Addr[0xc000480000]  Index[38400]  Cap[ 48128 -  25%]
+Addr[0xc000200000]  Index[48128]  Cap[ 60416 -  26%]
+Addr[0xc0002ec000]  Index[60416]  Cap[ 75776 -  25%]
+Addr[0xc000700000]  Index[75776]  Cap[ 94720 -  25%]
+Addr[0xc000872000]  Index[94720]  Cap[118784 -  25%]
+</code></pre></td></tr></table></div></div><h1 id=nil-slice-和-empty-slice>nil slice 和 empty slice</h1><h2 id=定义>定义</h2><ul><li><code>var slice1 []string</code>声明了一个<code>zero value</code>的slice，值为<code>nil</code>。</li><li><code>slice2 := []string{}</code>初始化一个<code>empty</code>的slice，指向一个<code>empty struct</code>的backing。</li></ul><h2 id=结构图示>结构图示</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
