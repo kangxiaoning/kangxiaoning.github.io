@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Mac上使用fish shell及OMF - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="记录在 Mac 上安装配置 fish 和 OMF 的过程，"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/02/install-fish-shell-on-mac/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Mac上使用fish shell及OMF"><meta property="og:description" content="记录在 Mac 上安装配置 fish 和 OMF 的过程，"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/02/install-fish-shell-on-mac/"><meta property="article:published_time" content="2021-02-06T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-06T00:00:00+00:00"><meta itemprop=name content="Mac上使用fish shell及OMF"><meta itemprop=description content="记录在 Mac 上安装配置 fish 和 OMF 的过程，"><meta itemprop=datePublished content="2021-02-06T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-06T00:00:00+00:00"><meta itemprop=wordCount content="154"><meta itemprop=keywords content="fish,,shell,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Mac上使用fish shell及OMF"><meta name=twitter:description content="记录在 Mac 上安装配置 fish 和 OMF 的过程，"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Mac上使用fish shell及OMF</h1><div class=post-meta><span class=post-time>2021-02-06</span><div class=post-category><a href=/categories/linux/>linux</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>安装Fish</a></li><li><a href=#headline-2>安装OMF</a></li><li><a href=#headline-3>配置</a><ul><li><a href=#headline-4>环境变量</a></li></ul></li></ul></nav></div></div><div class=post-content><p>记录在 <code>Mac</code> 上安装配置 <code>fish</code> 和 <code>OMF</code> 的过程，</p><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>安装Fish</h2><div id=outline-text-headline-1 class=outline-text-2><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Mac上使用fish shell及OMF - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="记录在 Mac 上安装配置 fish 和 OMF 的过程。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/02/install-fish-shell-on-mac/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Mac上使用fish shell及OMF"><meta property="og:description" content="记录在 Mac 上安装配置 fish 和 OMF 的过程。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/02/install-fish-shell-on-mac/"><meta property="article:published_time" content="2021-02-06T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-06T00:00:00+00:00"><meta itemprop=name content="Mac上使用fish shell及OMF"><meta itemprop=description content="记录在 Mac 上安装配置 fish 和 OMF 的过程。"><meta itemprop=datePublished content="2021-02-06T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-06T00:00:00+00:00"><meta itemprop=wordCount content="673"><meta itemprop=keywords content="fish,,shell,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Mac上使用fish shell及OMF"><meta name=twitter:description content="记录在 Mac 上安装配置 fish 和 OMF 的过程。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Mac上使用fish shell及OMF</h1><div class=post-meta><span class=post-time>2021-02-06</span><div class=post-category><a href=/categories/linux/>linux</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>安装Fish</a></li><li><a href=#headline-2>安装OMF</a></li><li><a href=#headline-3>配置</a><ul><li><a href=#headline-4>环境变量</a></li></ul></li><li><a href=#headline-5>技巧</a></li><li><a href=#headline-6>插件</a><ul><li><a href=#headline-7>fzf</a></li><li><a href=#headline-8>autojump</a><ul><li><a href=#headline-9>install</a></li><li><a href=#headline-10>usage</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><p>记录在 <code>Mac</code> 上安装配置 <code>fish</code> 和 <code>OMF</code> 的过程。</p><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>安装Fish</h2><div id=outline-text-headline-1 class=outline-text-2><p>安装 <code>fish</code> 并设置为默认shell。</p><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>brew install fish
@@ -9,7 +9,177 @@ chsh -s <span class=sb>`</span>which fish<span class=sb>`</span></code></pre></t
 </span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>git clone https://github.com/oh-my-fish/oh-my-fish
 <span class=nb>cd</span> oh-my-fish
 bin/install --offline</code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-3 class=outline-2><h2 id=headline-3>配置</h2><div id=outline-text-headline-3 class=outline-text-2><div id=outline-container-headline-4 class=outline-3><h3 id=headline-4>环境变量</h3><div id=outline-text-headline-4 class=outline-text-3><p><code>-U</code> 可持久化配置，重启后也生效，具体可以通过 <code>help set</code> 查询。</p><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell><span class=nb>set</span> -U fish_user_paths <span class=nv>$fish_user_paths</span> /usr/local/opt/ruby/bin</code></pre></td></tr></table></div></div></div></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell><span class=nb>set</span> -U fish_user_paths <span class=nv>$fish_user_paths</span> /usr/local/opt/ruby/bin</code></pre></td></tr></table></div></div></div></div></div></div></div><div id=outline-container-headline-5 class=outline-2><h2 id=headline-5>技巧</h2><div id=outline-text-headline-5 class=outline-text-2><p>一些使用技巧。</p><ul><li><p>补全</p><p>当你在 <code>fish</code> 里键入部分命令后， <code>fish</code> 会有一些提示给出来，如果是目录/文件名，按下 <code>Tab</code> 补全，如果是要执行的命令，按下右箭头即可。</p></li></ul></div></div><div id=outline-container-headline-6 class=outline-2><h2 id=headline-6>插件</h2><div id=outline-text-headline-6 class=outline-text-2><p>记录一些有助于提升效率的插件。</p><div id=outline-container-headline-7 class=outline-3><h3 id=headline-7>fzf</h3><div id=outline-text-headline-7 class=outline-text-3><p>从 <code>zsh</code> + <code>Oh My Zsh</code> 切换过来，经常使用的 <code>Ctrl + r</code> 搜索历史命令在 <code>fish</code> 默认不可用，可以通过 <code>fzf</code> 插件来支持。</p><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>brew install fzf
+omf install fzf</code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-8 class=outline-3><h3 id=headline-8>autojump</h3><div id=outline-text-headline-8 class=outline-text-3><div id=outline-container-headline-9 class=outline-4><h4 id=headline-9>install</h4><div id=outline-text-headline-9 class=outline-text-4><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>brew install autojump
+omf install autojump</code></pre></td></tr></table></div></div></div><p>注意在安装结束按提示配置 <code>fish</code> ，如果没有提示，可重新执行 <code>brew reinstall autojump</code> ，如下所示。</p><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell>❯ brew reinstall <span class=nv>autojump</span>
+<span class=o>==</span>&gt; Downloading https://homebrew.bintray.com/bottles/autojump-22.5.3_2.big_sur.bottle.tar.gz
+Already downloaded: /Users/kangxiaoning/Library/Caches/Homebrew/downloads/c0f774243efbd135fe13fd570d605201c372ff11a0412469be2252ad1801a8fa--autojump-22.5.3_2.big_sur.bottle.tar.gz
+<span class=o>==</span>&gt; Reinstalling <span class=nv>autojump</span>
+<span class=o>==</span>&gt; Pouring autojump-22.5.3_2.big_sur.bottle.tar.gz
+<span class=o>==</span>&gt; Caveats
+Add the following line to your ~/.bash_profile or ~/.zshrc file:
+  <span class=o>[</span> -f /usr/local/etc/profile.d/autojump.sh <span class=o>]</span> <span class=o>&amp;&amp;</span> . /usr/local/etc/profile.d/autojump.sh
+
+If you use the Fish shell <span class=k>then</span> add the following line to your ~/.config/fish/config.fish:
+  <span class=o>[</span> -f /usr/local/share/autojump/autojump.fish <span class=o>]</span><span class=p>;</span> and <span class=nb>source</span> /usr/local/share/autojump/autojump.fish
+
+Restart your terminal <span class=k>for</span> the settings to take effect.
+<span class=o>==</span>&gt; Summary
+🍺  /usr/local/Cellar/autojump/22.5.3_2: <span class=m>20</span> files, 169.8KB
+~/workspace/blog master*
+❯</code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-10 class=outline-4><h4 id=headline-10>usage</h4><div id=outline-text-headline-10 class=outline-text-4><ul><li><p>查看统计信息， <code>j -s</code></p></li><li><p>跳转到包含 <code>blog</code> 的目录，执行 <code>j blog</code> ，可以通过加多个参数来定位，比如 <code>j w blog</code></p></li><li><p>跳转到包含 <code>post</code> 的子目录，执行 <code>jc post</code></p></li></ul><div class="src src-shell"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-shell data-lang=shell> ~
+❯ autojump -s
+________________________________________
+
+0:	 total weight
+0:	 number of entries
+0.00:	 current directory weight
+
+data:	 /Users/kangxiaoning/Library/autojump/autojump.txt
+
+~
+❯ <span class=nb>cd</span> ~/workspace/blog
+
+~/workspace/blog master*
+❯ <span class=nb>cd</span>
+
+~
+❯ j -s
+10.0:	/Users/kangxiaoning/workspace/blog
+________________________________________
+
+10:	 total weight
+1:	 number of entries
+0.00:	 current directory weight
+
+data:	 /Users/kangxiaoning/Library/autojump/autojump.txt
+
+~
+❯ j blog
+/Users/kangxiaoning/workspace/blog
+
+~/workspace/blog master*
+❯ <span class=nb>pwd</span>
+/Users/kangxiaoning/workspace/blog
+
+~/workspace/blog master*
+❯ <span class=nb>cd</span> content/post/
+
+~/workspace/blog/content/post master*
+❯ j -s
+10.0:	/Users/kangxiaoning/workspace/blog/content/post
+14.1:	/Users/kangxiaoning/workspace/blog
+________________________________________
+
+24:	 total weight
+2:	 number of entries
+10.00:	 current directory weight
+
+data:	 /Users/kangxiaoning/Library/autojump/autojump.txt
+
+~/workspace/blog/content/post master*
+❯ <span class=nb>cd</span>
+
+~
+❯
+
+~
+❯ j post
+/Users/kangxiaoning/workspace/blog/content/post
+
+~/workspace/blog/content/post master*
+❯ j blog
+/Users/kangxiaoning/workspace/blog
+
+~/workspace/blog master*
+❯</code></pre></td></tr></table></div></div></div></div></div></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
 <span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
 <span class=item-content>2021-02-06</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/fish/>fish,</a>
 <a href=/tags/shell/>shell</a></div><nav class=post-nav><a class=next href=/post/2021/02/learn-emacs-lisp-part-2/><span class="next-text nav-default">学习Emacs Lisp第二篇</span>
