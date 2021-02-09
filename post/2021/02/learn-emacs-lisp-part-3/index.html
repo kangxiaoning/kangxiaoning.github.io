@@ -5,18 +5,16 @@
 如果一个 symbol 指向了一个函数定义，则称这个 symbol 为函数。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-3/"><meta property="article:published_time" content="2021-02-08T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-08T00:00:00+00:00"><meta itemprop=name content="学习Emacs Lisp第三篇"><meta itemprop=description content="理解了基础概念、变量使用等内容，接下来学习如何编写函数。
 
 前面了解到当 Lisp 解释执行一个 List 时，首先看第一个 symbol 是否绑定了函数定义，或者说是否指向了一个函数定义。
-如果一个 symbol 指向了一个函数定义，则称这个 symbol 为函数。"><meta itemprop=datePublished content="2021-02-08T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-08T00:00:00+00:00"><meta itemprop=wordCount content="417"><meta itemprop=keywords content="emacs,,lisp,"><meta name=twitter:card content="summary"><meta name=twitter:title content="学习Emacs Lisp第三篇"><meta name=twitter:description content="理解了基础概念、变量使用等内容，接下来学习如何编写函数。
+如果一个 symbol 指向了一个函数定义，则称这个 symbol 为函数。"><meta itemprop=datePublished content="2021-02-08T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-08T00:00:00+00:00"><meta itemprop=wordCount content="1022"><meta itemprop=keywords content="emacs,,lisp,"><meta name=twitter:card content="summary"><meta name=twitter:title content="学习Emacs Lisp第三篇"><meta name=twitter:description content="理解了基础概念、变量使用等内容，接下来学习如何编写函数。
 
 前面了解到当 Lisp 解释执行一个 List 时，首先看第一个 symbol 是否绑定了函数定义，或者说是否指向了一个函数定义。
-如果一个 symbol 指向了一个函数定义，则称这个 symbol 为函数。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>学习Emacs Lisp第三篇</h1><div class=post-meta><span class=post-time>2021-02-08</span><div class=post-category><a href=/categories/emacs/>emacs</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>Function</a><ul><li><a href=#headline-2>defun</a></li></ul></li></ul></nav></div></div><div class=post-content><p>理解了基础概念、变量使用等内容，接下来学习如何编写函数。</p><p>前面了解到当 <code>Lisp</code> 解释执行一个 <code>List</code> 时，首先看第一个 <code>symbol</code> 是否绑定了函数定义，或者说是否指向了一个函数定义。
-如果一个 <code>symbol</code> 指向了一个函数定义，则称这个 <code>symbol</code> 为函数。</p><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>Function</h2><div id=outline-text-headline-1 class=outline-text-2><p>用 <code>Emacs Lisp</code> 写的所有函数都是在其它函数的基础上编写的，除了一些 <code>primitive function</code> ，它们是用 <code>C</code> 语言编写的。
-我们只需要了解有这么个概念即可，后面写 <code>Emacs Lisp</code> 函数也无需关心要调用的函数是不是用 <code>C</code> 语言写的。</p><div id=outline-container-headline-2 class=outline-3><h3 id=headline-2>defun</h3><div id=outline-text-headline-2 class=outline-text-3><p><code>defen</code> 是一个宏，是 <code>define function</code> 的缩写。</p><p>一个函数包含5个部分。</p><ol><li><p>函数名</p></li><li><p>参数列表，没有参数的话使用空列表 <code>()</code></p></li><li><p>文档描述，可选部分</p></li><li><p><code>interactive</code> 部分，可选</p></li><li><p>函数体，描述函数具体执行的功能</p></li></ol><p>上面提到的函数组成可以用如下模板表示。</p><pre class=example>
+如果一个 symbol 指向了一个函数定义，则称这个 symbol 为函数。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>学习Emacs Lisp第三篇</h1><div class=post-meta><span class=post-time>2021-02-08</span><div class=post-category><a href=/categories/emacs/>emacs</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>Function</a><ul><li><a href=#headline-2>defun</a></li><li><a href=#headline-3>注释</a></li><li><a href=#headline-4>interactive</a></li></ul></li></ul></nav></div></div><div class=post-content><p>理解了基础概念、变量使用等内容，接下来学习如何编写函数。</p><p>前面了解到当 <code>Lisp</code> 解释执行一个 <code>List</code> 时，首先看第一个 <code>symbol</code> 是否绑定了函数定义，或者说是否指向了一个函数定义。
+如果一个 <code>symbol</code> 指向了一个函数定义，则称这个 <code>symbol</code> 为函数。</p><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>Function</h2><div id=outline-text-headline-1 class=outline-text-2><p>用 <code>Emacs Lisp</code> 写的所有函数都是在其它函数的基础上编写的，除了一些 <code>primitive function</code> ，它们是用 <code>C</code> 语言编写的。我们只需要了解有这么个概念即可，后面写 <code>Emacs Lisp</code> 函数也无需关心要调用的函数是不是用 <code>C</code> 语言写的。</p><div id=outline-container-headline-2 class=outline-3><h3 id=headline-2>defun</h3><div id=outline-text-headline-2 class=outline-text-3><p><code>defen</code> 是一个宏，是 <code>define function</code> 的缩写。</p><p>一个函数包含5个部分。</p><ol><li><p>函数名</p></li><li><p>参数列表，没有参数的话使用空列表 <code>()</code></p></li><li><p>文档描述，可选部分</p></li><li><p><code>interactive</code> 部分，可选</p></li><li><p>函数体，描述函数具体执行的功能</p></li></ol><p>上面提到的函数组成可以用如下模板表示。</p><pre class=example>
 (defun function-name (arguments…)
   &#34;optional-documentation…&#34;
   (interactive argument-passing-info)     ; optional
   body…)
-</pre><p>如下是个完整的函数示例，第一部分是函数定义，第二部分是函数调用，分别在两部分的末尾执行
-<kbd>C-x C-e </kbd>，即可在屏幕下方看到函数执行结果。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</pre><p>如下是个完整的函数示例，第一部分是函数定义，第二部分是函数调用，分别在函数定义及函数调用的末尾执行<kbd> C-x C-e </kbd>，即可在屏幕下方看到函数执行结果。在函数定义末尾执行 <kbd>C-x C-e </kbd>相当将函数 <code>install</code> 到了 <code>Emacs</code> ，可代后续使用。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
 </span><span class=lnt>4
@@ -25,7 +23,58 @@
     <span class=s>&#34;Multiply NUMBER by seven.&#34;</span>
     <span class=p>(</span><span class=nf>*</span> <span class=mi>7</span> <span class=nc>number</span><span class=p>))</span>
 
-  <span class=p>(</span><span class=nv>multiply-by-seven</span> <span class=mi>5</span><span class=p>)</span></code></pre></td></tr></table></div></div></div></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+  <span class=p>(</span><span class=nv>multiply-by-seven</span> <span class=mi>5</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><p>注意，虽然定义函数时，参数需要在括号中，但是在调用的时候参数不需要括号。</p></div></div><div id=outline-container-headline-3 class=outline-3><h3 id=headline-3>注释</h3><div id=outline-text-headline-3 class=outline-text-3><p>注释以 <code>;</code> 开始，和其它编程语言一样，注释主要是给人看的，以提升代码的可读性，执行时会被解释器忽略。</p><p>如下示例中 <code>;</code> 开始到行尾的内容都是注释。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>multiply-by-seven</span> <span class=p>(</span><span class=nc>number</span><span class=p>)</span>       <span class=c1>; Second version.</span>
+  <span class=s>&#34;Multiply NUMBER by seven.&#34;</span>
+  <span class=p>(</span><span class=nf>+</span> <span class=nc>number</span> <span class=nc>number</span> <span class=nc>number</span> <span class=nc>number</span> <span class=nc>number</span> <span class=nc>number</span> <span class=nc>number</span><span class=p>))</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-4 class=outline-3><h3 id=headline-4>interactive</h3><div id=outline-text-headline-4 class=outline-text-3><p>用户可以通过 <kbd>M-x</kbd> 输入函数名来调用 <code>interactive</code> 函数，或者通过绑定快捷键调用，比如 <kbd>C-n</kbd> 调用 <code>next-line</code> 或 <kbd>C-x C-h</kbd> 调用 <code>mark-whole-buffer</code> 等。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=nb>defun</span> <span class=nv>multiply-by-seven</span> <span class=p>(</span><span class=nc>number</span><span class=p>)</span>       <span class=c1>; Interactive version.</span>
+  <span class=s>&#34;Multiply NUMBER by seven.&#34;</span>
+  <span class=p>(</span><span class=nv>interactive</span> <span class=s>&#34;p&#34;</span><span class=p>)</span>
+  <span class=p>(</span><span class=nv>message</span> <span class=s>&#34;The result is %d&#34;</span> <span class=p>(</span><span class=nf>*</span> <span class=mi>7</span> <span class=nc>number</span><span class=p>)))</span>
+
+
+  <span class=p>(</span><span class=nv>multiply-by-seven</span> <span class=mi>5</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><p>可以看到上面的函数定义增加了 <code>(interactive "p")</code> 表达式，其中的 <code>"p"</code> 称为 <code>prefix argument</code> ，在这里表示输入一个数字。可接受的 <code>prefix argument</code> 如下。</p><ul><li><p><a href=https://www.gnu.org/software/emacs/manual/html_node/elisp/Interactive-Codes.html#Interactive-Codes>https://www.gnu.org/software/emacs/manual/html_node/elisp/Interactive-Codes.html#Interactive-Codes</a></p></li></ul><pre class=example>
+Code letters available are:
+a -- Function name: symbol with a function definition.
+b -- Name of existing buffer.
+B -- Name of buffer, possibly nonexistent.
+c -- Character (no input method is used).
+C -- Command name: symbol with interactive function definition.
+d -- Value of point as number.  Does not do I/O.
+D -- Directory name.
+e -- Parameterized event (i.e., one that’s a list) that invoked this command.
+     If used more than once, the Nth ‘e’ returns the Nth parameterized event.
+     This skips events that are integers or symbols.
+f -- Existing file name.
+F -- Possibly nonexistent file name.
+G -- Possibly nonexistent file name, defaulting to just directory name.
+i -- Ignored, i.e. always nil.  Does not do I/O.
+k -- Key sequence (downcase the last event if needed to get a definition).
+K -- Key sequence to be redefined (do not downcase the last event).
+m -- Value of mark as number.  Does not do I/O.
+M -- Any string.  Inherits the current input method.
+n -- Number read using minibuffer.
+N -- Numeric prefix arg, or if none, do like code ‘n’.
+p -- Prefix arg converted to number.  Does not do I/O.
+P -- Prefix arg in raw form.  Does not do I/O.
+r -- Region: point and mark as 2 numeric args, smallest first.  Does no I/O.
+s -- Any string.  Does not inherit the current input method.
+S -- Any symbol.
+U -- Mouse up event discarded by a previous k or K argument.
+v -- Variable name: symbol that is ‘custom-variable-p’.
+x -- Lisp expression read but not evaluated.
+X -- Lisp expression read and evaluated.
+z -- Coding system.
+Z -- Coding system, nil if no prefix arg.
+</pre></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
 <span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
 <span class=item-content>2021-02-08</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/emacs/>emacs,</a>
 <a href=/tags/lisp/>lisp</a></div><nav class=post-nav><a class=next href=/post/2021/02/install-fish-shell-on-mac/><span class="next-text nav-default">Mac上使用fish shell及OMF</span>
