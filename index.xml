@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>南寨小子</title><link>https://kangxiaoning.github.io/</link><description>Recent content on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 10 Feb 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Programming Rust 2nd Edition-读书笔记一</title><link>https://kangxiaoning.github.io/post/2021/02/programming-rust-2nd-edition-notes-01/</link><pubDate>Wed, 10 Feb 2021 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2021/02/programming-rust-2nd-edition-notes-01/</guid><description>&lt;p>
 Programming Rust 2nd Edition 读书笔记。&lt;/p>
 &lt;p>
-&lt;code>Rust&lt;/code> 是类型安全（type-safe）的语言，那么类型安全具体是什么意思？&lt;/p></description></item><item><title>学习Emacs Lisp第三篇</title><link>https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-3/</link><pubDate>Mon, 08 Feb 2021 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-3/</guid><description>&lt;p>
+&lt;code>Rust&lt;/code> 是类型安全（type-safe）的语言，那么类型安全具体是什么意思？ &lt;code>Rust&lt;/code> 中有哪些类型可供使用？本篇做个大概的介绍。&lt;/p></description></item><item><title>学习Emacs Lisp第三篇</title><link>https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-3/</link><pubDate>Mon, 08 Feb 2021 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-3/</guid><description>&lt;p>
 理解了基础概念、变量使用等内容，接下来学习如何编写函数。&lt;/p>
 &lt;p>
 前面了解到当 &lt;code>Lisp&lt;/code> 解释执行一个 &lt;code>List&lt;/code> 时，首先看第一个 &lt;code>symbol&lt;/code> 是否绑定了函数定义，或者说是否指向了一个函数定义。
