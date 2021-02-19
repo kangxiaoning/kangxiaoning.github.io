@@ -1,27 +1,4 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>学习Emacs Lisp第二篇 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="上一篇我们介绍了一些基本概念，了解了 Lisp interpreter 执行 lisp 的3种情况，错误信息是怎么抛出的等， 接下来我们学习关于变量相关的内容。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-2/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="学习Emacs Lisp第二篇"><meta property="og:description" content="上一篇我们介绍了一些基本概念，了解了 Lisp interpreter 执行 lisp 的3种情况，错误信息是怎么抛出的等，
-接下来我们学习关于变量相关的内容。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-2/"><meta property="article:published_time" content="2021-02-03T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-03T00:00:00+00:00"><meta itemprop=name content="学习Emacs Lisp第二篇"><meta itemprop=description content="上一篇我们介绍了一些基本概念，了解了 Lisp interpreter 执行 lisp 的3种情况，错误信息是怎么抛出的等，
-接下来我们学习关于变量相关的内容。"><meta itemprop=datePublished content="2021-02-03T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-03T00:00:00+00:00"><meta itemprop=wordCount content="1843"><meta itemprop=keywords content="emacs,,lisp,"><meta name=twitter:card content="summary"><meta name=twitter:title content="学习Emacs Lisp第二篇"><meta name=twitter:description content="上一篇我们介绍了一些基本概念，了解了 Lisp interpreter 执行 lisp 的3种情况，错误信息是怎么抛出的等，
-接下来我们学习关于变量相关的内容。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>学习Emacs Lisp第二篇</h1><div class=post-meta><span class=post-time>2021-02-03</span><div class=post-category><a href=/categories/emacs/>emacs</a></div><span id=busuanzi_container_page_pv class=more-meta><span id=busuanzi_value_page_pv><img src=/img/spinner.svg alt=spinner.svg></span> times read</span></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>REPL</a></li><li><a href=#headline-2>变量</a><ul><li><a href=#headline-3>打印变量</a></li><li><a href=#headline-4>void variable</a></li><li><a href=#headline-5>void function</a></li></ul></li><li><a href=#headline-6>参数</a><ul><li><a href=#headline-7>参数个数</a></li><li><a href=#headline-8>参数类型</a></li><li><a href=#headline-9>变量或列表作为参数</a></li><li><a href=#headline-10>message function</a></li><li><a href=#headline-11>prefix</a></li></ul></li><li><a href=#headline-12>绑定变量</a><ul><li><a href=#headline-13>set</a></li><li><a href=#headline-14>setq</a></li><li><a href=#headline-15>let</a></li></ul></li><li><a href=#headline-16>总结</a></li><li><a href=#headline-17>Footnotes</a></li></ul></nav></div></div><div class=post-content><p>上一篇我们介绍了一些基本概念，了解了 <code>Lisp interpreter</code> 执行 <code>lisp</code> 的3种情况，错误信息是怎么抛出的等，
-接下来我们学习关于变量相关的内容。</p><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>REPL</h2><div id=outline-text-headline-1 class=outline-text-2><p><code>spacemacs</code> 内置了一个 <code>REPL(Read-Eval-Print-Loop)</code> ，可以基于这个环境快速验证一些简单的代码。打开方式
-是键入<kbd> SPC SPC </kbd>，在弹出的窗口输入 <code>ielm</code> 回车。</p><p><img src=/images/emacs/ielm-buffer.png alt=/images/emacs/ielm-buffer.png title=/images/emacs/ielm-buffer.png></p></div></div><div id=outline-container-headline-2 class=outline-2><h2 id=headline-2>变量</h2><div id=outline-text-headline-2 class=outline-text-2><p><code>Lisp</code> 中一个 <code>symbol</code> 既可以关联一个值，也可以关联一个函数定义。如果关联的是一个值，则叫变量，变量值可以
-是 <code>symbol, number, list, string</code> 。</p><p>在 <code>Lisp</code> 中变量和函数定义属于不同的命令空间，因此一个 <code>symbol</code> 可以同时关联值和函数定义。</p><div id=outline-container-headline-3 class=outline-3><h3 id=headline-3>打印变量</h3><div id=outline-text-headline-3 class=outline-text-3><p>在 <code>REPL</code> 中输入变量名回车即可打印变量，比如 <code>Emacs</code> 的 <code>fill-column</code> 变量在我这里是80。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=nv>fill-column</span>
-<span class=mi>80</span> <span class=p>(</span><span class=mo>#o120</span><span class=o>,</span> <span class=mh>#x50</span><span class=o>,</span> <span class=nv>?P</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-4 class=outline-3><h3 id=headline-4>void variable</h3><div id=outline-text-headline-4 class=outline-text-3><p>如果一个执行一个没有绑定变量的 <code>symbol</code> ，则会报 <code>void symbol</code> 错误。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=nf>+</span>
-<span class=vg>***</span> <span class=nv>Eval</span> <span class=kt>error</span> <span class=vg>***</span>  <span class=nv>Symbol</span><span class=err>’</span><span class=nv>s</span> <span class=nv>value</span> <span class=nv>as</span> <span class=nv>variable</span> <span class=nv>is</span> <span class=nv>void:</span> <span class=nf>+</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-5 class=outline-3><h3 id=headline-5>void function</h3><div id=outline-text-headline-5 class=outline-text-3><p>如果一个 <code>symbol</code> 是列表中的第一个元素或者仅有的一个元素， <code>Lisp interpreter</code> 将把当作函数并尝试
-去找函数定义，此时如果找不到，则会报 <code>void function</code> 错误。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nv>fill-column</span><span class=p>)</span>
-<span class=vg>***</span> <span class=nv>Eval</span> <span class=kt>error</span> <span class=vg>***</span>  <span class=nv>Symbol</span><span class=err>’</span><span class=nv>s</span> <span class=nc>function</span> <span class=nv>definition</span> <span class=nv>is</span> <span class=nv>void:</span> <span class=nv>fill-column</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div></div></div><div id=outline-container-headline-6 class=outline-2><h2 id=headline-6>参数</h2><div id=outline-text-headline-6 class=outline-text-2><p>在 <code>Lisp</code> 中，函数也是 <code>symbol</code> ，因此下面的 <code>+</code> 实际指向了一个函数定义，函数的参数即为 <code>+</code> 后面的数字。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=nf>+</span> <span class=mi>2</span> <span class=mi>2</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><div id=outline-container-headline-7 class=outline-3><h3 id=headline-7>参数个数</h3><div id=outline-text-headline-7 class=outline-text-3><p>和其它编程语言一样，不同的函数需要的参数数量不一样，也有不需要函数的函数，参数数量和类型取决于函数功能。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>学习Emacs Lisp系列二之elisp编程类型 - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content="和学习其它编辑语言一样，基本类型和数据结构一般是需要先掌握的，因此本篇我们了解下Emacs Lisp两大类型之一的编程类型(Programming Types)，另外一大类是Emacs特有的，称为是编辑类型(Editing Types)，下一篇介绍。"><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.80.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-2/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="学习Emacs Lisp系列二之elisp编程类型"><meta property="og:description" content="和学习其它编辑语言一样，基本类型和数据结构一般是需要先掌握的，因此本篇我们了解下Emacs Lisp两大类型之一的编程类型(Programming Types)，另外一大类是Emacs特有的，称为是编辑类型(Editing Types)，下一篇介绍。"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-2/"><meta property="article:published_time" content="2021-02-03T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-19T00:00:00+00:00"><meta itemprop=name content="学习Emacs Lisp系列二之elisp编程类型"><meta itemprop=description content="和学习其它编辑语言一样，基本类型和数据结构一般是需要先掌握的，因此本篇我们了解下Emacs Lisp两大类型之一的编程类型(Programming Types)，另外一大类是Emacs特有的，称为是编辑类型(Editing Types)，下一篇介绍。"><meta itemprop=datePublished content="2021-02-03T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-19T00:00:00+00:00"><meta itemprop=wordCount content="1769"><meta itemprop=keywords content="emacs,,lisp,,elisp,"><meta name=twitter:card content="summary"><meta name=twitter:title content="学习Emacs Lisp系列二之elisp编程类型"><meta name=twitter:description content="和学习其它编辑语言一样，基本类型和数据结构一般是需要先掌握的，因此本篇我们了解下Emacs Lisp两大类型之一的编程类型(Programming Types)，另外一大类是Emacs特有的，称为是编辑类型(Editing Types)，下一篇介绍。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>学习Emacs Lisp系列二之elisp编程类型</h1><div class=post-meta><span class=post-time>2021-02-03</span><div class=post-category><a href=/categories/emacs/>emacs</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>Emacs Types</a></li><li><a href=#headline-2>Programming Types</a><ul><li><a href=#headline-3>Character</a></li><li><a href=#headline-4>Sequences</a></li><li><a href=#headline-5>Cons Cell</a></li><li><a href=#headline-6>List</a><ul><li><a href=#headline-7>根据cons创建list</a></li><li><a href=#headline-8>Whitespace in Lists</a></li></ul></li><li><a href=#headline-9>String</a></li><li><a href=#headline-10>Vector</a></li><li><a href=#headline-11>Predicates</a></li></ul></li></ul></nav></div></div><div class=post-content><p>和学习其它编辑语言一样，基本类型和数据结构一般是需要先掌握的，因此本篇我们了解下Emacs Lisp两大类型之一的编程类型(Programming Types)，另外一大类是Emacs特有的，称为是编辑类型(Editing Types)，下一篇介绍。</p><p>该系列其它文章请参考如下。</p><ul><li><p><a href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-1/>Emacs Lisp运行过程</a></p></li><li><p><a href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-2/>Emacs Lisp编程类型</a></p></li><li><p>Emacs Lisp编辑类型</p></li><li><p><a href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-4/>Emacs Lisp变量定义</a></p></li><li><p><a href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-5/>Emacs Lisp条件语句</a></p></li><li><p>Emacs Lisp循环语句</p></li><li><p><a href=https://kangxiaoning.github.io/post/2021/02/learn-emacs-lisp-part-7/>Emacs Lisp函数定义</a></p></li><li><p>Emacs Lisp开源包分析</p></li></ul><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>Emacs Types</h2><div id=outline-text-headline-1 class=outline-text-2><p>Emacs Lisp中任何 <code>value</code> 或者 <code>object</code> 都有一个类型，也有其文本表示形式，有的是可以阅读的，有的是不可阅读的。Emacs Lisp的类型有两大类，一类是用于Lisp编程，一类是Emacs编辑相关的，后者是Emacs Lisp特有的类型。</p></div></div><div id=outline-container-headline-2 class=outline-2><h2 id=headline-2>Programming Types</h2><div id=outline-text-headline-2 class=outline-text-2><p>如下类型是用于Lisp编程的，大部分在其它Lisp家族语言也通用，有些类型和其它编程语言基本一样，比如整数、浮点数等，就不再赘述，这里着重介绍在Emacs Lisp里有特殊性的类型。</p><p>参考 <a href=https://www.gnu.org/software/emacs/manual/html_node/elisp/Programming-Types.html#Programming-Types>https://www.gnu.org/software/emacs/manual/html_node/elisp/Programming-Types.html#Programming-Types</a></p><table><thead><tr><th>type</th><th>comment</th></tr></thead><tbody><tr><td>Integer</td><td>Numbers without fractional parts.</td></tr><tr><td>Floating-Point</td><td>Numbers with fractional parts and with a large range.</td></tr><tr><td>Character</td><td>The representation of letters, numbers and control characters.</td></tr><tr><td>Symbol</td><td>A multi-use object that refers to a function, variable, or property list, and has a unique identity.</td></tr><tr><td>Sequence</td><td>Both lists and arrays are classified as sequences.</td></tr><tr><td>Cons Cell</td><td>Cons cells, and lists (which are made from cons cells).</td></tr><tr><td>Array</td><td>Arrays include strings and vectors.</td></tr><tr><td>String</td><td>An (efficient) array of characters.</td></tr><tr><td>Vector</td><td>One-dimensional arrays.</td></tr><tr><td>Char-Table</td><td>One-dimensional sparse arrays indexed by characters.</td></tr><tr><td>Bool-Vector</td><td>One-dimensional arrays of t or nil.</td></tr><tr><td>Hash Table</td><td>Super-fast lookup tables.</td></tr><tr><td>Function</td><td>A piece of executable code you can call from elsewhere.</td></tr><tr><td>Macro</td><td>A method of expanding an expression into another expression, more fundamental but less pretty.</td></tr><tr><td>Primitive Function</td><td>A function written in C, callable from Lisp.</td></tr><tr><td>Byte-Code</td><td>A function written in Lisp, then compiled.</td></tr><tr><td>Record</td><td>Compound objects with programmer-defined types.</td></tr><tr><td>Type Descriptors</td><td>Objects holding information about types.</td></tr><tr><td>Autoload</td><td>A type used for automatically loading seldom-used functions.</td></tr><tr><td>Finalizer</td><td>Runs code when no longer reachable.</td></tr></tbody></table><div id=outline-container-headline-3 class=outline-3><h3 id=headline-3>Character</h3><div id=outline-text-headline-3 class=outline-text-3><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
 </span><span class=lnt> 4
@@ -33,90 +10,215 @@
 </span><span class=lnt>10
 </span><span class=lnt>11
 </span><span class=lnt>12
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>*</span> <span class=mi>3</span> <span class=mi>4</span> <span class=mi>5</span><span class=p>)</span>
-<span class=mi>60</span> <span class=p>(</span><span class=mo>#o74</span><span class=o>,</span> <span class=mh>#x3c</span><span class=o>,</span> <span class=nv>?&lt;</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span> 
-<span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>*</span><span class=p>)</span>
-<span class=mi>1</span> <span class=p>(</span><span class=mo>#o1</span><span class=o>,</span> <span class=mh>#x1</span><span class=o>,</span> <span class=nv>?\C-a</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>+</span><span class=p>)</span>
-<span class=mi>0</span> <span class=p>(</span><span class=mo>#o0</span><span class=o>,</span> <span class=mh>#x0</span><span class=o>,</span> <span class=nv>?\C-@</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>-</span><span class=p>)</span>
-<span class=mi>0</span> <span class=p>(</span><span class=mo>#o0</span><span class=o>,</span> <span class=mh>#x0</span><span class=o>,</span> <span class=nv>?\C-@</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>/</span><span class=p>)</span>
-<span class=vg>***</span> <span class=nv>Eval</span> <span class=kt>error</span> <span class=vg>***</span>  <span class=nv>Wrong</span> <span class=nc>number</span> <span class=nv>of</span> <span class=nv>arguments:</span> <span class=nv>/,</span> <span class=mi>0</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-8 class=outline-3><h3 id=headline-8>参数类型</h3><div id=outline-text-headline-8 class=outline-text-3><p>参数类型使用错误会报错。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>+</span> <span class=mi>2</span> <span class=ss>&#39;hello</span><span class=p>)</span>
-<span class=vg>***</span> <span class=nv>Eval</span> <span class=kt>error</span> <span class=vg>***</span>  <span class=nv>Wrong</span> <span class=k>type</span> <span class=nv>argument:</span> <span class=nv>number-or-marker-p,</span> <span class=nv>hello</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-9 class=outline-3><h3 id=headline-9>变量或列表作为参数</h3><div id=outline-text-headline-9 class=outline-text-3><p>参数可以是 <code>symbol</code> 或者 <code>list</code> ， <code>list</code> 会被计算并返回一个值作为参数。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
-</span><span class=lnt>5
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nf>+</span> <span class=mi>2</span> <span class=nv>fill-column</span><span class=p>)</span>
-<span class=mi>82</span> <span class=p>(</span><span class=mo>#o122</span><span class=o>,</span> <span class=mh>#x52</span><span class=o>,</span> <span class=nv>?R</span><span class=p>)</span>
-<span class=nv>ELISP&gt;</span> <span class=p>(</span><span class=nv>concat</span> <span class=s>&#34;The &#34;</span> <span class=p>(</span><span class=nv>number-to-string</span> <span class=p>(</span><span class=nf>+</span> <span class=mi>2</span> <span class=nv>fill-column</span><span class=p>))</span> <span class=s>&#34; red foxes.&#34;</span><span class=p>)</span>
-<span class=s>&#34;The 82 red foxes.&#34;</span>
-<span class=nv>ELISP&gt;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-10 class=outline-3><h3 id=headline-10>message function</h3><div id=outline-text-headline-10 class=outline-text-3><p><code>message</code> 函数可以接受多个参数，功能是将参数输出到 <code>echo area</code> 同时也写入到 <code>Message</code> bufffer中。</p><p><img src=/images/emacs/message-to-echo-area.png alt=/images/emacs/message-to-echo-area.png title=/images/emacs/message-to-echo-area.png></p><p><img src=/images/emacs/message-to-buffer.png alt=/images/emacs/message-to-buffer.png title=/images/emacs/message-to-buffer.png></p></div></div><div id=outline-container-headline-11 class=outline-3><h3 id=headline-11>prefix</h3><div id=outline-text-headline-11 class=outline-text-3><p><code>Lisp</code> 采用的是 <code>prefix</code> 表达式，因此操作符在参数前面，关于表达式的三种写法可以参考如下，虽然写法不同，但效果
-是一样的。</p><blockquote><p>Infix, Postfix and Prefix notations are three different but equivalent ways of writing expressions.
-It is easiest to demonstrate the differences by looking at examples of operators that take two operands<sup class=footnote-reference><a id=footnote-reference-1 href=#footnote-1>1</a></sup>.</p><ul><li><p>Infix notation: X + Y</p></li><li><p>Postfix notation (also known as "Reverse Polish notation"): X Y +</p></li><li><p>Prefix notation (also known as "Polish notation"): + X Y</p></li></ul></blockquote></div></div></div></div><div id=outline-container-headline-12 class=outline-2><h2 id=headline-12>绑定变量</h2><div id=outline-text-headline-12 class=outline-text-2><p>绑定定量有如下几种方式，下面介绍下 <code>set</code> 和 <code>setq</code> 的用法。</p><ol><li><p><code>set</code></p></li><li><p><code>setq</code></p></li><li><p><code>let</code></p></li></ol><div id=outline-container-headline-13 class=outline-3><h3 id=headline-13>set</h3><div id=outline-text-headline-13 class=outline-text-3><p>上一篇提到了单引号的作用，如果 <code>symbol</code> 前面不带单引号，则解释器会将其看作一个命令去执行，执行完成后再执行 <code>set</code> 。</p><p>这里可以看到 <code>set</code> 也是一个 <code>list</code> ，第一个元素 set 没有带单引号，因此会被解释器执行，后面两个元素带了单引号，所以
-会以字面文本来处理，效果就是把第三个元素作为value绑定给第二个元素。</p><ul><li><p>正确写法</p></li></ul><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nf>set</span> <span class=ss>&#39;flowers</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>rose</span> <span class=nv>violet</span> <span class=nv>daisy</span> <span class=nv>buttercup</span><span class=p>))</span></code></pre></td></tr></table></div></div></div><ul><li><p>错误写法</p><p>错误原因是变量名前面没有带单引号。</p></li></ul><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nf>set</span> <span class=nv>flowers</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>rose</span> <span class=nv>violet</span> <span class=nv>daisy</span> <span class=nv>buttercup</span><span class=p>))</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-14 class=outline-3><h3 id=headline-14>setq</h3><div id=outline-text-headline-14 class=outline-text-3><p>由于 <code>set</code> 的使用需要第一个参数以单引号引用，这种场景经常出现，因此诞生了 <code>setq</code> ， <code>q</code> 在这里的意思是 <code>quote</code> ，和 <code>set</code>
-区别是会自动给第一个参数加引号，所以我们不需要自己写单引号了。还有一个便利是 <code>setq</code> 允许一次设置多个变量。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=k>setq</span> <span class=nv>carnivores</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>lion</span> <span class=nv>tiger</span> <span class=nv>leopard</span><span class=p>))</span></code></pre></td></tr></table></div></div></div><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nf>set</span> <span class=ss>&#39;carnivores</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>lion</span> <span class=nv>tiger</span> <span class=nv>leopard</span><span class=p>))</span></code></pre></td></tr></table></div></div></div><p>上面两个是等价的写法。</p><p>下面是一次设置多个变量的示例，可以在一行，也可以在多行， <code>Lisp</code> 在解释执行时会处理掉多余的空白符。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=k>setq</span> <span class=nv>trees</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>pine</span> <span class=nv>fir</span> <span class=nv>oak</span> <span class=nv>maple</span><span class=p>)</span>
-        <span class=nv>herbivores</span> <span class=o>&#39;</span><span class=p>(</span><span class=nv>gazelle</span> <span class=nv>antelope</span> <span class=nv>zebra</span><span class=p>))</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-15 class=outline-3><h3 id=headline-15>let</h3><div id=outline-text-headline-15 class=outline-text-3><blockquote><p>In computer science jargon, we would say the binding of a symbol is visible only in functions called in the let form;
-in Emacs Lisp, the default scoping is dynamic, not lexical<sup class=footnote-reference><a id=footnote-reference-2 href=#footnote-2>2</a></sup>.</p></blockquote><p><code>let</code> 创建变量的作用域在 <code>let</code> 表达式内，退出 <code>let</code> 表达式后变量自动销毁，可以理解为 <code>setq</code> 创建的临时/本地变量。 <code>Emacs Lisp</code> 默认的作用域是动态的，
-而不是 <code>lexical</code> 的。~let~ 可以一次创建多个变量并初始化，不显式初始化的变量默认为 <code>nil</code> ， <code>let</code> 的最后一个表达式的值作为 <code>let</code> 表达式的返回值。</p><p>一个 <code>let</code> 表达式的模板如下，饱含三个部分。</p><ol><li><p><code>let</code> 关键字</p></li><li><p>变量列表，比如 <code>(thread (needles 3))</code> ，其中 <code>thread</code> 未显式初始化，值为 <code>nil</code> ； <code>needles</code> 显式初始化为 3</p></li><li><p><code>let</code> 表达式 <code>body</code> ，可以包含多个 <code>list</code></p></li></ol><pre class=example>
-(let ((variable value)
-      (variable value)
-      …)
-  body…)
-</pre><p>如下示例对变量进行了初始化，因此 <code>message</code> 打印变量的值为初始化指定的值。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=k>let</span> <span class=p>((</span><span class=nv>zebra</span> <span class=s>&#34;stripes&#34;</span><span class=p>)</span>
-      <span class=p>(</span><span class=nv>tiger</span> <span class=s>&#34;fierce&#34;</span><span class=p>))</span>
-  <span class=p>(</span><span class=nv>message</span> <span class=s>&#34;One kind of animal has %s and another is %s.&#34;</span>
-           <span class=nv>zebra</span> <span class=nv>tiger</span><span class=p>))</span></code></pre></td></tr></table></div></div></div><p>如下示例未对中间2个变量进行初始化，因此 <code>message</code> 打印变量的值为 <code>nil</code> 。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=nv>?A</span>   <span class=c1>;; 65</span>
+  <span class=nv>?a</span>   <span class=c1>;; 97</span>
+
+  <span class=nv>?\n</span>  <span class=c1>;; 10</span>
+  <span class=nv>?\t</span>  <span class=c1>;; 9</span>
+
+  <span class=c1>;; Unicode</span>
+  <span class=nv>?\N{U+E0}</span>    <span class=c1>;; 224</span>
+  <span class=nv>?\u00e0</span>      <span class=c1>;; 224</span>
+  <span class=nv>?\U000000E0</span>  <span class=c1>;; 224</span>
+  <span class=nv>?\N{LATIN</span> <span class=nv>SMALL</span> <span class=nv>LETTER</span> <span class=nv>A</span> <span class=nv>WITH</span> <span class=nv>GRAVE}</span> <span class=c1>;; 224</span>
+
+  <span class=c1>;; Control and meta char syntax</span>
+  <span class=nv>?\C-c</span>        <span class=c1>;; 3</span>
+  <span class=p>(</span><span class=nv>kbd</span> <span class=s>&#34;C-c&#34;</span><span class=p>)</span>  <span class=c1>;; &#34;^C&#34;</span>
+  <span class=nv>?\M-x</span>        <span class=c1>;; 134217848</span>
+  <span class=p>(</span><span class=nv>kbd</span> <span class=s>&#34;M-x&#34;</span><span class=p>)</span>  <span class=c1>;; [134217848]</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-4 class=outline-3><h3 id=headline-4>Sequences</h3><div id=outline-text-headline-4 class=outline-text-3><p>如下类型在Emacs Lisp里都属于sequence。</p><ul><li><p>list</p></li><li><p>array</p></li><li><p>string</p></li><li><p>vector</p></li></ul><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nv>sequencep</span> <span class=s>&#34;Sequence?&#34;</span><span class=p>)</span>     <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=s>&#34;&#34;</span><span class=p>)</span>              <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>))</span>        <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=o>&#39;</span><span class=p>())</span>             <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>[1</span> <span class=mi>2</span> <span class=nv>3]</span><span class=p>)</span>         <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>[]</span><span class=p>)</span>              <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=mi>22</span><span class=p>)</span>              <span class=c1>;; nil</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>?A</span><span class=p>)</span>              <span class=c1>;; nil</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=no>nil</span><span class=p>)</span> <span class=c1>;; t</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-5 class=outline-3><h3 id=headline-5>Cons Cell</h3><div id=outline-text-headline-5 class=outline-text-3><ul><li><p><strong>cons cell</strong> 由两个 <strong>slots</strong> 组成，每个 <strong>slot</strong> 都可以保存任何Lisp对象，分别称为 <code>CAR</code> 和 <code>CDR</code></p></li><li><p>List就是由多个 <strong>cons cell</strong> 连接起来构建出来的，可以理解为 <strong>linked list</strong></p></li><li><p>通过 <code>car</code> 和 <code>cdr</code> 访问 cons cell</p><ul><li><p><code>car</code> 访问 cons cell 的第一个元素</p></li><li><p><code>cdr</code> 访问 cons cell 的第二个元素</p></li></ul></li></ul><blockquote><p>The names CAR and CDR derive from the history of Lisp. The original Lisp implementation ran on an IBM 704 computer which divided words into two parts, the address and the decrement; CAR was an instruction to extract the contents of the address part of a register, and CDR an instruction to extract the contents of the decrement. By contrast, cons cells are named for the function cons that creates them, which in turn was named for its purpose, the construction of cells.</p></blockquote><p>如下是一个由3个元素组成的list <code>(rose violet buttercup)</code> 的图示，写法等价于 <code>(rose . (violet . (buttercup)))</code> 。</p><pre class=example>
+   +--- ---+    +--- ---+    +--- ---+
+   |   |   |--&gt; |   |   |--&gt; |   |   |--&gt; nil
+   +--- ---+    +--- ---+    +--- ---+
+     |            |            |
+     |            |            |
+      --&gt; rose     --&gt; violet   --&gt; buttercup
+</pre><p>下图是相同list的另一种图示。</p><pre class=example>
++---------------+     +----------------+     +-------------------+
+| car   | cdr   |     | car    | cdr   |     | car       | cdr   |
+| rose  |   o--------&gt;| violet |   o--------&gt;| buttercup |  nil  |
+|       |       |     |        |       |     |           |       |
++---------------+     +----------------+     +-------------------+
+</pre></div></div><div id=outline-container-headline-6 class=outline-3><h3 id=headline-6>List</h3><div id=outline-text-headline-6 class=outline-text-3><p>在 <code>Lisp</code> 中，数据和程序的表现方式相同，也就是说他们都是 <code>words</code> 、 <code>numbers</code> 组成的 <code>List</code> ，或 <code>List</code> 组成的 <code>List</code> ，由空白符分隔，括号包围。
+也正是这个特性，一个程序可以很容易作为另一个程序的数据，是 <code>Lisp</code> 中非常强大的一个特性。</p><blockquote><p>The single apostrophe, ', that I put in front of some of the example lists in preceding sections is called a quote;
+when it precedes a list, it tells Lisp to do nothing with the list, other than take it as it is written.
+But if there is no quote preceding a list, the first item of the list is special: it is a command for the computer to obey<sup class=footnote-reference><a id=footnote-reference-1 href=#footnote-1>1</a></sup>.</p></blockquote><p><code>List</code> 看起来像下面这样，注意前面有个单引号，表示按普通文本对待，没有单引号表示第一个元素是个命令。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=o>&#39;</span><span class=p>(</span><span class=nv>rose</span> <span class=nv>violet</span> <span class=nv>daisy</span> <span class=nv>buttercup</span><span class=p>)</span>
+
+  <span class=o>&#39;</span><span class=p>(</span><span class=nv>rose</span>
+    <span class=nv>violet</span>
+    <span class=nv>daisy</span>
+    <span class=nv>buttercup</span><span class=p>)</span>
+
+  <span class=o>&#39;</span><span class=p>(</span><span class=nv>this</span> <span class=nc>list</span> <span class=nv>has</span> <span class=p>(</span><span class=nv>a</span> <span class=nc>list</span> <span class=nv>inside</span> <span class=nv>of</span> <span class=nv>it</span><span class=p>))</span>
+
+  <span class=p>(</span><span class=nf>+</span> <span class=mi>2</span> <span class=mi>2</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><div id=outline-container-headline-7 class=outline-6><h6 id=headline-7>根据cons创建list</h6><div id=outline-text-headline-7 class=outline-text-6><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
 </span><span class=lnt>4
 </span><span class=lnt>5
 </span><span class=lnt>6
 </span><span class=lnt>7
-</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp><span class=p>(</span><span class=k>let</span> <span class=p>((</span><span class=nv>birch</span> <span class=mi>3</span><span class=p>)</span>
-      <span class=nv>pine</span>
-      <span class=nv>fir</span>
-      <span class=p>(</span><span class=nv>oak</span> <span class=ss>&#39;some</span><span class=p>))</span>
-  <span class=p>(</span><span class=nv>message</span>
-   <span class=s>&#34;Here are %d variables with %s, %s, and %s value.&#34;</span>
-   <span class=nv>birch</span> <span class=nv>pine</span> <span class=nv>fir</span> <span class=nv>oak</span><span class=p>))</span></code></pre></td></tr></table></div></div></div></div></div></div></div><div id=outline-container-headline-16 class=outline-2><h2 id=headline-16>总结</h2><div id=outline-text-headline-16 class=outline-text-2><p>这两篇学习了一些 <code>lisp</code> 基础知识，如果将学习 <code>lisp</code> 比作爬山，第一部分是最陡峭的，我们已经爬过了最困难
-的部分，接下来会相对容易些，下面对前面所学做个总结。</p><blockquote><ul><li><p>Lisp programs are made up of expressions, which are lists or single atoms.</p></li><li><p>Lists are made up of zero or more atoms or inner lists, separated by whitespace
-and surrounded by parentheses. A list can be empty.</p></li><li><p>Atoms are multi-character symbols, like forward-paragraph, single character symbols
-like +, strings of characters between double quotation marks, or numbers.</p></li><li><p>A number evaluates to itself.</p></li><li><p>A string between double quotes also evaluates to itself.</p></li><li><p>When you evaluate a symbol by itself, its value is returned.</p></li><li><p>When you evaluate a list, the Lisp interpreter looks at the first symbol in the list
-and then at the function definition bound to that symbol. Then the instructions in the function definition are carried out.</p></li><li><p>A single-quote ‘'’ tells the Lisp interpreter that it should return the following
-expression as written, and not evaluate it as it would if the quote were not there.</p></li><li><p>Arguments are the information passed to a function. The arguments to a function are
-computed by evaluating the rest of the elements of the list of which the function is
-the first element.</p></li><li><p>A function always returns a value when it is evaluated (unless it gets an error);
-in addition, it may also carry out some action that is a side effect. In many cases,
-a function’s primary purpose is to create a side effect<sup class=footnote-reference><a id=footnote-reference-3 href=#footnote-3>3</a></sup>.</p></li></ul></blockquote></div></div><div id=outline-container-headline-17 class=outline-2><h2 id=headline-17>Footnotes</h2></div><div class=footnotes><hr class=footnotes-separatator><div class=footnote-definitions><div class=footnote-definition><sup id=footnote-1><a href=#footnote-reference-1>1</a></sup><div class=footnote-body><p><a href=http://www.cs.man.ac.uk/~pjj/cs212/fix.html>http://www.cs.man.ac.uk/~pjj/cs212/fix.html</a></p></div></div><div class=footnote-definition><sup id=footnote-2><a href=#footnote-reference-2>2</a></sup><div class=footnote-body><p><a href=https://www.gnu.org/software/emacs/manual/html_node/eintr/Prevent-confusion.html#Prevent-confusion>https://www.gnu.org/software/emacs/manual/html_node/eintr/Prevent-confusion.html#Prevent-confusion</a></p></div></div><div class=footnote-definition><sup id=footnote-3><a href=#footnote-reference-3>3</a></sup><div class=footnote-body><p><a href=https://www.gnu.org/software/emacs/manual/html_node/eintr/Summary.html#Summary>https://www.gnu.org/software/emacs/manual/html_node/eintr/Summary.html#Summary</a></p></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>2</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>3</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>4</span> <span class=no>nil</span><span class=p>))))</span>
+  <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>2</span> <span class=mi>3</span> <span class=mi>4</span><span class=p>))</span>
+
+  <span class=p>(</span><span class=nc>cons</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>)</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>4</span> <span class=mi>5</span> <span class=mi>6</span><span class=p>))</span>
+
+  <span class=p>(</span><span class=nf>append</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>)</span> <span class=mi>4</span><span class=p>)</span>
+  <span class=p>(</span><span class=nf>append</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>)</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>4</span><span class=p>))</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-8 class=outline-6><h6 id=headline-8>Whitespace in Lists</h6><div id=outline-text-headline-8 class=outline-text-6><p><code>List</code> 中空白符的数量不重要，多余的空白符主要用来提升代码可读性， <code>Lisp</code> 在解释这些表达式时会删除多余的空白符<sup class=footnote-reference><a id=footnote-reference-2 href=#footnote-2>2</a></sup>。</p><p>如下两个 <code>List</code> 在 <code>Lisp</code> 是相同的。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=o>&#39;</span><span class=p>(</span><span class=nv>this</span> <span class=nc>list</span>
+         <span class=nv>looks</span> <span class=nv>like</span> <span class=nv>this</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=o>&#39;</span><span class=p>(</span><span class=nv>this</span> <span class=nc>list</span> <span class=nv>looks</span> <span class=nv>like</span> <span class=nv>this</span><span class=p>)</span></code></pre></td></tr></table></div></div></div><blockquote><p>In brief, a list is between parentheses, a string is between quotation marks, a symbol looks like a word, and a number looks like a number.<sup class=footnote-reference><a id=footnote-reference-2 href=#footnote-2>2</a></sup></p></blockquote></div></div></div></div><div id=outline-container-headline-9 class=outline-3><h3 id=headline-9>String</h3><div id=outline-text-headline-9 class=outline-text-3><p>A string is an array of characters.</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=s>&#34;Hello!&#34;</span>
+
+  <span class=s>&#34;Hello \
+</span><span class=s>   System Crafters!&#34;</span>
+
+  <span class=s>&#34;Hello \\ System Crafters!&#34;</span>
+
+  <span class=p>(</span><span class=nf>make-string</span> <span class=mi>5</span> <span class=nv>?!</span><span class=p>)</span>            <span class=c1>;; !!!!!</span>
+  <span class=p>(</span><span class=nc>string</span> <span class=nv>?H</span> <span class=nv>?e</span> <span class=nv>?l</span> <span class=nv>?l</span> <span class=nv>?o</span> <span class=nv>?!</span><span class=p>)</span>    <span class=c1>;; &#34;Hello!&#34;</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-10 class=outline-3><h3 id=headline-10>Vector</h3><div id=outline-text-headline-10 class=outline-text-3><p>A vector is a one-dimensional array of elements of any type.</p><ul><li><p>访问vector里的元素是O(1)的时间复杂度</p></li><li><p>访问list里的元素是O(n)的时间复杂度，因为list是基于cons cell构建的linked list</p></li></ul><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=nv>[1</span> <span class=s>&#34;two&#34;</span> <span class=p>(</span><span class=nv>three</span><span class=p>)</span><span class=nv>]</span>      <span class=c1>; A vector of three elements.</span>
+       <span class=err>⇒</span> <span class=nv>[1</span> <span class=s>&#34;two&#34;</span> <span class=p>(</span><span class=nv>three</span><span class=p>)</span><span class=nv>]</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-11 class=outline-3><h3 id=headline-11>Predicates</h3><div id=outline-text-headline-11 class=outline-text-3><p>断言给定输入是否是对应的类型，返回 t 或 nil 。</p><div class="src src-lisp"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-lisp data-lang=lisp>  <span class=p>(</span><span class=nv>sequencep</span> <span class=s>&#34;Sequence?&#34;</span><span class=p>)</span>     <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=s>&#34;&#34;</span><span class=p>)</span>              <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>))</span>        <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=o>&#39;</span><span class=p>())</span>             <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>[1</span> <span class=mi>2</span> <span class=nv>3]</span><span class=p>)</span>         <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>[]</span><span class=p>)</span>              <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=mi>22</span><span class=p>)</span>              <span class=c1>;; nil</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=nv>?A</span><span class=p>)</span>              <span class=c1>;; nil</span>
+
+  <span class=c1>;; What do you expect?</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=no>nil</span><span class=p>)</span>
+
+  <span class=p>(</span><span class=nf>stringp</span> <span class=s>&#34;Test!&#34;</span><span class=p>)</span>           <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nf>stringp</span> <span class=mi>1</span><span class=p>)</span>                 <span class=c1>;; nil</span>
+  <span class=p>(</span><span class=nf>stringp</span> <span class=no>nil</span><span class=p>)</span>               <span class=c1>;; nil</span>
+
+  <span class=p>(</span><span class=nv>string-or-null-p</span> <span class=s>&#34;Test&#34;</span><span class=p>)</span>   <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>string-or-null-p</span> <span class=no>nil</span><span class=p>)</span>      <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nv>char-or-string-p</span> <span class=nv>?A</span><span class=p>)</span>       <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>char-or-string-p</span> <span class=mi>65</span><span class=p>)</span>       <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>char-or-string-p</span> <span class=s>&#34;A&#34;</span><span class=p>)</span>      <span class=c1>;; t</span>
+
+  <span class=p>(</span><span class=nf>arrayp</span> <span class=s>&#34;Array?&#34;</span><span class=p>)</span>           <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nv>sequencep</span> <span class=s>&#34;Sequence?&#34;</span><span class=p>)</span>     <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nf>listp</span> <span class=s>&#34;List?&#34;</span><span class=p>)</span>             <span class=c1>;; nil</span>
+
+  <span class=p>(</span><span class=nf>listp</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span> <span class=mi>2</span> <span class=mi>3</span><span class=p>))</span>
+  <span class=p>(</span><span class=nf>listp</span> <span class=mi>1</span><span class=p>)</span>
+
+  <span class=p>(</span><span class=nf>listp</span> <span class=no>nil</span><span class=p>)</span>       <span class=c1>;; t</span>
+  <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=no>nil</span><span class=p>)</span>
+  <span class=p>(</span><span class=nf>append</span> <span class=o>&#39;</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=no>nil</span><span class=p>)</span>
+
+  <span class=p>(</span><span class=nf>listp</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=mi>2</span><span class=p>))</span>
+  <span class=p>(</span><span class=nf>listp</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>2</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>3</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>4</span> <span class=no>nil</span><span class=p>)))))</span>
+  <span class=p>(</span><span class=nf>consp</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>1</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>2</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>3</span> <span class=p>(</span><span class=nc>cons</span> <span class=mi>4</span> <span class=no>nil</span><span class=p>)))))</span></code></pre></td></tr></table></div></div></div></div></div></div></div><div class=footnotes><hr class=footnotes-separatator><div class=footnote-definitions><div class=footnote-definition><sup id=footnote-1><a href=#footnote-reference-1>1</a></sup><div class=footnote-body><p><a href=https://www.gnu.org/software/emacs/manual/html_node/eintr/Run-a-Program.html#Run-a-Program>https://www.gnu.org/software/emacs/manual/html_node/eintr/Run-a-Program.html#Run-a-Program</a></p></div></div><div class=footnote-definition><sup id=footnote-2><a href=#footnote-reference-2>2</a></sup><div class=footnote-body><p><a href=https://www.gnu.org/software/emacs/manual/html_node/eintr/Whitespace-in-Lists.html#Whitespace-in-Lists>https://www.gnu.org/software/emacs/manual/html_node/eintr/Whitespace-in-Lists.html#Whitespace-in-Lists</a></p></div></div></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
 <span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
-<span class=item-content>2021-02-03</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/emacs/>emacs,</a>
-<a href=/tags/lisp/>lisp</a></div><nav class=post-nav><a class=prev href=/post/2021/02/install-fish-shell-on-mac/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Mac上使用fish shell及OMF</span>
+<span class=item-content>2021-02-19</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/emacs/>emacs,</a>
+<a href=/tags/lisp/>lisp,</a>
+<a href=/tags/elisp/>elisp</a></div><nav class=post-nav><a class=prev href=/post/2021/02/install-fish-shell-on-mac/><i class="iconfont icon-left"></i><span class="prev-text nav-default">Mac上使用fish shell及OMF</span>
 <span class="prev-text nav-mobile">Prev</span></a>
-<a class=next href=/post/2021/02/learn-emacs-lisp-part-1/><span class="next-text nav-default">学习Emacs Lisp第一篇</span>
+<a class=next href=/post/2021/02/learn-emacs-lisp-part-1/><span class="next-text nav-default">学习Emacs Lisp系列一之elisp运行过程</span>
 <span class="next-text nav-mobile">Next</span>
-<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2021-02-03 00:00:00 \u002b0000 UTC',title:'学习Emacs Lisp第二篇',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2021-02-03 00:00:00 \u002b0000 UTC',title:'学习Emacs Lisp系列二之elisp编程类型',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container');</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
 <span class=division>|</span>
 <span class=theme-info>Theme -
-<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span><div class=busuanzi-footer><span id=busuanzi_container_site_pv>site pv: <span id=busuanzi_value_site_pv><img src=/img/spinner.svg alt=spinner.svg></span></span>
-<span class=division>|</span>
-<span id=busuanzi_container_site_uv>site uv: <span id=busuanzi_value_site_uv><img src=/img/spinner.svg alt=spinner.svg></span></span></div><span class=copyright-year>&copy;
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
 2012 -
 2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js></script><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-190107936-1','auto');ga('set','anonymizeIp',true);ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script><script id=baidu_analytics>var _hmt=_hmt||[];(function(){if(window.location.hostname==='localhost')return;var hm=document.createElement("script");hm.async=true;hm.src="https://hm.baidu.com/hm.js?8db9f5e9a2ca980b6306c1cbe251de61";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script></body></html>
