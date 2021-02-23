@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>virtualization on 南寨小子</title><link>https://kangxiaoning.github.io/tags/virtualization/</link><description>Recent content in virtualization on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 23 Feb 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/virtualization/index.xml" rel="self" type="application/rss+xml"/><item><title>Matering KVM Virtualization-读书笔记一</title><link>https://kangxiaoning.github.io/post/2021/02/mastering-kvm-virtualization-notes-01/</link><pubDate>Tue, 23 Feb 2021 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2021/02/mastering-kvm-virtualization-notes-01/</guid><description>&lt;p>
+Matering KVM Virtualization - Second Edition读书笔记。&lt;/p>
+&lt;p>
+虚拟化技术并不是x86或Linux的新技术，早在1967年IBM CP-40和S/360-40等非x86产品已经存在虚拟化技术。 &lt;/p>
+&lt;p>
+开源市场的最大玩家，RedHat于2007年在 &lt;code>RHEL 5&lt;/code> 中引入 &lt;code>Xen&lt;/code> 虚拟化，之后由于某些原因放弃了 &lt;code>Xen&lt;/code> ，于2010年在 &lt;code>RHEL 6&lt;/code>
+中转向了 &lt;code>KVM&lt;/code> ，在此之后主要基于 &lt;code>KVM&lt;/code> 发展虚拟化技术。&lt;/p></description></item></channel></rss>
