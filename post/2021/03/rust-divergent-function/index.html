@@ -1,0 +1,114 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Rust Divergent Function - 南寨小子</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="dbo"><meta name=description content=" 一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 if else 或 match 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 continue 分支返回的是什么类型？
+1 2 3 4  letguess: u32 =matchguess.trim().parse(){Ok(num)=&amp;gt;num,Err(_)=&amp;gt;continue,};   "><meta name=keywords content="Hugo,theme,even"><meta name=generator content="Hugo 0.81.0 with theme even"><link rel=canonical href=https://kangxiaoning.github.io/post/2021/03/rust-divergent-function/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.af7fd1da18d66c2b017df5b4cae508ef44cfcac3fb4c7c7a327fe4f4f9e28b08.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Rust Divergent Function"><meta property="og:description" content="
+一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 if else 或 match 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 continue 分支返回的是什么类型？
+
+
+
+1
+2
+3
+4
+
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+
+
+"><meta property="og:type" content="article"><meta property="og:url" content="https://kangxiaoning.github.io/post/2021/03/rust-divergent-function/"><meta property="article:section" content="post"><meta property="article:published_time" content="2021-03-07T00:00:00+00:00"><meta property="article:modified_time" content="2021-03-07T00:00:00+00:00"><meta itemprop=name content="Rust Divergent Function"><meta itemprop=description content="
+一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 if else 或 match 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 continue 分支返回的是什么类型？
+
+
+
+1
+2
+3
+4
+
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+
+
+"><meta itemprop=datePublished content="2021-03-07T00:00:00+00:00"><meta itemprop=dateModified content="2021-03-07T00:00:00+00:00"><meta itemprop=wordCount content="510"><meta itemprop=keywords content="rust,,divergent,,never-type,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Rust Divergent Function"><meta name=twitter:description content="
+一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 if else 或 match 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 continue 分支返回的是什么类型？
+
+
+
+1
+2
+3
+4
+
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+
+
+"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>南寨小子</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>Home</li></a><a href=/post/><li class=mobile-menu-item>Archives</li></a><a href=/tags/><li class=mobile-menu-item>Tags</li></a><a href=/categories/><li class=mobile-menu-item>Categories</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>南寨小子</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>Home</a></li><li class=menu-item><a class=menu-item-link href=/post/>Archives</a></li><li class=menu-item><a class=menu-item-link href=/tags/>Tags</a></li><li class=menu-item><a class=menu-item-link href=/categories/>Categories</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Rust Divergent Function</h1><div class=post-meta><span class=post-time>2021-03-07</span><div class=post-category><a href=/categories/rust/>rust</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>Contents</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#headline-1>Never Type</a></li><li><a href=#headline-2>Divergent Function</a></li><li><a href=#headline-3>类型判断</a></li><li><a href=#headline-4>参考</a></li></ul></nav></div></div><div class=post-content><p>一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 <code>if else</code> 或 <code>match</code> 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 <code>continue</code> 分支返回的是什么类型？</p><div class="src src-rust"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-rust data-lang=rust><span class=w>        </span><span class=kd>let</span><span class=w> </span><span class=n>guess</span>: <span class=kt>u32</span> <span class=o>=</span><span class=w> </span><span class=k>match</span><span class=w> </span><span class=n>guess</span><span class=p>.</span><span class=n>trim</span><span class=p>().</span><span class=n>parse</span><span class=p>()</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>            </span><span class=nb>Ok</span><span class=p>(</span><span class=n>num</span><span class=p>)</span><span class=w> </span><span class=o>=&gt;</span><span class=w> </span><span class=n>num</span><span class=p>,</span><span class=w>
+</span><span class=w>            </span><span class=nb>Err</span><span class=p>(</span><span class=n>_</span><span class=p>)</span><span class=w> </span><span class=o>=&gt;</span><span class=w> </span><span class=k>continue</span><span class=p>,</span><span class=w>
+</span><span class=w>        </span><span class=p>};</span><span class=w>
+</span></code></pre></td></tr></table></div></div></div><div id=outline-container-headline-1 class=outline-2><h2 id=headline-1>Never Type</h2><div id=outline-text-headline-1 class=outline-text-2><p>Rust有一个特殊的类型名为 <code>!</code> ，在类型理论里叫作 <code>empty type</code> 或 <code>zero type</code> ，在Rust里叫 <strong>Never Type</strong> ，因为它出现的位置正好是函数返回值的位置，但是 <code>!</code> 表示的是永远不返回。</p><p>和Rust里的 <code>unit type</code> <code>()</code> 并不一样， <code>()</code> 是有一个值的，当函数不需要返回有意义的值时，可以返回 <code>()</code> 。</p></div></div><div id=outline-container-headline-2 class=outline-2><h2 id=headline-2>Divergent Function</h2><div id=outline-text-headline-2 class=outline-text-2><p>返回值为 <code>!</code> 的函数称为 <strong>Divergent Function</strong> ，表示该函数永远不返回，比如下面的<a href=https://doc.rust-lang.org/src/std/process.rs.html#1721-1724>std::process::exit</a>函数。</p><div class="src src-rust"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-rust data-lang=rust><span class=w>  </span><span class=k>pub</span><span class=w> </span><span class=k>fn</span> <span class=nf>exit</span><span class=p>(</span><span class=n>code</span>: <span class=kt>i32</span><span class=p>)</span><span class=w> </span>-&gt; <span class=o>!</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=k>crate</span>::<span class=n>sys_common</span>::<span class=n>cleanup</span><span class=p>();</span><span class=w>
+</span><span class=w>      </span><span class=k>crate</span>::<span class=n>sys</span>::<span class=n>os</span>::<span class=n>exit</span><span class=p>(</span><span class=n>code</span><span class=p>)</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-3 class=outline-2><h2 id=headline-3>类型判断</h2><div id=outline-text-headline-3 class=outline-text-2><p>回到文章最开始的问题， <code>continue</code> 返回的是什么类型呢？</p><p>正如大家想的那样， <code>continue</code> 返回的是 <code>!</code> ，其类型是 <code>never type</code> ，当Rust计算上述 <code>guess</code> 的类型时，它会检查两个分支，前一个分支为 <code>u32</code> ，第二个分支为 <code>!</code> ，因为 <code>!</code> 代表没有类型，所以Rust最终确定 <code>guess</code> 的类型是 <code>u32</code> 。</p><blockquote><p>The formal way of describing this behavior is that expressions of type ! can be coerced into any other type</p></blockquote><p><code>Never type</code> 也同样应用于 <code>panic!</code> 之上，比如下面 <code>unwrap</code> 可以从 <code>Option&lt;T></code> 中返回一个值或者panic。</p><div class="src src-rust"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-rust data-lang=rust><span class=w>  </span><span class=k>impl</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=nb>Option</span><span class=o>&lt;</span><span class=n>T</span><span class=o>&gt;</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=k>pub</span><span class=w> </span><span class=k>fn</span> <span class=nf>unwrap</span><span class=p>(</span><span class=bp>self</span><span class=p>)</span><span class=w> </span>-&gt; <span class=nc>T</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>          </span><span class=k>match</span><span class=w> </span><span class=bp>self</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>              </span><span class=nb>Some</span><span class=p>(</span><span class=n>val</span><span class=p>)</span><span class=w> </span><span class=o>=&gt;</span><span class=w> </span><span class=n>val</span><span class=p>,</span><span class=w>
+</span><span class=w>              </span><span class=nb>None</span><span class=w> </span><span class=o>=&gt;</span><span class=w> </span><span class=n>panic</span><span class=o>!</span><span class=p>(</span><span class=s>&#34;called `Option::unwrap()` on a `None` value&#34;</span><span class=p>),</span><span class=w>
+</span><span class=w>          </span><span class=p>}</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span></code></pre></td></tr></table></div></div></div><p>类似的用法也出现在 <code>break return loop</code> 等表达式。</p><div class="src src-rust"><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-rust data-lang=rust><span class=w>  </span><span class=k>fn</span> <span class=nf>serve_forever</span><span class=p>(</span><span class=n>socket</span>: <span class=nc>ServerSocket</span><span class=p>,</span><span class=w> </span><span class=n>handler</span>: <span class=nc>ServerHandler</span><span class=p>)</span><span class=w> </span>-&gt; <span class=o>!</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>      </span><span class=n>socket</span><span class=p>.</span><span class=n>listen</span><span class=p>();</span><span class=w>
+</span><span class=w>      </span><span class=k>loop</span><span class=w> </span><span class=p>{</span><span class=w>
+</span><span class=w>          </span><span class=kd>let</span><span class=w> </span><span class=n>s</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>socket</span><span class=p>.</span><span class=n>accept</span><span class=p>();</span><span class=w>
+</span><span class=w>          </span><span class=n>handler</span><span class=p>.</span><span class=n>handle</span><span class=p>(</span><span class=n>s</span><span class=p>);</span><span class=w>
+</span><span class=w>      </span><span class=p>}</span><span class=w>
+</span><span class=w>  </span><span class=p>}</span><span class=w>
+</span></code></pre></td></tr></table></div></div></div></div></div><div id=outline-container-headline-4 class=outline-2><h2 id=headline-4>参考</h2><div id=outline-text-headline-4 class=outline-text-2><ul><li><p><a href=https://en.wikipedia.org/wiki/Bottom_type>https://en.wikipedia.org/wiki/Bottom_type</a></p></li><li><p><a href=https://doc.rust-lang.org/book/ch19-04-advanced-types.html>https://doc.rust-lang.org/book/ch19-04-advanced-types.html</a></p></li></ul></div></div></div><div class=post-copyright><p class=copyright-item><span class=item-title>Author</span>
+<span class=item-content>dbo</span></p><p class=copyright-item><span class=item-title>LastMod</span>
+<span class=item-content>2021-03-07</span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/rust/>rust,</a>
+<a href=/tags/divergent/>divergent,</a>
+<a href=/tags/never-type/>never-type</a></div><nav class=post-nav><a class=next href=/post/2021/03/rust-subtyping-and-variance/><span class="next-text nav-default">Rust Subtyping and Variance</span>
+<span class="next-text nav-mobile">Next</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><div id=gitalk-container></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js crossorigin=anonymous></script><script type=text/javascript>var gitalk=new Gitalk({id:'2021-03-07 00:00:00 \u002b0000 UTC',title:'Rust Divergent Function',clientID:'70d4f3aa0365e70058f7',clientSecret:'f90c781aefe41487ab5ddf2b6475f67dc3628751',repo:'gitment-comments',owner:'kangxiaoning',admin:['kangxiaoning'],body:decodeURI(location.href)});gitalk.render('gitalk-container')</script><noscript>Please enable JavaScript to view the <a href=https://github.com/gitalk/gitalk>comments powered by gitalk.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=kxnmei@email.com class="iconfont icon-email" title=email></a><a href=http://github.com/kangxiaoning class="iconfont icon-github" title=github></a><a href=https://kangxiaoning.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a></span>
+<span class=division>|</span>
+<span class=theme-info>Theme -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2012 -
+2021<span class=heart><i class="iconfont icon-heart"></i></span><span>dbo</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/js/main.min.c99b103c33d1539acf3025e1913697534542c4a5aa5af0ccc20475ed2863603b.js></script><script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-190107936-1','auto'),ga('set','anonymizeIp',!0),ga('send','pageview'))</script><script async src=https://www.google-analytics.com/analytics.js></script><script id=baidu_analytics>var _hmt=_hmt||[];(function(){var a,b;if(window.location.hostname==='localhost')return;a=document.createElement("script"),a.async=!0,a.src="https://hm.baidu.com/hm.js?8db9f5e9a2ca980b6306c1cbe251de61",b=document.getElementsByTagName("script")[0],b.parentNode.insertBefore(a,b)})()</script></body></html>

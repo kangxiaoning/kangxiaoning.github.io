@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>divergent, on 南寨小子</title><link>https://kangxiaoning.github.io/tags/divergent/</link><description>Recent content in divergent, on 南寨小子</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 07 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://kangxiaoning.github.io/tags/divergent/index.xml" rel="self" type="application/rss+xml"/><item><title>Rust Divergent Function</title><link>https://kangxiaoning.github.io/post/2021/03/rust-divergent-function/</link><pubDate>Sun, 07 Mar 2021 00:00:00 +0000</pubDate><guid>https://kangxiaoning.github.io/post/2021/03/rust-divergent-function/</guid><description>&lt;p>
+一个函数或表达式可能会有多个分支，Rust会检查所有分支的返回类型，确保它们是一致的。比如在 &lt;code>if else&lt;/code> 或 &lt;code>match&lt;/code> 等表达式里如果两个不同分支的返回类型不一样会得到Rust编译器的错误提示。那像下面的 &lt;code>continue&lt;/code> 分支返回的是什么类型？&lt;/p>
+&lt;div class="src src-rust">
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">guess&lt;/span>: &lt;span class="kt">u32&lt;/span> &lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">match&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">guess&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">trim&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">parse&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">Ok&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">num&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">num&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">Err&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">_&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">continue&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w">
+&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>
+&lt;/div></description></item></channel></rss>
