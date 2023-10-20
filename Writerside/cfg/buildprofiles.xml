@@ -7,10 +7,6 @@
         <algolia-index>kangxiaoning.github.io</algolia-index>
         <algolia-api-key>2cd95384e04d2e20fe45bcfaacebdf26</algolia-api-key>
     </variables>
-    <build-profile instance="k">
-        <variables>
-            <noindex-content>false</noindex-content>
-        </variables>
-    </build-profile>
+    <build-profile instance="k"/>
 
 </buildprofiles>
