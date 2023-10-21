@@ -257,7 +257,7 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 
 总结一下，etcd在启动过程中，会初始化`mvcc`模块，它是一个实现了Watch特性的KV存储，注册`WatchServer`服务并启动了gRPC Server，至此就可以接收watch gRPC调用了，接下来我们看Watch在服务端的具体实现，了解客户端的watch请求如何到达服务端，服务端是如何处理watch请求并响应的。
 
-## 3. Watch的gRPC Service是如何实现的？
+## 4. Watch的gRPC Service是如何实现的？
 
 根据上图的函数调用，可以看到图一第10步执行了`NewWatchServer()`，这里创建了`WatchServer`对象，`WatchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
 
@@ -348,7 +348,7 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 
 主要逻辑就是这3步，完成了客户端和服务端的Watch通信机制，我们具体分析下每一步分别做了什么。
 
-### 3.1 serverWatchStream有什么作用？
+### 4.1 serverWatchStream有什么作用？
 
 先从它的定义看起。
 
@@ -455,11 +455,11 @@ type WatchStream interface {
 
 上面在代码注释中标记了3.1.1和3.1.2两个关键字段，这是打通客户端到KV存储的关键。只从定义是无法得出这个结论的，需要从`serverWatchStream`的初始化过程来理解。
 
-### 3.1.1 gRPCStream
+### 4.1.1 gRPCStream
 
 在第3节开始部分贴了`Watch`的gRPC Service实现，可以看到`gRPCStream:  stream`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是对`gRPC stream`的透传。
 
-### 3.1.2 watchStream
+### 4.1.2 watchStream
 
 同样地，在第3节开始部分`Watch`的gRPC Service实现中，可以看到`watchStream: ws.watchable.NewWatchStream()`，我们先看下`NewWatchStream()`。
 
@@ -676,7 +676,7 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 ![Watch overview](watch-overview.svg)
 
-### 3.2 recvLoop()做了什么事情？
+### 4.2 recvLoop()做了什么事情？
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -811,13 +811,13 @@ func (sws *serverWatchStream) recvLoop() error {
 
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
-## 4. mvcc的watchableStore是如何处理Watch的？
+## 5. mvcc的watchableStore是如何处理Watch的？
 
 在3.1.2节中，已经分析出来`watchStream`就是`mvcc.watchableStore`，在第3.2节，看到在`recvLoop()`里调用了`sws.watchStream.Watch()`，那它是怎么处理Watch的呢？
 
 我们从`sws.watchStream.Watch()`和`mvcc.watchableStore`的定义及实现一步一步看下。
 
-### 4.1 sws.watchStream.Watch()
+### 5.1 sws.watchStream.Watch()
 ```Go
 // etcd/mvcc/watcher.go
 
@@ -998,11 +998,11 @@ func (s *watchableStore) watch(key, end []byte, startRev int64, id WatchID, ch c
 总结一下，在`recvLoop`里调用`sws.watchStream.Watch()`后，分配了WatchID，`sws.watchStream.Watch()`又调用`ws.watchable.watch()`创建watcher，并根据要监听的版本号将watcher保存在了不同的数据结构，以便对不同进度的watcher执行不同的处理。
 
 
-## 5. mvcc是在什么时机产生事件的？
+## 6. mvcc是在什么时机产生事件的？
 
 Watch的作用是及时感知事件，而KV存储是事件的来源，那具体是在什么时机产生的事件呢？
 
-参考资料
+## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
 - Etcd深入解析可以参考Etcd作者在CNCF的演讲 [Deep Dive: etcd - Xiang Li, Alibaba & Wenjia Zhang, Google](https://youtu.be/GJqO1TYzVDE?si=fuQroGUNRO2sewqX) 。
 - Watch在Kubernetes中的应用可以参考 [The Life of a Kubernetes Watch Event - Wenjia Zhang & Haowei Cai, Google](https://youtu.be/PLSDvFjR9HY?si=jKTer1TEFhOfnE5T) 。
