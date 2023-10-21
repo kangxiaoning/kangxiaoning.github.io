@@ -259,7 +259,7 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 
 ## 4. Watch的gRPC Service是如何实现的？
 
-根据上图的函数调用，可以看到图一第10步执行了`NewWatchServer()`，这里创建了`WatchServer`对象，`WatchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
+根据上图的函数调用，可以看到图一第10步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -342,9 +342,9 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 
 我在注释中添加了序号，方便理解关键逻辑。
 
-1. 创建并初始化了`serverWatchStream`对象，这个对象在Watch机制的实现中起着至关重要的作用，向上与客户端建立联系，向下与KV存储建立联系，确保了KV存储的变化能被及时感知并推送给客户端，在下面详细解析
-2. 创建一个goroutine，执行`sws.recvLoop()`，它的作用是接收客户端的请求，通知下层KV存储创建watcher，建立watcher和key或key range的watch关系
-3. 创建一个goroutine，执行`sws.sendLoop()`，它的作用是从KV存储获取变化，当KV中被监听的key发生变化时，实时向客户端发送事件
+1. 创建并初始化了`serverWatchStream`对象，这个对象在Watch机制的实现中起着至关重要的作用，向上与客户端建立联系，向下与KV存储建立联系，确保了KV存储的变化能被及时感知并推送给客户端，在下面详细解析。
+2. 创建一个goroutine，执行`sws.recvLoop()`，它的作用是接收客户端的请求，通知下层KV存储创建watcher，建立watcher和key或key range的watch关系。
+3. 创建一个goroutine，执行`sws.sendLoop()`，它的作用是从KV存储获取变化，当KV中被监听的key发生变化时，实时向客户端发送事件。
 
 主要逻辑就是这3步，完成了客户端和服务端的Watch通信机制，我们具体分析下每一步分别做了什么。
 
@@ -371,14 +371,14 @@ type serverWatchStream struct {
 	watchable mvcc.WatchableKV
 	ag        AuthGetter
 
-    // 3.1.1
+    // 4.1.1
     // pb.Watch_WatchServer是一个interface，提供了Send和Recv方法
     // Send表示向客户端发送gRPC请求
     // Recv表示从客户端接收gRPC请求
     // gRPCStream在这里的作用是和客户端进行grpc通信，建立了与上层客户端的联系
 	gRPCStream  pb.Watch_WatchServer
 	
-    // 3.1.2
+    // 4.1.2
     // mvcc.WatchStream是一个interface，提供了Watch、Chan等方法
     // Watch方法用于创建watcher，注意这和gRPC Service的Watch不一样，只是名字相同而已
     // Chan方法返回一个channel，被监听key的变化会发送到这个channel中
@@ -453,15 +453,15 @@ type WatchStream interface {
 }
 ```
 
-上面在代码注释中标记了3.1.1和3.1.2两个关键字段，这是打通客户端到KV存储的关键。只从定义是无法得出这个结论的，需要从`serverWatchStream`的初始化过程来理解。
+上面在代码注释中标记了4.1.1和4.1.2两个关键字段，这是打通客户端到KV存储的关键。只从定义是无法得出这个结论的，需要从`serverWatchStream`的初始化过程来理解。
 
 ### 4.1.1 gRPCStream
 
-在第3节开始部分贴了`Watch`的gRPC Service实现，可以看到`gRPCStream:  stream`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是对`gRPC stream`的透传。
+在第4节开始部分贴了`Watch`的gRPC Service实现，可以看到`gRPCStream:  stream`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是对`gRPCStream`的透传。
 
 ### 4.1.2 watchStream
 
-同样地，在第3节开始部分`Watch`的gRPC Service实现中，可以看到`watchStream: ws.watchable.NewWatchStream()`，我们先看下`NewWatchStream()`。
+同样地，在第4节开始部分`Watch`的gRPC Service实现中，可以看到`watchStream: ws.watchable.NewWatchStream()`，我们先看下`NewWatchStream()`。
 
 ```Go
 // etcd/mvcc/watchable_store.go
@@ -560,7 +560,7 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 }
 ```
 
-- *到这里我们已经知道，`serverWatchStream`在`watchStream: ws.watchable.NewWatchStream()`这个初始化过程中，最终是将`mvcc.watchableStore`封装成`watchStream`对象赋值给了`watchStream~*
+- *到这里我们已经知道，`serverWatchStream`在`watchStream: ws.watchable.NewWatchStream()`这个初始化过程中，最终是将`mvcc.watchableStore`封装成`watchStream`对象赋值给了`watchStream`*。
 
 - 继续往下跟踪，可以看到这个`store`封装了`backend.Backend`这个interface
 
@@ -649,11 +649,11 @@ type backend struct {
 ```
 
 上面嵌套比较深，总结一下。
-1. 在`etcd`启动过程中，创建了`mvcc.watchableStore`并赋值给`etcdserver`的`kv`字段，代码为`srv.kv = mvcc.New()~
-2. 在`Watch`的gRPC Service注册过程中，创建了`watchServer`并对`ws.watchable`字段进行了初始化，代码为``watchable: s.Watchable()~
+1. 在`etcd`启动过程中，创建了`mvcc.watchableStore`并赋值给`etcdserver`的`kv`字段，代码为`srv.kv = mvcc.New()`
+2. 在`Watch`的gRPC Service注册过程中，创建了`watchServer`并对`ws.watchable`字段进行了初始化，代码为``watchable: s.Watchable()`
 3. 在`s.Watchable()`函数中返回了第1步的`s.kv`，也就是`mvcc.watchableStore`对象
-4. 在`Watch`的gRPC Service执行中，创建了`serverWatchStream`，并对`sws.watchStream`字段进行了初始化，代码为`watchStream: ws.watchable.NewWatchStream()~
-5. 结合第2步、第3步，可以看到`ws.watchable`就是`mvcc.watchableStore`，所以`ws.watchable.NewWatchStream()`就是`mvcc.watchableStore.NewWatchStream()~
+4. 在`Watch`的gRPC Service执行中，创建了`serverWatchStream`，并对`sws.watchStream`字段进行了初始化，代码为`watchStream: ws.watchable.NewWatchStream()`
+5. 结合第2步、第3步，可以看到`ws.watchable`就是`mvcc.watchableStore`，所以`ws.watchable.NewWatchStream()`就是`mvcc.watchableStore.NewWatchStream()`
 6. 所以`sws.watchStream`的值就是`mvcc.watchableStore.NewWatchStream()`结果，实际代码如下，是基于`mvcc.watchableStore`封装的`watchStream`对象
 
 ```Go
@@ -672,7 +672,7 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 也看可以看到，在`serverWatchStream`对象中，最终和底层的KV存储进行了关联。
 
-结合3.1.1和3.1.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，在这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
+结合4.1.1和4.1.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，在这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
 
 ![Watch overview](watch-overview.svg)
 
@@ -683,7 +683,7 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 func (sws *serverWatchStream) recvLoop() error {
 	for {
-        // 3.2.1
+        // 4.2.1
         // 通过sws.gRPCStream.Recv()接收客户端的rpc请求
 		req, err := sws.gRPCStream.Recv()
 		if err == io.EOF {
@@ -694,7 +694,7 @@ func (sws *serverWatchStream) recvLoop() error {
 		}
 
 		switch uv := req.RequestUnion.(type) {
-        // 3.2.2
+        // 4.2.2
         / Watch的Create请求处理逻辑
 		case *pb.WatchRequest_CreateRequest:
 			if uv.CreateRequest == nil {
@@ -739,7 +739,7 @@ func (sws *serverWatchStream) recvLoop() error {
 			if rev == 0 {
 				rev = wsrev + 1
 			}
-            // 3.2.3
+            // 4.2.3
             // 调用mvcc的watchableStore.Watch方法创建watcher并返回watchID
 			id, err := sws.watchStream.Watch(mvcc.WatchID(creq.WatchId), creq.Key, creq.RangeEnd, rev, filters...)
 			if err == nil {
@@ -813,7 +813,7 @@ func (sws *serverWatchStream) recvLoop() error {
 
 ## 5. mvcc的watchableStore是如何处理Watch的？
 
-在3.1.2节中，已经分析出来`watchStream`就是`mvcc.watchableStore`，在第3.2节，看到在`recvLoop()`里调用了`sws.watchStream.Watch()`，那它是怎么处理Watch的呢？
+在4.1.2节中，已经分析出来`watchStream`就是`mvcc.watchableStore`，在第4.2节，看到在`recvLoop()`里调用了`sws.watchStream.Watch()`，那它是怎么处理Watch的呢？
 
 我们从`sws.watchStream.Watch()`和`mvcc.watchableStore`的定义及实现一步一步看下。
 
@@ -855,7 +855,7 @@ func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ..
 }
 ```
 
-- 上述代码可以看到，第3.2节中`recvLoop()`调用的`sws.watchStream.Watch()`主要做了两件事件
+- 上述代码可以看到，第4.2节中`recvLoop()`调用的`sws.watchStream.Watch()`主要做了两件事件
   1. 获取WathID
   2. 调用`ws.watchable.watch()`创建watcher，也就是调用`watchableStore.watch()`方法
 
