@@ -1,6 +1,7 @@
-# Etcd的Watch实现分析
-
 <show-structure depth="3"/>
+<web-file-name>etcd/etcd-watch.html</web-file-name>
+
+# Etcd的Watch实现分析
 
 Etcd作为Kubernetes的控制面存储，保存了Kubernetes集群状态，各种Controller通过Watch机制感知集群事件，与实际状态对比后执行reconcile，确保集群按期望状态运行。系统的性能、可靠性非常依赖**Watch机制**，既然Watch机制这么关键，那它是怎么实现的并且如何确保性能和可靠性的呢？
 
@@ -37,22 +38,167 @@ service Watch {
 >```Go
 >rpc BidiHello(stream HelloRequest) returns (stream HelloResponse);
 >```
+>
 
 ## 2. Watch的gRPC Server是什么时候启动的？
 
-实现gRPC通信需要启动gRPC Server，那Watch的gRPC Server是什么时候启动的，又是在哪里启动的呢？
+下面对Etcd启动流程做个概要分析，核心是找到启动gRPC Server的位置，以模块名为参与者，函数调用为消息，绘制出如下时序图。
 
-带着这个问题，我们进入Etcd的代码分析，跟踪关键函数调用，弄清楚gRPC Server的启动时机以及启动位置。
+```mermaid
+sequenceDiagram
+    autonumber
+    main->>main: main()
+    main->>etcdmain: Main()
+    etcdmain->>etcdmain: startEtcdOrProxyV2()
+    etcdmain->>etcdmain: startEtcd(&cfg.ec)
+    etcdmain->>embed: embed.StartEtcd(cfg)
+    embed->>embed: e.serveClients()
+    embed->>embed: s.serve()
+    alt insecure
+        embed->>v3rpc: v3rpc.Server(s, nil, gopts...)
+        v3rpc->>v3rpc: RegisterWatchServer()
+        v3rpc->>v3rpc: NewWatchServer()
+        embed->>grpc: gs.Serve(grpcl)
+    end
+    opt secure
+       embed->>v3rpc: v3rpc.Server(s, tlscfg, gopts...)
+       v3rpc->>v3rpc: RegisterWatchServer()
+       v3rpc->>v3rpc: NewWatchServer()
+       embed->>grpc: grpcServer.ServeHTTP(w, r)
+    end
+```
 
-从Etcd入口函数开始，到Watch的gRPC Server启动，绘制的关键函数调用如下图所示。
+可以看到etcd在启动流程中启动了gRPC Server，具体是在`embed`模块中的`StartEtcd()`函数中执行相关调用完成的，在`serve()`函数中调用`v3rpc.Server()`执行了WatchServer的创建和注册，针对是否启用了tls使用了不同的方式处理，`serve()`函数的逻辑如下。
 
-![Etcd Startup Process](start-rpc-server.svg)
+```Go
+// serve accepts incoming connections on the listener l,
+// creating a new service goroutine for each. The service goroutines
+// read requests and then call handler to reply to them.
+func (sctx *serveCtx) serve(
+	s *etcdserver.EtcdServer,
+	tlsinfo *transport.TLSInfo,
+	handler http.Handler,
+	errHandler func(error),
+	gopts ...grpc.ServerOption) (err error) {
+	logger := defaultLog.New(ioutil.Discard, "etcdhttp", 0)
+	<-s.ReadyNotify()
 
-接下来对图中几个关键部分做个解释。
+    // ...
+    
+	if sctx.insecure {
+	    // 创建gRPC Server
+		gs = v3rpc.Server(s, nil, gopts...)
+		// ...
+		grpcl := m.Match(cmux.HTTP2())
+		// 启动gRPC Server
+		go func() { errHandler(gs.Serve(grpcl)) }()
+	}
 
-- 第6步创建了`etcdserver`对象
-- 第7步创建了`mvcc`模块，这是一个实现了Watch特性的KV Store，具体代码如下
+	if sctx.secure {
+	    // ...
+	    // 创建gRPC Server
+		gs = v3rpc.Server(s, tlscfg, gopts...)
+		// ...
+		// 处理gRPC请求的handler
+		handler = grpcHandlerFunc(gs, handler)
+        // ...
+		httpmux := sctx.createMux(gwmux, handler)
 
+		srv := &http.Server{
+			Handler:   createAccessController(sctx.lg, s, httpmux),
+			TLSConfig: tlscfg,
+			ErrorLog:  logger, // do not log user error
+		}
+		// 启动http.Server，同时支持gRPC和HTTP
+		go func() { errHandler(srv.Serve(tlsl)) }()
+
+	close(sctx.serversC)
+	return m.Serve()
+}
+```
+{collapsible="true" collapsed-title="embed.serve()" default-state="expanded"}
+
+`v3rpc.Server()`中注册WatchServer的代码如下。
+```Go
+func Server(s *etcdserver.EtcdServer, tls *tls.Config, gopts ...grpc.ServerOption) *grpc.Server {
+    // ...
+	pb.RegisterWatchServer(grpcServer, NewWatchServer(s))
+    // ...
+	return grpcServer
+}
+```
+
+`v3rpc.NewWatchServer()`创建WatchServer的过程如下。
+```Go
+// NewWatchServer returns a new watch server.
+func NewWatchServer(s *etcdserver.EtcdServer) pb.WatchServer {
+	return &watchServer{
+		lg: s.Cfg.Logger,
+
+		clusterID: int64(s.Cluster().ID()),
+		memberID:  int64(s.ID()),
+
+		maxRequestBytes: int(s.Cfg.MaxRequestBytes + grpcOverheadBytes),
+
+		sg:        s,
+		watchable: s.Watchable(),
+		ag:        s,
+	}
+}
+```
+
+## 3. Watch机制和KV存储有什么关系？
+
+主要逻辑在`StartEtcd()`中，重点关注和Watch相关的过程，对这个函数做个分析。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    embed->>embed: StartEtcd(cfg)
+    embed->>etcdserver: NewServer(srvcfg)
+    etcdserver->>mvcc: mvcc.New()
+    mvcc->>mvcc: newWatchableStore()
+    mvcc->>mvcc: go s.syncWatchersLoop()
+    mvcc->>mvcc: go s.syncVictimsLoop()
+    embed->>embed: e.Server.Start()
+    embed->>embed: e.servePeers()
+    embed->>embed: e.serveClients()
+```
+
+对照上图的序号，对关键步骤做个解释。
+
+- 第1步执行`StartEtcd()`，函数签名为`func StartEtcd(inCfg *Config) (e *Etcd, err error)`，返回值是一个名为`Etcd`类型的对象。
+```Go
+// StartEtcd launches the etcd server and HTTP handlers for client/server communication.
+// The returned Etcd.Server is not guaranteed to have joined the cluster. Wait
+// on the Etcd.Server.ReadyNotify() channel to know when it completes and is ready for use.
+func StartEtcd(inCfg *Config) (e *Etcd, err error) {
+    // ...
+    // 第2步
+	if e.Server, err = etcdserver.NewServer(srvcfg); err != nil {
+		return e, err
+	}
+
+    // ...
+    // 第7步
+	e.Server.Start()
+
+    // 第8步
+	if err = e.servePeers(); err != nil {
+		return e, err
+	}
+    // 第9步
+	if err = e.serveClients(); err != nil {
+		return e, err
+	}
+	// ...
+	serving = true
+	return e, nil
+}
+```
+{collapsible="true" collapsed-title="StartEtcd()" default-state="expanded"}
+
+- 第2步创建了etcdserver对象，返回值是一个名为`EtcdServer`的对象。
 ```Go
 // etcd/etcdserver/server.go
 
@@ -71,369 +217,10 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 	return srv, nil
 }
 ```
+{collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="expanded"}
 
-```Go
-// etcd/etcdserver/server.go
-
-// NewServer creates a new EtcdServer from the supplied configuration. The
-// configuration is considered static for the lifetime of the EtcdServer.
-func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
-	st := v2store.New(StoreClusterPrefix, StoreKeysPrefix)
-
-	var (
-		w  *wal.WAL
-		n  raft.Node
-		s  *raft.MemoryStorage
-		id types.ID
-		cl *membership.RaftCluster
-	)
-
-	if cfg.MaxRequestBytes > recommendedMaxRequestBytes {
-		if cfg.Logger != nil {
-			cfg.Logger.Warn(
-				"exceeded recommended request limit",
-				zap.Uint("max-request-bytes", cfg.MaxRequestBytes),
-				zap.String("max-request-size", humanize.Bytes(uint64(cfg.MaxRequestBytes))),
-				zap.Int("recommended-request-bytes", recommendedMaxRequestBytes),
-				zap.String("recommended-request-size", humanize.Bytes(uint64(recommendedMaxRequestBytes))),
-			)
-		} else {
-			plog.Warningf("MaxRequestBytes %v exceeds maximum recommended size %v", cfg.MaxRequestBytes, recommendedMaxRequestBytes)
-		}
-	}
-
-	if terr := fileutil.TouchDirAll(cfg.DataDir); terr != nil {
-		return nil, fmt.Errorf("cannot access data directory: %v", terr)
-	}
-
-	haveWAL := wal.Exist(cfg.WALDir())
-
-	if err = fileutil.TouchDirAll(cfg.SnapDir()); err != nil {
-		if cfg.Logger != nil {
-			cfg.Logger.Fatal(
-				"failed to create snapshot directory",
-				zap.String("path", cfg.SnapDir()),
-				zap.Error(err),
-			)
-		} else {
-			plog.Fatalf("create snapshot directory error: %v", err)
-		}
-	}
-	ss := snap.New(cfg.Logger, cfg.SnapDir())
-
-	bepath := cfg.backendPath()
-	beExist := fileutil.Exist(bepath)
-	be := openBackend(cfg)
-
-	defer func() {
-		if err != nil {
-			be.Close()
-		}
-	}()
-
-	prt, err := rafthttp.NewRoundTripper(cfg.PeerTLSInfo, cfg.peerDialTimeout())
-	if err != nil {
-		return nil, err
-	}
-	var (
-		remotes  []*membership.Member
-		snapshot *raftpb.Snapshot
-	)
-
-	switch {
-	case !haveWAL && !cfg.NewCluster:
-		if err = cfg.VerifyJoinExisting(); err != nil {
-			return nil, err
-		}
-		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap)
-		if err != nil {
-			return nil, err
-		}
-		existingCluster, gerr := GetClusterFromRemotePeers(cfg.Logger, getRemotePeerURLs(cl, cfg.Name), prt)
-		if gerr != nil {
-			return nil, fmt.Errorf("cannot fetch cluster info from peer urls: %v", gerr)
-		}
-		if err = membership.ValidateClusterAndAssignIDs(cfg.Logger, cl, existingCluster); err != nil {
-			return nil, fmt.Errorf("error validating peerURLs %s: %v", existingCluster, err)
-		}
-		if !isCompatibleWithCluster(cfg.Logger, cl, cl.MemberByName(cfg.Name).ID, prt) {
-			return nil, fmt.Errorf("incompatible with current running cluster")
-		}
-
-		remotes = existingCluster.Members()
-		cl.SetID(types.ID(0), existingCluster.ID())
-		cl.SetStore(st)
-		cl.SetBackend(be)
-		id, n, s, w = startNode(cfg, cl, nil)
-		cl.SetID(id, existingCluster.ID())
-
-	case !haveWAL && cfg.NewCluster:
-		if err = cfg.VerifyBootstrap(); err != nil {
-			return nil, err
-		}
-		cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap)
-		if err != nil {
-			return nil, err
-		}
-		m := cl.MemberByName(cfg.Name)
-		if isMemberBootstrapped(cfg.Logger, cl, cfg.Name, prt, cfg.bootstrapTimeout()) {
-			return nil, fmt.Errorf("member %s has already been bootstrapped", m.ID)
-		}
-		if cfg.ShouldDiscover() {
-			var str string
-			str, err = v2discovery.JoinCluster(cfg.Logger, cfg.DiscoveryURL, cfg.DiscoveryProxy, m.ID, cfg.InitialPeerURLsMap.String())
-			if err != nil {
-				return nil, &DiscoveryError{Op: "join", Err: err}
-			}
-			var urlsmap types.URLsMap
-			urlsmap, err = types.NewURLsMap(str)
-			if err != nil {
-				return nil, err
-			}
-			if checkDuplicateURL(urlsmap) {
-				return nil, fmt.Errorf("discovery cluster %s has duplicate url", urlsmap)
-			}
-			if cl, err = membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, urlsmap); err != nil {
-				return nil, err
-			}
-		}
-		cl.SetStore(st)
-		cl.SetBackend(be)
-		id, n, s, w = startNode(cfg, cl, cl.MemberIDs())
-		cl.SetID(id, cl.ID())
-
-	case haveWAL:
-		if err = fileutil.IsDirWriteable(cfg.MemberDir()); err != nil {
-			return nil, fmt.Errorf("cannot write to member directory: %v", err)
-		}
-
-		if err = fileutil.IsDirWriteable(cfg.WALDir()); err != nil {
-			return nil, fmt.Errorf("cannot write to WAL directory: %v", err)
-		}
-
-		if cfg.ShouldDiscover() {
-			if cfg.Logger != nil {
-				cfg.Logger.Warn(
-					"discovery token is ignored since cluster already initialized; valid logs are found",
-					zap.String("wal-dir", cfg.WALDir()),
-				)
-			} else {
-				plog.Warningf("discovery token ignored since a cluster has already been initialized. Valid log found at %q", cfg.WALDir())
-			}
-		}
-		snapshot, err = ss.Load()
-		if err != nil && err != snap.ErrNoSnapshot {
-			return nil, err
-		}
-		if snapshot != nil {
-			if err = st.Recovery(snapshot.Data); err != nil {
-				if cfg.Logger != nil {
-					cfg.Logger.Panic("failed to recover from snapshot")
-				} else {
-					plog.Panicf("recovered store from snapshot error: %v", err)
-				}
-			}
-
-			if cfg.Logger != nil {
-				cfg.Logger.Info(
-					"recovered v2 store from snapshot",
-					zap.Uint64("snapshot-index", snapshot.Metadata.Index),
-					zap.String("snapshot-size", humanize.Bytes(uint64(snapshot.Size()))),
-				)
-			} else {
-				plog.Infof("recovered store from snapshot at index %d", snapshot.Metadata.Index)
-			}
-
-			if be, err = recoverSnapshotBackend(cfg, be, *snapshot); err != nil {
-				if cfg.Logger != nil {
-					cfg.Logger.Panic("failed to recover v3 backend from snapshot", zap.Error(err))
-				} else {
-					plog.Panicf("recovering backend from snapshot error: %v", err)
-				}
-			}
-			if cfg.Logger != nil {
-				s1, s2 := be.Size(), be.SizeInUse()
-				cfg.Logger.Info(
-					"recovered v3 backend from snapshot",
-					zap.Int64("backend-size-bytes", s1),
-					zap.String("backend-size", humanize.Bytes(uint64(s1))),
-					zap.Int64("backend-size-in-use-bytes", s2),
-					zap.String("backend-size-in-use", humanize.Bytes(uint64(s2))),
-				)
-			}
-		}
-
-		if !cfg.ForceNewCluster {
-			id, cl, n, s, w = restartNode(cfg, snapshot)
-		} else {
-			id, cl, n, s, w = restartAsStandaloneNode(cfg, snapshot)
-		}
-
-		cl.SetStore(st)
-		cl.SetBackend(be)
-		cl.Recover(api.UpdateCapability)
-		if cl.Version() != nil && !cl.Version().LessThan(semver.Version{Major: 3}) && !beExist {
-			os.RemoveAll(bepath)
-			return nil, fmt.Errorf("database file (%v) of the backend is missing", bepath)
-		}
-
-	default:
-		return nil, fmt.Errorf("unsupported bootstrap config")
-	}
-
-	if terr := fileutil.TouchDirAll(cfg.MemberDir()); terr != nil {
-		return nil, fmt.Errorf("cannot access member directory: %v", terr)
-	}
-
-	sstats := stats.NewServerStats(cfg.Name, id.String())
-	lstats := stats.NewLeaderStats(id.String())
-
-	heartbeat := time.Duration(cfg.TickMs) * time.Millisecond
-	srv = &EtcdServer{
-		readych:     make(chan struct{}),
-		Cfg:         cfg,
-		lgMu:        new(sync.RWMutex),
-		lg:          cfg.Logger,
-		errorc:      make(chan error, 1),
-		v2store:     st,
-		snapshotter: ss,
-		r: *newRaftNode(
-			raftNodeConfig{
-				lg:          cfg.Logger,
-				isIDRemoved: func(id uint64) bool { return cl.IsIDRemoved(types.ID(id)) },
-				Node:        n,
-				heartbeat:   heartbeat,
-				raftStorage: s,
-				storage:     NewStorage(w, ss),
-			},
-		),
-		id:               id,
-		attributes:       membership.Attributes{Name: cfg.Name, ClientURLs: cfg.ClientURLs.StringSlice()},
-		cluster:          cl,
-		stats:            sstats,
-		lstats:           lstats,
-		SyncTicker:       time.NewTicker(500 * time.Millisecond),
-		peerRt:           prt,
-		reqIDGen:         idutil.NewGenerator(uint16(id), time.Now()),
-		forceVersionC:    make(chan struct{}),
-		AccessController: &AccessController{CORS: cfg.CORS, HostWhitelist: cfg.HostWhitelist},
-	}
-	serverID.With(prometheus.Labels{"server_id": id.String()}).Set(1)
-
-	srv.applyV2 = &applierV2store{store: srv.v2store, cluster: srv.cluster}
-
-	srv.be = be
-	minTTL := time.Duration((3*cfg.ElectionTicks)/2) * heartbeat
-
-	// always recover lessor before kv. When we recover the mvcc.KV it will reattach keys to its leases.
-	// If we recover mvcc.KV first, it will attach the keys to the wrong lessor before it recovers.
-	srv.lessor = lease.NewLessor(
-		srv.getLogger(),
-		srv.be,
-		lease.LessorConfig{
-			MinLeaseTTL:                int64(math.Ceil(minTTL.Seconds())),
-			CheckpointInterval:         cfg.LeaseCheckpointInterval,
-			ExpiredLeasesRetryInterval: srv.Cfg.ReqTimeout(),
-		})
-	// 创建了`mvcc`模块，这是一个实现了Watch特性的KV Store
-	srv.kv = mvcc.New(srv.getLogger(), srv.be, srv.lessor, &srv.consistIndex, mvcc.StoreConfig{CompactionBatchLimit: cfg.CompactionBatchLimit})
-	if beExist {
-		kvindex := srv.kv.ConsistentIndex()
-		// TODO: remove kvindex != 0 checking when we do not expect users to upgrade
-		// etcd from pre-3.0 release.
-		if snapshot != nil && kvindex < snapshot.Metadata.Index {
-			if kvindex != 0 {
-				return nil, fmt.Errorf("database file (%v index %d) does not match with snapshot (index %d)", bepath, kvindex, snapshot.Metadata.Index)
-			}
-			if cfg.Logger != nil {
-				cfg.Logger.Warn(
-					"consistent index was never saved",
-					zap.Uint64("snapshot-index", snapshot.Metadata.Index),
-				)
-			} else {
-				plog.Warningf("consistent index never saved (snapshot index=%d)", snapshot.Metadata.Index)
-			}
-		}
-	}
-	newSrv := srv // since srv == nil in defer if srv is returned as nil
-	defer func() {
-		// closing backend without first closing kv can cause
-		// resumed compactions to fail with closed tx errors
-		if err != nil {
-			newSrv.kv.Close()
-		}
-	}()
-
-	srv.consistIndex.setConsistentIndex(srv.kv.ConsistentIndex())
-	tp, err := auth.NewTokenProvider(cfg.Logger, cfg.AuthToken,
-		func(index uint64) <-chan struct{} {
-			return srv.applyWait.Wait(index)
-		},
-	)
-	if err != nil {
-		if cfg.Logger != nil {
-			cfg.Logger.Warn("failed to create token provider", zap.Error(err))
-		} else {
-			plog.Errorf("failed to create token provider: %s", err)
-		}
-		return nil, err
-	}
-	srv.authStore = auth.NewAuthStore(srv.getLogger(), srv.be, tp, int(cfg.BcryptCost))
-	if num := cfg.AutoCompactionRetention; num != 0 {
-		srv.compactor, err = v3compactor.New(cfg.Logger, cfg.AutoCompactionMode, num, srv.kv, srv)
-		if err != nil {
-			return nil, err
-		}
-		srv.compactor.Run()
-	}
-
-	srv.applyV3Base = srv.newApplierV3Backend()
-	if err = srv.restoreAlarms(); err != nil {
-		return nil, err
-	}
-
-	if srv.Cfg.EnableLeaseCheckpoint {
-		// setting checkpointer enables lease checkpoint feature.
-		srv.lessor.SetCheckpointer(func(ctx context.Context, cp *pb.LeaseCheckpointRequest) {
-			srv.raftRequestOnce(ctx, pb.InternalRaftRequest{LeaseCheckpoint: cp})
-		})
-	}
-
-	// TODO: move transport initialization near the definition of remote
-	tr := &rafthttp.Transport{
-		Logger:      cfg.Logger,
-		TLSInfo:     cfg.PeerTLSInfo,
-		DialTimeout: cfg.peerDialTimeout(),
-		ID:          id,
-		URLs:        cfg.PeerURLs,
-		ClusterID:   cl.ID(),
-		Raft:        srv,
-		Snapshotter: ss,
-		ServerStats: sstats,
-		LeaderStats: lstats,
-		ErrorC:      srv.errorc,
-	}
-	if err = tr.Start(); err != nil {
-		return nil, err
-	}
-	// add all remotes into transport
-	for _, m := range remotes {
-		if m.ID != id {
-			tr.AddRemote(m.ID, m.PeerURLs)
-		}
-	}
-	for _, m := range cl.Members() {
-		if m.ID != id {
-			tr.AddPeer(m.ID, m.PeerURLs)
-		}
-	}
-	srv.r.transport = tr
-
-	return srv, nil
-}
-```
-{collapsible="true" collapsed-title="NewServer"}
-
+- 第3步创建`mvcc`模块，简单调用了第4步的`newWatchableStore()`函数。
+- 第4步是第3步的具体实现，返回值是一个实现了`ConsistentWatchableKV`接口的对象，实现这个接口的类型是名为`watchableStore`的struct，代码如下。
 ```Go
 // etcd/mvcc/watchable_store.go
 
@@ -456,27 +243,26 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 		s.le.SetRangeDeleter(func() lease.TxnDelete { return s.Write(traceutil.TODO()) })
 	}
 	s.wg.Add(2)
+	// 启动goroutine处理unsynced的watcher
 	go s.syncWatchersLoop()
+	// 启动goroutine处理victims的watcher
 	go s.syncVictimsLoop()
 	return s
 }
 ```
+- 第5步启动了一个goroutine执行`syncWatchersLoop()`函数，每100ms同步一次处于**unsynced map**中的watcher。
+- 第6步启动了一个goroutine执行`syncVictimsLoop()`函数，在**victims**集合非空的情况下每10m同步一次，尝试给被阻塞的watcher同步事件。
+- 第7步启动了etcdserver。
+- 第9步执行了`serveClients()`函数，这个函数前面已经分析过，注册并启动了gRPC Server。
 
-- 第8步创建了`WatchableStore`对象，从名字可以判断这是实现了Watch机制的Store
-- 第9步启动了一个goroutine执行`syncWatchersLoop()`函数，每100ms同步一次处于 *unsynced map* 中的watcher
-- 第10步启动了一个goroutine执行`syncVictimsLoop()`函数，在 *victims* 集合非空的情况下每10m同步一次，尝试给被阻塞的watcher同步事件
-- 第11步启动了etcdserver
-- 第13步执行了`serveClients()`函数，这个函数里执行了第16步的WatchServer的gRPCServer注册，并在第18步启动了gRPCServer
-
-总结一下，etcd在启动过程中，会初始化实现了Watch特性的`mvcc`存储，注册`Watch`gRPC服务并启动了gRPC Server，至此就可以接收watch gRPC调用了，接下来我们看Watch在服务端的具体实现，了解客户端的watch请求如何到达服务端，服务端是如何处理watch请求并响应的。
+总结一下，etcd在启动过程中，会初始化`mvcc`模块，它是一个实现了Watch特性的KV存储，注册`WatchServer`服务并启动了gRPC Server，至此就可以接收watch gRPC调用了，接下来我们看Watch在服务端的具体实现，了解客户端的watch请求如何到达服务端，服务端是如何处理watch请求并响应的。
 
 ## 3. Watch的gRPC Service是如何实现的？
 
-根据上图的函数调用，可以看到第17步执行了`NewWatchServer()`，这里创建了`WatchServer`对象，`WatchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
+根据上图的函数调用，可以看到图一第10步执行了`NewWatchServer()`，这里创建了`WatchServer`对象，`WatchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
-
 
 func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
     // 1. 创建 serverWatchStream 对象
@@ -693,7 +479,7 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 - 这里看到返回结果是基于`watchableStore`对象封装的`watchStream`对象。那`watchableStore`对象是怎么来的呢？我们需要从`ws`也就是`watchServer`的初始化看起。
 
-- 在函数调用图的第17步创建了`watchServer`对象，并对`ws.watchable`进行了初始化:`watchable: s.Watchable()`，那 s.Watchable()`做了什么呢？
+- 在函数调用图的第10步创建了`watchServer`对象，并对`ws.watchable`进行了初始化:`watchable: s.Watchable()`，那 s.Watchable()`做了什么呢？
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -727,7 +513,7 @@ func (s *EtcdServer) Watchable() mvcc.WatchableKV { return s.KV() }
 func (s *EtcdServer) KV() mvcc.ConsistentWatchableKV { return s.kv }
 ```
 
-- 从前面的启动过程分析可以看到，`s.kv`正是在函数调用图的第7步被创建的，`mvcc.New()`内部通过调用`newWatchableStore()`返回了一个`watchableStore`对象，它实现了`WatchableKV`这个interface，也实现了`KV`interface，因此这个`watchableStore`对象就是一个实现了 *watchable* 接口的 *KV* 存储。
+- 从前面的启动过程分析可以看到，`s.kv`正是在函数调用图的第3步被创建的，`mvcc.New()`内部通过调用`newWatchableStore()`返回了一个`watchableStore`对象，它实现了`WatchableKV`这个interface，也实现了`KV`interface，因此这个`watchableStore`对象就是一个实现了 *watchable* 接口的 *KV* 存储。
 
 ```Go
 // etcd/etcdserver/server.go
@@ -1070,8 +856,8 @@ func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ..
 ```
 
 - 上述代码可以看到，第3.2节中`recvLoop()`调用的`sws.watchStream.Watch()`主要做了两件事件
-    1. 获取WathID
-    2. 调用`ws.watchable.watch()`创建watcher，也就是调用`watchableStore.watch()`方法
+  1. 获取WathID
+  2. 调用`ws.watchable.watch()`创建watcher，也就是调用`watchableStore.watch()`方法
 
 - 如下watchableStore中将watcher分为了三类，分别是 *victims* 、 *unsynced* 、 *synced* 这三种，用于应对不同进度下的watcher处理。
 
