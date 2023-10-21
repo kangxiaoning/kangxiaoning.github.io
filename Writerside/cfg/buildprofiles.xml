@@ -7,6 +7,16 @@
         <algolia-index>kangxiaoning.github.io</algolia-index>
         <algolia-api-key>2cd95384e04d2e20fe45bcfaacebdf26</algolia-api-key>
     </variables>
-    <build-profile instance="k"/>
+    <build-profile instance="k">
+        <variables>
+            <noindex-content>true</noindex-content>
+        </variables>
+    </build-profile>
+
+    <footer>
+        <copyright>kangxiaoning 2012-2023</copyright>
+        <social type="blog" href="https://kangxiaoning.github.io"/>
+        <social type="email" href="kangxiaoning.dba@gmail.com"/>
+    </footer>
 
 </buildprofiles>

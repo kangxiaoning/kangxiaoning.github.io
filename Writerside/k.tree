@@ -3,7 +3,7 @@
         SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
 
 <instance-profile id="k"
-                 name="kangxiaoning"
+                 name="南寨小子"
                  start-page="etcd-watch.md">
 
     <toc-element topic="Etcd.md">
