@@ -48,7 +48,7 @@ service Watch {
 >```
 >
 
-## 2. Watch的gRPC Server是什么时候启动的？
+## 2. Watch的gRPC Server是什么时候启动的？ {id="2"}
 
 下面对Etcd启动流程做个概要分析，核心是找到启动gRPC Server的位置，绘制出如下时序图。
 
@@ -165,7 +165,7 @@ func NewWatchServer(s *etcdserver.EtcdServer) pb.WatchServer {
 
 ## 3. Watch机制和KV存储有什么关系？
 
-上一节看到etcd启动的主要逻辑在`StartEtcd()`中，因此重点分析下这个函数，关注和Watch相关的过程，看看是否可以找到Watch机制和KV存储的关系。
+第[2](#2)节看到etcd启动的主要逻辑在`StartEtcd()`中，因此重点分析下这个函数，关注和Watch相关的过程，看看是否可以找到Watch机制和KV存储的关系。
 
 >如下是梳理关键逻辑后绘制的时序图，先有个大概框架，再详细分析下每一步代码实现。
 
@@ -287,7 +287,7 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 
 ## 4. Watch的gRPC Service是如何实现的？
 
-在gRPC Server启动过程的分析中，看到第14步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
+在[gRPC Server启动过程](#2)的分析中，看到第14步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
 
 <include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
 
@@ -519,7 +519,7 @@ type WatchStream interface {
 - `gRPCStream`类型
 <include from="etcd-watch.md" element-id="etcd-code-2"></include>
 
-#### 4.1.2 watchStream
+#### 4.1.2 watchStream {id="4.1.2"}
 
 同样地，`serverWatchStream`初始化对`watchStream`字段也进行了赋值，即`watchStream: ws.watchable.NewWatchStream()`，先看下`ws.watchable.NewWatchStream()`定义。
 
@@ -544,7 +544,7 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 - 这里看到返回结果是基于`watchableStore`对象封装的`watchStream`对象。那`watchableStore`对象是怎么来的呢？需要从`ws`也就是`watchServer`的初始化看起。
 
-- 从前面的分析可知在启动过程（下图第14步）创建了`watchServer`对象，并对`ws.watchable`进行了初始化：`watchable: s.Watchable()`。
+- 从[前面的分析](#2)可知在启动过程（下图第14步）创建了`watchServer`对象，并对`ws.watchable`进行了初始化：`watchable: s.Watchable()`。
 
 <include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
 
@@ -752,12 +752,9 @@ flowchart TD
     G --> H
 ```
 
-也看可以看到，在`serverWatchStream`对象中，最终和底层的KV存储进行了关联。
+经过多层嵌套，最终`sws.watchStream`被赋值为基于`mvcc.watchableStore`封装的`watchStream`对象，和KV存储完成了关联。
 
-结合4.1.1和4.1.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，在这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
-
-
-### 4.2 recvLoop()做了什么事情？
+### 4.2 recvLoop()做了什么事情？ {id="4.2"}
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -887,19 +884,26 @@ func (sws *serverWatchStream) recvLoop() error {
 {collapsible="true" collapsed-title="v3rpc.recvLoop()" default-state="collapsed"}
 
 通过关键代码注释，可以将`recvLoop`的主要逻辑总结如下。
-1. 通过sws.gRPCStream.Recv()接收客户端的rpc请求。
+1. 通过`sws.gRPCStream.Recv()`接收客户端的rpc请求。
 2. 如果是Watch的Create请求，调用mvcc实现的watchableStore.Watch方法进行处理。
 3. 如果是Watch的Cancel、Progress请求，执行对应的逻辑进行处理。
 
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
+结合4.1和4.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
+
 ## 5. mvcc的watchableStore是如何处理Watch的？
 
-在4.1.2节中，已经分析出来`watchStream`就是`mvcc.watchableStore`，在第4.2节，看到在`recvLoop()`里调用了`sws.watchStream.Watch()`，那它是怎么处理Watch的呢？
+在[4.1.2](#4.1.2)节中，已经分析出来`watchStream.watchable`就是`mvcc.watchableStore`，在第[4.2](#4.2)节，看到在`recvLoop()`里调用了`sws.watchStream.Watch()`，那它是怎么处理Watch的呢？
 
 我们从`sws.watchStream.Watch()`和`mvcc.watchableStore`的定义及实现一步一步看下。
 
 ### 5.1 sws.watchStream.Watch()
+
+- 从`mvcc.Watch()`代码定义可以看到，第[4.2](#4.2)节中`recvLoop()`调用的`sws.watchStream.Watch()`主要做了两件事件
+  1. 获取WathID
+  2. 调用`ws.watchable.watch()`创建watcher，也就是调用`mvcc.watchableStore.watch()`方法
+
 ```Go
 // etcd/mvcc/watcher.go
 
@@ -936,109 +940,9 @@ func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ..
 	return id, nil
 }
 ```
+{collapsible="true" collapsed-title="mvcc.Watch()" default-state="collapsed"}
 
-- 上述代码可以看到，第4.2节中`recvLoop()`调用的`sws.watchStream.Watch()`主要做了两件事件
-  1. 获取WathID
-  2. 调用`ws.watchable.watch()`创建watcher，也就是调用`watchableStore.watch()`方法
-
-- 如下watchableStore中将watcher分为了三类，分别是 *victims* 、 *unsynced* 、 *synced* 这三种，用于应对不同进度下的watcher处理。
-
-```Go
-// etcd/mvcc/watcher_group.go
-
-type watchableStore struct {
-    *store
-
-	// mu protects watcher groups and batches. It should never be locked
-	// before locking store.mu to avoid deadlock.
-	mu sync.RWMutex
-
-	// victims are watcher batches that were blocked on the watch channel
-	victims []watcherBatch
-	victimc chan struct{}
-
-	// contains all unsynced watchers that needs to sync with events that have happened
-	unsynced watcherGroup
-
-	// contains all synced watchers that are in sync with the progress of the store.
-	// The key of the map is the key that the watcher watches on.
-	synced watcherGroup
-
-	stopc chan struct{}
-	wg    sync.WaitGroup
-}
-
-type watcherBatch map[*watcher]*eventBatch
-```
-
-- watcher的构成如下，保存了key、id、reversion等信息
-
-```Go
-// etcd/mvcc/watchable_store.go
-
-type watcher struct {
-// the watcher key
-key []byte
-// end indicates the end of the range to watch.
-// If end is set, the watcher is on a range.
-end []byte
-
-	// victim is set when ch is blocked and undergoing victim processing
-	victim bool
-
-	// compacted is set when the watcher is removed because of compaction
-	compacted bool
-
-	// restore is true when the watcher is being restored from leader snapshot
-	// which means that this watcher has just been moved from "synced" to "unsynced"
-	// watcher group, possibly with a future revision when it was first added
-	// to the synced watcher
-	// "unsynced" watcher revision must always be <= current revision,
-	// except when the watcher were to be moved from "synced" watcher group
-	restore bool
-
-	// minRev is the minimum revision update the watcher will accept
-	minRev int64
-	id     WatchID
-
-	fcs []FilterFunc
-	// a chan to send out the watch response.
-	// The chan might be shared with other watchers.
-	ch chan<- WatchResponse
-}
-```
-
-- eventBatch保存了Event及相关版本号，用于记录因watcher的channel被阻塞时要保存的event信息
-```Go
-// etcd/mvcc/watcher_group.go
-
-type eventBatch struct {
-	// evs is a batch of revision-ordered events
-	evs []mvccpb.Event
-	// revs is the minimum unique revisions observed for this batch
-	revs int
-	// moreRev is first revision with more events following this batch
-	moreRev int64
-}
-```
-
-- *synced* 和 *unsynced* 类型的数据结构，这里通过区间树、集合等数据结构保存watcher，在性能上可以保障 *O(log^n)* 的时间复杂度
-
-```Go
-// etcd/mvcc/watcher_group.go
-
-// watcherGroup is a collection of watchers organized by their ranges
-type watcherGroup struct {
-	// keyWatchers has the watchers that watch on a single key
-	keyWatchers watcherSetByKey
-	// ranges has the watchers that watch a range; it is sorted by interval
-	ranges adt.IntervalTree
-	// watchers is the set of all watchers
-	watchers watcherSet
-}
-```
-
-- 下面即`sws.watchStream.Watch`中的`watch`实现，可以看到主要是根据要监控的版本号将watcher放在了 *synced* 或 *unsynced* 结构中
+<snippet id="mvcc.watch()">
 
 ```Go
 // etcd/mvcc/watchable_store.go
@@ -1076,13 +980,203 @@ func (s *watchableStore) watch(key, end []byte, startRev int64, id WatchID, ch c
 	return wa, func() { s.cancelWatcher(wa) }
 }
 ```
+{collapsible="true" collapsed-title="mvcc.watch()" default-state="collapsed"}
 
-总结一下，在`recvLoop`里调用`sws.watchStream.Watch()`后，分配了WatchID，`sws.watchStream.Watch()`又调用`ws.watchable.watch()`创建watcher，并根据要监听的版本号将watcher保存在了不同的数据结构，以便对不同进度的watcher执行不同的处理。
+</snippet>
+
+### 5.2 mvcc.watchableStore
+
+- `watchableStore`中将watcher分为了三类，分别是**victims**、**unsynced**、**synced**这三种，用于应对不同进度下的watcher处理。
+
+```Go
+// etcd/mvcc/watcher_group.go
+
+type watchableStore struct {
+    *store
+
+	// mu protects watcher groups and batches. It should never be locked
+	// before locking store.mu to avoid deadlock.
+	mu sync.RWMutex
+
+	// victims are watcher batches that were blocked on the watch channel
+	victims []watcherBatch
+	victimc chan struct{}
+
+	// contains all unsynced watchers that needs to sync with events that have happened
+	unsynced watcherGroup
+
+	// contains all synced watchers that are in sync with the progress of the store.
+	// The key of the map is the key that the watcher watches on.
+	synced watcherGroup
+
+	stopc chan struct{}
+	wg    sync.WaitGroup
+}
+
+type watcherBatch map[*watcher]*eventBatch
+```
+{collapsible="true" collapsed-title="mvcc.watchableStore struct" default-state="collapsed"}
+
+- `watcher`类型的构成如下，保存了key、id、reversion等信息。
+
+```Go
+// etcd/mvcc/watchable_store.go
+
+type watcher struct {
+// the watcher key
+key []byte
+// end indicates the end of the range to watch.
+// If end is set, the watcher is on a range.
+end []byte
+
+	// victim is set when ch is blocked and undergoing victim processing
+	victim bool
+
+	// compacted is set when the watcher is removed because of compaction
+	compacted bool
+
+	// restore is true when the watcher is being restored from leader snapshot
+	// which means that this watcher has just been moved from "synced" to "unsynced"
+	// watcher group, possibly with a future revision when it was first added
+	// to the synced watcher
+	// "unsynced" watcher revision must always be <= current revision,
+	// except when the watcher were to be moved from "synced" watcher group
+	restore bool
+
+	// minRev is the minimum revision update the watcher will accept
+	minRev int64
+	id     WatchID
+
+	fcs []FilterFunc
+	// a chan to send out the watch response.
+	// The chan might be shared with other watchers.
+	ch chan<- WatchResponse
+}
+```
+{collapsible="true" collapsed-title="mvcc.watcher struct" default-state="collapsed"}
+
+- `eventBatch`类型保存了`Event`及相关版本号，用于记录因watcher的channel被阻塞时要保存的event信息。
+```Go
+// etcd/mvcc/watcher_group.go
+
+type eventBatch struct {
+	// evs is a batch of revision-ordered events
+	evs []mvccpb.Event
+	// revs is the minimum unique revisions observed for this batch
+	revs int
+	// moreRev is first revision with more events following this batch
+	moreRev int64
+}
+```
+
+- **synced**和**unsynced**类型的数据结构，这里通过区间树、集合等数据结构保存watcher，在性能上可以保障 **O(log^n)** 的时间复杂度
+
+```Go
+// etcd/mvcc/watcher_group.go
+
+// watcherGroup is a collection of watchers organized by their ranges
+type watcherGroup struct {
+	// keyWatchers has the watchers that watch on a single key
+	keyWatchers watcherSetByKey
+	// ranges has the watchers that watch a range; it is sorted by interval
+	ranges adt.IntervalTree
+	// watchers is the set of all watchers
+	watchers watcherSet
+}
+```
+
+- 在`mvcc.watch()`实现中，可以看到主要是根据要监控的版本号将watcher放在了**synced**或**unsynced**结构中。
+
+<include from="etcd-watch.md" element-id="mvcc.watch()"></include>
+
+总结如下。
+1. 在`v3rpc.recvLoop()`里调用`sws.watchStream.Watch()`，分配了WatchID
+2. 在`sws.watchStream.Watch()`调用`ws.watchable.watch()`，也就是调用`mvcc.watchableStore.watch()`，创建了watcher
+3. `mvcc.watchableStore.watch()`会根据要监听的版本号将watcher保存在不同的数据结构，对不同进度的watcher执行不同的处理，也就是下图的第5步、第6步完成的工作。
+
+<include from="etcd-watch.md" element-id="etcd-diagram-2"></include>
 
 
 ## 6. mvcc是在什么时机产生事件的？
 
 Watch的作用是及时感知事件，而KV存储是事件的来源，那具体是在什么时机产生的事件呢？
+
+这就得从写入数据流程来分析了，在执行`put hello`操作时，在mvcc的`Put`事务中，它会调用`End`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送。。
+
+```Go
+func (wv *writeView) Put(key, value []byte, lease lease.LeaseID) (rev int64) {
+	tw := wv.kv.Write(traceutil.TODO())
+	defer tw.End()
+	return tw.Put(key, value, lease)
+}
+```
+
+```Go
+// etcd/mvcc/watchable_store_txn.go
+
+func (tw *watchableStoreTxnWrite) End() {
+	changes := tw.Changes()
+	if len(changes) == 0 {
+		tw.TxnWrite.End()
+		return
+	}
+
+	rev := tw.Rev() + 1
+	evs := make([]mvccpb.Event, len(changes))
+	for i, change := range changes {
+		evs[i].Kv = &changes[i]
+		if change.CreateRevision == 0 {
+			evs[i].Type = mvccpb.DELETE
+			evs[i].Kv.ModRevision = rev
+		} else {
+			evs[i].Type = mvccpb.PUT
+		}
+	}
+
+	// end write txn under watchable store lock so the updates are visible
+	// when asynchronous event posting checks the current store revision
+	tw.s.mu.Lock()
+	tw.s.notify(rev, evs)
+	tw.TxnWrite.End()
+	tw.s.mu.Unlock()
+}
+```
+{collapsible="true" collapsed-title="mvcc.End()" default-state="collapsed"}
+
+```Go
+// notify notifies the fact that given event at the given rev just happened to
+// watchers that watch on the key of the event.
+func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
+	var victim watcherBatch
+	for w, eb := range newWatcherBatch(&s.synced, evs) {
+		if eb.revs != 1 {
+			if s.store != nil && s.store.lg != nil {
+				s.store.lg.Panic(
+					"unexpected multiple revisions in watch notification",
+					zap.Int("number-of-revisions", eb.revs),
+				)
+			} else {
+				plog.Panicf("unexpected multiple revisions in notification")
+			}
+		}
+		if w.send(WatchResponse{WatchID: w.id, Events: eb.evs, Revision: rev}) {
+			pendingEventsGauge.Add(float64(len(eb.evs)))
+		} else {
+			// move slow watcher to victims
+			w.minRev = rev + 1
+			if victim == nil {
+				victim = make(watcherBatch)
+			}
+			w.victim = true
+			victim[w] = eb
+			s.synced.delete(w)
+			slowWatcherGauge.Inc()
+		}
+	}
+	s.addVictim(victim)
+}
+```
+{collapsible="true" collapsed-title="mvcc.notify()" default-state="collapsed"}
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
