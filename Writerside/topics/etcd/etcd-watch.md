@@ -748,6 +748,8 @@ flowchart TD
     G["watchStream: ws.watchable.NewWatchStream()"]
     F --> G
     D --> G
+    H["watchStream"]
+    G --> H
 ```
 
 也看可以看到，在`serverWatchStream`对象中，最终和底层的KV存储进行了关联。
