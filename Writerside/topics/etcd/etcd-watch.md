@@ -3,13 +3,21 @@
 
 # Etcd的Watch实现分析
 
-Etcd作为Kubernetes的控制面存储，保存了Kubernetes集群状态，各种Controller通过Watch机制感知集群事件，与实际状态对比后执行reconcile，确保集群按期望状态运行。系统的性能、可靠性非常依赖**Watch机制**，既然Watch机制这么关键，那它是怎么实现的并且如何确保性能和可靠性的呢？
+Etcd作为Kubernetes的控制面存储，保存了Kubernetes集群状态，各种Controller通过Watch机制感知集群事件，对比资源实际状态与期望状态执行reconcile，确保集群按期望状态运行。整个系统的性能、可靠性非常依赖**Watch机制**，因此掌握Watcher的实现原理对于理解kubernetes的运行至关重要。
 
-下面通过提出问题、解答问题的方式，尝试揭开Watch的神秘面纱，因为生产环境用了**Etcd v3.4.3**版本，所以本文以该版本的源码进行分析。
+本文通过提出问题、回答问题的方式，尝试揭开Watch的神秘面纱。
+
+>因为生产环境用了**Etcd v3.4.3**版本，所以本文以该版本的源码进行分析。
+> 
+{style="note"}
 
 ## 1. Watch机制基于什么协议实现？
 
 在v3版本中，Etcd使用**gRPC**进行消息传输，利用**HTTP/2**的**Multiplexing**、**Server Push**特性，以及**protocol buffers**的**二进制**、**高压缩**等优点，实现了高效的Watch机制。
+
+>Etcd v2的Watch机制使用HTTP/1.x实现，每个watcher对应一个TCP连接。Client通过HTTP/1.1协议长连接定时轮询Server，获取最新的数据变化事件。
+> 
+>当watcher数量较多时，即使集群空负载，大量轮询也会产生一定的QPS，Server端会消耗大量的socket、内存等资源，导致Etcd的扩展性、稳定性无法满足Kubernetes等业务场景诉求。
 
 接下来我们从gRPC的API开始探索，在gRPC中API是定义在`.proto`文件中的，如下所示，需要实现一个`Watch`的rpc方法。
 
@@ -42,7 +50,11 @@ service Watch {
 
 ## 2. Watch的gRPC Server是什么时候启动的？
 
-下面对Etcd启动流程做个概要分析，核心是找到启动gRPC Server的位置，以模块名为参与者，函数调用为消息，绘制出如下时序图。
+下面对Etcd启动流程做个概要分析，核心是找到启动gRPC Server的位置，绘制出如下时序图。
+
+>下图中的对象用函数所在的`package`名表示，交互消息用函数调用表示。
+
+<snippet id="etcd-diagram-1">
 
 ```mermaid
 sequenceDiagram
@@ -68,7 +80,9 @@ sequenceDiagram
     end
 ```
 
-可以看到etcd在启动流程中启动了gRPC Server，具体是在`embed`模块中的`StartEtcd()`函数中执行相关调用完成的，在`serve()`函数中调用`v3rpc.Server()`执行了WatchServer的创建和注册，针对是否启用了tls使用了不同的方式处理，`serve()`函数的逻辑如下。
+</snippet>
+
+可以看到etcd在启动流程中启动了gRPC Server，具体是在`embed`包中的`StartEtcd()`函数中执行相关调用完成的，在`serve()`函数中调用`v3rpc.Server()`执行了WatchServer的创建和注册，针对是否启用了tls使用了不同的方式处理，`serve()`函数的逻辑如下。
 
 ```Go
 // serve accepts incoming connections on the listener l,
@@ -116,7 +130,7 @@ func (sctx *serveCtx) serve(
 	return m.Serve()
 }
 ```
-{collapsible="true" collapsed-title="embed.serve()" default-state="expanded"}
+{collapsible="true" collapsed-title="embed.serve()" default-state="collapsed"}
 
 `v3rpc.Server()`中注册WatchServer的代码如下。
 ```Go
@@ -127,6 +141,7 @@ func Server(s *etcdserver.EtcdServer, tls *tls.Config, gopts ...grpc.ServerOptio
 	return grpcServer
 }
 ```
+{collapsible="true" collapsed-title="v3rpc.Server()" default-state="expanded"}
 
 `v3rpc.NewWatchServer()`创建WatchServer的过程如下。
 ```Go
@@ -146,10 +161,15 @@ func NewWatchServer(s *etcdserver.EtcdServer) pb.WatchServer {
 	}
 }
 ```
+{collapsible="true" collapsed-title="v3rpc.NewWatchServer()" default-state="expanded"}
 
 ## 3. Watch机制和KV存储有什么关系？
 
-主要逻辑在`StartEtcd()`中，重点关注和Watch相关的过程，对这个函数做个分析。
+上一节看到etcd启动的主要逻辑在`StartEtcd()`中，因此重点分析下这个函数，关注和Watch相关的过程，看看是否可以找到Watch机制和KV存储的关系。
+
+>如下是梳理关键逻辑后绘制的时序图，先有个大概框架，再详细分析下每一步代码实现。
+
+<snippet id="etcd-diagram-2">
 
 ```mermaid
 sequenceDiagram
@@ -164,6 +184,8 @@ sequenceDiagram
     embed->>embed: e.servePeers()
     embed->>embed: e.serveClients()
 ```
+
+</snippet>
 
 对照上图的序号，对关键步骤做个解释。
 
@@ -196,7 +218,7 @@ func StartEtcd(inCfg *Config) (e *Etcd, err error) {
 	return e, nil
 }
 ```
-{collapsible="true" collapsed-title="StartEtcd()" default-state="expanded"}
+{collapsible="true" collapsed-title="StartEtcd()" default-state="collapsed"}
 
 - 第2步创建了etcdserver对象，返回值是一个名为`EtcdServer`的对象。
 ```Go
@@ -217,17 +239,21 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 	return srv, nil
 }
 ```
-{collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="expanded"}
+{collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="collapsed"}
 
 - 第3步创建`mvcc`模块，简单调用了第4步的`newWatchableStore()`函数。
-- 第4步是第3步的具体实现，返回值是一个实现了`ConsistentWatchableKV`接口的对象，实现这个接口的类型是名为`watchableStore`的struct，代码如下。
 ```Go
 // etcd/mvcc/watchable_store.go
 
 func New(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig ConsistentIndexGetter, cfg StoreConfig) ConsistentWatchableKV {
 	return newWatchableStore(lg, b, le, ig, cfg)
 }
+```
 
+- 第4步是第3步的具体实现，返回值是一个实现了`ConsistentWatchableKV`接口的对象，实现这个接口的类型是名为`watchableStore`的struct。
+- 第5步启动了一个goroutine执行`syncWatchersLoop()`函数，每100ms同步一次处于**unsynced map**中的watcher。
+- 第6步启动了一个goroutine执行`syncVictimsLoop()`函数，在**victims**集合非空的情况下每10m同步一次，尝试给被阻塞的watcher同步事件。第4步到第6步的代码如下。
+```Go
 func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig ConsistentIndexGetter, cfg StoreConfig) *watchableStore {
 	s := &watchableStore{
 		store:    NewStore(lg, b, le, ig, cfg),
@@ -250,16 +276,22 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 	return s
 }
 ```
-- 第5步启动了一个goroutine执行`syncWatchersLoop()`函数，每100ms同步一次处于**unsynced map**中的watcher。
-- 第6步启动了一个goroutine执行`syncVictimsLoop()`函数，在**victims**集合非空的情况下每10m同步一次，尝试给被阻塞的watcher同步事件。
+{collapsible="true" collapsed-title="mvcc.newWatchableStore()" default-state="collapsed"}
+
 - 第7步启动了etcdserver。
 - 第9步执行了`serveClients()`函数，这个函数前面已经分析过，注册并启动了gRPC Server。
 
-总结一下，etcd在启动过程中，会初始化`mvcc`模块，它是一个实现了Watch特性的KV存储，注册`WatchServer`服务并启动了gRPC Server，至此就可以接收watch gRPC调用了，接下来我们看Watch在服务端的具体实现，了解客户端的watch请求如何到达服务端，服务端是如何处理watch请求并响应的。
+总结一下，etcd在启动过程中，会初始化`mvcc`模块，它是一个实现了Watch特性的KV存储，在这之后才执行上一节介绍的gRPC Server注册及启动，因此etcd的Watch机制需要KV存储是watchable的，也就是说需要KV存储也实现Watch机制。
+
+了解了gRPC Server注册及启动，也知道了需要KV存储实现Watch机制，那这个Watch的gRPC Service具体是如何实现的呢？
 
 ## 4. Watch的gRPC Service是如何实现的？
 
-根据上图的函数调用，可以看到图一第10步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
+在gRPC Server启动过程的分析中，看到第14步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
+
+<include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
+
+<snippet id="etcd-code-1">
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -339,6 +371,9 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 	return err
 }
 ```
+{collapsible="true" collapsed-title="v3rpc.Watch()" default-state="collapsed"}
+
+</snippet>
 
 我在注释中添加了序号，方便理解关键逻辑。
 
@@ -346,11 +381,15 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 2. 创建一个goroutine，执行`sws.recvLoop()`，它的作用是接收客户端的请求，通知下层KV存储创建watcher，建立watcher和key或key range的watch关系。
 3. 创建一个goroutine，执行`sws.sendLoop()`，它的作用是从KV存储获取变化，当KV中被监听的key发生变化时，实时向客户端发送事件。
 
-主要逻辑就是这3步，完成了客户端和服务端的Watch通信机制，我们具体分析下每一步分别做了什么。
+核心逻辑就是这3步，可以用下图来概括，我们具体分析下每一步分别做了什么。
+
+![Watch overview](watch-overview.svg) {id="etcd-diagram-3"}
 
 ### 4.1 serverWatchStream有什么作用？
 
 先从它的定义看起。
+
+<snippet id="etcd-code-2">
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -372,17 +411,9 @@ type serverWatchStream struct {
 	ag        AuthGetter
 
     // 4.1.1
-    // pb.Watch_WatchServer是一个interface，提供了Send和Recv方法
-    // Send表示向客户端发送gRPC请求
-    // Recv表示从客户端接收gRPC请求
-    // gRPCStream在这里的作用是和客户端进行grpc通信，建立了与上层客户端的联系
 	gRPCStream  pb.Watch_WatchServer
 	
     // 4.1.2
-    // mvcc.WatchStream是一个interface，提供了Watch、Chan等方法
-    // Watch方法用于创建watcher，注意这和gRPC Service的Watch不一样，只是名字相同而已
-    // Chan方法返回一个channel，被监听key的变化会发送到这个channel中
-    // watchStream在这里的作用是和KV存储建立联系，从KV存储中获取新事件
 	watchStream mvcc.WatchStream
 	ctrlStream  chan *pb.WatchResponse
 
@@ -403,6 +434,18 @@ type serverWatchStream struct {
 	wg sync.WaitGroup
 }
 ```
+{collapsible="true" collapsed-title="serverWatchStream struct" default-state="collapsed"}
+
+</snippet>
+
+先看`gRPCStream`字段，这是一个`pb.Watch_WatchServer`类型，它是一个interface，提供了`Send()`和`Recv()`方法。
+
+- `Send()`表示向客户端发送gRPC请求。
+- `Recv()`表示从客户端接收gRPC请求。
+- `gRPCStream`在这里的作用是和客户端进行grpc通信，建立了与上层客户端的联系。
+
+`Watch_WatchServer`定义如下。
+
 
 ```Go
 // etcd/etcdserver/etcdserverpb/rpc.pb.go
@@ -414,6 +457,16 @@ type Watch_WatchServer interface {
 }
 ```
 
+
+再看`watchStream`字段，这是一个`mvcc.WatchStream`类型，它是一个interface，提供了`Watch()`、`Chan()`等方法。
+
+- `Watch()`方法用于创建watcher。
+>注意这和gRPC Service的Watch不一样，方法所在的对象不同，作用也不同，只是名字相同而已。
+
+- `Chan()`方法返回一个channel，被监听key的变化会发送到这个channel中。
+- `watchStream`在这里的作用是和`mvcc`存储建立联系，从`mvcc`存储中获取新事件。
+
+`WatchStream`定义如下。
 ```Go
 // etcd/mvcc/watcher.go
 
@@ -452,16 +505,25 @@ type WatchStream interface {
 	Rev() int64
 }
 ```
+{collapsible="true" collapsed-title="WatchStream interface" default-state="collapsed"}
 
 上面在代码注释中标记了4.1.1和4.1.2两个关键字段，这是打通客户端到KV存储的关键。只从定义是无法得出这个结论的，需要从`serverWatchStream`的初始化过程来理解。
 
-### 4.1.1 gRPCStream
+#### 4.1.1 gRPCStream
 
-在第4节开始部分贴了`Watch`的gRPC Service实现，可以看到`gRPCStream:  stream`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是对`gRPCStream`的透传。
+在`Watch`的gRPC Service实现中可以看到`serverWatchStream`的初始化，从`gRPCStream:  stream`可知`gRPCStream`字段被赋值为`stream`。`gRPCStream`字段的类型为`pb.Watch_WatchServer`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是正常传参，可以通过如下代码对比。
 
-### 4.1.2 watchStream
+- `stream`类型
+<include from="etcd-watch.md" element-id="etcd-code-1"></include>
 
-同样地，在第4节开始部分`Watch`的gRPC Service实现中，可以看到`watchStream: ws.watchable.NewWatchStream()`，我们先看下`NewWatchStream()`。
+- `gRPCStream`类型
+<include from="etcd-watch.md" element-id="etcd-code-2"></include>
+
+#### 4.1.2 watchStream
+
+同样地，`serverWatchStream`初始化对`watchStream`字段也进行了赋值，即`watchStream: ws.watchable.NewWatchStream()`，先看下`ws.watchable.NewWatchStream()`定义。
+
+<snippet id="etcd-code-3">
 
 ```Go
 // etcd/mvcc/watchable_store.go
@@ -476,10 +538,15 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 	}
 }
 ```
+{collapsible="true" collapsed-title="mvcc.NewWatchStream()" default-state="collapsed"}
 
-- 这里看到返回结果是基于`watchableStore`对象封装的`watchStream`对象。那`watchableStore`对象是怎么来的呢？我们需要从`ws`也就是`watchServer`的初始化看起。
+</snippet>
 
-- 在函数调用图的第10步创建了`watchServer`对象，并对`ws.watchable`进行了初始化:`watchable: s.Watchable()`，那 s.Watchable()`做了什么呢？
+- 这里看到返回结果是基于`watchableStore`对象封装的`watchStream`对象。那`watchableStore`对象是怎么来的呢？需要从`ws`也就是`watchServer`的初始化看起。
+
+- 从前面的分析可知在启动过程（下图第14步）创建了`watchServer`对象，并对`ws.watchable`进行了初始化：`watchable: s.Watchable()`。
+
+<include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -501,7 +568,7 @@ func NewWatchServer(s *etcdserver.EtcdServer) pb.WatchServer {
 }
 ```
 
-- 查看`s.Watchable()`的定义，最终返回了`s.kv`，那`s.kv`是哪来的呢？
+- 那`s.Watchable()`做了什么呢？查看`s.Watchable()`的定义，最终返回了`s.kv`，那`s.kv`是哪来的呢？
 
 ```Go
 // etcd/etcdserver/v3_server.go
@@ -513,7 +580,9 @@ func (s *EtcdServer) Watchable() mvcc.WatchableKV { return s.KV() }
 func (s *EtcdServer) KV() mvcc.ConsistentWatchableKV { return s.kv }
 ```
 
-- 从前面的启动过程分析可以看到，`s.kv`正是在函数调用图的第3步被创建的，`mvcc.New()`内部通过调用`newWatchableStore()`返回了一个`watchableStore`对象，它实现了`WatchableKV`这个interface，也实现了`KV`interface，因此这个`watchableStore`对象就是一个实现了 *watchable* 接口的 *KV* 存储。
+- 从前面的分析可以看到，`s.kv`正是在下图第3步被创建的，`mvcc.New()`内部通过调用`newWatchableStore()`返回了一个`watchableStore`对象，它实现了`WatchableKV`这个interface，也实现了`KV`interface，因此这个`watchableStore`对象就是一个实现了**watchable**接口的**KV**存储。
+
+<include from="etcd-watch.md" element-id="etcd-diagram-2"></include>
 
 ```Go
 // etcd/etcdserver/server.go
@@ -531,6 +600,7 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 	return srv, nil
 }
 ```
+{collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="expanded"}
 
 ```Go
 // etcd/mvcc/watchable_store.go
@@ -538,7 +608,10 @@ func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
 func New(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig ConsistentIndexGetter, cfg StoreConfig) ConsistentWatchableKV {
 	return newWatchableStore(lg, b, le, ig, cfg)
 }
+```
+{collapsible="true" collapsed-title="mvcc.New()" default-state="expanded"}
 
+```Go
 func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig ConsistentIndexGetter, cfg StoreConfig) *watchableStore {
 	s := &watchableStore{
 		store:    NewStore(lg, b, le, ig, cfg),
@@ -559,10 +632,11 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 	return s
 }
 ```
+{collapsible="true" collapsed-title="mvcc.newWatchableStore()" default-state="collapsed"}
 
-- *到这里我们已经知道，`serverWatchStream`在`watchStream: ws.watchable.NewWatchStream()`这个初始化过程中，最终是将`mvcc.watchableStore`封装成`watchStream`对象赋值给了`watchStream`*。
+- **到这里我们已经知道，`serverWatchStream`在`watchStream: ws.watchable.NewWatchStream()`这个初始化过程中，最终是将`mvcc.watchableStore`封装成`watchStream`对象赋值给了`watchStream`**。
 
-- 继续往下跟踪，可以看到这个`store`封装了`backend.Backend`这个interface
+- 继续往下跟踪`store`的初始化：`store:    NewStore(lg, b, le, ig, cfg)`，可以看到这个`store`封装了`backend.Backend`这个interface。
 
 ```Go
 // etcd/mvcc/kvstore.go
@@ -614,11 +688,11 @@ func NewStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig ConsistentI
 	return s
 }
 ```
+{collapsible="true" collapsed-title="mvcc.NewStore()" default-state="collapsed"}
 
-- 而`backend`的实现则是封装了`bolt.DB`，也就是`etcd`最终是通过`boltDB`实现的持久化存储
+- 而`backend`的实现则是封装了`bolt.DB`，也就是`etcd`最终是通过`boltDB`实现的持久化存储。
 
 ```Go
-
 type backend struct {
 	// size and commits are used with atomic operations so they must be
 	// 64-bit aligned, otherwise 32-bit tests will crash
@@ -647,34 +721,39 @@ type backend struct {
 	lg *zap.Logger
 }
 ```
+{collapsible="true" collapsed-title="mvcc/backend.backend" default-state="collapsed"}
 
 上面嵌套比较深，总结一下。
-1. 在`etcd`启动过程中，创建了`mvcc.watchableStore`并赋值给`etcdserver`的`kv`字段，代码为`srv.kv = mvcc.New()`
-2. 在`Watch`的gRPC Service注册过程中，创建了`watchServer`并对`ws.watchable`字段进行了初始化，代码为``watchable: s.Watchable()`
-3. 在`s.Watchable()`函数中返回了第1步的`s.kv`，也就是`mvcc.watchableStore`对象
-4. 在`Watch`的gRPC Service执行中，创建了`serverWatchStream`，并对`sws.watchStream`字段进行了初始化，代码为`watchStream: ws.watchable.NewWatchStream()`
-5. 结合第2步、第3步，可以看到`ws.watchable`就是`mvcc.watchableStore`，所以`ws.watchable.NewWatchStream()`就是`mvcc.watchableStore.NewWatchStream()`
-6. 所以`sws.watchStream`的值就是`mvcc.watchableStore.NewWatchStream()`结果，实际代码如下，是基于`mvcc.watchableStore`封装的`watchStream`对象
+1. 在`etcd`启动过程中，创建了`mvcc.watchableStore`并赋值给`etcdserver`的`kv`字段，代码为`srv.kv = mvcc.New()`。
+2. 在`Watch`的gRPC Service注册过程中，创建了`watchServer`并对`ws.watchable`字段进行了初始化，代码为`watchable: s.Watchable()`。
+3. 在`s.Watchable()`函数中返回了第1步的`s.kv`，也就是`mvcc.watchableStore`对象。
+4. 在`Watch`的gRPC Service执行中，创建了`serverWatchStream`，并对`sws.watchStream`字段进行了初始化，代码为`watchStream: ws.watchable.NewWatchStream()`。
+5. 结合第2步、第3步，可以知到`ws.watchable`就是`mvcc.watchableStore`，所以`ws.watchable.NewWatchStream()`就是`mvcc.watchableStore.NewWatchStream()`。
+6. 因此`sws.watchStream`的值就是`mvcc.watchableStore.NewWatchStream()`结果，实际代码如下，是基于`mvcc.watchableStore`封装的`watchStream`对象。
 
-```Go
-// etcd/mvcc/watchable_store.go
+<include from="etcd-watch.md" element-id="etcd-code-3"></include>
 
-func (s *watchableStore) NewWatchStream() WatchStream {
-	watchStreamGauge.Inc()
-	return &watchStream{
-		watchable: s,
-		ch:        make(chan WatchResponse, chanBufLen),
-		cancels:   make(map[WatchID]cancelFunc),
-		watchers:  make(map[WatchID]*watcher),
-	}
-}
+```mermaid
+flowchart TD
+    A["mvcc.New()"]
+    B["mvcc.watchableStore"]
+    A --> B
+    C["NewWatchServer()"]
+    D["watchable: s.Watchable()"]
+    C --> D
+    B --> D
+    E["v3rpc.Watch()"]
+    F["serverWatchStream"]
+    E --> F
+    G["watchStream: ws.watchable.NewWatchStream()"]
+    F --> G
+    D --> G
 ```
 
 也看可以看到，在`serverWatchStream`对象中，最终和底层的KV存储进行了关联。
 
 结合4.1.1和4.1.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，在这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
 
-![Watch overview](watch-overview.svg)
 
 ### 4.2 recvLoop()做了什么事情？
 
@@ -803,11 +882,12 @@ func (sws *serverWatchStream) recvLoop() error {
 	}
 }
 ```
+{collapsible="true" collapsed-title="v3rpc.recvLoop()" default-state="collapsed"}
 
 通过关键代码注释，可以将`recvLoop`的主要逻辑总结如下。
-1. 通过sws.gRPCStream.Recv()接收客户端的rpc请求
-2. 如果是Watch的Create请求，调用mvcc实现的watchableStore.Watch方法进行处理
-3. 如果是Watch的Cancel、Progress请求，执行对应的逻辑进行处理
+1. 通过sws.gRPCStream.Recv()接收客户端的rpc请求。
+2. 如果是Watch的Create请求，调用mvcc实现的watchableStore.Watch方法进行处理。
+3. 如果是Watch的Cancel、Progress请求，执行对应的逻辑进行处理。
 
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
