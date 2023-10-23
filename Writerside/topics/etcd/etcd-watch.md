@@ -1144,7 +1144,7 @@ func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ..
 		return -1, ErrWatcherDuplicateID
 	}
 
-    // 调用`watchableStore.watch()`方法
+    // 调用`watchableStore.watch()`方法创建watcher
 	w, c := ws.watchable.watch(key, end, startRev, id, ws.ch, fcs...)
 
 	ws.cancels[id] = c
@@ -1153,6 +1153,9 @@ func (ws *watchStream) Watch(id WatchID, key, end []byte, startRev int64, fcs ..
 }
 ```
 {collapsible="true" collapsed-title="mvcc.Watch()" default-state="collapsed"}
+
+>在创建watcher时将`ws.ch`传给了`ws.watchable.watch()`。当有新事件产生时，在`mvcc.notify()`中调用`mvcc.send()`将事件发送到`watcher.ch`，而`sendLoop()`中调用的`sws.watchStream.Chan()`实际也是这个channel，因此这就将事件与`serverWatchStream`关联起来了。
+> 
 
 <snippet id="mvcc.watch()">
 
@@ -1235,11 +1238,11 @@ type watcherBatch map[*watcher]*eventBatch
 // etcd/mvcc/watchable_store.go
 
 type watcher struct {
-// the watcher key
-key []byte
-// end indicates the end of the range to watch.
-// If end is set, the watcher is on a range.
-end []byte
+	// the watcher key
+	key []byte
+	// end indicates the end of the range to watch.
+	// If end is set, the watcher is on a range.
+	end []byte
 
 	// victim is set when ch is blocked and undergoing victim processing
 	victim bool
@@ -1313,11 +1316,25 @@ type watcherGroup struct {
 
 Watch的作用是及时感知事件，而KV存储是事件的来源，那具体是在什么时机产生的事件呢？
 
-这就得从写入数据流程来分析了，在执行`put hello`操作时，在mvcc的`Put`事务中，它会调用`End`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送。。
+这就得从写入数据流程来分析了，在执行`put hello`操作时，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
+
+```mermaid
+flowchart TB
+    p["put hello"]
+    e["mvcc.End()"]
+    n["mvcc.notify()"]
+    s["mvcc.send()"]
+    c["serverWatchStream.watchStream.ch"]
+    p-->e
+    e-->n
+    n-->s
+    s-->c
+```
 
 ```Go
 func (wv *writeView) Put(key, value []byte, lease lease.LeaseID) (rev int64) {
 	tw := wv.kv.Write(traceutil.TODO())
+	// 事务结束会调整End()
 	defer tw.End()
 	return tw.Put(key, value, lease)
 }
@@ -1348,6 +1365,7 @@ func (tw *watchableStoreTxnWrite) End() {
 	// end write txn under watchable store lock so the updates are visible
 	// when asynchronous event posting checks the current store revision
 	tw.s.mu.Lock()
+	// 调用notify()
 	tw.s.notify(rev, evs)
 	tw.TxnWrite.End()
 	tw.s.mu.Unlock()
@@ -1356,6 +1374,8 @@ func (tw *watchableStoreTxnWrite) End() {
 {collapsible="true" collapsed-title="mvcc.End()" default-state="collapsed"}
 
 ```Go
+// etcd/mvcc/watchable_store.go
+
 // notify notifies the fact that given event at the given rev just happened to
 // watchers that watch on the key of the event.
 func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
@@ -1371,6 +1391,7 @@ func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
 				plog.Panicf("unexpected multiple revisions in notification")
 			}
 		}
+		// 调用send将事件发送出去
 		if w.send(WatchResponse{WatchID: w.id, Events: eb.evs, Revision: rev}) {
 			pendingEventsGauge.Add(float64(len(eb.evs)))
 		} else {
@@ -1389,6 +1410,43 @@ func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
 }
 ```
 {collapsible="true" collapsed-title="mvcc.notify()" default-state="collapsed"}
+
+```Go
+// etcd/mvcc/watchable_store.go
+func (w *watcher) send(wr WatchResponse) bool {
+	progressEvent := len(wr.Events) == 0
+
+	if len(w.fcs) != 0 {
+		ne := make([]mvccpb.Event, 0, len(wr.Events))
+		for i := range wr.Events {
+			filtered := false
+			for _, filter := range w.fcs {
+				if filter(wr.Events[i]) {
+					filtered = true
+					break
+				}
+			}
+			if !filtered {
+				ne = append(ne, wr.Events[i])
+			}
+		}
+		wr.Events = ne
+	}
+
+	// if all events are filtered out, we should send nothing.
+	if !progressEvent && len(wr.Events) == 0 {
+		return true
+	}
+	select {
+	// w.ch 实际上就是serverWatchStream.watchStream.ch，也就是mvcc.watchStream.ch
+	case w.ch <- wr:
+		return true
+	default:
+		return false
+	}
+}
+```
+{collapsible="true" collapsed-title="mvcc.send()" default-state="collapsed"}
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
