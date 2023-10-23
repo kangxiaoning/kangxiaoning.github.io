@@ -381,9 +381,7 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 2. 创建一个goroutine，执行`sws.recvLoop()`，它的作用是接收客户端的请求，通知下层KV存储创建watcher，建立watcher和key或key range的watch关系。
 3. 创建一个goroutine，执行`sws.sendLoop()`，它的作用是从KV存储获取变化，当KV中被监听的key发生变化时，实时向客户端发送事件。
 
-核心逻辑就是这3步，可以用下图来概括，我们具体分析下每一步分别做了什么。
-
-![Watch overview](watch-overview.svg) {id="etcd-diagram-3"}
+接下来分别分析下这三步的代码逻辑。
 
 ### 4.1 serverWatchStream有什么作用？ {id="4.1"}
 
@@ -891,7 +889,7 @@ func (sws *serverWatchStream) recvLoop() error {
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
 ```mermaid
-flowchart TD
+flowchart LR
     client-->gRPCStream
     subgraph serverWatchStream
       gRPCStream-->|"Recv()"|recvLoop(("recvLoop()"))
@@ -901,7 +899,6 @@ flowchart TD
 ```
 
 ### 4.3 sendLoop()做了什么事情？ {id="4.3"}
-
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -1092,7 +1089,7 @@ func (sws *serverWatchStream) sendLoop() {
 3. 定时机制维持watcher心跳
 
 ```mermaid
-flowchart BT
+flowchart RL
   gRPCStream-->client
   subgraph serverWatchStream
     sendLoop(("sendLoop()"))-->|"Send()"|gRPCStream
@@ -1101,8 +1098,11 @@ flowchart BT
   mvcc.watchableStore[(mvcc.watchableStore)]-->watchStream
 ```
 
-
 结合[4.1](#4.1)、[4.2](#4.2)、[4.3](#4.3)，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
+
+`serverWatchStream`承上启下的作用可以用下图来概括。
+
+![Watch overview](watch-overview.svg) {id="etcd-diagram-3"}
 
 ## 5. mvcc的watchableStore是如何处理Watch的？
 
