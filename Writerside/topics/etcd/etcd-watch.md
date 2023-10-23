@@ -385,7 +385,7 @@ func (ws *watchServer) Watch(stream pb.Watch_WatchServer) (err error) {
 
 ![Watch overview](watch-overview.svg) {id="etcd-diagram-3"}
 
-### 4.1 serverWatchStream有什么作用？
+### 4.1 serverWatchStream有什么作用？ {id="4.1"}
 
 先从它的定义看起。
 
@@ -883,14 +883,226 @@ func (sws *serverWatchStream) recvLoop() error {
 ```
 {collapsible="true" collapsed-title="v3rpc.recvLoop()" default-state="collapsed"}
 
-通过关键代码注释，可以将`recvLoop`的主要逻辑总结如下。
+通过关键代码注释，可以将`recvLoop()`的主要逻辑总结如下。
 1. 通过`sws.gRPCStream.Recv()`接收客户端的rpc请求。
 2. 如果是Watch的Create请求，调用mvcc实现的watchableStore.Watch方法进行处理。
 3. 如果是Watch的Cancel、Progress请求，执行对应的逻辑进行处理。
 
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
-结合4.1和4.2，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
+```mermaid
+flowchart TD
+    client-->gRPCStream
+    subgraph serverWatchStream
+      gRPCStream-->|"Recv()"|recvLoop(("recvLoop()"))
+      recvLoop-->|"Watch()"|watchStream
+    end
+    watchStream-->mvcc.watchableStore[(mvcc.watchableStore)]
+```
+
+### 4.3 sendLoop()做了什么事情？ {id="4.3"}
+
+
+```Go
+// etcd/etcdserver/api/v3rpc/watch.go
+func (sws *serverWatchStream) sendLoop() {
+	// watch ids that are currently active
+	ids := make(map[mvcc.WatchID]struct{})
+	// watch responses pending on a watch id creation message
+	pending := make(map[mvcc.WatchID][]*pb.WatchResponse)
+
+	interval := GetProgressReportInterval()
+	progressTicker := time.NewTicker(interval)
+
+	defer func() {
+		progressTicker.Stop()
+		// drain the chan to clean up pending events
+		for ws := range sws.watchStream.Chan() {
+			mvcc.ReportEventReceived(len(ws.Events))
+		}
+		for _, wrs := range pending {
+			for _, ws := range wrs {
+				mvcc.ReportEventReceived(len(ws.Events))
+			}
+		}
+	}()
+
+	for {
+		select {
+		// 1. 调用Chan()从mvcc获取WatchResponse
+		case wresp, ok := <-sws.watchStream.Chan():
+			if !ok {
+				return
+			}
+
+			// TODO: evs is []mvccpb.Event type
+			// either return []*mvccpb.Event from the mvcc package
+			// or define protocol buffer with []mvccpb.Event.
+			evs := wresp.Events
+			events := make([]*mvccpb.Event, len(evs))
+			sws.mu.RLock()
+			needPrevKV := sws.prevKV[wresp.WatchID]
+			sws.mu.RUnlock()
+			for i := range evs {
+				events[i] = &evs[i]
+				if needPrevKV {
+					opt := mvcc.RangeOptions{Rev: evs[i].Kv.ModRevision - 1}
+					r, err := sws.watchable.Range(evs[i].Kv.Key, nil, opt)
+					if err == nil && len(r.KVs) != 0 {
+						events[i].PrevKv = &(r.KVs[0])
+					}
+				}
+			}
+
+			canceled := wresp.CompactRevision != 0
+			wr := &pb.WatchResponse{
+				Header:          sws.newResponseHeader(wresp.Revision),
+				WatchId:         int64(wresp.WatchID),
+				Events:          events,
+				CompactRevision: wresp.CompactRevision,
+				Canceled:        canceled,
+			}
+
+			if _, okID := ids[wresp.WatchID]; !okID {
+				// buffer if id not yet announced
+				wrs := append(pending[wresp.WatchID], wr)
+				pending[wresp.WatchID] = wrs
+				continue
+			}
+
+			mvcc.ReportEventReceived(len(evs))
+
+			sws.mu.RLock()
+			fragmented, ok := sws.fragment[wresp.WatchID]
+			sws.mu.RUnlock()
+
+			var serr error
+			// 1.1 调用sws.gRPCStream.Send()将事件发送给client
+			if !fragmented && !ok {
+				serr = sws.gRPCStream.Send(wr)
+			} else {
+				serr = sendFragments(wr, sws.maxRequestBytes, sws.gRPCStream.Send)
+			}
+
+			if serr != nil {
+				if isClientCtxErr(sws.gRPCStream.Context().Err(), serr) {
+					if sws.lg != nil {
+						sws.lg.Debug("failed to send watch response to gRPC stream", zap.Error(serr))
+					} else {
+						plog.Debugf("failed to send watch response to gRPC stream (%q)", serr.Error())
+					}
+				} else {
+					if sws.lg != nil {
+						sws.lg.Warn("failed to send watch response to gRPC stream", zap.Error(serr))
+					} else {
+						plog.Warningf("failed to send watch response to gRPC stream (%q)", serr.Error())
+					}
+					streamFailures.WithLabelValues("send", "watch").Inc()
+				}
+				return
+			}
+
+			sws.mu.Lock()
+			if len(evs) > 0 && sws.progress[wresp.WatchID] {
+				// elide next progress update if sent a key update
+				sws.progress[wresp.WatchID] = false
+			}
+			sws.mu.Unlock()
+
+        // 2. 控制逻辑，消息由recvLoop()产生
+		case c, ok := <-sws.ctrlStream:
+			if !ok {
+				return
+			}
+
+			if err := sws.gRPCStream.Send(c); err != nil {
+				if isClientCtxErr(sws.gRPCStream.Context().Err(), err) {
+					if sws.lg != nil {
+						sws.lg.Debug("failed to send watch control response to gRPC stream", zap.Error(err))
+					} else {
+						plog.Debugf("failed to send watch control response to gRPC stream (%q)", err.Error())
+					}
+				} else {
+					if sws.lg != nil {
+						sws.lg.Warn("failed to send watch control response to gRPC stream", zap.Error(err))
+					} else {
+						plog.Warningf("failed to send watch control response to gRPC stream (%q)", err.Error())
+					}
+					streamFailures.WithLabelValues("send", "watch").Inc()
+				}
+				return
+			}
+
+			// track id creation
+			wid := mvcc.WatchID(c.WatchId)
+			// 2.1 删除watcher
+			if c.Canceled {
+				delete(ids, wid)
+				continue
+			}
+			// 2.2 创建watcher
+			if c.Created {
+				// flush buffered events
+				ids[wid] = struct{}{}
+				for _, v := range pending[wid] {
+					mvcc.ReportEventReceived(len(v.Events))
+					if err := sws.gRPCStream.Send(v); err != nil {
+						if isClientCtxErr(sws.gRPCStream.Context().Err(), err) {
+							if sws.lg != nil {
+								sws.lg.Debug("failed to send pending watch response to gRPC stream", zap.Error(err))
+							} else {
+								plog.Debugf("failed to send pending watch response to gRPC stream (%q)", err.Error())
+							}
+						} else {
+							if sws.lg != nil {
+								sws.lg.Warn("failed to send pending watch response to gRPC stream", zap.Error(err))
+							} else {
+								plog.Warningf("failed to send pending watch response to gRPC stream (%q)", err.Error())
+							}
+							streamFailures.WithLabelValues("send", "watch").Inc()
+						}
+						return
+					}
+				}
+				delete(pending, wid)
+			}
+
+        // 3. 定时同步client
+		case <-progressTicker.C:
+			sws.mu.Lock()
+			for id, ok := range sws.progress {
+				if ok {
+					sws.watchStream.RequestProgress(id)
+				}
+				sws.progress[id] = true
+			}
+			sws.mu.Unlock()
+
+		case <-sws.closec:
+			return
+		}
+	}
+}
+```
+{collapsible="true" collapsed-title="v3rpc.sendLoop()" default-state="collapsed"}
+
+通过关键代码注释，可以将`sendLoop()`的主要逻辑总结如下。
+1. 通过`sws.watchStream.Chan()`从mvcc获取event消息，并推送给client。 `sws.watchStream`是`mvcc.WatchStream`类型，这个类型实现了`Chan()`方法，会返回一个channel，channel存储的类型为`WatchResponse`。
+2. 接收`recvLoop()`发送的control消息，包括watcher的create、cancel，以维护watcher列表。
+3. 定时机制维持watcher心跳
+
+```mermaid
+flowchart BT
+  gRPCStream-->client
+  subgraph serverWatchStream
+    sendLoop(("sendLoop()"))-->|"Send()"|gRPCStream
+    watchStream-->|"Chan()"|sendLoop
+  end
+  mvcc.watchableStore[(mvcc.watchableStore)]-->watchStream
+```
+
+
+结合[4.1](#4.1)、[4.2](#4.2)、[4.3](#4.3)，可以得出结论，`serverWatchStream`将客户端和KV存储做了关联，这个对象中既可以通过`gRPC Server`和客户端通信，也可以通过`mvcc`和KV存储通信。
 
 ## 5. mvcc的watchableStore是如何处理Watch的？
 
@@ -1182,3 +1394,4 @@ func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
 - Etcd深入解析可以参考Etcd作者在CNCF的演讲 [Deep Dive: etcd - Xiang Li, Alibaba & Wenjia Zhang, Google](https://youtu.be/GJqO1TYzVDE?si=fuQroGUNRO2sewqX) 。
 - Watch在Kubernetes中的应用可以参考 [The Life of a Kubernetes Watch Event - Wenjia Zhang & Haowei Cai, Google](https://youtu.be/PLSDvFjR9HY?si=jKTer1TEFhOfnE5T) 。
+- https://segmentfault.com/a/1190000040582989
