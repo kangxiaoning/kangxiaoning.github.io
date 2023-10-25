@@ -1284,7 +1284,7 @@ type eventBatch struct {
 }
 ```
 
-- **synced**和**unsynced**类型的数据结构，这里通过区间树、集合等数据结构保存watcher，在性能上可以保障 **O(log^n)** 的时间复杂度
+- **synced**和**unsynced**类型的数据结构，这里通过区间树、集合等数据结构保存watcher，在性能上可以保障 **O(log^n)** 的时间复杂度。
 
 ```Go
 // etcd/mvcc/watcher_group.go
@@ -1316,7 +1316,8 @@ type watcherGroup struct {
 
 Watch的作用是及时感知事件，而KV存储是事件的来源，那具体是在什么时机产生的事件呢？
 
-### 6.1 etcdctl中的Put调用过程
+### 6.1 从etcdctl跟踪Put调用过程
+
 从`etcdctl`跟踪`Put()`调用，过程如下，最终是通过`gRPC`执行了`Put()`方法。
 
 ```mermaid
@@ -1324,8 +1325,7 @@ sequenceDiagram
     autonumber
     main->>main: main()
     main->>ctlv3: ctlv3.Start()
-    ctlv3->>command: command.NewPutCommand()
-    command->>command: putCommandFunc()
+    ctlv3->>command: putCommandFunc()
     command->>command: mustClientFromCmd(cmd)
     command->>clientv3: clientv3.New(*cfg)
     clientv3->>clientv3: newClient(cfg *Config)
@@ -1336,9 +1336,64 @@ sequenceDiagram
     grpc->>etcdserver: Put()
 ```
 
+- 根据`cobra`的用法用可，`etcdctl`执行put操作会调用到`putCommandFunc()`。
+- 在`putCommandFunc()`中调用`mustClientFromCmd(cmd)`会返回一个`Client`对象。
+- 实际是`Client`调用的Put方法，因为`Client`实现了`KV`接口，而`Put()`是在`kv`对象实现的，所以最终会执行到`kv`结构体上的`Put()`方法，代码如下。
+
+```Go
+// etcd/clientv3/kv.go
+func (kv *kv) Put(ctx context.Context, key, val string, opts ...OpOption) (*PutResponse, error) {
+	r, err := kv.Do(ctx, OpPut(key, val, opts...))
+	return r.put, toErr(ctx, err)
+}
+```
+
+- 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
+
+```Go
+// etcd/clientv3/kv.go
+
+func (kv *kv) Do(ctx context.Context, op Op) (OpResponse, error) {
+	var err error
+	switch op.t {
+	case tRange:
+		var resp *pb.RangeResponse
+		resp, err = kv.remote.Range(ctx, op.toRangeRequest(), kv.callOpts...)
+		if err == nil {
+			return OpResponse{get: (*GetResponse)(resp)}, nil
+		}
+	case tPut:
+		var resp *pb.PutResponse
+		r := &pb.PutRequest{Key: op.key, Value: op.val, Lease: int64(op.leaseID), PrevKv: op.prevKV, IgnoreValue: op.ignoreValue, IgnoreLease: op.ignoreLease}
+		resp, err = kv.remote.Put(ctx, r, kv.callOpts...)
+		if err == nil {
+			return OpResponse{put: (*PutResponse)(resp)}, nil
+		}
+	case tDeleteRange:
+		var resp *pb.DeleteRangeResponse
+		r := &pb.DeleteRangeRequest{Key: op.key, RangeEnd: op.end, PrevKv: op.prevKV}
+		resp, err = kv.remote.DeleteRange(ctx, r, kv.callOpts...)
+		if err == nil {
+			return OpResponse{del: (*DeleteResponse)(resp)}, nil
+		}
+	case tTxn:
+		var resp *pb.TxnResponse
+		resp, err = kv.remote.Txn(ctx, op.toTxnRequest(), kv.callOpts...)
+		if err == nil {
+			return OpResponse{txn: (*TxnResponse)(resp)}, nil
+		}
+	default:
+		panic("Unknown op")
+	}
+	return OpResponse{}, toErr(ctx, err)
+}
+```
+{collapsible="true" collapsed-title="clientv3.kv.Do()" default-state="collapsed"}
+
 ### 6.2 etcdserver中的Put调用过程
 
-在前面分析启动过程时，提到下面这个函数，在这个函数中也注册了**KVServer**，`Put()`的rpc方法就是在这里注册的KVServer中实现的，从`NewQuotaKVServer(s)`中的`s`可以看出，实际上是**EtcdServer**实例实现了这个**KVServer**接口，可以顺着这个逻辑找到`Put()`的实现。
+在前面分析启动过程时，提到`v3rpc.Server()`函数，在这个函数中注册了`WatchServer`，也注册了**KVServer**，`Put()`的rpc方法就是在这个KVServer中实现的，从`NewQuotaKVServer(s)`中的`s`可以看出，实际上是**EtcdServer**实例实现了这个**KVServer**接口，可以顺着这个逻辑找到`Put()`的实现。
+
 ```Go
 // etcd/etcdserver/api/v3rpc/grpc.go
 
@@ -1398,7 +1453,147 @@ func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse
 ```
 {collapsible="true" collapsed-title="etcdserver.Put()" default-state="collapsed"}
 
-这就得从写入数据流程来分析了，在执行`put hello`操作时，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
+```mermaid
+sequenceDiagram
+    autonumber
+    etcdserver->>etcdserver: Put()
+    etcdserver->>etcdserver: s.raftRequest(ctx, pb.InternalRaftRequest{Put: r})
+    etcdserver->>etcdserver: s.raftRequestOnce(ctx, r)
+    etcdserver->>etcdserver: s.processInternalRaftRequestOnce(ctx, r)
+    etcdserver->>raft: s.r.Propose(cctx, data)
+    etcdserver->>etcdserver: <-s.r.apply()
+```
+
+etcd启动过程中会执行一个`run()`函数，然后在这个函数中执行`<-s.r.apply()`等待经过`raft`完成`propose`的数据，这里调用链比较长，最终会执行到`a.s.applyV3.Put(nil, r.Put)`，也就是下面的`Put()`方法，终于进入`mvcc`模块了。
+
+```Go
+// etcd/etcdserver/apply.go
+
+func (a *applierV3backend) Apply(r *pb.InternalRaftRequest) *applyResult {
+	ar := &applyResult{}
+	defer func(start time.Time) {
+		warnOfExpensiveRequest(a.s.getLogger(), start, &pb.InternalRaftStringer{Request: r}, ar.resp, ar.err)
+	}(time.Now())
+
+	// call into a.s.applyV3.F instead of a.F so upper appliers can check individual calls
+	switch {
+	case r.Range != nil:
+		ar.resp, ar.err = a.s.applyV3.Range(context.TODO(), nil, r.Range)
+	// 执行Put操作
+	case r.Put != nil:
+		ar.resp, ar.trace, ar.err = a.s.applyV3.Put(nil, r.Put)
+	case r.DeleteRange != nil:
+		ar.resp, ar.err = a.s.applyV3.DeleteRange(nil, r.DeleteRange)
+	case r.Txn != nil:
+		ar.resp, ar.err = a.s.applyV3.Txn(r.Txn)
+	case r.Compaction != nil:
+		ar.resp, ar.physc, ar.trace, ar.err = a.s.applyV3.Compaction(r.Compaction)
+	case r.LeaseGrant != nil:
+		ar.resp, ar.err = a.s.applyV3.LeaseGrant(r.LeaseGrant)
+	case r.LeaseRevoke != nil:
+		ar.resp, ar.err = a.s.applyV3.LeaseRevoke(r.LeaseRevoke)
+	case r.LeaseCheckpoint != nil:
+		ar.resp, ar.err = a.s.applyV3.LeaseCheckpoint(r.LeaseCheckpoint)
+	case r.Alarm != nil:
+		ar.resp, ar.err = a.s.applyV3.Alarm(r.Alarm)
+	case r.Authenticate != nil:
+		ar.resp, ar.err = a.s.applyV3.Authenticate(r.Authenticate)
+	case r.AuthEnable != nil:
+		ar.resp, ar.err = a.s.applyV3.AuthEnable()
+	case r.AuthDisable != nil:
+		ar.resp, ar.err = a.s.applyV3.AuthDisable()
+	case r.AuthUserAdd != nil:
+		ar.resp, ar.err = a.s.applyV3.UserAdd(r.AuthUserAdd)
+	case r.AuthUserDelete != nil:
+		ar.resp, ar.err = a.s.applyV3.UserDelete(r.AuthUserDelete)
+	case r.AuthUserChangePassword != nil:
+		ar.resp, ar.err = a.s.applyV3.UserChangePassword(r.AuthUserChangePassword)
+	case r.AuthUserGrantRole != nil:
+		ar.resp, ar.err = a.s.applyV3.UserGrantRole(r.AuthUserGrantRole)
+	case r.AuthUserGet != nil:
+		ar.resp, ar.err = a.s.applyV3.UserGet(r.AuthUserGet)
+	case r.AuthUserRevokeRole != nil:
+		ar.resp, ar.err = a.s.applyV3.UserRevokeRole(r.AuthUserRevokeRole)
+	case r.AuthRoleAdd != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleAdd(r.AuthRoleAdd)
+	case r.AuthRoleGrantPermission != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleGrantPermission(r.AuthRoleGrantPermission)
+	case r.AuthRoleGet != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleGet(r.AuthRoleGet)
+	case r.AuthRoleRevokePermission != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleRevokePermission(r.AuthRoleRevokePermission)
+	case r.AuthRoleDelete != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleDelete(r.AuthRoleDelete)
+	case r.AuthUserList != nil:
+		ar.resp, ar.err = a.s.applyV3.UserList(r.AuthUserList)
+	case r.AuthRoleList != nil:
+		ar.resp, ar.err = a.s.applyV3.RoleList(r.AuthRoleList)
+	default:
+		panic("not implemented")
+	}
+	return ar
+}
+```
+{collapsible="true" collapsed-title="applyV3.Apply()" default-state="collapsed"}
+
+```Go
+// etcd/etcdserver/apply.go
+
+func (a *applierV3backend) Put(txn mvcc.TxnWrite, p *pb.PutRequest) (resp *pb.PutResponse, trace *traceutil.Trace, err error) {
+	resp = &pb.PutResponse{}
+	resp.Header = &pb.ResponseHeader{}
+	trace = traceutil.New("put",
+		a.s.getLogger(),
+		traceutil.Field{Key: "key", Value: string(p.Key)},
+		traceutil.Field{Key: "req_size", Value: proto.Size(p)},
+	)
+	val, leaseID := p.Value, lease.LeaseID(p.Lease)
+	if txn == nil {
+		if leaseID != lease.NoLease {
+			if l := a.s.lessor.Lookup(leaseID); l == nil {
+				return nil, nil, lease.ErrLeaseNotFound
+			}
+		}
+		txn = a.s.KV().Write(trace)
+		defer txn.End()
+	}
+
+	var rr *mvcc.RangeResult
+	if p.IgnoreValue || p.IgnoreLease || p.PrevKv {
+		trace.DisableStep()
+		rr, err = txn.Range(p.Key, nil, mvcc.RangeOptions{})
+		if err != nil {
+			return nil, nil, err
+		}
+		trace.EnableStep()
+		trace.Step("get previous kv pair")
+	}
+	if p.IgnoreValue || p.IgnoreLease {
+		if rr == nil || len(rr.KVs) == 0 {
+			// ignore_{lease,value} flag expects previous key-value pair
+			return nil, nil, ErrKeyNotFound
+		}
+	}
+	if p.IgnoreValue {
+		val = rr.KVs[0].Value
+	}
+	if p.IgnoreLease {
+		leaseID = lease.LeaseID(rr.KVs[0].Lease)
+	}
+	if p.PrevKv {
+		if rr != nil && len(rr.KVs) != 0 {
+			resp.PrevKv = &rr.KVs[0]
+		}
+	}
+
+	resp.Header.Revision = txn.Put(p.Key, val, leaseID)
+	trace.AddField(traceutil.Field{Key: "response_revision", Value: resp.Header.Revision})
+	return resp, trace, nil
+}
+```
+{collapsible="true" collapsed-title="applyV3.Put()" default-state="collapsed"}
+
+在执行`put hello`操作时，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
 
 ```mermaid
 flowchart TB
@@ -1535,3 +1730,4 @@ func (w *watcher) send(wr WatchResponse) bool {
 - Etcd深入解析可以参考Etcd作者在CNCF的演讲 [Deep Dive: etcd - Xiang Li, Alibaba & Wenjia Zhang, Google](https://youtu.be/GJqO1TYzVDE?si=fuQroGUNRO2sewqX) 。
 - Watch在Kubernetes中的应用可以参考 [The Life of a Kubernetes Watch Event - Wenjia Zhang & Haowei Cai, Google](https://youtu.be/PLSDvFjR9HY?si=jKTer1TEFhOfnE5T) 。
 - https://segmentfault.com/a/1190000040582989
+- https://juejin.cn/post/7253020765312860216#heading-0
