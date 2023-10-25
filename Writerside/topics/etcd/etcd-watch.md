@@ -1316,6 +1316,88 @@ type watcherGroup struct {
 
 Watch的作用是及时感知事件，而KV存储是事件的来源，那具体是在什么时机产生的事件呢？
 
+### 6.1 etcdctl中的Put调用过程
+从`etcdctl`跟踪`Put()`调用，过程如下，最终是通过`gRPC`执行了`Put()`方法。
+
+```mermaid
+sequenceDiagram
+    autonumber
+    main->>main: main()
+    main->>ctlv3: ctlv3.Start()
+    ctlv3->>command: command.NewPutCommand()
+    command->>command: putCommandFunc()
+    command->>command: mustClientFromCmd(cmd)
+    command->>clientv3: clientv3.New(*cfg)
+    clientv3->>clientv3: newClient(cfg *Config)
+    clientv3->>clientv3: NewKV(c *Client)
+    clientv3->>clientv3: RetryKVClient(c *Client)
+    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
+    etcdserverpb->>grpc: NewKVClient(cc *grpc.ClientConn)
+    grpc->>etcdserver: Put()
+```
+
+### 6.2 etcdserver中的Put调用过程
+
+在前面分析启动过程时，提到下面这个函数，在这个函数中也注册了**KVServer**，`Put()`的rpc方法就是在这里注册的KVServer中实现的，从`NewQuotaKVServer(s)`中的`s`可以看出，实际上是**EtcdServer**实例实现了这个**KVServer**接口，可以顺着这个逻辑找到`Put()`的实现。
+```Go
+// etcd/etcdserver/api/v3rpc/grpc.go
+
+func Server(s *etcdserver.EtcdServer, tls *tls.Config, gopts ...grpc.ServerOption) *grpc.Server {
+	var opts []grpc.ServerOption
+	opts = append(opts, grpc.CustomCodec(&codec{}))
+	if tls != nil {
+		bundle := credentials.NewBundle(credentials.Config{TLSConfig: tls})
+		opts = append(opts, grpc.Creds(bundle.TransportCredentials()))
+	}
+	opts = append(opts, grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+		newLogUnaryInterceptor(s),
+		newUnaryInterceptor(s),
+		grpc_prometheus.UnaryServerInterceptor,
+	)))
+	opts = append(opts, grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+		newStreamInterceptor(s),
+		grpc_prometheus.StreamServerInterceptor,
+	)))
+	opts = append(opts, grpc.MaxRecvMsgSize(int(s.Cfg.MaxRequestBytes+grpcOverheadBytes)))
+	opts = append(opts, grpc.MaxSendMsgSize(maxSendBytes))
+	opts = append(opts, grpc.MaxConcurrentStreams(maxStreams))
+	grpcServer := grpc.NewServer(append(opts, gopts...)...)
+
+    // 注册KVServer
+	pb.RegisterKVServer(grpcServer, NewQuotaKVServer(s))
+	pb.RegisterWatchServer(grpcServer, NewWatchServer(s))
+	pb.RegisterLeaseServer(grpcServer, NewQuotaLeaseServer(s))
+	pb.RegisterClusterServer(grpcServer, NewClusterServer(s))
+	pb.RegisterAuthServer(grpcServer, NewAuthServer(s))
+	pb.RegisterMaintenanceServer(grpcServer, NewMaintenanceServer(s))
+
+	// server should register all the services manually
+	// use empty service name for all etcd services' health status,
+	// see https://github.com/grpc/grpc/blob/master/doc/health-checking.md for more
+	hsrv := health.NewServer()
+	hsrv.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
+	healthpb.RegisterHealthServer(grpcServer, hsrv)
+
+	// set zero values for metrics registered for this grpc server
+	grpc_prometheus.Register(grpcServer)
+
+	return grpcServer
+}
+```
+{collapsible="true" collapsed-title="v3rpc.Server()" default-state="collapsed"}
+
+```Go
+func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse, error) {
+	ctx = context.WithValue(ctx, traceutil.StartTimeKey, time.Now())
+	resp, err := s.raftRequest(ctx, pb.InternalRaftRequest{Put: r})
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.PutResponse), nil
+}
+```
+{collapsible="true" collapsed-title="etcdserver.Put()" default-state="collapsed"}
+
 这就得从写入数据流程来分析了，在执行`put hello`操作时，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
 
 ```mermaid
