@@ -1453,18 +1453,108 @@ func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse
 ```
 {collapsible="true" collapsed-title="etcdserver.Put()" default-state="collapsed"}
 
+`Put()`请求经过`raft`的处理后，最终会在`etcdserver.run()`方法中的`<-s.r.apply()`读取出来，下面再介绍。
+
+```Go
+// etcd/etcdserver/v3_server.go
+
+func (s *EtcdServer) processInternalRaftRequestOnce(ctx context.Context, r pb.InternalRaftRequest) (*applyResult, error) {
+	ai := s.getAppliedIndex()
+	ci := s.getCommittedIndex()
+	if ci > ai+maxGapBetweenApplyAndCommitIndex {
+		return nil, ErrTooManyRequests
+	}
+
+	r.Header = &pb.RequestHeader{
+		ID: s.reqIDGen.Next(),
+	}
+
+	authInfo, err := s.AuthInfoFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if authInfo != nil {
+		r.Header.Username = authInfo.Username
+		r.Header.AuthRevision = authInfo.Revision
+	}
+
+	data, err := r.Marshal()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(data) > int(s.Cfg.MaxRequestBytes) {
+		return nil, ErrRequestTooLarge
+	}
+
+	id := r.ID
+	if id == 0 {
+		id = r.Header.ID
+	}
+	ch := s.w.Register(id)
+
+	cctx, cancel := context.WithTimeout(ctx, s.Cfg.ReqTimeout())
+	defer cancel()
+
+	start := time.Now()
+	err = s.r.Propose(cctx, data)
+	if err != nil {
+		proposalsFailed.Inc()
+		s.w.Trigger(id, nil) // GC wait
+		return nil, err
+	}
+	proposalsPending.Inc()
+	defer proposalsPending.Dec()
+
+	select {
+	case x := <-ch:
+		return x.(*applyResult), nil
+	case <-cctx.Done():
+		proposalsFailed.Inc()
+		s.w.Trigger(id, nil) // GC wait
+		return nil, s.parseProposeCtxErr(cctx.Err(), start)
+	case <-s.done:
+		return nil, ErrStopped
+	}
+}
+```
+{collapsible="true" collapsed-title="etcdserver.processInternalRaftRequestOnce()" default-state="collapsed"}
+
+
 ```mermaid
 sequenceDiagram
-    autonumber
-    etcdserver->>etcdserver: Put()
-    etcdserver->>etcdserver: s.raftRequest(ctx, pb.InternalRaftRequest{Put: r})
-    etcdserver->>etcdserver: s.raftRequestOnce(ctx, r)
-    etcdserver->>etcdserver: s.processInternalRaftRequestOnce(ctx, r)
-    etcdserver->>raft: s.r.Propose(cctx, data)
-    etcdserver->>etcdserver: <-s.r.apply()
+  autonumber
+  etcdserver->>etcdserver: Put()
+  etcdserver->>etcdserver: s.raftRequest(ctx, pb.InternalRaftRequest{Put: r})
+  etcdserver->>etcdserver: s.raftRequestOnce(ctx, r)
+  etcdserver->>etcdserver: s.processInternalRaftRequestOnce(ctx, r)
+  etcdserver->>raft: s.r.Propose(cctx, data)
 ```
 
 etcd启动过程中会执行一个`run()`函数，然后在这个函数中执行`<-s.r.apply()`等待经过`raft`完成`propose`的数据，这里调用链比较长，最终会执行到`a.s.applyV3.Put(nil, r.Put)`，也就是下面的`Put()`方法，终于进入`mvcc`模块了。
+
+```mermaid
+sequenceDiagram
+  autonumber
+  main->>main: main()
+  main->>etcdmain: Main()
+  etcdmain->>etcdmain: startEtcdOrProxyV2()
+  etcdmain->>etcdmain: startEtcd(&cfg.ec)
+  etcdmain->>embed: embed.StartEtcd(cfg)
+  embed->>etcdserver: e.Server.Start()
+  etcdserver->>etcdserver: s.start()
+  etcdserver->>etcdserver: go s.run()
+  etcdserver->>etcdserver: <-s.r.apply()
+  etcdserver->>etcdserver: s.applyAll(&ep, &ap)
+  etcdserver->>etcdserver: s.applyEntries(ep, apply)
+  etcdserver->>etcdserver: s.apply(ents, &ep.confState)
+  etcdserver->>etcdserver: s.applyEntryNormal(&e)
+  etcdserver->>etcdserver-apply: s.applyV3.Apply(&raftReq)
+  etcdserver-apply->>etcdserver-apply:a.s.applyV3.Put(nil, r.Put)
+  embed->>embed: e.servePeers()
+  embed->>embed: e.serveClients()
+  embed->>embed: s.serve()
+```
 
 ```Go
 // etcd/etcdserver/apply.go
