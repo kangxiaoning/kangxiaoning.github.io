@@ -1329,6 +1329,13 @@ sequenceDiagram
     command->>command: mustClientFromCmd(cmd)
     command->>clientv3: clientv3.New(*cfg)
     clientv3->>clientv3: newClient(cfg *Config)
+```
+
+`newClient()`继续调用`NewKV()`，最终会走到`Put()`的rpc调用。
+
+```mermaid
+sequenceDiagram
+    autonumber 7
     clientv3->>clientv3: NewKV(c *Client)
     clientv3->>clientv3: RetryKVClient(c *Client)
     clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
