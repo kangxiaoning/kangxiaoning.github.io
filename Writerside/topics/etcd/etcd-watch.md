@@ -57,6 +57,9 @@ service Watch {
 <snippet id="etcd-diagram-1">
 
 ```mermaid
+---
+title: 启动gRPC Server
+---
 sequenceDiagram
     autonumber
     main->>main: main()
@@ -1318,8 +1321,28 @@ Watch的作用是及时感知事件，而KV存储是事件的来源，那具体�
 
 ### 6.1 从etcdctl跟踪Put调用过程
 
-从`etcdctl`跟踪`Put()`调用，过程如下，最终是通过`gRPC`执行了`Put()`方法。
+如下以`etcdctl put`执行为例，分析一个数据从无到有的过程，进而了解触发`Watch`的位置及原理。
 
+- 根据`cobra`的用法可知，`etcdctl put`实际是通过`putCommandFunc()`完成的。
+- 在`putCommandFunc()`中调用`mustClientFromCmd(cmd)`会返回一个`*clientv3.Client`对象。
+
+```Go
+// putCommandFunc executes the "put" command.
+func putCommandFunc(cmd *cobra.Command, args []string) {
+	key, value, opts := getPutOp(args)
+
+	ctx, cancel := commandCtx(cmd)
+	resp, err := mustClientFromCmd(cmd).Put(ctx, key, value, opts...)
+	cancel()
+	if err != nil {
+		ExitWithError(ExitError, err)
+	}
+	display.Put(*resp)
+}
+```
+{collapsible="true" collapsed-title="putCommandFunc()" default-state="collapsed"}
+
+ 
 ```mermaid
 sequenceDiagram
     autonumber
@@ -1331,21 +1354,50 @@ sequenceDiagram
     clientv3->>clientv3: newClient(cfg *Config)
 ```
 
-`newClient()`继续调用`NewKV()`，最终会走到`Put()`的rpc调用。
+- 到这里已经获取了`clientv3.Client`对象，根据`putCommandFunc()`的实现可看到接下来调用了`clientv3.Client`对象的`Put()`方法。从`clientv3.Client`定义可知它需要实现`KV`接口，而`Put()`正是这个`KV`接口下的方法，接下来需要分析`clientv3.Client`的`Put`方法是如何实现的。
 
-```mermaid
-sequenceDiagram
-    autonumber 7
-    clientv3->>clientv3: NewKV(c *Client)
-    clientv3->>clientv3: RetryKVClient(c *Client)
-    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
-    etcdserverpb->>grpc: NewKVClient(cc *grpc.ClientConn)
-    grpc->>etcdserver: Put()
+```Go
+// Client provides and manages an etcd v3 client session.
+type Client struct {
+	Cluster
+	KV
+	Lease
+	Watcher
+	Auth
+	Maintenance
+
+	conn *grpc.ClientConn
+
+	cfg           Config
+	creds         grpccredentials.TransportCredentials
+	resolverGroup *endpoint.ResolverGroup
+	mu            *sync.RWMutex
+
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	// Username is a user name for authentication.
+	Username string
+	// Password is a password for authentication.
+	Password        string
+	authTokenBundle credentials.Bundle
+
+	callOpts []grpc.CallOption
+
+	lg *zap.Logger
+}
 ```
+{collapsible="true" collapsed-title="Client struct" default-state="collapsed"}
 
-- 根据`cobra`的用法用可，`etcdctl`执行put操作会调用到`putCommandFunc()`。
-- 在`putCommandFunc()`中调用`mustClientFromCmd(cmd)`会返回一个`Client`对象。
-- 实际是`Client`调用的Put方法，因为`Client`实现了`KV`接口，而`Put()`是在`kv`对象实现的，所以最终会执行到`kv`结构体上的`Put()`方法，代码如下。
+- 根据`clientv3`这个package的结构可以判断出`kv`实现了`KV`接口，因此`client.Put()`将调用如下`kv`对象的`Put()`方法。
+
+```Go
+type kv struct {
+	remote   pb.KVClient
+	callOpts []grpc.CallOption
+}
+```
+{collapsible="true" collapsed-title="clientv3.kv struct" default-state="collapsed"}
 
 ```Go
 // etcd/clientv3/kv.go
@@ -1354,8 +1406,9 @@ func (kv *kv) Put(ctx context.Context, key, val string, opts ...OpOption) (*PutR
 	return r.put, toErr(ctx, err)
 }
 ```
+{collapsible="true" collapsed-title="clientv3.Put()" default-state="collapsed"}
 
-- 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
+- 接下来到了`kv.Do()`，它通过`kv.remote.Range(ctx, op.toRangeRequest(), kv.callOpts...)`执行了远程调用，实际上就是`gRPC`调用，那它是怎么实现的呢？
 
 ```Go
 // etcd/clientv3/kv.go
@@ -1396,6 +1449,66 @@ func (kv *kv) Do(ctx context.Context, op Op) (OpResponse, error) {
 }
 ```
 {collapsible="true" collapsed-title="clientv3.kv.Do()" default-state="collapsed"}
+
+- 这个细节藏在`clientv3.New()`中，它会调用`newClient(cfg *Config)`，接着来到`NewKV(c *Client)`，得到一个`kVclient`对象，它实现了`Put()`的rpc客户端方法。
+
+```Go
+func NewKV(c *Client) KV {
+	api := &kv{remote: RetryKVClient(c)}
+	if c != nil {
+		api.callOpts = c.callOpts
+	}
+	return api
+}
+```
+{collapsible="true" collapsed-title="clientv3.NewKV()" default-state="collapsed"}
+
+```Go
+func RetryKVClient(c *Client) pb.KVClient {
+	return &retryKVClient{
+		kc: pb.NewKVClient(c.conn),
+	}
+}
+```
+{collapsible="true" collapsed-title="clientv3.RetryKVClient()" default-state="collapsed"}
+
+
+```Go
+type kVClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewKVClient(cc *grpc.ClientConn) KVClient {
+	return &kVClient{cc}
+}
+```
+{collapsible="true" collapsed-title="clientv3.NewKVClient()" default-state="collapsed"}
+
+```Go
+func (c *kVClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error) {
+	out := new(PutResponse)
+	err := grpc.Invoke(ctx, "/etcdserverpb.KV/Put", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+```
+{collapsible="true" collapsed-title="kVClient.Put()" default-state="collapsed"}
+
+```mermaid
+sequenceDiagram
+    autonumber 7
+    clientv3->>clientv3: NewKV(c *Client)
+    clientv3->>clientv3: RetryKVClient(c *Client)
+    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
+    etcdserverpb->>grpc: Put()
+    grpc->>etcdserver: grpc.Invoke()
+```
+
+
+- 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
+
 
 ### 6.2 etcdserver中的Put调用过程
 
@@ -1451,6 +1564,7 @@ func Server(s *etcdserver.EtcdServer, tls *tls.Config, gopts ...grpc.ServerOptio
 ```Go
 func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse, error) {
 	ctx = context.WithValue(ctx, traceutil.StartTimeKey, time.Now())
+	// Put操作转化raft请求
 	resp, err := s.raftRequest(ctx, pb.InternalRaftRequest{Put: r})
 	if err != nil {
 		return nil, err
@@ -1460,7 +1574,7 @@ func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse
 ```
 {collapsible="true" collapsed-title="etcdserver.Put()" default-state="collapsed"}
 
-`Put()`请求经过`raft`的处理后，最终会在`etcdserver.run()`方法中的`<-s.r.apply()`读取出来，下面再介绍。
+从`Put()`实现可以看到，Put操作就是一个raft请求，请求经过`raft`模块的处理后，最终会在`etcdserver.run()`方法中的`<-s.r.apply()`读取出来，下面再介绍。
 
 ```Go
 // etcd/etcdserver/v3_server.go
