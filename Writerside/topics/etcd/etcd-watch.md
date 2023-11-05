@@ -1506,7 +1506,6 @@ sequenceDiagram
     grpc->>etcdserver: grpc.Invoke()
 ```
 
-
 - 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
 
 

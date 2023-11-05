@@ -8,5 +8,6 @@
 
     <toc-element topic="Etcd.md">
         <toc-element topic="etcd-watch.md"/>
+        <toc-element topic="etcd-raft.md"/>
     </toc-element>
 </instance-profile>
