@@ -88,7 +88,279 @@ n.ProposeConfChange(ctx, cc)
 
 ![etcd raft library](etcd-raft-library.svg)
 
-## 2. Propose()后的数据去哪了？
+## 2. etcd中的raft节点创建和启动
+
+学习了raft库的使用后，接下来分析etcd中是如何使用raft的，先看下raft节点的创建和启动。
+
+### 2.1 创建raft节点
+
+在etcd启动过程中，有一步是`etcdserver.NewServer(srvcfg)`，在这个函数中创建了raft节点。
+
+```Go
+	srv = &EtcdServer{
+		readych:     make(chan struct{}),
+		Cfg:         cfg,
+		lgMu:        new(sync.RWMutex),
+		lg:          cfg.Logger,
+		errorc:      make(chan error, 1),
+		v2store:     st,
+		snapshotter: ss,
+		
+		// 创建raft节点
+		r: *newRaftNode(
+			raftNodeConfig{
+				lg:          cfg.Logger,
+				isIDRemoved: func(id uint64) bool { return cl.IsIDRemoved(types.ID(id)) },
+				Node:        n,
+				heartbeat:   heartbeat,
+				raftStorage: s,
+				storage:     NewStorage(w, ss),
+			},
+		),
+		id:               id,
+		attributes:       membership.Attributes{Name: cfg.Name, ClientURLs: cfg.ClientURLs.StringSlice()},
+		cluster:          cl,
+		stats:            sstats,
+		lstats:           lstats,
+		SyncTicker:       time.NewTicker(500 * time.Millisecond),
+		peerRt:           prt,
+		reqIDGen:         idutil.NewGenerator(uint16(id), time.Now()),
+		forceVersionC:    make(chan struct{}),
+		AccessController: &AccessController{CORS: cfg.CORS, HostWhitelist: cfg.HostWhitelist},
+	}
+```
+{collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="collapsed"}
+
+`Etcdserver`中的raft节点是个`raftNode`结构体，实现了raft库的`Node`接口，具体在`raftNode.raftNodeConfig`这个结构体中。
+
+```Go
+type raftNode struct {
+	lg *zap.Logger
+
+	tickMu *sync.Mutex
+	raftNodeConfig
+
+	// a chan to send/receive snapshot
+	msgSnapC chan raftpb.Message
+
+	// a chan to send out apply
+	applyc chan apply
+
+	// a chan to send out readState
+	readStateC chan raft.ReadState
+
+	// utility
+	ticker *time.Ticker
+	// contention detectors for raft heartbeat message
+	td *contention.TimeoutDetector
+
+	stopped chan struct{}
+	done    chan struct{}
+}
+```
+{collapsible="true" collapsed-title="etcdserver.raftNode struct" default-state="collapsed"}
+
+```Go
+type raftNodeConfig struct {
+	lg *zap.Logger
+
+	// to check if msg receiver is removed from cluster
+	isIDRemoved func(id uint64) bool
+	raft.Node
+	raftStorage *raft.MemoryStorage
+	storage     Storage
+	heartbeat   time.Duration // for logging
+	// transport specifies the transport to send and receive msgs to members.
+	// Sending messages MUST NOT block. It is okay to drop messages, since
+	// clients should timeout and reissue their messages.
+	// If transport is nil, server will panic.
+	transport rafthttp.Transporter
+}
+```
+{collapsible="true" collapsed-title="etcdserver.raftNodeConfig struct" default-state="collapsed"}
+
+可以看到`etcdserver.NewServer(srvcfg)`初始化过程中将`raft.Node`传给了`raftNodeConfig.Node`，这一步建立了`etcdserver.raftNode`和`raft.Node`的关系。
+
+### 2.2 启动raft节点
+
+在`embed.StartEtcd()`执行了如下代码启动了`Etcdserver`。
+
+```Go
+	e.Server.Start()
+```
+在`EtcdServer.Start()`中经过如下调用后，最终在`run()`中执行`s.r.start(rh)`启动了`raftNode`。
+
+```mermaid
+flowchart LR
+    A("EtcdServer.Start()")
+    B("EtcdServer.start()")
+    C("EtcdServer.run()")
+    D("raftNode.start()")
+    
+    A-->B
+    B-->C
+    C-->D
+```
+
+1. 执行`s.r.start(rh)`启动`raftNode`，该函数执行了一个goroutine在后台运行。
+```Go
+	rh := &raftReadyHandler{
+		getLead:    func() (lead uint64) { return s.getLead() },
+		updateLead: func(lead uint64) { s.setLead(lead) },
+		updateLeadership: func(newLeader bool) {
+			if !s.isLeader() {
+				if s.lessor != nil {
+					s.lessor.Demote()
+				}
+				if s.compactor != nil {
+					s.compactor.Pause()
+				}
+				setSyncC(nil)
+			} else {
+				if newLeader {
+					t := time.Now()
+					s.leadTimeMu.Lock()
+					s.leadElectedTime = t
+					s.leadTimeMu.Unlock()
+				}
+				setSyncC(s.SyncTicker.C)
+				if s.compactor != nil {
+					s.compactor.Resume()
+				}
+			}
+			if newLeader {
+				s.leaderChangedMu.Lock()
+				lc := s.leaderChanged
+				s.leaderChanged = make(chan struct{})
+				close(lc)
+				s.leaderChangedMu.Unlock()
+			}
+			// TODO: remove the nil checking
+			// current test utility does not provide the stats
+			if s.stats != nil {
+				s.stats.BecomeLeader()
+			}
+		},
+		updateCommittedIndex: func(ci uint64) {
+			cci := s.getCommittedIndex()
+			if ci > cci {
+				s.setCommittedIndex(ci)
+			}
+		},
+	}
+	s.r.start(rh)
+```
+{collapsible="true" collapsed-title="Etcdserver.run().s.r.start(rh)" default-state="collapsed"}
+
+2. 执行`rd := <-r.Ready()`从raft模块获取更新，执行`r.applyc <- ap`将处理结果发往`raftNode.applyc` channel。
+```Go
+// start prepares and starts raftNode in a new goroutine. It is no longer safe
+// to modify the fields after it has been started.
+func (r *raftNode) start(rh *raftReadyHandler) {
+	internalTimeout := time.Second
+
+	go func() {
+		defer r.onStop()
+		islead := false
+
+		for {
+			select {
+			case <-r.ticker.C:
+				r.tick()
+			// 折叠`case rd := <-r.Ready()`代码块
+			case rd := <-r.Ready():...
+			   // ...
+				ap := apply{
+					entries:  rd.CommittedEntries,
+					snapshot: rd.Snapshot,
+					notifyc:  notifyc,
+				}
+
+				updateCommittedIndex(&ap, rh)
+
+				select {
+				case r.applyc <- ap:
+				case <-r.stopped:
+					return
+				}
+			case <-r.stopped:
+				return
+			}
+			// ...
+		}
+	}()
+}
+```
+{collapsible="true" collapsed-title="raftNode.start()" default-state="collapsed"}
+
+3. 在`Etcdserver.run()`中执行`ap := <-s.r.apply()`获取第2步的`raftNode`处理后的结果，最终会调用到apply模块。
+```Go
+	for {
+		select {
+		case ap := <-s.r.apply():
+			f := func(context.Context) { s.applyAll(&ep, &ap) }
+			sched.Schedule(f)
+		case leases := <-expiredLeaseC:
+			s.goAttach(func() {
+				// Increases throughput of expired leases deletion process through parallelization
+				c := make(chan struct{}, maxPendingRevokes)
+				for _, lease := range leases {
+					select {
+					case c <- struct{}{}:
+					case <-s.stopping:
+						return
+					}
+					lid := lease.ID
+					s.goAttach(func() {
+						ctx := s.authStore.WithRoot(s.ctx)
+						_, lerr := s.LeaseRevoke(ctx, &pb.LeaseRevokeRequest{ID: int64(lid)})
+						if lerr == nil {
+							leaseExpired.Inc()
+						} else {
+							if lg != nil {
+								lg.Warn(
+									"failed to revoke lease",
+									zap.String("lease-id", fmt.Sprintf("%016x", lid)),
+									zap.Error(lerr),
+								)
+							} else {
+								plog.Warningf("failed to revoke %016x (%q)", lid, lerr.Error())
+							}
+						}
+
+						<-c
+					})
+				}
+			})
+		case err := <-s.errorc:
+			if lg != nil {
+				lg.Warn("server error", zap.Error(err))
+				lg.Warn("data-dir used by this member must be removed")
+			} else {
+				plog.Errorf("%s", err)
+				plog.Infof("the data-dir used by this member must be removed.")
+			}
+			return
+		case <-getSyncC():
+			if s.v2store.HasTTLKeys() {
+				s.sync(s.Cfg.ReqTimeout())
+			}
+		case <-s.stop:
+			return
+		}
+	}
+```
+{collapsible="true" collapsed-title="Etcdserver.run().for{...}" default-state="collapsed"}
+
+### 2.3 总结
+
+创建并启动`raftNode`后，最终会和`EtcdServer`关联起来，通过channel传递消息，异步处理最终持久化到`EtcdServer`的存储中。
+
+`raft`模块输出消息给`raftNode`，最后被`EtcdServer`处理的大致过程可以用下图表示。
+
+![raftNode](etcd-raft-raftnode.svg)
+
+## 3. Propose()后的数据去哪了？
 
 `Etcdserver`执行`Put()`请求后，通过如下一系列调用，最终数据包装成`msgWithResult{m: m}`发给了`node.prooc`，接下来这个调用就断了，那这个请求最终是在哪里被处理了呢？
 
