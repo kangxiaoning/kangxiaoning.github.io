@@ -88,11 +88,11 @@ n.ProposeConfChange(ctx, cc)
 
 ![etcd raft library](etcd-raft-library.svg)
 
-## 2. etcd中的raft节点创建和启动
+## 2. 创建和启动raftNode
 
-学习了raft库的使用后，接下来分析etcd中是如何使用raft的，先看下raft节点的创建和启动。
+学习了raft库的使用后，接下来分析etcd中是如何使用raft的，先看下`raftNode`的创建和启动。
 
-### 2.1 创建raft节点
+### 2.1 创建raftNode
 
 在etcd启动过程中，有一步是`etcdserver.NewServer(srvcfg)`，在这个函数中创建了raft节点。
 
@@ -181,7 +181,7 @@ type raftNodeConfig struct {
 
 可以看到`etcdserver.NewServer(srvcfg)`初始化过程中将`raft.Node`传给了`raftNodeConfig.Node`，这一步建立了`etcdserver.raftNode`和`raft.Node`的关系。
 
-### 2.2 启动raft节点
+### 2.2 启动raftNode
 
 在`embed.StartEtcd()`执行了如下代码启动了`Etcdserver`。
 
@@ -202,7 +202,7 @@ flowchart LR
     C-->D
 ```
 
-1. 执行`s.r.start(rh)`启动`raftNode`，该函数执行了一个goroutine在后台运行。
+1. 执行`s.r.start(rh)`启动`raftNode`，该函数创建了一个goroutine在后台运行。
 ```Go
 	rh := &raftReadyHandler{
 		getLead:    func() (lead uint64) { return s.getLead() },
@@ -252,7 +252,7 @@ flowchart LR
 ```
 {collapsible="true" collapsed-title="Etcdserver.run().s.r.start(rh)" default-state="collapsed"}
 
-2. 执行`rd := <-r.Ready()`从raft模块获取更新，执行`r.applyc <- ap`将处理结果发往`raftNode.applyc` channel。
+2. 在`raftNode.start()`执行`rd := <-r.Ready()`从raft模块获取数据，对数据进行处理后，接着执行`r.applyc <- ap`将处理结果发往`raftNode.applyc` channel。
 ```Go
 // start prepares and starts raftNode in a new goroutine. It is no longer safe
 // to modify the fields after it has been started.
@@ -293,7 +293,7 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 ```
 {collapsible="true" collapsed-title="raftNode.start()" default-state="collapsed"}
 
-3. 在`Etcdserver.run()`中执行`ap := <-s.r.apply()`获取第2步的`raftNode`处理后的结果，最终会调用到apply模块。
+3. 在`Etcdserver.run()`中执行`ap := <-s.r.apply()`，从`raftNode.applyc`获取第2步的处理结果，最终会调用到apply模块完成持久化。
 ```Go
 	for {
 		select {
@@ -354,13 +354,570 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 
 ### 2.3 总结
 
-创建并启动`raftNode`后，最终会和`EtcdServer`关联起来，通过channel传递消息，异步处理最终持久化到`EtcdServer`的存储中。
+创建并启动`raftNode`后，从raft库输出的数据与`EtcdServer`就关联起来了，通过channel传递消息，以异步的方式处理，最终会持久化到`EtcdServer`的存储中。
 
-`raft`模块输出消息给`raftNode`，最后被`EtcdServer`处理的大致过程可以用下图表示。
+`raft`模块通过`readyc`输出数据给`raftNode`，`raftNode`通过`applyc`输出数据给`EtcdServer`，数据流向可以用下图表示。
 
 ![raftNode](etcd-raft-raftnode.svg)
 
-## 3. Propose()后的数据去哪了？
+## 3. 创建和启动transport
+
+raft库并没有提供网络传输的功能，这是留给用户做的工作，那在etcd中这个功能是在哪实现的呢？
+
+etcd通过rafthttp实现了这个功能，这个模块中定义了如下`Transporter`接口，并且在`Transport` struct中实现了这个接口。
+
+```Go
+type Transporter interface {
+	// Start starts the given Transporter.
+	// Start MUST be called before calling other functions in the interface.
+	Start() error
+	// Handler returns the HTTP handler of the transporter.
+	// A transporter HTTP handler handles the HTTP requests
+	// from remote peers.
+	// The handler MUST be used to handle RaftPrefix(/raft)
+	// endpoint.
+	Handler() http.Handler
+	// Send sends out the given messages to the remote peers.
+	// Each message has a To field, which is an id that maps
+	// to an existing peer in the transport.
+	// If the id cannot be found in the transport, the message
+	// will be ignored.
+	Send(m []raftpb.Message)
+	// SendSnapshot sends out the given snapshot message to a remote peer.
+	// The behavior of SendSnapshot is similar to Send.
+	SendSnapshot(m snap.Message)
+	// AddRemote adds a remote with given peer urls into the transport.
+	// A remote helps newly joined member to catch up the progress of cluster,
+	// and will not be used after that.
+	// It is the caller's responsibility to ensure the urls are all valid,
+	// or it panics.
+	AddRemote(id types.ID, urls []string)
+	// AddPeer adds a peer with given peer urls into the transport.
+	// It is the caller's responsibility to ensure the urls are all valid,
+	// or it panics.
+	// Peer urls are used to connect to the remote peer.
+	AddPeer(id types.ID, urls []string)
+	// RemovePeer removes the peer with given id.
+	RemovePeer(id types.ID)
+	// RemoveAllPeers removes all the existing peers in the transport.
+	RemoveAllPeers()
+	// UpdatePeer updates the peer urls of the peer with the given id.
+	// It is the caller's responsibility to ensure the urls are all valid,
+	// or it panics.
+	UpdatePeer(id types.ID, urls []string)
+	// ActiveSince returns the time that the connection with the peer
+	// of the given id becomes active.
+	// If the connection is active since peer was added, it returns the adding time.
+	// If the connection is currently inactive, it returns zero time.
+	ActiveSince(id types.ID) time.Time
+	// ActivePeers returns the number of active peers.
+	ActivePeers() int
+	// Stop closes the connections and stops the transporter.
+	Stop()
+}
+```
+{collapsible="true" collapsed-title="rafthttp.Transporter interface" default-state="collapsed"}
+
+`Transport`实现了`Transporter`接口，它提供向其它节点发送消息、从其它节点接收消息的功能。
+
+```Go
+// Transport implements Transporter interface. It provides the functionality
+// to send raft messages to peers, and receive raft messages from peers.
+// User should call Handler method to get a handler to serve requests
+// received from peerURLs.
+// User needs to call Start before calling other functions, and call
+// Stop when the Transport is no longer used.
+type Transport struct {
+	Logger *zap.Logger
+
+	DialTimeout time.Duration // maximum duration before timing out dial of the request
+	// DialRetryFrequency defines the frequency of streamReader dial retrial attempts;
+	// a distinct rate limiter is created per every peer (default value: 10 events/sec)
+	DialRetryFrequency rate.Limit
+
+	TLSInfo transport.TLSInfo // TLS information used when creating connection
+
+	ID          types.ID   // local member ID
+	URLs        types.URLs // local peer URLs
+	ClusterID   types.ID   // raft cluster ID for request validation
+	Raft        Raft       // raft state machine, to which the Transport forwards received messages and reports status
+	Snapshotter *snap.Snapshotter
+	ServerStats *stats.ServerStats // used to record general transportation statistics
+	// used to record transportation statistics with followers when
+	// performing as leader in raft protocol
+	LeaderStats *stats.LeaderStats
+	// ErrorC is used to report detected critical errors, e.g.,
+	// the member has been permanently removed from the cluster
+	// When an error is received from ErrorC, user should stop raft state
+	// machine and thus stop the Transport.
+	ErrorC chan error
+
+	streamRt   http.RoundTripper // roundTripper used by streams
+	pipelineRt http.RoundTripper // roundTripper used by pipelines
+
+	mu      sync.RWMutex         // protect the remote and peer map
+	remotes map[types.ID]*remote // remotes map that helps newly joined member to catch up
+	peers   map[types.ID]Peer    // peers map
+
+	pipelineProber probing.Prober
+	streamProber   probing.Prober
+}
+```
+{collapsible="true" collapsed-title="rafthttp.Transport struct" default-state="collapsed"}
+
+### 3.1 创建transport
+
+在`etcdserver.NewServer(srvcfg)`函数中创建并启动了`Transport`，从前面的分析可知，在etcd启动过程中会执行这个函数，因此也是在etcd启动过程中创建并启动了`transport`。
+
+```Go
+func NewServer(cfg ServerConfig) (srv *EtcdServer, err error) {
+    // 省略
+
+	// TODO: move transport initialization near the definition of remote
+	tr := &rafthttp.Transport{
+		Logger:      cfg.Logger,
+		TLSInfo:     cfg.PeerTLSInfo,
+		DialTimeout: cfg.peerDialTimeout(),
+		ID:          id,
+		URLs:        cfg.PeerURLs,
+		ClusterID:   cl.ID(),
+		Raft:        srv,
+		Snapshotter: ss,
+		ServerStats: sstats,
+		LeaderStats: lstats,
+		ErrorC:      srv.errorc,
+	}
+	if err = tr.Start(); err != nil {
+		return nil, err
+	}
+	// add all remotes into transport
+	// 已有集群要处理的member
+	for _, m := range remotes {
+		if m.ID != id {
+			tr.AddRemote(m.ID, m.PeerURLs)
+		}
+	}
+	// 新建集群要处理的member
+	for _, m := range cl.Members() {
+		if m.ID != id {
+			tr.AddPeer(m.ID, m.PeerURLs)
+		}
+	}
+	srv.r.transport = tr
+
+	return srv, nil
+}
+```
+{collapsible="true" collapsed-title="Etcdserver.NewServer()" default-state="collapsed"}
+
+这段代码创建了`Transport`，设置了`ID`、`URLs`、`ClusterID`、`Raft`等相关属性。
+
+`Transport.Raft`是个接口，这里将`srv`赋值给`Transport.Raft`，说明`EtcdServer`实现了这个接口，具体如下。
+
+```Go
+type Raft interface {
+	Process(ctx context.Context, m raftpb.Message) error
+	IsIDRemoved(id uint64) bool
+	ReportUnreachable(id uint64)
+	ReportSnapshot(id uint64, status raft.SnapshotStatus)
+}
+```
+{collapsible="true" collapsed-title="rafthttp.Raft interface" default-state="collapsed"}
+
+```Go
+func (s *EtcdServer) RaftHandler() http.Handler { return s.r.transport.Handler() }
+
+// Process takes a raft message and applies it to the server's raft state
+// machine, respecting any timeout of the given context.
+func (s *EtcdServer) Process(ctx context.Context, m raftpb.Message) error {
+	if s.cluster.IsIDRemoved(types.ID(m.From)) {
+		if lg := s.getLogger(); lg != nil {
+			lg.Warn(
+				"rejected Raft message from removed member",
+				zap.String("local-member-id", s.ID().String()),
+				zap.String("removed-member-id", types.ID(m.From).String()),
+			)
+		} else {
+			plog.Warningf("reject message from removed member %s", types.ID(m.From).String())
+		}
+		return httptypes.NewHTTPError(http.StatusForbidden, "cannot process message from removed member")
+	}
+	if m.Type == raftpb.MsgApp {
+		s.stats.RecvAppendReq(types.ID(m.From).String(), m.Size())
+	}
+	return s.r.Step(ctx, m)
+}
+
+func (s *EtcdServer) IsIDRemoved(id uint64) bool { return s.cluster.IsIDRemoved(types.ID(id)) }
+
+func (s *EtcdServer) ReportUnreachable(id uint64) { s.r.ReportUnreachable(id) }
+
+// ReportSnapshot reports snapshot sent status to the raft state machine,
+// and clears the used snapshot from the snapshot store.
+func (s *EtcdServer) ReportSnapshot(id uint64, status raft.SnapshotStatus) {
+	s.r.ReportSnapshot(id, status)
+}
+```
+{collapsible="true" collapsed-title="Etcdserver.Raft" default-state="collapsed"}
+
+### 3.2 启动transport
+
+在上述代码片段中也通过`tr.Start()`启动了`Transport`，开始监听集群其它成员的HTTP请求，处理节点之间的Raft通信和数据同步。
+
+```Go
+func (t *Transport) Start() error {
+	var err error
+	t.streamRt, err = newStreamRoundTripper(t.TLSInfo, t.DialTimeout)
+	if err != nil {
+		return err
+	}
+	t.pipelineRt, err = NewRoundTripper(t.TLSInfo, t.DialTimeout)
+	if err != nil {
+		return err
+	}
+	t.remotes = make(map[types.ID]*remote)
+	t.peers = make(map[types.ID]Peer)
+	t.pipelineProber = probing.NewProber(t.pipelineRt)
+	t.streamProber = probing.NewProber(t.streamRt)
+
+	// If client didn't provide dial retry frequency, use the default
+	// (100ms backoff between attempts to create a new stream),
+	// so it doesn't bring too much overhead when retry.
+	if t.DialRetryFrequency == 0 {
+		t.DialRetryFrequency = rate.Every(100 * time.Millisecond)
+	}
+	return nil
+}
+```
+{collapsible="true" collapsed-title="Transport.Start()" default-state="collapsed"}
+
+这个函数主要通过`http.transport`对这个`Transport`进行了初始化，包括`Timeout`、`MaxIdleConnsPerHost`、`KeepAlive`等。
+
+真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
+
+```mermaid
+flowchart LR
+    A("Transport.AddPeer()")
+    B("Transport.startPeer()")
+    C("pipeline.startPeer()")
+    D("go p.handle()")
+    E("goroutine: mm := <-p.recvc")
+    F("goroutine: mm := <-p.propc")
+    
+    A-->B
+    B-->C
+    C-->E
+    C-->F
+    C-->D
+```
+
+```Go
+func (t *Transport) AddPeer(id types.ID, us []string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	if t.peers == nil {
+		panic("transport stopped")
+	}
+	if _, ok := t.peers[id]; ok {
+		return
+	}
+	urls, err := types.NewURLs(us)
+	if err != nil {
+		if t.Logger != nil {
+			t.Logger.Panic("failed NewURLs", zap.Strings("urls", us), zap.Error(err))
+		} else {
+			plog.Panicf("newURLs %+v should never fail: %+v", us, err)
+		}
+	}
+	fs := t.LeaderStats.Follower(id.String())
+	t.peers[id] = startPeer(t, urls, id, fs)
+	addPeerToProber(t.Logger, t.pipelineProber, id.String(), us, RoundTripperNameSnapshot, rttSec)
+	addPeerToProber(t.Logger, t.streamProber, id.String(), us, RoundTripperNameRaftMessage, rttSec)
+
+	if t.Logger != nil {
+		t.Logger.Info(
+			"added remote peer",
+			zap.String("local-member-id", t.ID.String()),
+			zap.String("remote-peer-id", id.String()),
+			zap.Strings("remote-peer-urls", us),
+		)
+	} else {
+		plog.Infof("added peer %s", id)
+	}
+}
+```
+{collapsible="true" collapsed-title="Transport.AddPeer()" default-state="collapsed"}
+
+1. 在`startPeer()`中启动了两个goroutine分别处理来自`recvc`和`propc` channel的数据。
+
+```Go
+func startPeer(t *Transport, urls types.URLs, peerID types.ID, fs *stats.FollowerStats) *peer {
+	if t.Logger != nil {
+		t.Logger.Info("starting remote peer", zap.String("remote-peer-id", peerID.String()))
+	} else {
+		plog.Infof("starting peer %s...", peerID)
+	}
+	defer func() {
+		if t.Logger != nil {
+			t.Logger.Info("started remote peer", zap.String("remote-peer-id", peerID.String()))
+		} else {
+			plog.Infof("started peer %s", peerID)
+		}
+	}()
+
+	status := newPeerStatus(t.Logger, t.ID, peerID)
+	picker := newURLPicker(urls)
+	errorc := t.ErrorC
+	r := t.Raft
+	pipeline := &pipeline{
+		peerID:        peerID,
+		tr:            t,
+		picker:        picker,
+		status:        status,
+		followerStats: fs,
+		raft:          r,
+		errorc:        errorc,
+	}
+	pipeline.start()
+
+	p := &peer{
+		lg:             t.Logger,
+		localID:        t.ID,
+		id:             peerID,
+		r:              r,
+		status:         status,
+		picker:         picker,
+		msgAppV2Writer: startStreamWriter(t.Logger, t.ID, peerID, status, fs, r),
+		writer:         startStreamWriter(t.Logger, t.ID, peerID, status, fs, r),
+		pipeline:       pipeline,
+		snapSender:     newSnapshotSender(t, picker, peerID, status),
+		recvc:          make(chan raftpb.Message, recvBufSize),
+		propc:          make(chan raftpb.Message, maxPendingProposals),
+		stopc:          make(chan struct{}),
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	p.cancel = cancel
+	go func() {
+		for {
+			select {
+			case mm := <-p.recvc:
+				if err := r.Process(ctx, mm); err != nil {
+					if t.Logger != nil {
+						t.Logger.Warn("failed to process Raft message", zap.Error(err))
+					} else {
+						plog.Warningf("failed to process raft message (%v)", err)
+					}
+				}
+			case <-p.stopc:
+				return
+			}
+		}
+	}()
+
+	// r.Process might block for processing proposal when there is no leader.
+	// Thus propc must be put into a separate routine with recvc to avoid blocking
+	// processing other raft messages.
+	go func() {
+		for {
+			select {
+			case mm := <-p.propc:
+				if err := r.Process(ctx, mm); err != nil {
+					plog.Warningf("failed to process raft message (%v)", err)
+				}
+			case <-p.stopc:
+				return
+			}
+		}
+	}()
+
+	p.msgAppV2Reader = &streamReader{
+		lg:     t.Logger,
+		peerID: peerID,
+		typ:    streamTypeMsgAppV2,
+		tr:     t,
+		picker: picker,
+		status: status,
+		recvc:  p.recvc,
+		propc:  p.propc,
+		rl:     rate.NewLimiter(t.DialRetryFrequency, 1),
+	}
+	p.msgAppReader = &streamReader{
+		lg:     t.Logger,
+		peerID: peerID,
+		typ:    streamTypeMessage,
+		tr:     t,
+		picker: picker,
+		status: status,
+		recvc:  p.recvc,
+		propc:  p.propc,
+		rl:     rate.NewLimiter(t.DialRetryFrequency, 1),
+	}
+
+	p.msgAppV2Reader.start()
+	p.msgAppReader.start()
+
+	return p
+}
+```
+{collapsible="true" collapsed-title="Transport.startPeer()" default-state="collapsed"}
+
+```Go
+func (p *pipeline) start() {
+	p.stopc = make(chan struct{})
+	p.msgc = make(chan raftpb.Message, pipelineBufSize)
+	p.wg.Add(connPerPipeline)
+	for i := 0; i < connPerPipeline; i++ {
+		go p.handle()
+	}
+
+	if p.tr != nil && p.tr.Logger != nil {
+		p.tr.Logger.Info(
+			"started HTTP pipelining with remote peer",
+			zap.String("local-member-id", p.tr.ID.String()),
+			zap.String("remote-peer-id", p.peerID.String()),
+		)
+	} else {
+		plog.Infof("started HTTP pipelining with peer %s", p.peerID)
+	}
+}
+```
+{collapsible="true" collapsed-title="pipeline.startPeer()" default-state="collapsed"}
+
+2. `p.msgAppV2Reader.start()`则负责从其它节点读取数据，通过`streamReader.decodeLoop()`对数据进行解码并最终放入`recvc`或`propc` channel中。如果消息类型为`MsgProp`，则发送到`propc`，否则发送到`recvc`。
+
+```Go
+		recvc := cr.recvc
+		if m.Type == raftpb.MsgProp {
+			recvc = cr.propc
+		}
+```
+
+3. `msgAppV2Reader`负责从远程节点读取数据并写入`recvc`及`propc`，然后`Transport`启动goroutine从这两个channel读取数据并进行处理，这样`recvc`和`propc`的两端就连起来了。
+
+```mermaid
+flowchart LR
+   A("Transport.startPeer()")
+   B("p.msgAppV2Reader.start()")
+   C("go cr.run()")
+   D("cr.decodeLoop(rc, t)")
+   E[("recvc")]
+   F[("propc")]
+
+   A-->B
+   B-->C
+   C-->D
+   D-->E
+   D-->F
+```
+
+```Go
+func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
+	var dec decoder
+	cr.mu.Lock()
+	switch t {
+	case streamTypeMsgAppV2:
+		dec = newMsgAppV2Decoder(rc, cr.tr.ID, cr.peerID)
+	case streamTypeMessage:
+		dec = &messageDecoder{r: rc}
+	default:
+		if cr.lg != nil {
+			cr.lg.Panic("unknown stream type", zap.String("type", t.String()))
+		} else {
+			plog.Panicf("unhandled stream type %s", t)
+		}
+	}
+	select {
+	case <-cr.ctx.Done():
+		cr.mu.Unlock()
+		if err := rc.Close(); err != nil {
+			return err
+		}
+		return io.EOF
+	default:
+		cr.closer = rc
+	}
+	cr.mu.Unlock()
+
+	// gofail: labelRaftDropHeartbeat:
+	for {
+		m, err := dec.decode()
+		if err != nil {
+			cr.mu.Lock()
+			cr.close()
+			cr.mu.Unlock()
+			return err
+		}
+
+		// gofail-go: var raftDropHeartbeat struct{}
+		// continue labelRaftDropHeartbeat
+		receivedBytes.WithLabelValues(types.ID(m.From).String()).Add(float64(m.Size()))
+
+		cr.mu.Lock()
+		paused := cr.paused
+		cr.mu.Unlock()
+
+		if paused {
+			continue
+		}
+
+		if isLinkHeartbeatMessage(&m) {
+			// raft is not interested in link layer
+			// heartbeat message, so we should ignore
+			// it.
+			continue
+		}
+
+		recvc := cr.recvc
+		if m.Type == raftpb.MsgProp {
+			recvc = cr.propc
+		}
+
+		select {
+		case recvc <- m:
+		default:
+			if cr.status.isActive() {
+				if cr.lg != nil {
+					cr.lg.Warn(
+						"dropped internal Raft message since receiving buffer is full (overloaded network)",
+						zap.String("message-type", m.Type.String()),
+						zap.String("local-member-id", cr.tr.ID.String()),
+						zap.String("from", types.ID(m.From).String()),
+						zap.String("remote-peer-id", types.ID(m.To).String()),
+						zap.Bool("remote-peer-active", cr.status.isActive()),
+					)
+				} else {
+					plog.MergeWarningf("dropped internal raft message from %s since receiving buffer is full (overloaded network)", types.ID(m.From))
+				}
+			} else {
+				if cr.lg != nil {
+					cr.lg.Warn(
+						"dropped Raft message since receiving buffer is full (overloaded network)",
+						zap.String("message-type", m.Type.String()),
+						zap.String("local-member-id", cr.tr.ID.String()),
+						zap.String("from", types.ID(m.From).String()),
+						zap.String("remote-peer-id", types.ID(m.To).String()),
+						zap.Bool("remote-peer-active", cr.status.isActive()),
+					)
+				} else {
+					plog.Debugf("dropped %s from %s since receiving buffer is full", m.Type, types.ID(m.From))
+				}
+			}
+			recvFailures.WithLabelValues(types.ID(m.From).String()).Inc()
+		}
+	}
+}
+```
+{collapsible="true" collapsed-title="streamReader.decodeLoop()" default-state="collapsed"}
+
+### 3.3 总结
+
+至此，对节点间通信的流程有了大概的了解，也解释了`recvc`和`propc`数据的来源和去向，可以通过下图对节点间通信做个总结。
+
+![Transport](etcd-raft-transport.svg)
+
+## 4. Propose()后的数据去哪了？
 
 `Etcdserver`执行`Put()`请求后，通过如下一系列调用，最终数据包装成`msgWithResult{m: m}`发给了`node.prooc`，接下来这个调用就断了，那这个请求最终是在哪里被处理了呢？
 
