@@ -465,6 +465,14 @@ type Transport struct {
 ```
 {collapsible="true" collapsed-title="rafthttp.Transport struct" default-state="collapsed"}
 
+![transport peer](etcd-raft-transport-peer.svg)
+
+- **peer**: peer代表远程raft节点，本地的raft节点通过peer将消息发送给远程raft节点，peer有两种发送消息的机制，分别是**stream**和**pipeline**。
+- **stream**: stream的实现是HTTP长连接，使用`GET`方法，始终处理open状态，用于发送频率较高、数据量小的数据传输，例如追加日志、心跳等raft协议数据。
+- **pipeline**: pipeline的实现是HTTP短连接，使用`POST`方法，用于发送频率较低、数据量大的数据传输，例如快照数据。
+
+![stream and pipeline](etcd-raft-peer-stream-pipeline.svg)
+
 ### 3.1 创建transport
 
 在`etcdserver.NewServer(srvcfg)`函数中创建并启动了`Transport`，从前面的分析可知，在etcd启动过程中会执行这个函数，因此也是在etcd启动过程中创建并启动了`transport`。
@@ -596,7 +604,7 @@ func (t *Transport) Start() error {
 真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
 
 ```mermaid
-flowchart LR
+flowchart TD
     A("Transport.AddPeer()")
     B("Transport.startPeer()")
     C("pipeline.startPeer()")
