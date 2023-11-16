@@ -1943,22 +1943,17 @@ func (w *watcher) send(wr WatchResponse) bool {
 ```
 {collapsible="true" collapsed-title="mvcc.send()" default-state="collapsed"}
 
-#### 6.2.5 总结
+### 6.3 总结
 
-总结一下，在客户端执行`put hello`操作后，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
+总结一下。
 
-```mermaid
-flowchart TB
-    p["put hello"]
-    e["mvcc.End()"]
-    n["mvcc.notify()"]
-    s["mvcc.send()"]
-    c["serverWatchStream.watchStream.ch"]
-    p-->e
-    e-->n
-    n-->s
-    s-->c
-```
+1. 客户端执行`etcdctl put hello`操作，会转换成`clientv3.Put()`进行gRPC调用。
+2. 因为`EtcdServer`实现了`KVServer`并启动了gRPC Server，所以客户端的gRPC请求先来到`KVServer`模块进行处理。
+3. `KVServer`模块处理后进入`Raft`模块，最终会在`EtcdServer.run()`中获取被raft处理后的提案消息，接着进行apply。
+4. 进入`Apply`模块后，经过一系列调用，会进入mvcc的`Put()`事务中，在事务结束后会调用`End()`。
+5. `End()`会调用到`notify()`，`notify()`实现了**最新事件推送**，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了`serverWatchStream`，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
+
+![notify](watch-overview-notify.svg)
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
