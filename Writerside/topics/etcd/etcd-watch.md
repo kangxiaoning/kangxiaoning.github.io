@@ -1513,6 +1513,10 @@ sequenceDiagram
 
 在前面分析启动过程时，提到`v3rpc.Server()`函数，在这个函数中注册了`WatchServer`，也注册了**KVServer**，`Put()`的rpc方法就是在这个KVServer中实现的，从`NewQuotaKVServer(s)`中的`s`可以看出，实际上是**EtcdServer**实例实现了这个**KVServer**接口，可以顺着这个逻辑找到`Put()`的实现。
 
+#### 6.2.1 KVServer处理
+
+启动过程注册`KVServer`。
+
 ```Go
 // etcd/etcdserver/api/v3rpc/grpc.go
 
@@ -1560,6 +1564,8 @@ func Server(s *etcdserver.EtcdServer, tls *tls.Config, gopts ...grpc.ServerOptio
 ```
 {collapsible="true" collapsed-title="v3rpc.Server()" default-state="collapsed"}
 
+因为`EtcdServer`实现了`KVServer`接口，因此这个`Put()`方法还是体现在`EtcdServer`上。
+
 ```Go
 func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse, error) {
 	ctx = context.WithValue(ctx, traceutil.StartTimeKey, time.Now())
@@ -1572,6 +1578,8 @@ func (s *EtcdServer) Put(ctx context.Context, r *pb.PutRequest) (*pb.PutResponse
 }
 ```
 {collapsible="true" collapsed-title="etcdserver.Put()" default-state="collapsed"}
+
+#### 6.2.2 Raft处理
 
 从`Put()`实现可以看到，Put操作就是一个raft请求，请求经过`raft`模块的处理后，最终会在`etcdserver.run()`方法中的`<-s.r.apply()`读取出来，下面再介绍。
 
@@ -1650,6 +1658,8 @@ sequenceDiagram
   etcdserver->>etcdserver: s.processInternalRaftRequestOnce(ctx, r)
   etcdserver->>raft: s.r.Propose(cctx, data)
 ```
+
+#### 6.2.3 Apply处理
 
 etcd启动过程中会执行一个`run()`函数，然后在这个函数中执行`<-s.r.apply()`等待经过`raft`完成`propose`的数据，这里调用链比较长，最终会执行到`a.s.applyV3.Put(nil, r.Put)`，也就是下面的`Put()`方法，终于进入`mvcc`模块了。
 
@@ -1746,6 +1756,8 @@ func (a *applierV3backend) Apply(r *pb.InternalRaftRequest) *applyResult {
 ```
 {collapsible="true" collapsed-title="applyV3.Apply()" default-state="collapsed"}
 
+根据case分支可以判断最终会走到如下函数。
+
 ```Go
 // etcd/etcdserver/apply.go
 
@@ -1764,6 +1776,7 @@ func (a *applierV3backend) Put(txn mvcc.TxnWrite, p *pb.PutRequest) (resp *pb.Pu
 				return nil, nil, lease.ErrLeaseNotFound
 			}
 		}
+		// 这一步创建了TxnWrite，具体实现是`watchableStoreTxnWrite`
 		txn = a.s.KV().Write(trace)
 		defer txn.End()
 	}
@@ -1803,33 +1816,22 @@ func (a *applierV3backend) Put(txn mvcc.TxnWrite, p *pb.PutRequest) (resp *pb.Pu
 ```
 {collapsible="true" collapsed-title="applyV3.Put()" default-state="collapsed"}
 
-在执行`put hello`操作时，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
-
-```mermaid
-flowchart TB
-    p["put hello"]
-    e["mvcc.End()"]
-    n["mvcc.notify()"]
-    s["mvcc.send()"]
-    c["serverWatchStream.watchStream.ch"]
-    p-->e
-    e-->n
-    n-->s
-    s-->c
-```
+这个`Put()`方法中的`defer txn.End()`表明这个函数最后会执行`txn.End()`，向客户端发送事件就是在这里触发的。从`txn = a.s.KV().Write(trace)`可知，这个`Write`方法是`watchableStore`实现的，追踪下去发现`txn`具体是`watchableStoreTxnWrite`结构体，它实现了`TxnWrite`接口。
 
 ```Go
-func (wv *writeView) Put(key, value []byte, lease lease.LeaseID) (rev int64) {
-	tw := wv.kv.Write(traceutil.TODO())
-	// 事务结束会调整End()
-	defer tw.End()
-	return tw.Put(key, value, lease)
+func (s *watchableStore) Write(trace *traceutil.Trace) TxnWrite {
+	return &watchableStoreTxnWrite{s.store.Write(trace), s}
 }
 ```
 
 ```Go
-// etcd/mvcc/watchable_store_txn.go
+type watchableStoreTxnWrite struct {
+	TxnWrite
+	s *watchableStore
+}
+```
 
+```Go
 func (tw *watchableStoreTxnWrite) End() {
 	changes := tw.Changes()
 	if len(changes) == 0 {
@@ -1852,13 +1854,17 @@ func (tw *watchableStoreTxnWrite) End() {
 	// end write txn under watchable store lock so the updates are visible
 	// when asynchronous event posting checks the current store revision
 	tw.s.mu.Lock()
-	// 调用notify()
+	// 调用notify将事件发送给watchStream
 	tw.s.notify(rev, evs)
 	tw.TxnWrite.End()
 	tw.s.mu.Unlock()
 }
 ```
-{collapsible="true" collapsed-title="mvcc.End()" default-state="collapsed"}
+{collapsible="true" collapsed-title="txn.End()" default-state="collapsed"}
+
+#### 6.2.4 触发新事件发送 
+
+从上面的`End`方法中可以看到，首先将本次事务中的`changes`转换成`Event`，然后调用`notify`方法通知`watchStream`，完成事件推送。`notify()`的实现如下。
 
 ```Go
 // etcd/mvcc/watchable_store.go
@@ -1898,6 +1904,8 @@ func (s *watchableStore) notify(rev int64, evs []mvccpb.Event) {
 ```
 {collapsible="true" collapsed-title="mvcc.notify()" default-state="collapsed"}
 
+在`send()`方法中将`WatchResponse`发送给`serverWatchStream.watchStream.ch`，也就是`mvcc.watchStream.ch`，然后`sendLoop`不断从 `watchStream.ch`中取出`Event`并发送给Client。
+
 ```Go
 // etcd/mvcc/watchable_store.go
 func (w *watcher) send(wr WatchResponse) bool {
@@ -1934,6 +1942,23 @@ func (w *watcher) send(wr WatchResponse) bool {
 }
 ```
 {collapsible="true" collapsed-title="mvcc.send()" default-state="collapsed"}
+
+#### 6.2.5 总结
+
+总结一下，在客户端执行`put hello`操作后，在mvcc的`put`事务中，它会调用`End()`，而`End()`最终会调用到`notify()`，`notify()`实现了最新事件推送，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了serverWatchStream，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
+
+```mermaid
+flowchart TB
+    p["put hello"]
+    e["mvcc.End()"]
+    n["mvcc.notify()"]
+    s["mvcc.send()"]
+    c["serverWatchStream.watchStream.ch"]
+    p-->e
+    e-->n
+    n-->s
+    s-->c
+```
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
