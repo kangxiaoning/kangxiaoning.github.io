@@ -86,7 +86,9 @@ n.ProposeConfChange(ctx, cc)
 - `readyc` channel用于`raft`向`Application`通知状态变化。
 - 节点间的`message`网络传输、数据持久化，需要在`Application`里实现。
 
-![etcd raft library](etcd-raft-library.svg)
+<procedure>
+<img src="etcd-raft-library.svg" alt="etcd raft library"/>
+</procedure>
 
 ## 2. 创建和启动raftNode
 
@@ -190,17 +192,19 @@ type raftNodeConfig struct {
 ```
 在`EtcdServer.Start()`中经过如下调用后，最终在`run()`中执行`s.r.start(rh)`启动了`raftNode`。
 
-```mermaid
+<procedure>
+<code-block lang="mermaid">
 flowchart LR
     A("EtcdServer.Start()")
     B("EtcdServer.start()")
     C("EtcdServer.run()")
     D("raftNode.start()")
-    
+
     A-->B
     B-->C
     C-->D
-```
+</code-block>
+</procedure>
 
 1. 执行`s.r.start(rh)`启动`raftNode`，该函数创建了一个goroutine在后台运行。
 ```Go
@@ -358,7 +362,9 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 
 `raft`模块通过`readyc`输出数据给`raftNode`，`raftNode`通过`applyc`输出数据给`EtcdServer`，数据流向可以用下图表示。
 
-![raftNode](etcd-raft-raftnode.svg)
+<procedure>
+<img src="etcd-raft-raftnode.svg" alt="raftNode"/>
+</procedure>
 
 ## 3. 创建和启动transport
 
@@ -465,13 +471,17 @@ type Transport struct {
 ```
 {collapsible="true" collapsed-title="rafthttp.Transport struct" default-state="collapsed"}
 
-![transport peer](etcd-raft-transport-peer.svg)
+<procedure>
+<img src="etcd-raft-transport-peer.svg" alt="transport peer"/>
+</procedure>
 
 - **peer**: peer代表远程raft节点，本地的raft节点通过peer将消息发送给远程raft节点，peer有两种发送消息的机制，分别是**stream**和**pipeline**。
 - **stream**: stream的实现是HTTP长连接，使用`GET`方法，始终处理open状态，用于发送频率较高、数据量小的数据传输，例如追加日志、心跳等raft协议数据。
 - **pipeline**: pipeline的实现是HTTP短连接，使用`POST`方法，用于发送频率较低、数据量大的数据传输，例如快照数据。
 
-![stream and pipeline](etcd-raft-peer-stream-pipeline.svg)
+<procedure>
+<img src="etcd-raft-peer-stream-pipeline.svg" alt="stream and pipeline"/>
+</procedure>
 
 ### 3.1 创建transport
 
@@ -603,7 +613,8 @@ func (t *Transport) Start() error {
 
 真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
 
-```mermaid
+<procedure>
+<code-block lang="mermaid">
 flowchart TD
     A("Transport.AddPeer()")
     B("Transport.startPeer()")
@@ -611,13 +622,14 @@ flowchart TD
     D("go p.handle()")
     E("goroutine: mm := <-p.recvc")
     F("goroutine: mm := <-p.propc")
-    
+
     A-->B
     B-->C
     C-->E
     C-->F
     C-->D
-```
+</code-block>
+</procedure>
 
 ```Go
 func (t *Transport) AddPeer(id types.ID, us []string) {
@@ -805,7 +817,7 @@ func (p *pipeline) start() {
 3. `msgAppV2Reader`负责从远程节点读取数据并写入`recvc`及`propc`，然后`Transport`启动goroutine从这两个channel读取数据并进行处理，这样`recvc`和`propc`的两端就连起来了。
 
 ```mermaid
-flowchart LR
+flowchart TB
    A("Transport.startPeer()")
    B("p.msgAppV2Reader.start()")
    C("go cr.run()")
@@ -923,7 +935,9 @@ func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
 
 至此，对节点间通信的流程有了大概的了解，也解释了`recvc`和`propc`数据的来源和去向，可以通过下图对节点间通信做个总结。
 
-![Transport](etcd-raft-transport.svg)
+<procedure>
+<img src="etcd-raft-transport.svg" alt="Transport"/>
+</procedure>
 
 ## 4. Propose()后的数据去哪了？
 
