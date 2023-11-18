@@ -6,8 +6,8 @@
                  name="南寨小子"
                  start-page="etcd-watch.md">
 
-    <toc-element topic="Etcd.md">
+    <toc-element toc-title="Etcd">
         <toc-element topic="etcd-watch.md"/>
-        <toc-element topic="etcd-raft.md"/>
+        <toc-element topic="etcd-raft.md" hidden="true"/>
     </toc-element>
 </instance-profile>

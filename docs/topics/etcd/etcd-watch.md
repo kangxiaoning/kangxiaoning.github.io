@@ -1683,7 +1683,7 @@ sequenceDiagram
   etcdserver-apply->>etcdserver-apply:a.s.applyV3.Put(nil, r.Put)
   embed->>embed: e.servePeers()
   embed->>embed: e.serveClients()
-  embed->>embed: s.serve()
+  embed->>embed: s.serveMetrics()
 ```
 
 ```Go
@@ -1953,7 +1953,13 @@ func (w *watcher) send(wr WatchResponse) bool {
 4. 进入`Apply`模块后，经过一系列调用，会进入mvcc的`Put()`事务中，在事务结束后会调用`End()`。
 5. `End()`会调用到`notify()`，`notify()`实现了**最新事件推送**，发送给watcher的channel，而创建watcher时传入的channel正是`serverWatchStream.watchStream.ch`，因此`notify()`最终将事件发送给了`serverWatchStream`，在`sendLoop()`通过调用`sws.watchStream.Chan()`对这些事件进行了消费，并最终发送给客户端。
 
-![notify](watch-overview-notify.svg)
+<procedure>
+<img src="watch-overview-notify.svg" alt="watch overview" thumbnail="true"/>
+</procedure>
+
+```
+![notify](watch-overview-notify.svg) {thumbnail="true"}
+```
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。

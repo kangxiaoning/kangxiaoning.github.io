@@ -6,8 +6,4 @@
         <accepts>page.html</accepts>
     </rule>
     -->
-    <rule id="41fd3cd0">
-        <description>Created after removal of "This is the first topic" from kangxiaoning</description>
-        <accepts>Default-topic.html</accepts>
-    </rule>
 </rules>
