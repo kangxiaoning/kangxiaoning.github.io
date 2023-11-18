@@ -192,19 +192,17 @@ type raftNodeConfig struct {
 ```
 在`EtcdServer.Start()`中经过如下调用后，最终在`run()`中执行`s.r.start(rh)`启动了`raftNode`。
 
-<procedure>
-<code-block lang="mermaid">
-flowchart LR
+```mermaid
+flowchart TB
     A("EtcdServer.Start()")
     B("EtcdServer.start()")
     C("EtcdServer.run()")
     D("raftNode.start()")
-
+    
     A-->B
     B-->C
     C-->D
-</code-block>
-</procedure>
+```
 
 1. 执行`s.r.start(rh)`启动`raftNode`，该函数创建了一个goroutine在后台运行。
 ```Go
@@ -613,8 +611,7 @@ func (t *Transport) Start() error {
 
 真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
 
-<procedure>
-<code-block lang="mermaid">
+```mermaid
 flowchart TD
     A("Transport.AddPeer()")
     B("Transport.startPeer()")
@@ -622,14 +619,13 @@ flowchart TD
     D("go p.handle()")
     E("goroutine: mm := <-p.recvc")
     F("goroutine: mm := <-p.propc")
-
+    
     A-->B
     B-->C
     C-->E
     C-->F
     C-->D
-</code-block>
-</procedure>
+```
 
 ```Go
 func (t *Transport) AddPeer(id types.ID, us []string) {
