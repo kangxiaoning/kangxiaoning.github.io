@@ -68,6 +68,14 @@ sequenceDiagram
     etcdmain->>etcdmain: startEtcd(&cfg.ec)
     etcdmain->>embed: embed.StartEtcd(cfg)
     embed->>embed: e.serveClients()
+```
+
+```mermaid
+---
+title: 启动gRPC Server
+---
+sequenceDiagram
+  autonumber 7
     embed->>embed: s.serve()
     alt insecure
         embed->>v3rpc: v3rpc.Server(s, nil, gopts...)
@@ -892,7 +900,7 @@ func (sws *serverWatchStream) recvLoop() error {
 简单总结下，`recvLoop`会持续接收客户端的rpc请求，并调用底层的`mvcc`模块进行相应处理。
 
 ```mermaid
-flowchart LR
+flowchart TD
     client-->gRPCStream
     subgraph serverWatchStream
       gRPCStream-->|"Recv()"|recvLoop(("recvLoop()"))
@@ -1092,7 +1100,7 @@ func (sws *serverWatchStream) sendLoop() {
 3. 定时机制维持watcher心跳
 
 ```mermaid
-flowchart RL
+flowchart TB
   gRPCStream-->client
   subgraph serverWatchStream
     sendLoop(("sendLoop()"))-->|"Send()"|gRPCStream
@@ -1105,7 +1113,9 @@ flowchart RL
 
 `serverWatchStream`承上启下的作用可以用下图来概括。
 
-![Watch overview](watch-overview.svg) {id="etcd-diagram-3"}
+<procedure>
+<img src="watch-overview.svg" alt="watch overview" thumbnail="true"/>
+</procedure>
 
 ## 5. mvcc的watchableStore是如何处理Watch的？
 
@@ -1326,6 +1336,15 @@ Watch的作用是及时感知事件，而KV存储是事件的来源，那具体�
 - 根据`cobra`的用法可知，`etcdctl put`实际是通过`putCommandFunc()`完成的。
 - 在`putCommandFunc()`中调用`mustClientFromCmd(cmd)`会返回一个`*clientv3.Client`对象。
 
+```mermaid
+sequenceDiagram
+  autonumber
+  main->>main: main()
+  main->>ctlv3: ctlv3.Start()
+  ctlv3->>command: putCommandFunc()
+  command->>command: mustClientFromCmd(cmd)
+```
+
 ```Go
 // putCommandFunc executes the "put" command.
 func putCommandFunc(cmd *cobra.Command, args []string) {
@@ -1342,17 +1361,6 @@ func putCommandFunc(cmd *cobra.Command, args []string) {
 ```
 {collapsible="true" collapsed-title="putCommandFunc()" default-state="collapsed"}
 
- 
-```mermaid
-sequenceDiagram
-    autonumber
-    main->>main: main()
-    main->>ctlv3: ctlv3.Start()
-    ctlv3->>command: putCommandFunc()
-    command->>command: mustClientFromCmd(cmd)
-    command->>clientv3: clientv3.New(*cfg)
-    clientv3->>clientv3: newClient(cfg *Config)
-```
 
 - 到这里已经获取了`clientv3.Client`对象，根据`putCommandFunc()`的实现可看到接下来调用了`clientv3.Client`对象的`Put()`方法。从`clientv3.Client`定义可知它需要实现`KV`接口，而`Put()`正是这个`KV`接口下的方法，接下来需要分析`clientv3.Client`的`Put`方法是如何实现的。
 
@@ -1484,6 +1492,20 @@ func NewKVClient(cc *grpc.ClientConn) KVClient {
 ```
 {collapsible="true" collapsed-title="clientv3.NewKVClient()" default-state="collapsed"}
 
+
+```mermaid
+sequenceDiagram
+    autonumber 5
+    command->>clientv3: clientv3.New(*cfg)
+    clientv3->>clientv3: newClient(cfg *Config)
+    clientv3->>clientv3: NewKV(c *Client)
+    clientv3->>clientv3: RetryKVClient(c *Client)
+    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
+```
+
+- 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
+
+
 ```Go
 func (c *kVClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error) {
 	out := new(PutResponse)
@@ -1498,16 +1520,10 @@ func (c *kVClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOpt
 
 ```mermaid
 sequenceDiagram
-    autonumber 7
-    clientv3->>clientv3: NewKV(c *Client)
-    clientv3->>clientv3: RetryKVClient(c *Client)
-    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
-    etcdserverpb->>grpc: Put()
-    grpc->>etcdserver: grpc.Invoke()
+  autonumber 10
+  etcdserverpb->>grpc: Put()
+  grpc->>etcdserver: grpc.Invoke()
 ```
-
-- 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
-
 
 ### 6.2 etcdserver中的Put调用过程
 
@@ -1671,6 +1687,11 @@ sequenceDiagram
   etcdmain->>etcdmain: startEtcdOrProxyV2()
   etcdmain->>etcdmain: startEtcd(&cfg.ec)
   etcdmain->>embed: embed.StartEtcd(cfg)
+```
+
+```mermaid
+sequenceDiagram
+  autonumber 6
   embed->>etcdserver: e.Server.Start()
   etcdserver->>etcdserver: s.start()
   etcdserver->>etcdserver: go s.run()
@@ -1956,10 +1977,6 @@ func (w *watcher) send(wr WatchResponse) bool {
 <procedure>
 <img src="watch-overview-notify.svg" alt="watch overview" thumbnail="true"/>
 </procedure>
-
-```
-![notify](watch-overview-notify.svg) {thumbnail="true"}
-```
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
