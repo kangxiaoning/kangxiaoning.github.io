@@ -54,11 +54,10 @@ service Watch {
 
 >下图中的对象用函数所在的`package`名表示，交互消息用函数调用表示。
 
-<snippet id="etcd-diagram-1">
 
 ```mermaid
 ---
-title: 启动gRPC Server
+title: 启动 gRPC Server
 ---
 sequenceDiagram
     autonumber
@@ -70,21 +69,25 @@ sequenceDiagram
     embed->>embed: e.serveClients()
 ```
 
+在`embed.StartEtcd()`中执行了`e.serveClients()`，这个函数启动了面向客户端的服务，也是在这个函数中完成了gRPC Server的启程。
+
+<snippet id="etcd-diagram-1">
+
 ```mermaid
 ---
-title: 启动gRPC Server
+title: 启动 gRPC Server
 ---
 sequenceDiagram
   autonumber 7
     embed->>embed: s.serve()
     alt insecure
-        embed->>v3rpc: v3rpc.Server(s, nil, gopts...)
+        embed->>v3rpc: v3rpc.Server(s, nil, ...)
         v3rpc->>v3rpc: RegisterWatchServer()
         v3rpc->>v3rpc: NewWatchServer()
         embed->>grpc: gs.Serve(grpcl)
     end
     opt secure
-       embed->>v3rpc: v3rpc.Server(s, tlscfg, gopts...)
+       embed->>v3rpc: v3rpc.Server(s, tlscfg, ...)
        v3rpc->>v3rpc: RegisterWatchServer()
        v3rpc->>v3rpc: NewWatchServer()
        embed->>grpc: grpcServer.ServeHTTP(w, r)
@@ -1500,7 +1503,7 @@ sequenceDiagram
     clientv3->>clientv3: newClient(cfg *Config)
     clientv3->>clientv3: NewKV(c *Client)
     clientv3->>clientv3: RetryKVClient(c *Client)
-    clientv3->>etcdserverpb: NewKVClient(cc *grpc.ClientConn)
+    clientv3->>etcdserverpb: NewKVClient()
 ```
 
 - 从`NewKV(c *Client)`可知，`kv.remote`是grpc的客户端`KVClient`，所以`kv.Do()`中实际是执行了`gRPC`调用，因为是`gRPC`调用，所以`KVClient`会对应存在一个`KVServer`，`Put()`的实现在`KVServer`中，在启动过程会可以找到`KVServer`的注册及启动，在后面解释。
