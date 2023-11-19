@@ -11,6 +11,32 @@ Etcd作为Kubernetes的控制面存储，保存了Kubernetes集群状态，各�
 > 
 {style="note"}
 
+## 0. 架构
+
+在开始前，先从两个维度对etcd的架构做个介绍。
+
+1. raft复制状态机
+
+<procedure>
+<img src="replicated-sate-machine-architecture.png" alt="replicated state machine"/>
+</procedure>
+
+2. etcd功能架构
+
+从下图可以看到，在提供给用户的功能方面，etcd抽象了六大类API，以gRPC服务的形式暴露出来。
+
+<procedure>
+<img src="etcd-arch-service.svg" alt="etcd service" thumbnail="true"/>
+</procedure>
+
+3. etcd模块架构
+ 
+六大类gRPC服务在实现上，涉及多个模块间的配合，比如Raft、Mvcc、Lease、Watch Server等。
+
+<procedure>
+<img src="etcd-arch-module.svg" alt="etcd module" thumbnail="true"/>
+</procedure>
+
 ## 1. Watch机制基于什么协议实现？
 
 在v3版本中，Etcd使用**gRPC**进行消息传输，利用**HTTP/2**的**Multiplexing**、**Server Push**特性，以及**protocol buffers**的**二进制**、**高压缩**等优点，实现了高效的Watch机制。
