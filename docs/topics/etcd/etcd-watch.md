@@ -580,6 +580,22 @@ func (s *watchableStore) NewWatchStream() WatchStream {
 
 </snippet>
 
+接收Watch事件的channel，默认buffer是1024，定义如下。如果buffer满了将无法推送Watch事件，这也是`watchableStore`中存在`victims`存在的原因，针对异常情况有专门的机制处理。
+
+```Go
+var (
+	// chanBufLen is the length of the buffered chan
+	// for sending out watched events.
+	// TODO: find a good buf value. 1024 is just a random one that
+	// seems to be reasonable.
+	chanBufLen = 1024
+
+	// maxWatchersPerSync is the number of watchers to sync in a single batch
+	maxWatchersPerSync = 512
+)
+```
+{collapsible="true" collapsed-title="mvcc.chanBufLen" default-state="collapsed"}
+
 - 这里看到返回结果是基于`watchableStore`对象封装的`watchStream`对象。那`watchableStore`对象是怎么来的呢？需要从`ws`也就是`watchServer`的初始化看起。
 
 - 从[前面的分析](#2)可知在启动过程（下图第14步）创建了`watchServer`对象，并对`ws.watchable`进行了初始化：`watchable: s.Watchable()`。
@@ -2006,6 +2022,240 @@ func (w *watcher) send(wr WatchResponse) bool {
 <procedure>
 <img src="watch-overview-notify.svg" alt="watch overview" thumbnail="true"/>
 </procedure>
+
+## 7. 历史事件和异常是怎么处理的？
+
+前面介绍了对新产生事件的处理，使用过etcd就知道它也支持监听历史事件，那它是怎么实现的？
+
+根据监听事件的进度，可以将watcher分为synced和unsynced两类，无论是synced还是unsynced的watcher，在推送过程中都可能出现失败，因此又多出来一个失败的场景，在etcd中用`synced`、`unsynced`、`victims`三个场景来表示前面的分类，每个场景有对应的机制处理。
+
+![watchers](synced-unsynced-victim-watcher.svg)
+
+1. 针对`synced`场景，前面已经介绍过了
+2. 针对`unsynced`场景，在创建`watchableStore`时通过`go s.syncWatchersLoop()`启动后台goroutine处理
+
+```Go
+// syncWatchersLoop syncs the watcher in the unsynced map every 100ms.
+func (s *watchableStore) syncWatchersLoop() {
+	defer s.wg.Done()
+
+	for {
+		s.mu.RLock()
+		st := time.Now()
+		lastUnsyncedWatchers := s.unsynced.size()
+		s.mu.RUnlock()
+
+		unsyncedWatchers := 0
+		if lastUnsyncedWatchers > 0 {
+			unsyncedWatchers = s.syncWatchers()
+		}
+		syncDuration := time.Since(st)
+
+		waitDuration := 100 * time.Millisecond
+		// more work pending?
+		if unsyncedWatchers != 0 && lastUnsyncedWatchers > unsyncedWatchers {
+			// be fair to other store operations by yielding time taken
+			waitDuration = syncDuration
+		}
+
+		select {
+		case <-time.After(waitDuration):
+		case <-s.stopc:
+			return
+		}
+	}
+}
+```
+{collapsible="true" collapsed-title="watchableStore.syncWatchersLoop()" default-state="collapsed"}
+
+```Go
+// syncWatchers syncs unsynced watchers by:
+//	1. choose a set of watchers from the unsynced watcher group
+//	2. iterate over the set to get the minimum revision and remove compacted watchers
+//	3. use minimum revision to get all key-value pairs and send those events to watchers
+//	4. remove synced watchers in set from unsynced group and move to synced group
+func (s *watchableStore) syncWatchers() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.unsynced.size() == 0 {
+		return 0
+	}
+
+	s.store.revMu.RLock()
+	defer s.store.revMu.RUnlock()
+
+	// in order to find key-value pairs from unsynced watchers, we need to
+	// find min revision index, and these revisions can be used to
+	// query the backend store of key-value pairs
+	curRev := s.store.currentRev
+	compactionRev := s.store.compactMainRev
+
+	wg, minRev := s.unsynced.choose(maxWatchersPerSync, curRev, compactionRev)
+	minBytes, maxBytes := newRevBytes(), newRevBytes()
+	revToBytes(revision{main: minRev}, minBytes)
+	revToBytes(revision{main: curRev + 1}, maxBytes)
+
+	// UnsafeRange returns keys and values. And in boltdb, keys are revisions.
+	// values are actual key-value pairs in backend.
+	tx := s.store.b.ReadTx()
+	tx.RLock()
+	revs, vs := tx.UnsafeRange(keyBucketName, minBytes, maxBytes, 0)
+	var evs []mvccpb.Event
+	if s.store != nil && s.store.lg != nil {
+		evs = kvsToEvents(s.store.lg, wg, revs, vs)
+	} else {
+		// TODO: remove this in v3.5
+		evs = kvsToEvents(nil, wg, revs, vs)
+	}
+	tx.RUnlock()
+
+	var victims watcherBatch
+	wb := newWatcherBatch(wg, evs)
+	for w := range wg.watchers {
+		w.minRev = curRev + 1
+
+		eb, ok := wb[w]
+		if !ok {
+			// bring un-notified watcher to synced
+			s.synced.add(w)
+			s.unsynced.delete(w)
+			continue
+		}
+
+		if eb.moreRev != 0 {
+			w.minRev = eb.moreRev
+		}
+
+		if w.send(WatchResponse{WatchID: w.id, Events: eb.evs, Revision: curRev}) {
+			pendingEventsGauge.Add(float64(len(eb.evs)))
+		} else {
+			if victims == nil {
+				victims = make(watcherBatch)
+			}
+			w.victim = true
+		}
+
+		if w.victim {
+			victims[w] = eb
+		} else {
+			if eb.moreRev != 0 {
+				// stay unsynced; more to read
+				continue
+			}
+			s.synced.add(w)
+		}
+		s.unsynced.delete(w)
+	}
+	s.addVictim(victims)
+
+	vsz := 0
+	for _, v := range s.victims {
+		vsz += len(v)
+	}
+	slowWatcherGauge.Set(float64(s.unsynced.size() + vsz))
+
+	return s.unsynced.size()
+}
+```
+{collapsible="true" collapsed-title="watchableStore.syncWatchers()" default-state="collapsed"}
+
+每次会选择一批unsynced watchers进行处理，默认是512，若推送成功，则根据watcher监控的最小版本号和当前版本号判断是否要转移到synced watcher集合中。
+
+3. 针对`victims`场景，在创建`watchableStore`时通过`go s.syncVictimsLoop()`启动后台goroutine处理
+ 
+```Go
+// syncVictimsLoop tries to write precomputed watcher responses to
+// watchers that had a blocked watcher channel
+func (s *watchableStore) syncVictimsLoop() {
+	defer s.wg.Done()
+
+	for {
+		for s.moveVictims() != 0 {
+			// try to update all victim watchers
+		}
+		s.mu.RLock()
+		isEmpty := len(s.victims) == 0
+		s.mu.RUnlock()
+
+		var tickc <-chan time.Time
+		if !isEmpty {
+			tickc = time.After(10 * time.Millisecond)
+		}
+
+		select {
+		case <-tickc:
+		case <-s.victimc:
+		case <-s.stopc:
+			return
+		}
+	}
+}
+```
+{collapsible="true" collapsed-title="watchableStore.syncVictimsLoop()" default-state="collapsed"}
+
+```Go
+// moveVictims tries to update watches with already pending event data
+func (s *watchableStore) moveVictims() (moved int) {
+	s.mu.Lock()
+	victims := s.victims
+	s.victims = nil
+	s.mu.Unlock()
+
+	var newVictim watcherBatch
+	for _, wb := range victims {
+		// try to send responses again
+		for w, eb := range wb {
+			// watcher has observed the store up to, but not including, w.minRev
+			rev := w.minRev - 1
+			if w.send(WatchResponse{WatchID: w.id, Events: eb.evs, Revision: rev}) {
+				pendingEventsGauge.Add(float64(len(eb.evs)))
+			} else {
+				if newVictim == nil {
+					newVictim = make(watcherBatch)
+				}
+				newVictim[w] = eb
+				continue
+			}
+			moved++
+		}
+
+		// assign completed victim watchers to unsync/sync
+		s.mu.Lock()
+		s.store.revMu.RLock()
+		curRev := s.store.currentRev
+		for w, eb := range wb {
+			if newVictim != nil && newVictim[w] != nil {
+				// couldn't send watch response; stays victim
+				continue
+			}
+			w.victim = false
+			if eb.moreRev != 0 {
+				w.minRev = eb.moreRev
+			}
+			if w.minRev <= curRev {
+				s.unsynced.add(w)
+			} else {
+				slowWatcherGauge.Dec()
+				s.synced.add(w)
+			}
+		}
+		s.store.revMu.RUnlock()
+		s.mu.Unlock()
+	}
+
+	if len(newVictim) > 0 {
+		s.mu.Lock()
+		s.victims = append(s.victims, newVictim)
+		s.mu.Unlock()
+	}
+
+	return moved
+}
+```
+{collapsible="true" collapsed-title="watchableStore.moveVictims()" default-state="collapsed"}
+
+根据推送结果判断是否要转移到`synced`或者`unsynced` watcher集合中。
 
 ## 参考资料
 - gRPC的概念可以参考官方文档的 [core-concepts](https://grpc.io/docs/what-is-grpc/core-concepts/) 学习。
