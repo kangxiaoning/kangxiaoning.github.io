@@ -1,7 +1,6 @@
-<show-structure depth="3"/>
-<web-file-name>etcd/etcd-watch.html</web-file-name>
-
 # Etcd的Watch实现分析
+
+<show-structure depth="2"/>
 
 Etcd作为Kubernetes的控制面存储，保存了Kubernetes集群状态，各种Controller通过Watch机制感知集群事件，对比资源实际状态与期望状态执行reconcile，确保集群按期望状态运行。整个系统的性能、可靠性非常依赖**Watch机制**，因此掌握Watcher的实现原理对于理解kubernetes的运行至关重要。
 
@@ -329,7 +328,7 @@ func newWatchableStore(lg *zap.Logger, b backend.Backend, le lease.Lessor, ig Co
 
 在[gRPC Server启动过程](#2)的分析中，看到第14步执行了`NewWatchServer()`，这里创建了`watchServer`对象，`watchServer`实现了`Watch`的rpc方法，我们看一下它的代码。
 
-<include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-diagram-1"></include>
 
 <snippet id="etcd-code-1">
 
@@ -552,10 +551,10 @@ type WatchStream interface {
 在`Watch`的gRPC Service实现中可以看到`serverWatchStream`的初始化，从`gRPCStream:  stream`可知`gRPCStream`字段被赋值为`stream`。`gRPCStream`字段的类型为`pb.Watch_WatchServer`，而`stream`的类型也是`pb.Watch_WatchServer`，因此这里并没有特殊的地方，就是正常传参，可以通过如下代码对比。
 
 - `stream`类型
-<include from="etcd-watch.md" element-id="etcd-code-1"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-code-1"></include>
 
 - `gRPCStream`类型
-<include from="etcd-watch.md" element-id="etcd-code-2"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-code-2"></include>
 
 #### 4.1.2 watchStream {id="4.1.2"}
 
@@ -600,7 +599,7 @@ var (
 
 - 从[前面的分析](#2)可知在启动过程（下图第14步）创建了`watchServer`对象，并对`ws.watchable`进行了初始化：`watchable: s.Watchable()`。
 
-<include from="etcd-watch.md" element-id="etcd-diagram-1"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-diagram-1"></include>
 
 ```Go
 // etcd/etcdserver/api/v3rpc/watch.go
@@ -636,7 +635,7 @@ func (s *EtcdServer) KV() mvcc.ConsistentWatchableKV { return s.kv }
 
 - 从前面的分析可以看到，`s.kv`正是在下图第3步被创建的，`mvcc.New()`内部通过调用`newWatchableStore()`返回了一个`watchableStore`对象，它实现了`WatchableKV`这个interface，也实现了`KV`interface，因此这个`watchableStore`对象就是一个实现了**watchable**接口的**KV**存储。
 
-<include from="etcd-watch.md" element-id="etcd-diagram-2"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-diagram-2"></include>
 
 ```Go
 // etcd/etcdserver/server.go
@@ -785,7 +784,7 @@ type backend struct {
 5. 结合第2步、第3步，可以知到`ws.watchable`就是`mvcc.watchableStore`，所以`ws.watchable.NewWatchStream()`就是`mvcc.watchableStore.NewWatchStream()`。
 6. 因此`sws.watchStream`的值就是`mvcc.watchableStore.NewWatchStream()`结果，实际代码如下，是基于`mvcc.watchableStore`封装的`watchStream`对象。
 
-<include from="etcd-watch.md" element-id="etcd-code-3"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-code-3"></include>
 
 ```mermaid
 flowchart TD
@@ -1360,14 +1359,14 @@ type watcherGroup struct {
 
 - 在`mvcc.watch()`实现中，可以看到主要是根据要监控的版本号将watcher放在了**synced**或**unsynced**结构中。
 
-<include from="etcd-watch.md" element-id="mvcc.watch()"></include>
+<include from="how-etcd-watch-works.md" element-id="mvcc.watch()"></include>
 
 总结如下。
 1. 在`v3rpc.recvLoop()`里调用`sws.watchStream.Watch()`，分配了WatchID
 2. 在`sws.watchStream.Watch()`调用`ws.watchable.watch()`，也就是调用`mvcc.watchableStore.watch()`，创建了watcher
 3. `mvcc.watchableStore.watch()`会根据要监听的版本号将watcher保存在不同的数据结构，对不同进度的watcher执行不同的处理，也就是下图的第5步、第6步完成的工作。
 
-<include from="etcd-watch.md" element-id="etcd-diagram-2"></include>
+<include from="how-etcd-watch-works.md" element-id="etcd-diagram-2"></include>
 
 
 ## 6. mvcc是在什么时机产生事件的？

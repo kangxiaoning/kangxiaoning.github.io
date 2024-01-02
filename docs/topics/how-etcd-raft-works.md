@@ -1,7 +1,6 @@
-<show-structure depth="3"/>
-<web-file-name>etcd/etcd-raft.html</web-file-name>
-
 # Etcd的Raft使用分析
+
+<show-structure depth="2"/>
 
 看了raft论文，以为可以理解Etcd，实际并不是这么回事，原因是Etcd中的raft库只实现了raft协议的核心内容，**没有实现网络传输、存储的功能**，因此在etcd的`raft`库里，有一个**Application**的概念，网络传输和存储功能是**Application**的职责，而**Application**和**raft**的协作又是通过一系列**channel**完成的，导致代码逻辑断点较多，理解较为困难。
 

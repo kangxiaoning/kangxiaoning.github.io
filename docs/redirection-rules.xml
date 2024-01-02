@@ -6,4 +6,28 @@
         <accepts>page.html</accepts>
     </rule>
     -->
+    <rule id="31fff9f5">
+        <description>Created after removal of "Etcd的Raft使用分析" from 南寨小子</description>
+        <accepts>etcd-raft.html</accepts>
+    </rule>
+    <rule id="7ccde755">
+        <description>Created after removal of "Etcd的Watch实现分析" from 南寨小子</description>
+        <accepts>etcd-watch.html</accepts>
+    </rule>
+    <rule id="679e8d8b">
+        <description>Created after removal of "Etcd的Raft使用分析" from 南寨小子</description>
+        <accepts>etcd-raft1.html</accepts>
+    </rule>
+    <rule id="6f467a25">
+        <description>Created after removal of "Etcd的Watch实现分析" from 南寨小子</description>
+        <accepts>etcd-watch1.html</accepts>
+    </rule>
+    <rule id="78b4ab54">
+        <description>Created after removal of "Etcd" from 南寨小子</description>
+        <accepts>Etcd.html</accepts>
+    </rule>
+    <rule id="6e2b4d8f">
+        <description>Created after removal of "write-ebpf-programs-in-rust.md" from 南寨小子</description>
+        <accepts>write-ebpf-programs-in-rust-md.html</accepts>
+    </rule>
 </rules>
