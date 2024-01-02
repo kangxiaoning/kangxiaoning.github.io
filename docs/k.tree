@@ -13,4 +13,7 @@
     <toc-element toc-title="eBPF">
         <toc-element topic="write-ebpf-program-in-rust.md"/>
     </toc-element>
+    <toc-element toc-title="Linux">
+        <toc-element topic="fedora-lvm-extend.md"/>
+    </toc-element>
 </instance-profile>
