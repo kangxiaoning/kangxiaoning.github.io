@@ -6,11 +6,11 @@
                  name="南寨小子"
                   start-page="how-etcd-watch-works.md">
 
-    <toc-element topic="Etcd.md">
+    <toc-element toc-title="Etcd">
         <toc-element topic="how-etcd-raft-works.md" hidden="true"/>
         <toc-element topic="how-etcd-watch-works.md"/>
     </toc-element>
-    <toc-element topic="eBPF.md">
+    <toc-element toc-title="eBPF">
         <toc-element topic="write-ebpf-program-in-rust.md"/>
     </toc-element>
 </instance-profile>

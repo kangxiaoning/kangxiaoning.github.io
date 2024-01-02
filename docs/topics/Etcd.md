@@ -1,3 +1,0 @@
-# Etcd
-
-Start typing here...
