@@ -136,13 +136,9 @@ cargo install cargo-generate
 
 ## 3. 编译运行
 
-这个自动生成的项目可以直接编译运行，但是默认绑定的是`eth0`网卡，如果网卡不一样需要修改下。
+这个自动生成的项目可以直接编译运行，但是默认绑定的是`eth0`网卡，如果网卡不一样需要修改下代码或者在运行时指定网卡名。
 
-### 3.1 修改网卡名称
-
-修改`xdp-hello/src/main.rs`文件中的`eth0`为自己的网卡名称即可。
-
-### 3.2 编译
+### 3.1 编译
 
 ```Shell
 [root@localhost xdp-hello]# cargo xtask run -- -h
@@ -162,9 +158,12 @@ Options:
 [root@localhost xdp-hello]#
 ```
 
-### 3.3 运行
+### 3.2 运行
 
-执行`RUST_LOG=info cargo xtask run`，就会看到很多日志，表示这个`xdp-hello`这个eBPF程序已经正常被加载到内核，并且被接收网络包的事件触发。
+- 方法一：修改`xdp-hello/src/main.rs`文件中的`eth0`为自己的网卡名称，执行`RUST_LOG=info cargo xtask run`。
+- 方法二：使用`RUST_LOG=info cargo xtask run -- -i ens160`运行。
+
+运行后会看到很多日志，表示这个`xdp-hello`这个eBPF程序已经正常被加载到内核，并且被接收网络包的事件触发。
 
 ```Shell
 [root@localhost xdp-hello]# RUST_LOG=info cargo xtask run
