@@ -9,7 +9,7 @@
     </variables>
     <build-profile instance="k">
         <variables>
-            <noindex-content>true</noindex-content>
+            <noindex-content>false</noindex-content>
         </variables>
     </build-profile>
 
