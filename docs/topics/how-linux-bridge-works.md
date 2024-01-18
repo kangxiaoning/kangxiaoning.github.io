@@ -640,7 +640,7 @@ out:
 
 经过上述处理后，Linux就做好了接收数据包的准备。当数据帧从网线到达网卡后，经过网卡驱动DMA，发出硬中断，内核执行硬中断处理函数，再发出软中断，最后触发ksoftirqd执行软中断处理函数`net_rx_action()`。这个函数会执行网卡驱动注册的poll方法，把数据帧从RingBuffer上取下来，然后进入GRO(Generic Receive Offload)处理逻辑，最后会进入`netif_receive_skb()`函数进行处理，这个函数是设备层进入协议层前的最后一个处理逻辑，因此二层相关的处理会在这里体现。
 
-## 4. netif_receive_skb
+## 4. netif_receive_skb()
 
 `netif_receive_skb()`逻辑比较简单，主要是对数据包进行了RPS的处理，然后调用了`__netif_receive_skb()`，接着往下看。
 ```C
@@ -706,7 +706,7 @@ static int __netif_receive_skb(struct sk_buff *skb)
 ```
 {collapsible="true" collapsed-title="__netif_receive_skb()" default-state="collapsed"}
 
-在这个函数中，调用了`br_add_if()`时注册的`rx_handler`函数，也就是`br_handle_frame()`，这里就和Bridge对数据帧的处理逻辑关联上了。
+在这个函数中，调用了执行`br_add_if()`时注册的`rx_handler`函数，也就是`br_handle_frame()`，这里就和Bridge对数据帧的处理逻辑关联上了。
 ```C
 	rx_handler = rcu_dereference(skb->dev->rx_handler);
 	if (rx_handler) {
@@ -876,9 +876,22 @@ out:
 ```
 {collapsible="true" collapsed-title="__netif_receive_skb_core()" default-state="collapsed"}
 
-# 5. br_handle_frame
+## 5. br_handle_frame()
 
-改天继续补充。
+这个函数的作用，可以理解为“在Bridge的port收到frame时调用这个函数进行处理”，逻辑大概如下。
+
+1. 如果是loopback的packet，返回**RX_HANDLER_PASS**，表示应该由上层处理。
+2. 检查二层源MAC，如果无效则drop。
+3. 从Bridge上获取结构为`net_bridge_port`的port信息。
+4. 特殊MAC处理。
+5. 转发处理。
+   - BR_STATE_FORWARDING：如果有自定义hook则交给hook处理，否则继续交给BR_STATE_LEARNING逻辑处理。
+   - BR_STATE_LEARNING：
+     - 检查目标MAC地址是否与当前网桥设备的MAC地址相同。如果是，则设置数据包类型为PACKET_HOST，表示数据包发往本地主机。
+     - 调用Netfilter的NF_HOOK宏，执行NFPROTO_BRIDGE协议族的NF_BR_PRE_ROUTING钩子链，最后会调用**br_handle_frame_finish**这个回调函数。
+   - 如果不是上面两个状态，最会执行到drop分支，释放skb内存，返回RX_HANDLER_CONSUMED，表示数据包已被丢弃。
+
+从上面逻辑看，正常情况下都会执行到`br_handle_frame_finish()`。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_input.c
@@ -969,6 +982,105 @@ drop:
 }
 ```
 {collapsible="true" collapsed-title="br_handle_frame()" default-state="collapsed"}
+
+## 6. br_handle_frame_finish()
+
+这个函数主要对以太网数据帧执行进一步的决策和执行，主要逻辑如下。
+1. 获取并检查网桥端口，判断端口是否处于禁用状态。如果是，则丢弃该数据包。
+2. 调用br_allowed_ingress()函数检查数据包是否符合进入网桥的条件，包括VLAN信息等。如果不满足条件，则丢弃数据包。
+3. 更新MAC地址表，将源MAC地址添加到MAC地址学习表中，以便后续的数据包可以基于MAC地址表进行快速转发。
+4. 处理广播和多播帧，如果目标MAC地址为广播地址，则直接将数据包复制一份用于本地主机，并继续处理。如果目标MAC地址为多播地址，则调用br_multicast_rcv()函数处理多播接收逻辑。如果应丢弃该多播帧，则执行drop操作。
+5. 若端口此时仍处于学习状态(BR_STATE_LEARNING)，则丢弃数据包，因为学习阶段不进行实际转发。
+6. 设置skb的桥接设备字段。
+7. 处理本机接收的逻辑，根据网桥设备的混杂模式（promiscuous mode）标志决定是否将原始数据包发送给本地主机。根据目标MAC地址进行转发：
+   - 对于单播、广播和多播帧分别进行不同的处理：
+     - 单播：查找MAC地址表中的条目，并根据结果转发或泛洪数据包。
+     - 广播：将数据包复制一份用于本地主机，并转发原始数据包。 
+     - 多播：查找多播数据库中的条目，如果找到匹配项且有组播路由器或者需要仅发给组播路由器，则将数据包复制一份用于本地主机，并使用br_multicast_forward()进行组播转发。同时更新多播统计信息。
+8. 如果最终有数据包需要传递给上层协议栈（即skb2非空），则通过br_pass_frame_up()将其传递给上层网络协议栈处理，并返回。否则，释放资源并退出。
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_input.c
+
+int br_handle_frame_finish(struct sk_buff *skb)
+{
+	const unsigned char *dest = eth_hdr(skb)->h_dest;
+	struct net_bridge_port *p = br_port_get_rcu(skb->dev);
+	struct net_bridge *br;
+	struct net_bridge_fdb_entry *dst;
+	struct net_bridge_mdb_entry *mdst;
+	struct sk_buff *skb2;
+	u16 vid = 0;
+
+	if (!p || p->state == BR_STATE_DISABLED)
+		goto drop;
+
+	if (!br_allowed_ingress(p->br, nbp_get_vlan_info(p), skb, &vid))
+		goto drop;
+
+	/* insert into forwarding database after filtering to avoid spoofing */
+	br = p->br;
+	br_fdb_update(br, p, eth_hdr(skb)->h_source, vid);
+
+	if (!is_broadcast_ether_addr(dest) && is_multicast_ether_addr(dest) &&
+	    br_multicast_rcv(br, p, skb))
+		goto drop;
+
+	if (p->state == BR_STATE_LEARNING)
+		goto drop;
+
+	BR_INPUT_SKB_CB(skb)->brdev = br->dev;
+
+	/* The packet skb2 goes to the local host (NULL to skip). */
+	skb2 = NULL;
+
+	if (br->dev->flags & IFF_PROMISC)
+		skb2 = skb;
+
+	dst = NULL;
+
+	if (is_broadcast_ether_addr(dest))
+		skb2 = skb;
+	else if (is_multicast_ether_addr(dest)) {
+		mdst = br_mdb_get(br, skb, vid);
+		if (mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) {
+			if ((mdst && mdst->mglist) ||
+			    br_multicast_is_router(br))
+				skb2 = skb;
+			br_multicast_forward(mdst, skb, skb2);
+			skb = NULL;
+			if (!skb2)
+				goto out;
+		} else
+			skb2 = skb;
+
+		br->dev->stats.multicast++;
+	} else if ((dst = __br_fdb_get(br, dest, vid)) &&
+			dst->is_local) {
+		skb2 = skb;
+		/* Do not forward the packet since it's local. */
+		skb = NULL;
+	}
+
+	if (skb) {
+		if (dst) {
+			dst->used = jiffies;
+			br_forward(dst->dst, skb, skb2);
+		} else
+			br_flood_forward(br, skb, skb2);
+	}
+
+	if (skb2)
+		return br_pass_frame_up(skb2);
+
+out:
+	return 0;
+drop:
+	kfree_skb(skb);
+	goto out;
+}
+```
+{collapsible="true" collapsed-title="br_handle_frame_finish()" default-state="collapsed"}
 
 ## 参考
 - 《深入理解Linux网络》
