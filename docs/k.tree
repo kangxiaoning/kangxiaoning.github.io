@@ -17,6 +17,7 @@
         <toc-element topic="how-many-ntp-servers-should-be-configured.md"/>
         <toc-element topic="fedora-lvm-extend.md"/>
     </toc-element>
+    <toc-element topic="how-linux-bridge-works.md"/>
     <toc-element toc-title="Kubernetes">
         <toc-element topic="the-lifecycle-of-empty-dir.md"/>
     </toc-element>
