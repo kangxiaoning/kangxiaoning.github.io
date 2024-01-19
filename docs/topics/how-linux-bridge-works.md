@@ -1,5 +1,7 @@
 # Linux Bridge源码分析
 
+<show-structure depth="2"/>
+
 > 本文基于Linux kernel v3.10对Bridge工作原理进行分析。
 
 ## 1. 创建Bridge
@@ -549,13 +551,86 @@ struct net_device {
 
 在继续分析bridge之前，有必要先介绍下内核对数据包的处理过程，以便能和Linux处理数据包的整体逻辑串起来。
 
-内核是通过中断的方式来处理网络数据的。当网卡上有数据到达时，会给CPU的相关引脚上触发一个电压变化，以通知CPU来处理数据。对于网络模块来说，由于处理过程比较复杂和耗时，如果在中断函数中完成所有的处理，将会导致中断处理函数(优先级过高)过度占据CPU，使得CPU无法响应其它设备，例如鼠标和键 盘的消息。因此 Linux中断处理函数是分上半部和下半部的。上半部是只进行最简单的工作，快速处理然后释放CPU，接着CPU就可以允许其它中断进来。剩下将绝大部分的工作都放到下半部中，可以慢慢从容处理。2.4以后的内核版本采用的下半部实现方式是软中断，由ksoftirqd内核线程全权处理。硬中断是通过给CPU物理引脚施加电压变化，而软中断是通过给内存中的一个变􏰁的二进制值以标记有软中断发生。
+### 3.1 Linux收包概览
 
-Linux kernel在启动的过程中，会执行一系列操作，做好接收网络数据的准备。
-- 创建ksoftirqd内核线程，处理软件中断
-- 网络子系统初始化
+```mermaid
+sequenceDiagram
+    autonumber
+    网卡->>内存: 数据帧DMA到内存RingBuffer
+    网卡->>CPU: 硬中断通知CPU
+    CPU->>内核: 响应硬中断
+    内核->>内核: 发出软中断
+    内核->>内核: ksoftirqd处理软中断
+    内核->>驱动: 调用网卡驱动poll收包
+    驱动->>内核: 帧从RingBuffer上取出保存为skb
+    内核->>内核: 协议层处理skb
+    
+```
 
-这一步注册了软件中断对应的处理函数。
+当网卡上有数据到达时，Linux处理数据包的路径如上图。
+1. **网卡**以**DMA**的方式把数据帧写入内存。
+2. **网卡**向**CPU**发起一个硬中断，通知CPU有数据到达，要紧急处理。
+3. **CPU**调用**内核**中网络驱动注册的中断处理函数。
+4. 中断处理函数发出**软中断**。
+5. **ksoftirqd**处理软中断。
+6. **ksoftirqd**调用网卡驱动的`poll()`函数处理数据帧。
+7. 网卡驱动的`poll()`从RingBuffer上取出数据包，保存为`skb`结构。
+8. 内核对`skb`进行处理，比如设备层处理，协议层处理等，对于TCP包来说，最后会放到用户空间的`socket`等待队列中。
+
+> **中断**：当网卡上有数据到来时，会给CPU的相关引脚上触发一个电压变化，以通知CPU来处理数据。对于网络模块来说，由于处理过程比较复杂和耗时，如果在中断函数中完成所有的处理，将会导致中断处理函数(优先级过高)过度占据CPU，使得CPU无法响应其它设备，例如鼠标和键盘的消息。因此Linux中断处理函数是分**上半部**和**下半部**的。上半部是只进行最简单的工作，快速处理然后释放CPU，接着CPU就可以允许其它中断进来。剩下将绝大部分的工作都放到下半部中，可以慢慢从容处理。在Linux 2.4版本以后的内核版本采用的下半部实现方式是**软中断**，由**ksoftirqd**内核线程处理。**硬中断**是通过给CPU物理引脚施加电压变化，而软中断是通过给内存中的一个变量的二进制值以标记有软中断发生。
+
+### 3.2 Linux网络初始化
+
+Linux kernel在启动的过程中，需要执行一系列操作，以做好接收网络数据的准备。
+1. 通过`early_initcall(spawn_ksoftirqd)`创建ksoftirqd内核线程，用来处理软中断，有几个CPU核心就有几个`softirqd`进程。
+```C
+static __init int spawn_ksoftirqd(void)
+{
+	register_cpu_notifier(&cpu_nfb);
+
+	BUG_ON(smpboot_register_percpu_thread(&softirq_threads));
+
+	return 0;
+}
+early_initcall(spawn_ksoftirqd);
+```
+{collapsible="true" collapsed-title="early_initcall(spawn_ksoftirqd)" default-state="collapsed"}
+
+```C
+static struct smp_hotplug_thread softirq_threads = {
+	.store			= &ksoftirqd,
+	.thread_should_run	= ksoftirqd_should_run,
+	.thread_fn		= run_ksoftirqd,
+	.thread_comm		= "ksoftirqd/%u",
+};
+```
+{collapsible="true" collapsed-title="softirq_threads" default-state="collapsed"}
+
+```C
+int smpboot_register_percpu_thread(struct smp_hotplug_thread *plug_thread)
+{
+	unsigned int cpu;
+	int ret = 0;
+
+	mutex_lock(&smpboot_threads_lock);
+	for_each_online_cpu(cpu) {
+		ret = __smpboot_create_thread(plug_thread, cpu);
+		if (ret) {
+			smpboot_destroy_threads(plug_thread);
+			goto out;
+		}
+		smpboot_unpark_thread(plug_thread, cpu);
+	}
+	list_add(&plug_thread->list, &hotplug_threads);
+out:
+	mutex_unlock(&smpboot_threads_lock);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(smpboot_register_percpu_thread);
+```
+{collapsible="true" collapsed-title="smpboot_register_percpu_thread()" default-state="collapsed"}
+
+2. 通过`subsys_initcall(net_dev_init)`执行网络子系统初始化，比如初始化`softdata`等per cpu数据结构，注册**RX_SOFTIRQ**和**TX_SOFTIRQ**对应的中断处理函数。
 ```C
 
 static int __init net_dev_init(void)
@@ -634,11 +709,220 @@ out:
 }
 ```
 {collapsible="true" collapsed-title="net_dev_init()" default-state="collapsed"}
-- 协议栈注册
-- 网卡驱动初始化
-- 启动网卡
 
-经过上述处理后，Linux就做好了接收数据包的准备。当数据帧从网线到达网卡后，经过网卡驱动DMA，发出硬中断，内核执行硬中断处理函数，再发出软中断，最后触发ksoftirqd执行软中断处理函数`net_rx_action()`。这个函数会执行网卡驱动注册的poll方法，把数据帧从RingBuffer上取下来，然后进入GRO(Generic Receive Offload)处理逻辑，最后会进入`netif_receive_skb()`函数进行处理，这个函数是设备层进入协议层前的最后一个处理逻辑，因此二层相关的处理会在这里体现。
+3. 协议栈注册，比如IP，TCP，UDP等协议，对应的实现函数为`ip_rcv()`，`tcp_v4_rcv()`和`udp_rcv()`，将这些函数注册到了`inet_protos`和`ptype_base`数据结构中了。
+
+```C
+	if (inet_add_protocol(&icmp_protocol, IPPROTO_ICMP) < 0)
+		pr_crit("%s: Cannot add ICMP protocol\n", __func__);
+	if (inet_add_protocol(&udp_protocol, IPPROTO_UDP) < 0)
+		pr_crit("%s: Cannot add UDP protocol\n", __func__);
+	if (inet_add_protocol(&tcp_protocol, IPPROTO_TCP) < 0)
+		pr_crit("%s: Cannot add TCP protocol\n", __func__);
+	/* 省略 */
+	
+	dev_add_pack(&ip_packet_type);
+```
+`inet_init()`完整代码如下。
+```C
+static int __init inet_init(void)
+{
+	struct inet_protosw *q;
+	struct list_head *r;
+	int rc = -EINVAL;
+
+	BUILD_BUG_ON(sizeof(struct inet_skb_parm) > FIELD_SIZEOF(struct sk_buff, cb));
+
+	sysctl_local_reserved_ports = kzalloc(65536 / 8, GFP_KERNEL);
+	if (!sysctl_local_reserved_ports)
+		goto out;
+
+	rc = proto_register(&tcp_prot, 1);
+	if (rc)
+		goto out_free_reserved_ports;
+
+	rc = proto_register(&udp_prot, 1);
+	if (rc)
+		goto out_unregister_tcp_proto;
+
+	rc = proto_register(&raw_prot, 1);
+	if (rc)
+		goto out_unregister_udp_proto;
+
+	rc = proto_register(&ping_prot, 1);
+	if (rc)
+		goto out_unregister_raw_proto;
+
+	/*
+	 *	Tell SOCKET that we are alive...
+	 */
+
+	(void)sock_register(&inet_family_ops);
+
+#ifdef CONFIG_SYSCTL
+	ip_static_sysctl_init();
+#endif
+
+	tcp_prot.sysctl_mem = init_net.ipv4.sysctl_tcp_mem;
+
+	/*
+	 *	Add all the base protocols.
+	 */
+
+	if (inet_add_protocol(&icmp_protocol, IPPROTO_ICMP) < 0)
+		pr_crit("%s: Cannot add ICMP protocol\n", __func__);
+	if (inet_add_protocol(&udp_protocol, IPPROTO_UDP) < 0)
+		pr_crit("%s: Cannot add UDP protocol\n", __func__);
+	if (inet_add_protocol(&tcp_protocol, IPPROTO_TCP) < 0)
+		pr_crit("%s: Cannot add TCP protocol\n", __func__);
+#ifdef CONFIG_IP_MULTICAST
+	if (inet_add_protocol(&igmp_protocol, IPPROTO_IGMP) < 0)
+		pr_crit("%s: Cannot add IGMP protocol\n", __func__);
+#endif
+
+	/* Register the socket-side information for inet_create. */
+	for (r = &inetsw[0]; r < &inetsw[SOCK_MAX]; ++r)
+		INIT_LIST_HEAD(r);
+
+	for (q = inetsw_array; q < &inetsw_array[INETSW_ARRAY_LEN]; ++q)
+		inet_register_protosw(q);
+
+	/*
+	 *	Set the ARP module up
+	 */
+
+	arp_init();
+
+	/*
+	 *	Set the IP module up
+	 */
+
+	ip_init();
+
+	tcp_v4_init();
+
+	/* Setup TCP slab cache for open requests. */
+	tcp_init();
+
+	/* Setup UDP memory threshold */
+	udp_init();
+
+	/* Add UDP-Lite (RFC 3828) */
+	udplite4_register();
+
+	ping_init();
+
+	/*
+	 *	Set the ICMP layer up
+	 */
+
+	if (icmp_init() < 0)
+		panic("Failed to create the ICMP control socket.\n");
+
+	/*
+	 *	Initialise the multicast router
+	 */
+#if defined(CONFIG_IP_MROUTE)
+	if (ip_mr_init())
+		pr_crit("%s: Cannot init ipv4 mroute\n", __func__);
+#endif
+	/*
+	 *	Initialise per-cpu ipv4 mibs
+	 */
+
+	if (init_ipv4_mibs())
+		pr_crit("%s: Cannot init ipv4 mibs\n", __func__);
+
+	ipv4_proc_init();
+
+	ipfrag_init();
+
+	dev_add_pack(&ip_packet_type);
+
+	rc = 0;
+out:
+	return rc;
+out_unregister_raw_proto:
+	proto_unregister(&raw_prot);
+out_unregister_udp_proto:
+	proto_unregister(&udp_prot);
+out_unregister_tcp_proto:
+	proto_unregister(&tcp_prot);
+out_free_reserved_ports:
+	kfree(sysctl_local_reserved_ports);
+	goto out;
+}
+
+fs_initcall(inet_init);
+```
+{collapsible="true" collapsed-title="fs_initcall(inet_init)" default-state="collapsed"}
+
+4. 通过`module_init(igb_init_module)`向内核注册网卡驱动初始化函数，不同网卡的初始化函数不一样，这里举例的是`igb`网卡驱动。
+
+```C
+static struct pci_driver igb_driver = {
+	.name     = igb_driver_name,
+	.id_table = igb_pci_tbl,
+	.probe    = igb_probe,
+	.remove   = igb_remove,
+#ifdef CONFIG_PM
+	.driver.pm = &igb_pm_ops,
+#endif
+	.shutdown = igb_shutdown,
+	.sriov_configure = igb_pci_sriov_configure,
+	.err_handler = &igb_err_handler
+};
+
+static int __init igb_init_module(void)
+{
+	int ret;
+	pr_info("%s - version %s\n",
+	       igb_driver_string, igb_driver_version);
+
+	pr_info("%s\n", igb_copyright);
+
+#ifdef CONFIG_IGB_DCA
+	dca_register_notify(&dca_notifier);
+#endif
+	ret = pci_register_driver(&igb_driver);
+	return ret;
+}
+
+module_init(igb_init_module);
+```
+{collapsible="true" collapsed-title="module_init(igb_init_module)" default-state="collapsed"}
+
+```C
+static const struct net_device_ops igb_netdev_ops = {
+	.ndo_open		= igb_open,
+	.ndo_stop		= igb_close,
+	.ndo_start_xmit		= igb_xmit_frame,
+	.ndo_get_stats64	= igb_get_stats64,
+	.ndo_set_rx_mode	= igb_set_rx_mode,
+	.ndo_set_mac_address	= igb_set_mac,
+	.ndo_change_mtu		= igb_change_mtu,
+	.ndo_do_ioctl		= igb_ioctl,
+	.ndo_tx_timeout		= igb_tx_timeout,
+	.ndo_validate_addr	= eth_validate_addr,
+	.ndo_vlan_rx_add_vid	= igb_vlan_rx_add_vid,
+	.ndo_vlan_rx_kill_vid	= igb_vlan_rx_kill_vid,
+	.ndo_set_vf_mac		= igb_ndo_set_vf_mac,
+	.ndo_set_vf_vlan	= igb_ndo_set_vf_vlan,
+	.ndo_set_vf_tx_rate	= igb_ndo_set_vf_bw,
+	.ndo_set_vf_spoofchk	= igb_ndo_set_vf_spoofchk,
+	.ndo_get_vf_config	= igb_ndo_get_vf_config,
+#ifdef CONFIG_NET_POLL_CONTROLLER
+	.ndo_poll_controller	= igb_netpoll,
+#endif
+	.ndo_fix_features	= igb_fix_features,
+	.ndo_set_features	= igb_set_features,
+};
+```
+{collapsible="true" collapsed-title="igb_netdev_ops" default-state="collapsed"}
+
+5. 前面的初始化都完成后，内核就可以调用上面`net_device_ops`结构体中对应的函数执行各种网卡操作，比如启动，关闭，设置MAC等。
+
+经过上述处理后，Linux就做好了接收数据包的准备。当数据帧从网线到达网卡后，经过网卡驱动执行DMA，发出硬中断，内核执行硬中断处理函数，再发出软中断，最后触发ksoftirqd执行软中断处理函数`net_rx_action()`，接着执行网卡驱动注册的`poll()`方法，把数据帧从RingBuffer上取下来，然后进入GRO(Generic Receive Offload)处理逻辑，最后会进入`netif_receive_skb()`函数进行处理，这个函数是设备层进入协议层前的处理逻辑，二层相关的处理会在这里体现。
 
 ## 4. 进入Bridge处理逻辑
 
