@@ -640,9 +640,8 @@ out:
 
 经过上述处理后，Linux就做好了接收数据包的准备。当数据帧从网线到达网卡后，经过网卡驱动DMA，发出硬中断，内核执行硬中断处理函数，再发出软中断，最后触发ksoftirqd执行软中断处理函数`net_rx_action()`。这个函数会执行网卡驱动注册的poll方法，把数据帧从RingBuffer上取下来，然后进入GRO(Generic Receive Offload)处理逻辑，最后会进入`netif_receive_skb()`函数进行处理，这个函数是设备层进入协议层前的最后一个处理逻辑，因此二层相关的处理会在这里体现。
 
-## 4. netif_receive_skb()
+## 4. 进入Bridge处理逻辑
 
-`netif_receive_skb()`逻辑比较简单，主要是对数据包进行了RPS的处理，然后调用了`__netif_receive_skb()`，接着往下看。
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/dev.c
 
@@ -675,7 +674,7 @@ int netif_receive_skb(struct sk_buff *skb)
 ```
 {collapsible="true" collapsed-title="netif_receive_skb()" default-state="collapsed"}
 
-`__netif_receive_skb()`做了个特殊类型判断后就调用了`__netif_receive_skb_core()`，实际处理工作在这个函数中，继续往下看。
+`netif_receive_skb()`逻辑比较简单，主要是对数据包进行了RPS的处理，然后调用了`__netif_receive_skb()`。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/dev.c
@@ -706,31 +705,8 @@ static int __netif_receive_skb(struct sk_buff *skb)
 ```
 {collapsible="true" collapsed-title="__netif_receive_skb()" default-state="collapsed"}
 
-在这个函数中，调用了执行`br_add_if()`时注册的`rx_handler`函数，也就是`br_handle_frame()`，这里就和Bridge对数据帧的处理逻辑关联上了。
-```C
-	rx_handler = rcu_dereference(skb->dev->rx_handler);
-	if (rx_handler) {
-		if (pt_prev) {
-			ret = deliver_skb(skb, pt_prev, orig_dev);
-			pt_prev = NULL;
-		}
-		switch (rx_handler(&skb)) {
-		case RX_HANDLER_CONSUMED:
-			ret = NET_RX_SUCCESS;
-			goto unlock;
-		case RX_HANDLER_ANOTHER:
-			goto another_round;
-		case RX_HANDLER_EXACT:
-			deliver_exact = true;
-		case RX_HANDLER_PASS:
-			break;
-		default:
-			BUG();
-		}
-	}
-```
+`__netif_receive_skb()`做了个特殊类型判断后就调用了`__netif_receive_skb_core()`。
 
-完整函数看如下代码。
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/dev.c
 static int __netif_receive_skb_core(struct sk_buff *skb, bool pfmemalloc)
@@ -876,25 +852,37 @@ out:
 ```
 {collapsible="true" collapsed-title="__netif_receive_skb_core()" default-state="collapsed"}
 
-## 5. br_handle_frame()
+在`__netif_receive_skb_core()`函数中，调用`rx_handler()`函数（在`br_add_if()`中注册的），也就是`br_handle_frame()`，这里就和Bridge对数据帧的处理逻辑关联上了，通过如下代码进入了Bridge处理逻辑。
+```C
+	rx_handler = rcu_dereference(skb->dev->rx_handler);
+	if (rx_handler) {
+		if (pt_prev) {
+			ret = deliver_skb(skb, pt_prev, orig_dev);
+			pt_prev = NULL;
+		}
+		switch (rx_handler(&skb)) {
+		case RX_HANDLER_CONSUMED:
+			ret = NET_RX_SUCCESS;
+			goto unlock;
+		case RX_HANDLER_ANOTHER:
+			goto another_round;
+		case RX_HANDLER_EXACT:
+			deliver_exact = true;
+		case RX_HANDLER_PASS:
+			break;
+		default:
+			BUG();
+		}
+	}
+```
 
-这个函数的作用，可以理解为“在Bridge的port收到frame时调用这个函数进行处理”，逻辑大概如下。
+接下来就要看看Bridge入口函数即`br_handle_frame()`的处理逻辑了。
 
-1. 如果是loopback的packet，返回**RX_HANDLER_PASS**，表示应该由上层处理。
-2. 检查二层源MAC，如果无效则drop。
-3. 从Bridge上获取结构为`net_bridge_port`的port信息。
-4. 特殊MAC处理。
-5. 转发处理。
-   - BR_STATE_FORWARDING：如果有自定义hook则交给hook处理，否则继续交给BR_STATE_LEARNING逻辑处理。
-   - BR_STATE_LEARNING：
-     - 检查目标MAC地址是否与当前网桥设备的MAC地址相同。如果是，则设置数据包类型为PACKET_HOST，表示数据包发往本地主机。
-     - 调用Netfilter的NF_HOOK宏，执行NFPROTO_BRIDGE协议族的NF_BR_PRE_ROUTING钩子链，最后会调用**br_handle_frame_finish**这个回调函数。
-   - 如果不是上面两个状态，最会执行到drop分支，释放skb内存，返回RX_HANDLER_CONSUMED，表示数据包已被丢弃。
-
-从上面逻辑看，正常情况下都会执行到`br_handle_frame_finish()`。
+## 5. Bridge处理入口
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_input.c
+
 rx_handler_result_t br_handle_frame(struct sk_buff **pskb)
 {
 	struct net_bridge_port *p;
@@ -983,21 +971,20 @@ drop:
 ```
 {collapsible="true" collapsed-title="br_handle_frame()" default-state="collapsed"}
 
-## 6. br_handle_frame_finish()
+`br_handle_frame()`的作用，可以理解为“**在Bridge的port收到frame时调用这个函数进行处理**”，逻辑大概如下。
 
-这个函数主要对以太网数据帧执行进一步的决策和执行，主要逻辑如下。
-1. 获取并检查网桥端口，判断端口是否处于禁用状态。如果是，则丢弃该数据包。
-2. 调用br_allowed_ingress()函数检查数据包是否符合进入网桥的条件，包括VLAN信息等。如果不满足条件，则丢弃数据包。
-3. 更新MAC地址表，将源MAC地址添加到MAC地址学习表中，以便后续的数据包可以基于MAC地址表进行快速转发。
-4. 处理广播和多播帧，如果目标MAC地址为广播地址，则直接将数据包复制一份用于本地主机，并继续处理。如果目标MAC地址为多播地址，则调用br_multicast_rcv()函数处理多播接收逻辑。如果应丢弃该多播帧，则执行drop操作。
-5. 若端口此时仍处于学习状态(BR_STATE_LEARNING)，则丢弃数据包，因为学习阶段不进行实际转发。
-6. 设置skb的桥接设备字段。
-7. 处理本机接收的逻辑，根据网桥设备的混杂模式（promiscuous mode）标志决定是否将原始数据包发送给本地主机。根据目标MAC地址进行转发：
-   - 对于单播、广播和多播帧分别进行不同的处理：
-     - 单播：查找MAC地址表中的条目，并根据结果转发或泛洪数据包。
-     - 广播：将数据包复制一份用于本地主机，并转发原始数据包。 
-     - 多播：查找多播数据库中的条目，如果找到匹配项且有组播路由器或者需要仅发给组播路由器，则将数据包复制一份用于本地主机，并使用br_multicast_forward()进行组播转发。同时更新多播统计信息。
-8. 如果最终有数据包需要传递给上层协议栈（即skb2非空），则通过br_pass_frame_up()将其传递给上层网络协议栈处理，并返回。否则，释放资源并退出。
+1. 如果是loopback的packet，返回**RX_HANDLER_PASS**，表示应该由上层处理。
+2. 检查二层源MAC，如果无效则drop。
+3. 从Bridge上获取结构为`net_bridge_port`的port信息。
+4. 特殊MAC处理，这里不分析。
+5. **转发处理**，根据网桥端口状态（br_state_forwarding或br_state_learning）来决定如何处理数据包。
+   - **BR_STATE_FORWARDING**：如果端口处于转发状态并且存在自定义hook则交给hook处理，否则继续交给BR_STATE_LEARNING逻辑处理，因为这里没有`break`。
+   - **BR_STATE_LEARNING**： 如果**目标MAC地址与网桥设备MAC地址相同**，将数据包标记为发往本地主机（PACKET_HOST类型）。调用Netfilter的NF_HOOK宏，执行NFPROTO_BRIDGE协议族的NF_BR_PRE_ROUTING钩子链，最后会调用**br_handle_frame_finish**函数。
+6. 默认情况（即不满足上述条件时）：丢弃数据包并释放内存资源，返回RX_HANDLER_CONSUMED。
+
+正常情况下都会执行到`br_handle_frame_finish()`。
+
+## 6. br_handle_frame_finish()
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_input.c
@@ -1081,6 +1068,69 @@ drop:
 }
 ```
 {collapsible="true" collapsed-title="br_handle_frame_finish()" default-state="collapsed"}
+
+这个函数主要对以太网数据帧执行进一步的决策和执行，主要逻辑如下。
+1. 获取当前接收设备对应的网桥端口结构体，并检查端口是否启用。若未启用，则丢弃数据包并返回。
+2. 调用`br_allowed_ingress()`检查数据包是否满足入站过滤规则，即是否允许其进入网桥设备。如果不满足，则丢弃数据包。
+3. **更新MAC地址学习表**，将源MAC地址与当前端口关联起来，以便后续的数据包可以基于MAC地址表进行快速转发，避免MAC地址欺骗。
+4. 根据目标MAC地址进行广播，多播，单播等操作：
+  - 如果目标MAC地址为**广播**地址，则创建skb2指向原始skb，并准备将其传递给本地主机。
+  - 如果目标MAC地址为**多播**地址，则查找多播数据库条目，并根据配置判断是否需要转发至多播组或本地主机。同时增加多播统计计数。
+  - 如果目标MAC地址为**单播**地址且存在于**本地**（通过`__br_fdb_get()`查询），则同样创建skb2指向原始skb，并**跳过转发**，因为该数据包应发送到本地主机。
+5. 对于需要**转发**的数据包（即skb非空）进行处理：
+  - 若存在对应的目标单播MAC地址条目dst，则更新条目的最后使用时间，并调用`br_forward(dst->dst, skb, skb2)`函数**直接转发**至相应端口。
+  - 若**不存在目标单播MAC地址条目**，则调用`br_flood_forward(br, skb, skb2)`对数据包进行**泛洪转发**，即将数据包转发至除接收端口之外的所有端口。
+6. 如果此时skb2还存在（即需要发送给本地主机的数据包），则调用`br_pass_frame_up(skb2)`将数据包传递给上层协议栈。
+7. 在所有情况结束后，清理资源并返回相应的结果状态。
+
+在容器环境中，Bridge上会接入很多`veth pair`，经过`veth pair`的单播数据帧要么通过第5步转发给另一个`veth pair`，要么通过第6步送到上层协议栈处理，接下来分析看一下。
+
+## 7. 送到上层协议栈
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_input.c
+static int br_pass_frame_up(struct sk_buff *skb)
+{
+	struct net_device *indev, *brdev = BR_INPUT_SKB_CB(skb)->brdev;
+	struct net_bridge *br = netdev_priv(brdev);
+	struct br_cpu_netstats *brstats = this_cpu_ptr(br->stats);
+
+	u64_stats_update_begin(&brstats->syncp);
+	brstats->rx_packets++;
+	brstats->rx_bytes += skb->len;
+	u64_stats_update_end(&brstats->syncp);
+
+	/* Bridge is just like any other port.  Make sure the
+	 * packet is allowed except in promisc modue when someone
+	 * may be running packet capture.
+	 */
+	if (!(brdev->flags & IFF_PROMISC) &&
+	    !br_allowed_egress(br, br_get_vlan_info(br), skb)) {
+		kfree_skb(skb);
+		return NET_RX_DROP;
+	}
+
+	skb = br_handle_vlan(br, br_get_vlan_info(br), skb);
+	if (!skb)
+		return NET_RX_DROP;
+
+	indev = skb->dev;
+	skb->dev = brdev;
+
+	return NF_HOOK(NFPROTO_BRIDGE, NF_BR_LOCAL_IN, skb, indev, NULL,
+		       netif_receive_skb);
+}
+```
+{collapsible="true" collapsed-title="br_pass_frame_up()" default-state="collapsed"}
+
+根据前面的分析，单播frame会通过`br_pass_frame_up()`将skb传递给上层网络协议栈处理。这个函数主要执行如下操作：
+- 更新Bridge统计信息。
+- 更新skb的dev为bridge设备，作用是避免再次进入bridge处理逻辑。因为bridge设备的rx_handler函数没有被设置，所以就不会再次进入bridge逻辑，而是直接进入上层协议栈处理，在TCP/IP网络中就是送给IP协议处理。
+
+## 8. 转发
+
+有空再补充。
+
 
 ## 参考
 - 《深入理解Linux网络》
