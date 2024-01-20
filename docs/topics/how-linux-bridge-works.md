@@ -6,8 +6,6 @@
 
 ## 1. 创建Bridge
 
-从下面内存分配逻辑可以看出，bridge在Linux中也是一个net device。
-
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_if.c
 
@@ -16,13 +14,16 @@ int br_add_bridge(struct net *net, const char *name)
 	struct net_device *dev;
 	int res;
 
+    // 为Bridge设备分配内存，使用`br_dev_setup()`初始化该设备
 	dev = alloc_netdev(sizeof(struct net_bridge), name,
 			   br_dev_setup);
 
 	if (!dev)
 		return -ENOMEM;
 
+    // 设置Bridge的network namespace
 	dev_net_set(dev, net);
+	// br_link_ops定义了该device上可以执行的操作
 	dev->rtnl_link_ops = &br_link_ops;
 
 	res = register_netdev(dev);
@@ -31,11 +32,165 @@ int br_add_bridge(struct net *net, const char *name)
 	return res;
 }
 ```
+{collapsible="true" collapsed-title="br_add_bridge()" default-state="collapsed"}
 
-- bridge结构
+创建Bridge的代码在`br_add_bridge()`函数中，通过`alloc_netdev()`为Bridge分配了内存并通过`br_dev_setup()`对Bridge做了初始化，返回值是一个`net_device`结构体，可见Bridge在Linux中是用`net_device`表示的。实际上这里分配了两个对象，分别是`net_device`和`net_bridge`，相当于通用的device信息加上特殊的bridge信息组合成一个bridge device。
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/include/linux/netdevice.h
+
+#define alloc_netdev(sizeof_priv, name, setup) \
+	alloc_netdev_mqs(sizeof_priv, name, setup, 1, 1)
+```
+
+`alloc_netdev()`是个宏，它是通过调用`alloc_netdev_mqs()`函数实现的。
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/core/dev.c
+
+/**
+ *	alloc_netdev_mqs - allocate network device
+ *	@sizeof_priv:	size of private data to allocate space for
+ *	@name:		device name format string
+ *	@setup:		callback to initialize device
+ *	@txqs:		the number of TX subqueues to allocate
+ *	@rxqs:		the number of RX subqueues to allocate
+ *
+ *	Allocates a struct net_device with private data area for driver use
+ *	and performs basic initialization.  Also allocates subquue structs
+ *	for each queue on the device.
+ */
+struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+		void (*setup)(struct net_device *),
+		unsigned int txqs, unsigned int rxqs)
+{
+	struct net_device *dev;
+	size_t alloc_size;
+	struct net_device *p;
+
+	BUG_ON(strlen(name) >= sizeof(dev->name));
+
+	if (txqs < 1) {
+		pr_err("alloc_netdev: Unable to allocate device with zero queues\n");
+		return NULL;
+	}
+
+#ifdef CONFIG_RPS
+	if (rxqs < 1) {
+		pr_err("alloc_netdev: Unable to allocate device with zero RX queues\n");
+		return NULL;
+	}
+#endif
+
+	alloc_size = sizeof(struct net_device);
+	if (sizeof_priv) {
+		/* ensure 32-byte alignment of private area */
+		alloc_size = ALIGN(alloc_size, NETDEV_ALIGN);
+		alloc_size += sizeof_priv;
+	}
+	/* ensure 32-byte alignment of whole construct */
+	alloc_size += NETDEV_ALIGN - 1;
+
+	p = kzalloc(alloc_size, GFP_KERNEL);
+	if (!p)
+		return NULL;
+
+	dev = PTR_ALIGN(p, NETDEV_ALIGN);
+	dev->padded = (char *)dev - (char *)p;
+
+	dev->pcpu_refcnt = alloc_percpu(int);
+	if (!dev->pcpu_refcnt)
+		goto free_p;
+
+	if (dev_addr_init(dev))
+		goto free_pcpu;
+
+	dev_mc_init(dev);
+	dev_uc_init(dev);
+
+	dev_net_set(dev, &init_net);
+
+	dev->gso_max_size = GSO_MAX_SIZE;
+	dev->gso_max_segs = GSO_MAX_SEGS;
+
+	INIT_LIST_HEAD(&dev->napi_list);
+	INIT_LIST_HEAD(&dev->unreg_list);
+	INIT_LIST_HEAD(&dev->link_watch_list);
+	INIT_LIST_HEAD(&dev->upper_dev_list);
+	dev->priv_flags = IFF_XMIT_DST_RELEASE;
+	setup(dev);
+
+	dev->num_tx_queues = txqs;
+	dev->real_num_tx_queues = txqs;
+	if (netif_alloc_netdev_queues(dev))
+		goto free_all;
+
+#ifdef CONFIG_RPS
+	dev->num_rx_queues = rxqs;
+	dev->real_num_rx_queues = rxqs;
+	if (netif_alloc_rx_queues(dev))
+		goto free_all;
+#endif
+
+	strcpy(dev->name, name);
+	dev->group = INIT_NETDEV_GROUP;
+	if (!dev->ethtool_ops)
+		dev->ethtool_ops = &default_ethtool_ops;
+	return dev;
+
+free_all:
+	free_netdev(dev);
+	return NULL;
+
+free_pcpu:
+	free_percpu(dev->pcpu_refcnt);
+	kfree(dev->_tx);
+#ifdef CONFIG_RPS
+	kfree(dev->_rx);
+#endif
+
+free_p:
+	kfree(p);
+	return NULL;
+}
+```
+{collapsible="true" collapsed-title="alloc_netdev_mqs()" default-state="collapsed"}
+
+`alloc_netdev_mqs()`对新建的Bridge设备做了如下初始化。
+1. 为Bridge分配MAC地址。
+2. 为Bridge执行Ethernet初始化，也就是将这个设备初始化为Ethernet网络设备。
+3. 将该设备的操作关联到`br_netdev_ops`定义的操作，这里通过函数指针实现，后面对该设备的操作就指向了Bridge定义的操作，具体代码如下。
+
+```C
+static const struct net_device_ops br_netdev_ops = {
+	.ndo_open		 = br_dev_open,
+	.ndo_stop		 = br_dev_stop,
+	.ndo_init		 = br_dev_init,
+	.ndo_start_xmit		 = br_dev_xmit,
+	.ndo_get_stats64	 = br_get_stats64,
+	.ndo_set_mac_address	 = br_set_mac_address,
+	.ndo_set_rx_mode	 = br_dev_set_multicast_list,
+	.ndo_change_mtu		 = br_change_mtu,
+	.ndo_do_ioctl		 = br_dev_ioctl,
+#ifdef CONFIG_NET_POLL_CONTROLLER
+	.ndo_netpoll_setup	 = br_netpoll_setup,
+	.ndo_netpoll_cleanup	 = br_netpoll_cleanup,
+	.ndo_poll_controller	 = br_poll_controller,
+#endif
+	.ndo_add_slave		 = br_add_slave,
+	.ndo_del_slave		 = br_del_slave,
+	.ndo_fix_features        = br_fix_features,
+	.ndo_fdb_add		 = br_fdb_add,
+	.ndo_fdb_del		 = br_fdb_delete,
+	.ndo_fdb_dump		 = br_fdb_dump,
+	.ndo_bridge_getlink	 = br_getlink,
+	.ndo_bridge_setlink	 = br_setlink,
+	.ndo_bridge_dellink	 = br_dellink,
+};
+```
+{collapsible="true" collapsed-title="br_netdev_ops" default-state="collapsed"}
 
 在bridge的结构中有一个port_list字段，它是个双链表指针，维护了接入到bridge上的所有网卡/设备，比如`veth pair`等设备。
-
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_private.h
 
