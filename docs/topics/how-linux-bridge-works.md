@@ -1,6 +1,6 @@
 # Linux Bridge源码分析
 
-<show-structure depth="2"/>
+<show-structure depth="3"/>
 
 > 本文基于Linux kernel v3.10对Bridge工作原理进行分析。
 
@@ -704,7 +704,7 @@ struct net_device {
 
 ## 3. Linux数据帧处理过程
 
-在继续分析bridge之前，有必要先介绍下内核对数据包的处理过程，以便能和Linux处理数据包的整体逻辑串起来。
+在继续分析Bridge之前，有必要先介绍下内核对数据包的处理过程，因为大概过程基本一致，只是Bridge设备有特殊逻辑。
 
 ### 3.1 Linux收包概览
 
@@ -737,7 +737,10 @@ sequenceDiagram
 ### 3.2 Linux网络初始化
 
 Linux kernel在启动的过程中，需要执行一系列操作，以做好接收网络数据的准备。
-1. 通过`early_initcall(spawn_ksoftirqd)`创建ksoftirqd内核线程，用来处理软中断，有几个CPU核心就有几个`softirqd`进程。
+
+#### 3.2.1 创建ksoftirqd
+
+通过`early_initcall(spawn_ksoftirqd)`创建ksoftirqd内核线程，用来处理软中断，有几个CPU核心就有几个`softirqd`进程。
 ```C
 static __init int spawn_ksoftirqd(void)
 {
@@ -785,7 +788,13 @@ EXPORT_SYMBOL_GPL(smpboot_register_percpu_thread);
 ```
 {collapsible="true" collapsed-title="smpboot_register_percpu_thread()" default-state="collapsed"}
 
-2. 通过`subsys_initcall(net_dev_init)`执行网络子系统初始化，比如初始化`softdata`等per cpu数据结构，注册**RX_SOFTIRQ**和**TX_SOFTIRQ**对应的中断处理函数。
+#### 3.2.2 初始化网络设备
+
+通过`subsys_initcall(net_dev_init)`执行网络设备初始化。
+- 初始化`softnet_data`等per cpu数据结构，网卡驱动的`pool()`函数后面会注册到`softnet_data`结构体中的`poll_list`字段。
+- 调用`open_softirq()`注册**RX_SOFTIRQ**和**TX_SOFTIRQ**对应的中断处理函数。
+- 初始化`packet_type`哈希表，为所有可能的协议类型创建并初始化哈希表（`ptype_all`和`ptype_base`），这些哈希表用于快速查找特定协议的数据包处理器。
+
 ```C
 
 static int __init net_dev_init(void)
@@ -865,7 +874,9 @@ out:
 ```
 {collapsible="true" collapsed-title="net_dev_init()" default-state="collapsed"}
 
-3. 协议栈注册，比如IP，TCP，UDP等协议，对应的实现函数为`ip_rcv()`，`tcp_v4_rcv()`和`udp_rcv()`，将这些函数注册到了`inet_protos`和`ptype_base`数据结构中了。
+#### 3.2.3 注册协议栈
+
+协议栈注册，比如IP，TCP，UDP等协议，对应的实现函数为`ip_rcv()`，`tcp_v4_rcv()`和`udp_rcv()`，将这些函数注册到了`inet_protos`和`ptype_base`数据结构中了。
 
 ```C
 	if (inet_add_protocol(&icmp_protocol, IPPROTO_ICMP) < 0)
@@ -1012,7 +1023,49 @@ fs_initcall(inet_init);
 ```
 {collapsible="true" collapsed-title="fs_initcall(inet_init)" default-state="collapsed"}
 
-4. 通过`module_init(igb_init_module)`向内核注册网卡驱动初始化函数，不同网卡的初始化函数不一样，这里举例的是`igb`网卡驱动。
+- `inet_protos`记录着UDP，TCP的处理函数`udp_rcv()`，`tcp_v4_rcv()`的地址
+```C
+int inet_add_protocol(const struct net_protocol *prot, unsigned char protocol)
+{
+	if (!prot->netns_ok) {
+		pr_err("Protocol %u is not namespace aware, cannot register.\n",
+			protocol);
+		return -EINVAL;
+	}
+
+	return !cmpxchg((const struct net_protocol **)&inet_protos[protocol],
+			NULL, prot) ? 0 : -1;
+}
+```
+{collapsible="true" collapsed-title="inet_add_protocol()" default-state="collapsed"}
+
+- `ptype_base`存储着IP的处理函数`ip_rcv()`的地址
+```C
+void dev_add_pack(struct packet_type *pt)
+{
+	struct list_head *head = ptype_head(pt);
+
+	spin_lock(&ptype_lock);
+	list_add_rcu(&pt->list, head);
+	spin_unlock(&ptype_lock);
+}
+```
+{collapsible="true" collapsed-title="dev_add_pack()" default-state="collapsed"}
+
+```C
+static inline struct list_head *ptype_head(const struct packet_type *pt)
+{
+	if (pt->type == htons(ETH_P_ALL))
+		return &ptype_all;
+	else
+		return &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
+}
+```
+{collapsible="true" collapsed-title="ptype_head()" default-state="collapsed"}
+
+#### 3.2.4 注册网卡驱动
+
+通过`module_init(igb_init_module)`向内核注册网卡驱动初始化函数，不同网卡的初始化函数不一样，这里举例的是`igb`网卡驱动。
 
 ```C
 static struct pci_driver igb_driver = {
@@ -1048,6 +1101,120 @@ module_init(igb_init_module);
 {collapsible="true" collapsed-title="module_init(igb_init_module)" default-state="collapsed"}
 
 ```C
+// /Users/kangxiaoning/workspace/linux-3.10/include/linux/pci.h
+
+/*
+ * pci_register_driver must be a macro so that KBUILD_MODNAME can be expanded
+ */
+#define pci_register_driver(driver)		\
+	__pci_register_driver(driver, THIS_MODULE, KBUILD_MODNAME)
+```
+{collapsible="true" collapsed-title="pci_register_driver()" default-state="collapsed"}
+
+```C
+/**
+ * __pci_register_driver - register a new pci driver
+ * @drv: the driver structure to register
+ * @owner: owner module of drv
+ * @mod_name: module name string
+ * 
+ * Adds the driver structure to the list of registered drivers.
+ * Returns a negative value on error, otherwise 0. 
+ * If no error occurred, the driver remains registered even if 
+ * no device was claimed during registration.
+ */
+int __pci_register_driver(struct pci_driver *drv, struct module *owner,
+			  const char *mod_name)
+{
+	/* initialize common driver fields */
+	drv->driver.name = drv->name;
+	drv->driver.bus = &pci_bus_type;
+	drv->driver.owner = owner;
+	drv->driver.mod_name = mod_name;
+
+	spin_lock_init(&drv->dynids.lock);
+	INIT_LIST_HEAD(&drv->dynids.list);
+
+	/* register with core */
+	return driver_register(&drv->driver);
+}
+```
+{collapsible="true" collapsed-title="__pci_register_driver()" default-state="collapsed"}
+
+`pci_register_driver()`执行完成后，Linux就知道了驱动的信息，接下来就会调用驱动的`probe()`方法，igb的`probe`函数是`igb_probe`，这个函数非常长，贴部分代码理解下。
+
+```C
+	/* ... */
+	
+	// 设置MAC
+	hw->hw_addr = ioremap(mmio_start, mmio_len);
+	if (!hw->hw_addr)
+		goto err_ioremap;
+
+    // netdev_ops的类型为net_device_ops，使用igb_netdev_ops进行了设置
+	netdev->netdev_ops = &igb_netdev_ops;
+	// 设置ethtool对应的操作，具体操作在igb_ethtool_ops结构体中
+	igb_set_ethtool_ops(netdev);
+	netdev->watchdog_timeo = 5 * HZ;
+	
+	/* ... */
+	
+	/* setup the private structure */
+	// MTU，RingBuffer初始化等
+	err = igb_sw_init(adapter);
+	if (err)
+		goto err_sw_init;
+		
+	/* ... */
+	
+	// 册网络设备，会触发一系列注册过程，包括调用网络设备的注册回调函数、分配和配置网络设备的资源
+	// 以及将网络设备添加到系统中，使其能够被其他网络相关的子系统使用。
+	err = register_netdev(netdev);
+	
+	/* ... */
+```
+
+```C
+static const struct ethtool_ops igb_ethtool_ops = {
+	.get_settings		= igb_get_settings,
+	.set_settings		= igb_set_settings,
+	.get_drvinfo		= igb_get_drvinfo,
+	.get_regs_len		= igb_get_regs_len,
+	.get_regs		= igb_get_regs,
+	.get_wol		= igb_get_wol,
+	.set_wol		= igb_set_wol,
+	.get_msglevel		= igb_get_msglevel,
+	.set_msglevel		= igb_set_msglevel,
+	.nway_reset		= igb_nway_reset,
+	.get_link		= igb_get_link,
+	.get_eeprom_len		= igb_get_eeprom_len,
+	.get_eeprom		= igb_get_eeprom,
+	.set_eeprom		= igb_set_eeprom,
+	.get_ringparam		= igb_get_ringparam,
+	.set_ringparam		= igb_set_ringparam,
+	.get_pauseparam		= igb_get_pauseparam,
+	.set_pauseparam		= igb_set_pauseparam,
+	.self_test		= igb_diag_test,
+	.get_strings		= igb_get_strings,
+	.set_phys_id		= igb_set_phys_id,
+	.get_sset_count		= igb_get_sset_count,
+	.get_ethtool_stats	= igb_get_ethtool_stats,
+	.get_coalesce		= igb_get_coalesce,
+	.set_coalesce		= igb_set_coalesce,
+	.get_ts_info		= igb_get_ts_info,
+	.get_rxnfc		= igb_get_rxnfc,
+	.set_rxnfc		= igb_set_rxnfc,
+	.get_eee		= igb_get_eee,
+	.set_eee		= igb_set_eee,
+	.get_module_info	= igb_get_module_info,
+	.get_module_eeprom	= igb_get_module_eeprom,
+	.begin			= igb_ethtool_begin,
+	.complete		= igb_ethtool_complete,
+};
+```
+{collapsible="true" collapsed-title="igb_ethtool_ops" default-state="collapsed"}
+
+```C
 static const struct net_device_ops igb_netdev_ops = {
 	.ndo_open		= igb_open,
 	.ndo_stop		= igb_close,
@@ -1075,7 +1242,145 @@ static const struct net_device_ops igb_netdev_ops = {
 ```
 {collapsible="true" collapsed-title="igb_netdev_ops" default-state="collapsed"}
 
-5. 前面的初始化都完成后，内核就可以调用上面`net_device_ops`结构体中对应的函数执行各种网卡操作，比如启动，关闭，设置MAC等。
+#### 3.2.5 启动网卡
+
+前面的初始化都完成后，内核就可以调用上面`net_device_ops`结构体中对应的函数执行各种网卡操作，比如启动，关闭，设置MAC等。
+
+在启动网卡的过程中，会调用`igb_open()` -> `__igb_open()` -> `igb_setup_all_tx_resources()`/`igb_setup_all_rx_resources()`。在 `igb_setup_all_rx_resources()`调用中，分配了RingBuffer，建立内存和Rx队列的映射关系。在`igb_request_irq()`中注册了中断处理函数，在发生中断时调用`igb_request_msix()`进行处理。
+
+```C
+static int igb_open(struct net_device *netdev)
+{
+	return __igb_open(netdev, false);
+}
+```
+
+```C
+static int __igb_open(struct net_device *netdev, bool resuming)
+{
+	struct igb_adapter *adapter = netdev_priv(netdev);
+	struct e1000_hw *hw = &adapter->hw;
+	struct pci_dev *pdev = adapter->pdev;
+	int err;
+	int i;
+
+	/* disallow open during test */
+	if (test_bit(__IGB_TESTING, &adapter->state)) {
+		WARN_ON(resuming);
+		return -EBUSY;
+	}
+
+	if (!resuming)
+		pm_runtime_get_sync(&pdev->dev);
+
+	netif_carrier_off(netdev);
+
+	/* allocate transmit descriptors */
+	// 分配传输的descriptors，实际上是RingBuffer队列
+	err = igb_setup_all_tx_resources(adapter);
+	if (err)
+		goto err_setup_tx;
+
+	/* allocate receive descriptors */
+	// 分配接收的descriptors，实际上是RingBuffer队列
+	err = igb_setup_all_rx_resources(adapter);
+	if (err)
+		goto err_setup_rx;
+
+	igb_power_up_link(adapter);
+
+	/* before we allocate an interrupt, we must be ready to handle it.
+	 * Setting DEBUG_SHIRQ in the kernel makes it fire an interrupt
+	 * as soon as we call pci_request_irq, so we have to setup our
+	 * clean_rx handler before we do so.
+	 */
+	igb_configure(adapter);
+
+    // 注册中断处理函数
+	err = igb_request_irq(adapter);
+	if (err)
+		goto err_req_irq;
+
+	/* Notify the stack of the actual queue counts. */
+	err = netif_set_real_num_tx_queues(adapter->netdev,
+					   adapter->num_tx_queues);
+	if (err)
+		goto err_set_queues;
+
+	err = netif_set_real_num_rx_queues(adapter->netdev,
+					   adapter->num_rx_queues);
+	if (err)
+		goto err_set_queues;
+
+	/* From here on the code is the same as igb_up() */
+	clear_bit(__IGB_DOWN, &adapter->state);
+
+	for (i = 0; i < adapter->num_q_vectors; i++)
+		napi_enable(&(adapter->q_vector[i]->napi));
+
+	/* Clear any pending interrupts. */
+	rd32(E1000_ICR);
+
+	igb_irq_enable(adapter);
+
+	/* notify VFs that reset has been completed */
+	if (adapter->vfs_allocated_count) {
+		u32 reg_data = rd32(E1000_CTRL_EXT);
+		reg_data |= E1000_CTRL_EXT_PFRSTD;
+		wr32(E1000_CTRL_EXT, reg_data);
+	}
+
+	netif_tx_start_all_queues(netdev);
+
+	if (!resuming)
+		pm_runtime_put(&pdev->dev);
+
+	/* start the watchdog. */
+	hw->mac.get_link_status = 1;
+	schedule_work(&adapter->watchdog_task);
+
+	return 0;
+
+err_set_queues:
+	igb_free_irq(adapter);
+err_req_irq:
+	igb_release_hw_control(adapter);
+	igb_power_down_link(adapter);
+	igb_free_all_rx_resources(adapter);
+err_setup_rx:
+	igb_free_all_tx_resources(adapter);
+err_setup_tx:
+	igb_reset(adapter);
+	if (!resuming)
+		pm_runtime_put(&pdev->dev);
+
+	return err;
+}
+```
+{collapsible="true" collapsed-title="__igb_open()" default-state="collapsed"}
+
+从`igb_setup_all_rx_resources()`中可以看到，一个循环中创建了多个队列。
+```C
+static int igb_setup_all_rx_resources(struct igb_adapter *adapter)
+{
+	struct pci_dev *pdev = adapter->pdev;
+	int i, err = 0;
+
+	for (i = 0; i < adapter->num_rx_queues; i++) {
+		err = igb_setup_rx_resources(adapter->rx_ring[i]);
+		if (err) {
+			dev_err(&pdev->dev,
+				"Allocation for Rx Queue %u failed\n", i);
+			for (i--; i >= 0; i--)
+				igb_free_rx_resources(adapter->rx_ring[i]);
+			break;
+		}
+	}
+
+	return err;
+}
+```
+{collapsible="true" collapsed-title="igb_setup_all_rx_resources()" default-state="collapsed"}
 
 经过上述处理后，Linux就做好了接收数据包的准备。当数据帧从网线到达网卡后，经过网卡驱动执行DMA，发出硬中断，内核执行硬中断处理函数，再发出软中断，最后触发ksoftirqd执行软中断处理函数`net_rx_action()`，接着执行网卡驱动注册的`poll()`方法，把数据帧从RingBuffer上取下来，然后进入GRO(Generic Receive Offload)处理逻辑，最后会进入`netif_receive_skb()`函数进行处理，这个函数是设备层进入协议层前的处理逻辑，二层相关的处理会在这里体现。
 
@@ -1572,5 +1877,5 @@ static int br_pass_frame_up(struct sk_buff *skb)
 
 
 ## 参考
-- 《深入理解Linux网络》
-- http://www.embeddedlinux.org.cn/emb-linux/kernel-driver/201611/10-5842.html
+- 深入理解Linux网络
+- Linux Kernel Development Third Edition
