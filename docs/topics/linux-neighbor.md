@@ -92,6 +92,10 @@ static inline int ip_finish_output2(struct sk_buff *skb)
 
 ## 3. Neighbour条目创建及回收
 
+### 3.1 强制GC
+
+在创建neighbour条目时会判断是否要强制回收，代码如下。
+
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/neighbour.c
 
@@ -151,6 +155,99 @@ Neighbour是个结构体，有个table来存储Neighbour条目，保存在内存
     - 初始化定时器（用于老化邻居条目）。
     - 更新统计信息并关联到对应的邻居表。
     - 设置引用计数。
+
+### 3.2 周期性GC
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/core/neighbour.c
+static void neigh_periodic_work(struct work_struct *work)
+{
+	struct neigh_table *tbl = container_of(work, struct neigh_table, gc_work.work);
+	struct neighbour *n;
+	struct neighbour __rcu **np;
+	unsigned int i;
+	struct neigh_hash_table *nht;
+
+	NEIGH_CACHE_STAT_INC(tbl, periodic_gc_runs);
+
+	write_lock_bh(&tbl->lock);
+	nht = rcu_dereference_protected(tbl->nht,
+					lockdep_is_held(&tbl->lock));
+
+	if (atomic_read(&tbl->entries) < tbl->gc_thresh1)
+		goto out;
+
+	/*
+	 *	periodically recompute ReachableTime from random function
+	 */
+
+	if (time_after(jiffies, tbl->last_rand + 300 * HZ)) {
+		struct neigh_parms *p;
+		tbl->last_rand = jiffies;
+		for (p = &tbl->parms; p; p = p->next)
+			p->reachable_time =
+				neigh_rand_reach_time(p->base_reachable_time);
+	}
+
+	for (i = 0 ; i < (1 << nht->hash_shift); i++) {
+		np = &nht->hash_buckets[i];
+
+		while ((n = rcu_dereference_protected(*np,
+				lockdep_is_held(&tbl->lock))) != NULL) {
+			unsigned int state;
+
+			write_lock(&n->lock);
+
+			state = n->nud_state;
+			if (state & (NUD_PERMANENT | NUD_IN_TIMER)) {
+				write_unlock(&n->lock);
+				goto next_elt;
+			}
+
+			if (time_before(n->used, n->confirmed))
+				n->used = n->confirmed;
+
+			if (atomic_read(&n->refcnt) == 1 &&
+			    (state == NUD_FAILED ||
+			     time_after(jiffies, n->used + n->parms->gc_staletime))) {
+				*np = n->next;
+				n->dead = 1;
+				write_unlock(&n->lock);
+				neigh_cleanup_and_release(n);
+				continue;
+			}
+			write_unlock(&n->lock);
+
+next_elt:
+			np = &n->next;
+		}
+		/*
+		 * It's fine to release lock here, even if hash table
+		 * grows while we are preempted.
+		 */
+		write_unlock_bh(&tbl->lock);
+		cond_resched();
+		write_lock_bh(&tbl->lock);
+		nht = rcu_dereference_protected(tbl->nht,
+						lockdep_is_held(&tbl->lock));
+	}
+out:
+	/* Cycle through all hash buckets every base_reachable_time/2 ticks.
+	 * ARP entry timeouts range from 1/2 base_reachable_time to 3/2
+	 * base_reachable_time.
+	 */
+	schedule_delayed_work(&tbl->gc_work,
+			      tbl->parms.base_reachable_time >> 1);
+	write_unlock_bh(&tbl->lock);
+}
+```
+
+1. 如果小于第一个阈值gc_thresh1，则直接跳出垃圾回收过程
+2. 定期重新计算ReachableTime，如果距离上次随机计算超过5分钟（300秒），则根据base_reachable_time和随机函数更新所有`neigh_parms`结构体中的base_reachable_time，后续就会根据用户配置的时间定期GC。
+3. 遍历neighbour hash table的hash_buckets，处理每个条目。
+   - 如果该邻居条目为PERMANENT或正在进行定时器处理，则跳过。
+   - 更新used字段以确保其不早于confirmed字段的时间。
+   - 如果引用计数是否为1，并且状态为NUD_FAILED或者已经超过其对应的gc_staletime，则从链表中移除该条目，标记为dead，并调用`neigh_cleanup_and_release()`释放资源。
 
 ## 4. Neighbour条目GC逻辑
 
