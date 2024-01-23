@@ -1,5 +1,7 @@
 # Linux Neighbor源码分析
 
+<show-structure depth="2"/>
+
 ## 1. 什么时候需要创建Neighbor条目
 
 在Linux内核中，当网络数据包需要通过ARP（地址解析协议）或其他对应的协议（如IPv6下的NDP，Neighbor Discovery Protocol）来解析目标主机的硬件地址时，会创建neighbour条目(也就是ARP条目)，比如下列情况。
