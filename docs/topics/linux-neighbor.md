@@ -307,3 +307,24 @@ static int neigh_forced_gc(struct neigh_table *tbl)
 根据源码可以看到删除条目要满足的条件：
 - 引用计数是为1
 - 不是PERMANENT的条目
+
+## 5. 案例分析
+
+一个因为arp cache满导致应用timeout的案例。
+
+1. 现象
+
+业务**高峰期**应用出现timeout。
+
+2. 分析
+  - 从业务高峰期才出现异常，怀疑是性能问题
+  - 在Pod，Bridge，bond网卡等多个点抓包，对比正常和异常的数据包路径（见下图）
+    - 正常情况下，在Bridge可以看到第6步的包
+    - 异常情况下，在Bridge看不到第6步的包
+  - 从内核处理逻辑进一步分析，怀疑与ARP Cache有关
+
+![](arp-cache-full.svg)
+
+3. 解决
+
+将gc相关的3个参数调整为原来的2倍，持续观察未出现异常，问题解决。
