@@ -411,9 +411,13 @@ resolve_normal_ct(struct net *net, // 当前网络子系统结构体
 3. 如果找到匹配项，则根据其方向（回复还是原始数据包）确定当前数据包在连接中的状态，并通过`ctinfo`参数返回这个信息（如新建连接、已建立连接的回复部分、相关连接等）。
 4. 设置`skb->nfct`指向找到或创建的连接跟踪记录，并设置`skb->nfctinfo`为相应连接状态信息。
 
-## 4. NAT实现原理
+## 3. NAT实现原理
 
-### 4.1 NAT hook点及处理函数
+在这里先提一个问题：DNAT信息是从iptables规则来的还是从conntrack记录来的？
+
+答案在后面总结。
+
+### 3.1 NAT hook点及处理函数
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/netfilter/iptable_nat.c
@@ -497,7 +501,7 @@ err1:
 ```
 {collapsible="true" collapsed-title="iptable_nat_init()" default-state="collapsed"}
 
-### 4.2 Iptables NAT初始化
+### 3.2 Iptables NAT初始化
 Linux内核模块初始化时会执行`iptable_nat_init()`，用于初始化iptables的NAT功能，这个函数会在Netfilter框架中注册钩子函数，这样就可以捕获数据包并对其进行修改。
 
 Netfilter钩子注册的代码如下，可以看到除了`NF_INET_FORWARD`外其他hook点都注册了钩子函数。
@@ -507,7 +511,7 @@ nf_register_hooks(nf_nat_ipv4_ops, ARRAY_SIZE(nf_nat_ipv4_ops));
 ```
 上述代码将`nf_nat_ipv4_ops`定义的一组钩子函数注册到Netfilter框架中。这些函数在数据包通过不同阶段时执行，负责实现IPv4协议下的DNAT、SNAT等功能。
 
-### 4.3 DNAT实现逻辑
+### 3.3 DNAT实现逻辑
 
 根据`nf_nat_ipv4_ops`可以找到hook点及对应的处理函数，对于DNAT，有如下两条路，最终都会调用到`nf_nat_ipv4_fn()`函数。
 
@@ -669,7 +673,7 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
   - 调用三层协议处理模块（`l3proto`）的`manip_pkt`方法来实际修改数据包的内容，包括IP地址和端口号等，实现NAT转换。若调用失败，返回`NF_DROP`表示丢弃数据包。
 4. 如果未执行NAT操作或者NAT操作成功，则返回`NF_ACCEPT`，允许数据包继续在网络中传输。
 
-### 4.4 三层IP NAT
+### 3.4 三层IP NAT
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/netfilter/nf_nat_l3proto_ipv4.c
@@ -736,7 +740,7 @@ static bool nf_nat_ipv4_manip_pkt(struct sk_buff *skb,
   - 同时，利用`csum_replace4()`函数更新IPv4头部的校验和字段以反映IP地址的变化。
 5. 如果所有修改成功完成，函数返回`true`，表示数据包已成功进行了NAT转换。
 
-### 4.5 四层UDP端口NAT
+### 3.5 四层UDP端口NAT
 
 如下分析UDP的端口NAT操作函数，TCP类似。
 
@@ -806,9 +810,9 @@ udp_manip_pkt(struct sk_buff *skb,
 5. 最后将新的端口号赋值给原始端口号所在的内存位置。
 6. 函数返回`true`表示成功执行了对UDP数据包的端口号修改操作。
 
-### 4.6 根据iptables规则设置conntrack
+### 3.6 根据iptables规则设置conntrack
 
-从PRE_ROUTING挂载的hook函数开始，分析下iptables规则是如何执行的。
+这里再总结下NAT处理链，从PRE_ROUTING挂载的hook函数开始，分析下iptables规则及NAT是如何执行的。
 
 ```plantuml
   @startmindmap
@@ -935,7 +939,7 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
 
 总结一下，iptables规则定义了NAT应该如何发生，而conntrack则责维护这些规则应用后的状态，并确保双向通信过程中的地址一致性。两者紧密结合共同完成了Linux内核中的NAT功能。
 
-## 5. UDP的conntrack
+## 4. UDP的conntrack
 
 在Linux内核的Netfilter连接跟踪子系统中，`nf_conntrack_tuple`结构体用于存储网络数据包的关键信息以唯一标识一个网络连接的方向。对于UDP协议，`nf_conntrack_tuple`结构通常包含以下信息：
 
@@ -947,7 +951,7 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
 
 根据上述信息，得出结论: **在Kubernetes环境中，如果多次域名解析请求的sip/sport相同，那么会命中同一条cnntrack记录，因为dport永远是53，dip永远是同一个VIP，协议号永远是udp的协议号。**
  
-## 6. 案例分析
+## 5. 案例分析
 
 在kubernetes环境中，使用UDP协议解析域名，`coreDNS`异常重启，出现如下情况。
 1. 应用POD的`resolv.conf`文件中的nameserver配置相同的VIP，因此`nf_conntrack_tuple`中的`dip/dport/proto`都相同。
