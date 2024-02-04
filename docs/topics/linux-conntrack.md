@@ -411,8 +411,6 @@ resolve_normal_ct(struct net *net, // 当前网络子系统结构体
 3. 如果找到匹配项，则根据其方向（回复还是原始数据包）确定当前数据包在连接中的状态，并通过`ctinfo`参数返回这个信息（如新建连接、已建立连接的回复部分、相关连接等）。
 4. 设置`skb->nfct`指向找到或创建的连接跟踪记录，并设置`skb->nfctinfo`为相应连接状态信息。
 
-总之，`resolve_normal_ct`函数的核心功能是处理流入的数据包，将它们关联到正确的网络连接跟踪上下文中，并维护这些连接的状态。
-
 ## 4. NAT实现原理
 
 ### 4.1 NAT hook点及处理函数
@@ -502,18 +500,16 @@ err1:
 ### 4.2 Iptables NAT初始化
 Linux内核模块初始化时会执行`iptable_nat_init()`，用于初始化iptables的NAT功能，这个函数会在Netfilter框架中注册钩子函数，这样就可以捕获数据包并对其进行修改。
 
-- Netfilter hooks注册
-
-Netfilter钩子注册的代码如下，可以看到除了NF_INET_FORWARD外其他挂载点都注册了钩子函数。
+Netfilter钩子注册的代码如下，可以看到除了`NF_INET_FORWARD`外其他hook点都注册了钩子函数。
 
 ```C
 nf_register_hooks(nf_nat_ipv4_ops, ARRAY_SIZE(nf_nat_ipv4_ops));
 ```
-它将一组Netfilter钩子函数`nf_nat_ipv4_ops`注册到内核的Netfilter框架中。`nf_nat_ipv4_ops`是一个包含多个Netfilter钩子处理函数指针的数组，这些函数在数据包通过不同阶段时执行，负责实现IPv4协议下的DNAT、SNAT等功能。`ARRAY_SIZE(nf_nat_ipv4_ops)`用来获取这个数组中的元素个数，确保正确注册所有钩子函数。
+上述代码将`nf_nat_ipv4_ops`定义的一组钩子函数注册到Netfilter框架中。这些函数在数据包通过不同阶段时执行，负责实现IPv4协议下的DNAT、SNAT等功能。
 
 ### 4.3 DNAT实现逻辑
 
-根据`nf_nat_ipv4_ops`可以找到对应hook点要执行的函数，对于DNAT，有如下两条路，最终都会调用到`nf_nat_ipv4_fn()`函数。
+根据`nf_nat_ipv4_ops`可以找到hook点及对应的处理函数，对于DNAT，有如下两条路，最终都会调用到`nf_nat_ipv4_fn()`函数。
 
 ```plantuml
 @startmindmap
@@ -663,17 +659,154 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
 ```
 {collapsible="true" collapsed-title="nf_nat_packet()" default-state="collapsed"}
 
-`nf_nat_packet()`是Linux内核Netfilter子系统中NAT的核心逻辑，它负责检查和执行对经过特定钩子点的数据包进行源或目标地址的转换。
-1. 首先，根据传入的`hooknum`参数确定需要执行的NAT类型（SNAT或DNAT），并计算相应的状态位标志。
-2. 根据数据包的方向信息调整状态位标志，因为对于连接回复方向的数据包，需要做的可能是相反类型的NAT（例如，如果原始数据包做了SNAT，则其响应数据包应做DNAT）。
-3. 检查当前连接跟踪条目(`ct`)的状态是否包含需要进行NAT转换的标志。如果有，则继续执行NAT转换操作；否则，直接接受该数据包。
-4. 获取数据包反向（即初始方向）的连接跟踪元组，这将作为NAT的目标参考。
-5. 查找适用于该数据包三层协议（如IPv4/IPv6）和四层协议（如TCP/UDP）的NAT处理模块。
-6. 调用三层协议处理模块提供的`manip_pkt`函数来实际修改数据包的内容，使其符合目标NAT规则。这个函数会根据四层协议处理模块和目标NAT规则更新数据包中的IP地址和端口号等信息。
-7. 如果`manip_pkt`函数成功执行（返回非零值），说明数据包已成功进行了NAT转换，所以返回`NF_ACCEPT`，表示允许数据包通过。如果`manip_pkt`失败（返回0），则表示无法正确地进行NAT处理，因此返回`NF_DROP`，表明应该丢弃该数据包。
+`nf_nat_packet()`是处理NAT的函数，负责根据给定的连接跟踪信息（`ct`）、连接跟踪状态信息（`ctinfo`）、当前钩子点编号（`hooknum`）以及待处理的数据包（`skb`），对数据包执行相应的源或目标NAT操作。
+1. 首先，根据`hooknum`参数确定要进行的是源NAT（SNAT）还是目标NAT（DNAT），并设置相应的状态位标志`statusbit`。
+2. 判断数据包的方向（`dir`），如果是回复方向，则翻转状态位标志。
+3. 检查当前连接的状态（`ct->status`）是否设置了与NAT类型对应的状态位。如果设置了，继续执行以下步骤：
+  - 初始化一个目标五元组结构体`target`。
+  - 使用`nf_ct_invert_tuplepr()`函数从当前连接的另一方向的五元组生成反向五元组，这个反向五元组将作为NAT的目标配置。
+  - 根据反向五元组的信息找到对应的第三层（L3）和第四层（L4）协议处理模块。
+  - 调用三层协议处理模块（`l3proto`）的`manip_pkt`方法来实际修改数据包的内容，包括IP地址和端口号等，实现NAT转换。若调用失败，返回`NF_DROP`表示丢弃数据包。
+4. 如果未执行NAT操作或者NAT操作成功，则返回`NF_ACCEPT`，允许数据包继续在网络中传输。
+
+### 4.4 三层IP NAT
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/netfilter/nf_nat_l3proto_ipv4.c
+
+static const struct nf_nat_l3proto nf_nat_l3proto_ipv4 = {
+	.l3proto		= NFPROTO_IPV4,
+	.in_range		= nf_nat_ipv4_in_range,
+	.secure_port		= nf_nat_ipv4_secure_port,
+	.manip_pkt		= nf_nat_ipv4_manip_pkt,
+	.csum_update		= nf_nat_ipv4_csum_update,
+	.csum_recalc		= nf_nat_ipv4_csum_recalc,
+	.nlattr_to_range	= nf_nat_ipv4_nlattr_to_range,
+#ifdef CONFIG_XFRM
+	.decode_session		= nf_nat_ipv4_decode_session,
+#endif
+};
+```
+{collapsible="true" collapsed-title="nf_nat_l3proto_ipv4" default-state="collapsed"}
 
 
-### 4.4 根据iptables规则设置conntrack
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/netfilter/nf_nat_l3proto_ipv4.c
+
+static bool nf_nat_ipv4_manip_pkt(struct sk_buff *skb,
+				  unsigned int iphdroff,
+				  const struct nf_nat_l4proto *l4proto,
+				  const struct nf_conntrack_tuple *target,
+				  enum nf_nat_manip_type maniptype)
+{
+	struct iphdr *iph;
+	unsigned int hdroff;
+
+	if (!skb_make_writable(skb, iphdroff + sizeof(*iph)))
+		return false;
+
+	iph = (void *)skb->data + iphdroff;
+	hdroff = iphdroff + iph->ihl * 4;
+
+	if (!l4proto->manip_pkt(skb, &nf_nat_l3proto_ipv4, iphdroff, hdroff,
+				target, maniptype))
+		return false;
+	iph = (void *)skb->data + iphdroff;
+
+	if (maniptype == NF_NAT_MANIP_SRC) {
+		csum_replace4(&iph->check, iph->saddr, target->src.u3.ip);
+		iph->saddr = target->src.u3.ip;
+	} else {
+		csum_replace4(&iph->check, iph->daddr, target->dst.u3.ip);
+		iph->daddr = target->dst.u3.ip;
+	}
+	return true;
+}
+```
+{collapsible="true" collapsed-title="nf_nat_ipv4_manip_pkt()" default-state="collapsed"}
+
+`nf_nat_ipv4_manip_pkt()`是IPv4协议的NAT处理函数，主要作用是对IPv4数据包进行源IP地址或目标IP地址的替换，并更新相应的校验和。
+
+1. 首先，确保数据包头部在内核可写缓冲区中，调用`skb_make_writable()`函数来调整数据包的状态以使其内容可以被修改。如果无法使数据包变为可写，则返回`false`。
+2. 通过计算偏移量获取到IPv4头部指针`iph`。
+3. 调用特定第四层（L4）协议的处理模块（由`l4proto`指向）的`manip_pkt`方法来处理对应于上层协议（如TCP、UDP等）的端口转换或其他特定操作。如果这个过程失败，则返回`false`。
+4. 根据`maniptype`参数判断是要执行源NAT（SNAT）还是目标NAT（DNAT）。
+  - 对于SNAT，将原始数据包中的源IP地址替换为目标五元组结构体`target`中的新源IP地址。
+  - 对于DNAT，则替换目标IP地址为`target->dst.u3.ip`对应的目标地址，**`target`是在`nf_nat_ipv4_fn()`中获取，一路传下来的，可以理解为是从conntrack查询而来的**。
+  - 同时，利用`csum_replace4()`函数更新IPv4头部的校验和字段以反映IP地址的变化。
+5. 如果所有修改成功完成，函数返回`true`，表示数据包已成功进行了NAT转换。
+
+### 4.5 四层UDP端口NAT
+
+如下分析UDP的端口NAT操作函数，TCP类似。
+
+```C
+// /Users/kangxiaoning/workspace/linux-3.10/net/netfilter/nf_nat_proto_udp.c
+
+const struct nf_nat_l4proto nf_nat_l4proto_udp = {
+	.l4proto		= IPPROTO_UDP,
+	.manip_pkt		= udp_manip_pkt,
+	.in_range		= nf_nat_l4proto_in_range,
+	.unique_tuple		= udp_unique_tuple,
+#if defined(CONFIG_NF_CT_NETLINK) || defined(CONFIG_NF_CT_NETLINK_MODULE)
+	.nlattr_to_range	= nf_nat_l4proto_nlattr_to_range,
+#endif
+};
+```
+{collapsible="true" collapsed-title="nf_nat_l4proto_udp" default-state="collapsed"}
+
+```C
+static bool
+udp_manip_pkt(struct sk_buff *skb,
+	      const struct nf_nat_l3proto *l3proto,
+	      unsigned int iphdroff, unsigned int hdroff,
+	      const struct nf_conntrack_tuple *tuple,
+	      enum nf_nat_manip_type maniptype)
+{
+	struct udphdr *hdr;
+	__be16 *portptr, newport;
+
+	if (!skb_make_writable(skb, hdroff + sizeof(*hdr)))
+		return false;
+	hdr = (struct udphdr *)(skb->data + hdroff);
+
+	if (maniptype == NF_NAT_MANIP_SRC) {
+		/* Get rid of src port */
+		newport = tuple->src.u.udp.port;
+		portptr = &hdr->source;
+	} else {
+		/* Get rid of dst port */
+		newport = tuple->dst.u.udp.port;
+		portptr = &hdr->dest;
+	}
+	if (hdr->check || skb->ip_summed == CHECKSUM_PARTIAL) {
+		l3proto->csum_update(skb, iphdroff, &hdr->check,
+				     tuple, maniptype);
+		inet_proto_csum_replace2(&hdr->check, skb, *portptr, newport,
+					 0);
+		if (!hdr->check)
+			hdr->check = CSUM_MANGLED_0;
+	}
+	*portptr = newport;
+	return true;
+}
+```
+{collapsible="true" collapsed-title="udp_manip_pkt()" default-state="collapsed"}
+
+`udp_manip_pkt()`是处理UDP协议NAT操作的函数，主要任务是在给定的网络数据包中修改源或目标UDP端口号，以实现源地址转换（SNAT）或目标地址转换（DNAT）。
+1. 首先检查并确保数据包头部可写，通过调用`skb_make_writable()`函数移动数据包至内核内存区域，以便可以直接修改其内容。
+2. 获取指向UDP头部的指针`hdr`。
+3. 根据传入的`maniptype`参数判断是要修改源端口还是目标端口：
+  - 如果是`NF_NAT_MANIP_SRC`（源NAT），则获取新源端口`newport`（从`tupple->src.u.udp.port`获得），并将`portptr`指向`hdr->source`。
+  - 如果是`NF_NAT_MANIP_DST`（目标NAT），则获取新目标端口`newport`（从`tupple->dst.u.udp.port`获得），并将`portptr`指向`hdr->dest`。
+4. 检查UDP校验和是否有效或者数据包的校验和状态为部分校验。如果满足条件，则进行以下步骤：
+  - 调用三层协议（L3，如IPv4或IPv6）对应的`csum_update`方法更新整个IP头及TCP/UDP校验和的相关信息。
+  - 使用`inet_proto_csum_replace2`函数替换旧端口号为新端口号，并相应地更新校验和值。
+  - 若更新后的校验和为0，则设置为`CSUM_MANGLED_0`，表示校验和已计算但结果为0。
+5. 最后将新的端口号赋值给原始端口号所在的内存位置。
+6. 函数返回`true`表示成功执行了对UDP数据包的端口号修改操作。
+
+### 4.6 根据iptables规则设置conntrack
 
 从PRE_ROUTING挂载的hook函数开始，分析下iptables规则是如何执行的。
 
@@ -686,8 +819,39 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
         * alloc_null_binding
           * nf_nat_setup_info
       * nf_nat_packet
+        * nf_ct_invert_tuplepr
+        * l3proto->manip_pkt
+          * nf_nat_ipv4_manip_pkt
+            * l4proto->manip_pkt
+            * iph->daddr = target->dst.u3.ip
   @endmindmap
 ```
+
+```C
+
+static unsigned int nf_nat_rule_find(struct sk_buff *skb, unsigned int hooknum,
+				     const struct net_device *in,
+				     const struct net_device *out,
+				     struct nf_conn *ct)
+{
+	struct net *net = nf_ct_net(ct);
+	unsigned int ret;
+
+	ret = ipt_do_table(skb, hooknum, in, out, net->ipv4.nat_table);
+	if (ret == NF_ACCEPT) {
+		if (!nf_nat_initialized(ct, HOOK2MANIP(hooknum)))
+			ret = alloc_null_binding(ct, hooknum);
+	}
+	return ret;
+}
+```
+{collapsible="true" collapsed-title="nf_nat_rule_find()" default-state="collapsed"}
+
+`nf_nat_rule_find`的功能是查找和应用NAT规则，并对符合条件的数据包执行相应的NAT转换或维护必要的连接状态。
+- 使用`ipt_do_table()`函数处理给定的数据包（`skb`），根据其在Netfilter钩子链中的位置（`hooknum`）、输入设备（`in`）、输出设备（`out`）以及指向IPv4 NAT表（`net->ipv4.nat_table`）的指针来查找匹配的NAT规则，这个过程会遍历所有已配置的iptables NAT规则，并对数据包进行相应的操作，如果找到匹配的规则并执行成功，则返回`NF_ACCEPT`。
+- 如果`ipt_do_table()`函数返回了`NF_ACCEPT`，则进一步检查当前连接跟踪条目（`ct`）是否已经为当前钩子点初始化了NAT信息，如果没有初始化，调用`alloc_null_binding()`函数为该连接分配一个NULL binding，确保后续的NAT处理能够正确进行。
+
+这里就把conntrack和NAT需要的信息关联上了，第一次是从iptable规则中查，然后保存到conntrack中，后续就从conntrack中查找了，相当于缓存了NAT规则信息。
 
 ```C
 // 定义nf_nat_setup_info函数，用于设置给定连接（ct）的NAT信息，并根据指定的范围(range)和操纵类型(maniptype)进行转换。
@@ -763,7 +927,7 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
 ```
 {collapsible="true" collapsed-title="nf_nat_setup_info()" default-state="collapsed"}
 
-问题：DNAT信息是从iptables规则来的还是从conntrack记录来的？
+现在可以回答“**DNAT信息是从iptables规则来的还是从conntrack记录来的？**”这个问题了。
 
 答：从上述分析可以看出，Linux内核中处理NAT的函数是根据iptables规则确定的DNAT信息，并结合conntrack记录来执行实际的网络地址转换。
 - 当数据包经过Netfilter框架时，iptables规则首先在相应的钩子点上被应用。如果一个数据包与DNAT规则匹配，则会在conntrack中创建或更新一个条目，该条目记录了用于NAT转换的目标IP地址和端口号等信息。
