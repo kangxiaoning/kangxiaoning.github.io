@@ -124,16 +124,13 @@ static int __init nf_conntrack_l3proto_ipv4_init(void)
 
 从`nf_conntrack_l3proto_ipv4_init()`追踪，可以得出如下调用关系。
 
-```mermaid
-flowchart TD
-  A("nf_conntrack_l3proto_ipv4_init()")
-  B("nf_register_hooks()")
-  C("ipv4_conntrack_in()")
-  D("nf_conntrack_in()")
-
-  A-->B
-  B-->C
-  C-->D
+```plantuml
+@startmindmap
+* nf_conntrack_l3proto_ipv4_init
+  * nf_register_hooks
+    * ipv4_conntrack_in
+      * nf_conntrack_in
+@endmindmap
 ```
 
 
@@ -504,28 +501,22 @@ nf_register_hooks(nf_nat_ipv4_ops, ARRAY_SIZE(nf_nat_ipv4_ops));
 
 根据`nf_nat_ipv4_ops`可以找到对应hook点要执行的函数，对于DNAT，有如下两条路，最终都会调用到`nf_nat_ipv4_fn()`函数。
 
-```mermaid
-flowchart LR
-    A("PRE_ROUTING")
-    B("nf_nat_ipv4_in()")
-    C("nf_nat_ipv4_fn()")
-    D("nf_nat_packet()")
-    
-    A-->B
-    B-->C
-    C-->D
+```plantuml
+@startmindmap
+* PRE_ROUTING
+  * nf_nat_ipv4_in
+    * nf_nat_ipv4_fn
+      * nf_nat_packet
+@endmindmap
 ```
 
-```mermaid
-flowchart LR
-    A("LOCAL_OUT")
-    B("nf_nat_ipv4_local_fn()")
-    C("nf_nat_ipv4_fn()")
-    D("nf_nat_packet()")
-
-    A-->B
-    B-->C
-    C-->D
+```plantuml
+@startmindmap
+* LOCAL_OUT
+  * nf_nat_ipv4_local_fn
+    * nf_nat_ipv4_fn
+      * nf_nat_packet
+@endmindmap
 ```
 
 ```C
@@ -670,24 +661,18 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
 
 ### 4.4 根据iptables规则设置conntrack
 
-从PRE_ROUTING开始，分析下iptables规则是如何执行的。
+从PRE_ROUTING挂载的hook函数开始，分析下iptables规则是如何执行的。
 
-```mermaid
-flowchart TD
-    A("1. PRE_ROUTING")
-    B("2. nf_nat_ipv4_in()")
-    C("3. nf_nat_ipv4_fn()")
-    D("7. nf_nat_packet()")
-    E("4. nf_nat_rule_find()")
-    F("5. alloc_null_binding()")
-    G("6. nf_nat_setup_info()")
-
-    A-->B
-    B-->C
-    C-->D
-    C-->E
-    E-->F
-    F-->G
+```plantuml
+  @startmindmap
+  * nf_nat_ipv4_in
+    * nf_nat_ipv4_fn
+      * nf_nat_rule_find
+        * ipt_do_table
+        * alloc_null_binding
+          * nf_nat_setup_info
+      * nf_nat_packet
+  @endmindmap
 ```
 
 ```C
