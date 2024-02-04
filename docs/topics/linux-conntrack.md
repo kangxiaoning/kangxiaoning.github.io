@@ -25,9 +25,9 @@
 
 ## 2. 注册IPv4的conntrack 
 
-### 2.1 nf_conntrack_l3proto_ipv4_init()
+### 2.1 初始化IPv4 conntrack
 
-`nf_conntrack_l3proto_ipv4_init()`是一个内核模块初始化函数，负责初始化IPv4协议的conntrack支持。具体步骤如下：
+`nf_conntrack_l3proto_ipv4_init()`是一个内核模块初始化函数，负责初始化IPv4协议的conntrack支持。
 
 ```C
 
@@ -115,14 +115,21 @@ static int __init nf_conntrack_l3proto_ipv4_init(void)
 5. **注册Netfilter钩子**：调用`nf_register_hooks(ipv4_conntrack_ops, ARRAY_SIZE(ipv4_conntrack_ops))`，将IPv4连接跟踪的处理函数注册到Netfilter框架的不同钩子点上。
 6. **注册四层协议处理模块**：分别注册TCP、UDP和ICMPv4的四层协议处理模块，这些模块用于在连接跟踪过程中处理不同类型的IPv4数据包。
 7. **注册三层协议处理模块**：最后注册三层协议处理模块，即IPv4协议本身。
-8. 若配置支持，初始化proc文件系统兼容接口。
+8. 若配置支持，初始化`proc`文件系统兼容接口。
 9. 如果上述任何一步失败，则按照反向顺序进行清理，如取消注册已注册的模块、钩子以及sockopt等。
 
 整个过程确保了IPv4协议及其常用上层协议（TCP、UDP、ICMP）的连接跟踪功能能够正确地初始化并集成到Linux内核的Netfilter子系统中。
 
-### 2.2. conntrack相关逻辑
+### 2.2. 注册IPv4 conntrack hook函数
 
-从`nf_conntrack_l3proto_ipv4_init()`追踪，可以得出如下调用关系。
+在`nf_conntrack_l3proto_ipv4_init()`函数中有如下代码，目的是注册Netfilter框架中的hooks，将IPv4 conntrack的操作关联到特定的Netfilter钩子点上，如`NF_INET_PRE_ROUTING`、`NF_INET_LOCAL_IN`等，以便在相应阶段处理和追踪IPv4数据包。
+
+```C
+	ret = nf_register_hooks(ipv4_conntrack_ops,
+				ARRAY_SIZE(ipv4_conntrack_ops));
+```
+
+注册的hook最终调用到`nf_conntrack_in()`，如下图表示。
 
 ```plantuml
 @startmindmap
@@ -132,7 +139,6 @@ static int __init nf_conntrack_l3proto_ipv4_init(void)
       * nf_conntrack_in
 @endmindmap
 ```
-
 
 ```C
 
@@ -305,8 +311,7 @@ out:
 ```
 {collapsible="true" collapsed-title="nf_conntrack_in()" default-state="collapsed"}
 
-`nf_conntrack_in()`的主要作用是对进入的数据包进行连接跟踪处理，以实现对网络连接状态的维护和控制。
-
+`nf_conntrack_in`函数在`netfilter`框架中负责处理进入的数据包，并结合conntrack对数据包进行状态检查、创建或更新相应的conntrack记录，以支持如NAT等网络服务以及防火墙的状态检测功能，重点关注`resolve_normal_ct()`函数。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/netfilter/nf_conntrack_core.c
@@ -399,7 +404,16 @@ resolve_normal_ct(struct net *net, // 当前网络子系统结构体
 ```
 {collapsible="true" collapsed-title="resolve_normal_ct()" default-state="collapsed"}
 
-## 4. NAT原理
+`resolve_normal_ct`函数的的核心功能是处理流入的数据包，将它们关联到正确的网络连接跟踪上下文中，并维护这些连接的状态。
+
+1. 从数据包中提取五元组（即源IP、源端口、目标IP、目标端口和协议类型）信息，构建一个`nf_conntrack_tuple`结构体。
+2. 使用哈希函数计算五元组的哈希值，并在conntrack表中查找匹配项，如果没有找到匹配项，则初始化一个新的连接跟踪条目。
+3. 如果找到匹配项，则根据其方向（回复还是原始数据包）确定当前数据包在连接中的状态，并通过`ctinfo`参数返回这个信息（如新建连接、已建立连接的回复部分、相关连接等）。
+4. 设置`skb->nfct`指向找到或创建的连接跟踪记录，并设置`skb->nfctinfo`为相应连接状态信息。
+
+总之，`resolve_normal_ct`函数的核心功能是处理流入的数据包，将它们关联到正确的网络连接跟踪上下文中，并维护这些连接的状态。
+
+## 4. NAT实现原理
 
 ### 4.1 NAT hook点及处理函数
 
@@ -442,7 +456,7 @@ static struct nf_hook_ops nf_nat_ipv4_ops[] __read_mostly = {
 ```
 {collapsible="true" collapsed-title="nf_nat_ipv4_ops[]" default-state="collapsed"}
 
-这段代码是`nf_nat_ipv4_ops`的定义，包了四个`nf_hook_ops`结构体实例，用于在Netfilter框架中注册钩子函数，以便在网络数据包处理的不同阶段执行相应的NAT操作。
+`nf_nat_ipv4_ops`定义了四个`nf_hook_ops`结构体实例，用于在Netfilter框架中注册钩子函数，以便在网络数据包处理的不同阶段执行相应的NAT操作。
 
 `nf_hook_ops`解释如下：
 - `.hook`：指向一个函数指针，当数据包到达对应的网络过滤点时会调用此函数。这里分别定义了四种不同的处理函数：
@@ -486,7 +500,7 @@ err1:
 {collapsible="true" collapsed-title="iptable_nat_init()" default-state="collapsed"}
 
 ### 4.2 Iptables NAT初始化
-Linux内核模块初始化时会执行`iptable_nat_init()`，用于初始化iptables的NAT功能，这个函数会在Netfilter框架中注册钩子函数，这样就可以捕获数据包并对其进行修。
+Linux内核模块初始化时会执行`iptable_nat_init()`，用于初始化iptables的NAT功能，这个函数会在Netfilter框架中注册钩子函数，这样就可以捕获数据包并对其进行修改。
 
 - Netfilter hooks注册
 
@@ -649,7 +663,7 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
 ```
 {collapsible="true" collapsed-title="nf_nat_packet()" default-state="collapsed"}
 
-`nf_nat_packet()`是Linux内核Netfilter子系统中NAT的核心逻辑。它负责检查和执行对经过特定钩子点的数据包进行源或目标地址的转换。
+`nf_nat_packet()`是Linux内核Netfilter子系统中NAT的核心逻辑，它负责检查和执行对经过特定钩子点的数据包进行源或目标地址的转换。
 1. 首先，根据传入的`hooknum`参数确定需要执行的NAT类型（SNAT或DNAT），并计算相应的状态位标志。
 2. 根据数据包的方向信息调整状态位标志，因为对于连接回复方向的数据包，需要做的可能是相反类型的NAT（例如，如果原始数据包做了SNAT，则其响应数据包应做DNAT）。
 3. 检查当前连接跟踪条目(`ct`)的状态是否包含需要进行NAT转换的标志。如果有，则继续执行NAT转换操作；否则，直接接受该数据包。
