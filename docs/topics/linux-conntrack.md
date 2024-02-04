@@ -782,8 +782,7 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
 - **目的端口号**（dport）：接收方监听的UDP端口号。
 - **协议号**（proto）：在网络层通常是IPPROTO_UDP。
 
-根据上术信息，得出如下结论
-1. 如果上述tuple的所有信息都相同，那么会命中同一个conntrack记录。
+根据上述信息，得出结论: **在Kubernetes环境中，如果多次域名解析请求的sip/sport相同，那么会命中同一条cnntrack记录，因为dport永远是53，dip永远是同一个VIP，协议号永远是udp的协议号。**
  
 ## 6. 案例分析
 
