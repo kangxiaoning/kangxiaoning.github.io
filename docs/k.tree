@@ -14,6 +14,7 @@
         <toc-element topic="write-ebpf-program-in-rust.md"/>
     </toc-element>
     <toc-element toc-title="Linux">
+        <toc-element topic="linux-conntrack.md"/>
         <toc-element topic="linux-neighbor.md"/>
         <toc-element topic="how-linux-bridge-works.md"/>
         <toc-element topic="how-many-ntp-servers-should-be-configured.md"/>
