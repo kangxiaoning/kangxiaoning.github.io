@@ -2,7 +2,7 @@
 
 <show-structure depth="3"/>
 
-> 本文基于Linux kernel v3.10对ConnTrack工作原理进行分析。
+> 本文基于Linux kernel v3.10对ConnTrack及NAT工作原理进行分析。
 
 ## 1. Netfilter Packet Flow
 
@@ -12,7 +12,7 @@
 
 关注上图中conntrack的位置，包含了很多设计上的考虑。
 
-1. 要跟踪**有效**连接，有效性要求数据包在**进入应用之前**或者**离开网卡之前**要**通过所有查检**。
+1. 要跟踪**有效**连接，有效性要求数据包在**进入应用之前**或者**离开网卡之前**要**通过所有检查**。
 2. 要**尽可能早**的跟踪连接，越早介入干扰越小。
 
 要达成这些目的，必须确保数据包**通过所有检查**，并且**尽可能早**生成跟踪信息，因此这里涉及一个**开始生成**和**最终确认**的过程。
@@ -23,7 +23,170 @@
   - `LOCAL_IN`是数据包**通过所有检查**，**到达应用之前**的最后一个hook点，因此要在这个点确认。
   - `POST_ROUTING`是数据包**通过所有检查**，**离开主机之前**的最后一个hook点，因此要在这个点确认。
 
-## 2. nf_conntrack_in()
+## 2. 注册IPv4的conntrack 
+
+### 2.1 nf_conntrack_l3proto_ipv4_init()
+
+`nf_conntrack_l3proto_ipv4_init()`是一个内核模块初始化函数，负责初始化IPv4协议的conntrack支持。具体步骤如下：
+
+```C
+
+static int __init nf_conntrack_l3proto_ipv4_init(void)
+{
+	int ret = 0;
+
+	need_conntrack();
+	nf_defrag_ipv4_enable();
+
+	ret = nf_register_sockopt(&so_getorigdst);
+	if (ret < 0) {
+		printk(KERN_ERR "Unable to register netfilter socket option\n");
+		return ret;
+	}
+
+	ret = register_pernet_subsys(&ipv4_net_ops);
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register pernet ops\n");
+		goto cleanup_sockopt;
+	}
+
+	ret = nf_register_hooks(ipv4_conntrack_ops,
+				ARRAY_SIZE(ipv4_conntrack_ops));
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register hooks.\n");
+		goto cleanup_pernet;
+	}
+
+	ret = nf_ct_l4proto_register(&nf_conntrack_l4proto_tcp4);
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register tcp4 proto.\n");
+		goto cleanup_hooks;
+	}
+
+	ret = nf_ct_l4proto_register(&nf_conntrack_l4proto_udp4);
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register udp4 proto.\n");
+		goto cleanup_tcp4;
+	}
+
+	ret = nf_ct_l4proto_register(&nf_conntrack_l4proto_icmp);
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register icmpv4 proto.\n");
+		goto cleanup_udp4;
+	}
+
+	ret = nf_ct_l3proto_register(&nf_conntrack_l3proto_ipv4);
+	if (ret < 0) {
+		pr_err("nf_conntrack_ipv4: can't register ipv4 proto.\n");
+		goto cleanup_icmpv4;
+	}
+
+#if defined(CONFIG_PROC_FS) && defined(CONFIG_NF_CONNTRACK_PROC_COMPAT)
+	ret = nf_conntrack_ipv4_compat_init();
+	if (ret < 0)
+		goto cleanup_proto;
+#endif
+	return ret;
+#if defined(CONFIG_PROC_FS) && defined(CONFIG_NF_CONNTRACK_PROC_COMPAT)
+ cleanup_proto:
+	nf_ct_l3proto_unregister(&nf_conntrack_l3proto_ipv4);
+#endif
+ cleanup_icmpv4:
+	nf_ct_l4proto_unregister(&nf_conntrack_l4proto_icmp);
+ cleanup_udp4:
+	nf_ct_l4proto_unregister(&nf_conntrack_l4proto_udp4);
+ cleanup_tcp4:
+	nf_ct_l4proto_unregister(&nf_conntrack_l4proto_tcp4);
+ cleanup_hooks:
+	nf_unregister_hooks(ipv4_conntrack_ops, ARRAY_SIZE(ipv4_conntrack_ops));
+ cleanup_pernet:
+	unregister_pernet_subsys(&ipv4_net_ops);
+ cleanup_sockopt:
+	nf_unregister_sockopt(&so_getorigdst);
+	return ret;
+}
+```
+{collapsible="true" collapsed-title="nf_conntrack_l3proto_ipv4_init()" default-state="collapsed"}
+
+1. **调用`need_conntrack()`**：表示该功能需要连接跟踪的支持。
+2. **启用IPv4分片重组（defragmentation）**：通过调用`nf_defrag_ipv4_enable()`开启对IPv4数据包分片的重组功能。
+3. **注册获取原始目的地地址的套接字选项**：调用`nf_register_sockopt(&so_getorigdst)`允许用户空间程序通过套接字选项获取经过NAT转换后数据包的原始目的地地址。
+4. **注册网络命名空间子系统操作**：调用`register_pernet_subsys(&ipv4_net_ops)`将IPv4连接跟踪的相关操作注册到网络命名空间子系统中。
+5. **注册Netfilter钩子**：调用`nf_register_hooks(ipv4_conntrack_ops, ARRAY_SIZE(ipv4_conntrack_ops))`，将IPv4连接跟踪的处理函数注册到Netfilter框架的不同钩子点上。
+6. **注册四层协议处理模块**：分别注册TCP、UDP和ICMPv4的四层协议处理模块，这些模块用于在连接跟踪过程中处理不同类型的IPv4数据包。
+7. **注册三层协议处理模块**：最后注册三层协议处理模块，即IPv4协议本身。
+8. 若配置支持，初始化proc文件系统兼容接口。
+9. 如果上述任何一步失败，则按照反向顺序进行清理，如取消注册已注册的模块、钩子以及sockopt等。
+
+整个过程确保了IPv4协议及其常用上层协议（TCP、UDP、ICMP）的连接跟踪功能能够正确地初始化并集成到Linux内核的Netfilter子系统中。
+
+### 2.2. conntrack相关逻辑
+
+从`nf_conntrack_l3proto_ipv4_init()`追踪，可以得出如下调用关系。
+
+```mermaid
+flowchart TD
+  A("nf_conntrack_l3proto_ipv4_init()")
+  B("nf_register_hooks()")
+  C("ipv4_conntrack_in()")
+  D("nf_conntrack_in()")
+
+  A-->B
+  B-->C
+  C-->D
+```
+
+
+```C
+
+/* Connection tracking may drop packets, but never alters them, so
+   make it the first hook. */
+static struct nf_hook_ops ipv4_conntrack_ops[] __read_mostly = {
+	{
+		.hook		= ipv4_conntrack_in,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_PRE_ROUTING,
+		.priority	= NF_IP_PRI_CONNTRACK,
+	},
+	{
+		.hook		= ipv4_conntrack_local,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_LOCAL_OUT,
+		.priority	= NF_IP_PRI_CONNTRACK,
+	},
+	{
+		.hook		= ipv4_helper,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_POST_ROUTING,
+		.priority	= NF_IP_PRI_CONNTRACK_HELPER,
+	},
+	{
+		.hook		= ipv4_confirm,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_POST_ROUTING,
+		.priority	= NF_IP_PRI_CONNTRACK_CONFIRM,
+	},
+	{
+		.hook		= ipv4_helper,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_LOCAL_IN,
+		.priority	= NF_IP_PRI_CONNTRACK_HELPER,
+	},
+	{
+		.hook		= ipv4_confirm,
+		.owner		= THIS_MODULE,
+		.pf		= NFPROTO_IPV4,
+		.hooknum	= NF_INET_LOCAL_IN,
+		.priority	= NF_IP_PRI_CONNTRACK_CONFIRM,
+	},
+};
+```
+{collapsible="true" collapsed-title="ipv4_conntrack_ops[]" default-state="collapsed"}
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/netfilter/nf_conntrack_core.c
@@ -147,7 +310,6 @@ out:
 
 `nf_conntrack_in()`的主要作用是对进入的数据包进行连接跟踪处理，以实现对网络连接状态的维护和控制。
 
-## 3. resolve_normal_ct()
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/netfilter/nf_conntrack_core.c
@@ -240,7 +402,9 @@ resolve_normal_ct(struct net *net, // 当前网络子系统结构体
 ```
 {collapsible="true" collapsed-title="resolve_normal_ct()" default-state="collapsed"}
 
-## 4. NAT
+## 4. NAT原理
+
+### 4.1 NAT hook点及处理函数
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/netfilter/iptable_nat.c
@@ -324,6 +488,7 @@ err1:
 ```
 {collapsible="true" collapsed-title="iptable_nat_init()" default-state="collapsed"}
 
+### 4.2 Iptables NAT初始化
 Linux内核模块初始化时会执行`iptable_nat_init()`，用于初始化iptables的NAT功能，这个函数会在Netfilter框架中注册钩子函数，这样就可以捕获数据包并对其进行修。
 
 - Netfilter hooks注册
@@ -335,8 +500,7 @@ nf_register_hooks(nf_nat_ipv4_ops, ARRAY_SIZE(nf_nat_ipv4_ops));
 ```
 它将一组Netfilter钩子函数`nf_nat_ipv4_ops`注册到内核的Netfilter框架中。`nf_nat_ipv4_ops`是一个包含多个Netfilter钩子处理函数指针的数组，这些函数在数据包通过不同阶段时执行，负责实现IPv4协议下的DNAT、SNAT等功能。`ARRAY_SIZE(nf_nat_ipv4_ops)`用来获取这个数组中的元素个数，确保正确注册所有钩子函数。
 
-### 4.1 DNAT
-
+### 4.3 DNAT实现逻辑
 
 根据`nf_nat_ipv4_ops`可以找到对应hook点要执行的函数，对于DNAT，有如下两条路，最终都会调用到`nf_nat_ipv4_fn()`函数。
 
@@ -504,7 +668,7 @@ unsigned int nf_nat_packet(struct nf_conn *ct, // 当前连接跟踪条目指针
 7. 如果`manip_pkt`函数成功执行（返回非零值），说明数据包已成功进行了NAT转换，所以返回`NF_ACCEPT`，表示允许数据包通过。如果`manip_pkt`失败（返回0），则表示无法正确地进行NAT处理，因此返回`NF_DROP`，表明应该丢弃该数据包。
 
 
-### 4.2 根据iptables规则设置conntrack
+### 4.4 根据iptables规则设置conntrack
 
 从PRE_ROUTING开始，分析下iptables规则是如何执行的。
 
