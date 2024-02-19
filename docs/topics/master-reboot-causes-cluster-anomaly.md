@@ -44,6 +44,9 @@
 因为异常现象与预期不符，需要解释为什么会出现这些异常，我列了如下问题，根据这些问题指导分析方向。
 
 1. 为什么第1个coreDNS驱逐后没报错？
+
+**update**: 后面重新查看应用日志，其实第1个coreDNS驱逐后已经产生DNS解析报错了。
+
 2. 为什么第2个coreDNS驱逐后有报错？
 3. 为什么30分钟能自行恢复？
 4. 为什么Kubelet会NotReady？
@@ -73,8 +76,11 @@
 
 #### 4.4.1 为什么第1个coreDNS驱逐后没报错？
 
-1. 第1个coreDNS驱逐后，集群中仍然有一个DNS Server可用，因此能正常提供DNS解析服务，没有报错符合预期。
+1. 第1个coreDNS驱逐后，集群中仍然有一个DNS Server可用，因此能正常提供DNS解析服务，~~没有报错符合预期~~。
 
+**update:** 后面重新查看应用日志，其实第1个coreDNS驱逐后已经产生DNS解析报错了，所以上述解释不合理。
+
+技术原理上，第1个coreDNS驱逐后，连接Master-3的Nodes的iptables规则没有更新，所以这部分Nodes会有概率访问到不存在的coreDNS，一定会解析异常，但是由于集群中还有一个coreDNS可用，因此这时候重试可以恢复，报错较少，参考如下状态转换图，在驱逐第2个coreDNS后，集群中无效IP和Nodes最多，因此这个时候报错最多。
  
 #### 4.4.2 为什么第2个coreDNS驱逐后有报错？
 
@@ -95,6 +101,8 @@
 **新问题：** 第2个coreDNS变更后，很快IP-A就恢复了，即使Node上的iptables没有更新，按问题1的分析也可以使用IP-A解析，为什么没有恢复？
 
 某些应用使用的镜像，DNS client会重用source port，这会导致请求始终命无效的conntrack记录，DNAT转换到不存在的coreDNS IP上，因此解析失败。之前确实观察到一次向不存在的IP发送解析请求，直到重启Pod才恢复。因为重启Pod会新建连接，就会新建conntrack，DNAT转换正确，解析恢复。
+
+**update:** 参考4.4.1的解释，对照4.4.2的状态转换图，只要图中有标红的IP，这个阶段一定会出现解析异常，因此DNS解析异常时间段为第1台coreDNS删除到Master-1重启30分钟后，与观察到的应用现象一致。
 
 #### 4.4.3 为什么30分钟能自行恢复？
 
@@ -117,13 +125,14 @@
 
 #### 4.4.6 其它分析记录
 
-1. 因为有3个Master，所以实际上每次重启Master只会影响最终连接到那台Master上的Node
+1. 因为有3个Master，所以实际上每次重启Master只会影响最终连接到那台Master上的Node，参考4.4.2状态转换图。
+2. 修改F5参数后，F5健康检查发现Master异常后，会主动向kube-proxy/kubelet发送reset包，重建连接后Node与Master通信恢复。
 
 ## 5. 解决方案
 
 1. 解决DNS解析异常
 
-修改F5的**Action On Service Down**参数为**Reject**(默认是Node)，在检测到Master异常后及时通知kube-proxy，这样可以让kube-proxy重建连接，恢复与APIServer的通信。
+修改F5的**Action On Service Down**参数为**Reject**(默认是Node)，在检测到Master异常后及时通知kube-proxy，这样可以让kube-proxy重建连接，恢复与APIServer的通信。F5每5秒检测一次，如果连续3次检测Member异常，1秒后将Member在Pool标记为Down，所以大概**在Master异常16秒后**会向Node发送reset包，此时通信恢复，kube-proxy更新iptables规则后解析正常。
 
 - [](https://my.f5.com/manage/s/article/K15095)
 
