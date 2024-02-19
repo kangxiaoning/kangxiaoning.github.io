@@ -87,6 +87,9 @@
 - 第2个coreDNS变更：IP-B -> IP-A
   - 变更中，IP-C提供DNS服务，由于Node上的iptables规则没有更新，实际**没有可用的DNS Server**
   - 变更后，IP-C/IP-A供DNS服务，由于Node上的iptables规则没有更新，实际**可用的DNS Server只有IP-A**
+
+![iptable state transition](iptables-state-transition.svg)
+
 3. 从上面分析得知，在第2个coreDNS变更过程中，会出现没有DNS服务的情况，因此一定会出现报错。
 
 **新问题：** 第2个coreDNS变更后，很快IP-A就恢复了，即使Node上的iptables没有更新，按问题1的分析也可以使用IP-A解析，为什么没有恢复？
