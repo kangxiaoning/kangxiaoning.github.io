@@ -111,7 +111,7 @@
 #### 4.4.4 为什么Kubelet会NotReady？
 
 参考如下issue
-- [](https://github.com/kubernetes/kubernetes/issues/87615)
+- [(1.17) Kubelet won't reconnect to Apiserver after NIC failure (use of closed network connection) #87615](https://github.com/kubernetes/kubernetes/issues/87615)
 - [](https://github.com/kubernetes/kubernetes/issues/87615#issuecomment-800031931)
 - [](https://github.com/kubernetes/kubernetes/issues/87615#issuecomment-800828057)
 - [](https://github.com/kubernetes/kubernetes/issues/87615#issuecomment-803517109)
@@ -121,7 +121,7 @@
 
 通过前面的分析已经可以解释30分钟恢复的原因，但是为什么kube-proxy没有检测到连接异常呢？经过分析是命中了如下bug。
 
-- [](https://github.com/kubernetes/kubernetes/issues/107266)
+- [client wait forever if kube-apiserver restart in slb environment #107266](https://github.com/kubernetes/kubernetes/issues/107266)
 
 #### 4.4.6 其它分析记录
 
@@ -134,7 +134,7 @@
 
 修改F5的**Action On Service Down**参数为**Reject**(默认是Node)，在检测到Master异常后及时通知kube-proxy，这样可以让kube-proxy重建连接，恢复与APIServer的通信。F5每5秒检测一次，如果连续3次检测Member异常，1秒后将Member在Pool标记为Down，所以大概**在Master异常16秒后**会向Node发送reset包，此时通信恢复，kube-proxy更新iptables规则后解析正常。
 
-- [](https://my.f5.com/manage/s/article/K15095)
+- [K15095: Overview of the Action On Service Down feature](https://my.f5.com/manage/s/article/K15095)
 
 
 2. 解决kubelet NotReady
