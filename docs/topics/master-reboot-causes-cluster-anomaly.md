@@ -144,7 +144,7 @@
 
 根据[issue 87615](https://github.com/kubernetes/kubernetes/issues/87615)，需要升级或者重新编译kubelet。
 
-修改F5参数能解决？
+修改F5参数能解决吗？
 
 答：通过如下分析解决不了。
 
