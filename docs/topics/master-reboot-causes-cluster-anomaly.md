@@ -129,7 +129,7 @@
 #### 4.4.6 其它分析记录
 
 1. 因为有3个Master，所以实际上每次重启Master只会影响最终连接到那台Master上的Node，参考4.4.2状态转换图。
-2. 修改F5参数后，F5健康检查发现Master异常后，会主动向kube-proxy/kubelet发送reset包，重建连接后Node与Master通信恢复。
+2. 修改F5参数后，F5健康检查发现Master异常后，会主动向kube-proxy发送reset包，重建连接后kube-proxy与Master通信恢复。
 
 ## 5. 解决方案
 
