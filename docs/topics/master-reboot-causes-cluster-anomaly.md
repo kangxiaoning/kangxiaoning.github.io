@@ -142,4 +142,27 @@
 
 2. 解决kubelet NotReady
 
-根据[issue 87615](https://github.com/kubernetes/kubernetes/issues/87615)，需要升级或者重新编译kubelet。实际上我判断在我们环境中，修改F5参数也能解决，kubelet的做法是在client端提供异常检测及恢复功能，而修改F5参数相当于在Server端提供异常检测并通知client重建连接恢复。
+根据[issue 87615](https://github.com/kubernetes/kubernetes/issues/87615)，需要升级或者重新编译kubelet。
+
+修改F5参数能解决？
+
+答：通过如下分析解决不了。
+
+![use of closed network connection](closed-network-connection.svg)
+
+上图描绘了`use of closed network connection`的场景。
+1. Kubelet使用http库中的HTTP/2协议和Master通信。
+2. Go的http库会维护一个connection pool，从pool里取出connection对象给kubelet使用。
+3. Linux Kernel在协议栈维护真正的TCP Socket。
+ 
+理论上connection pool里的connection对象和Kernel的socket一一对应，因为http库有bug，在维护connection pool的过程中会出现pool中有connection-A，Kernel中没有connection-A的情况。这时候kubelet使用connection-A就会出现`use of closed network connection`的报错，因为在Kernel中这个connection(socket)已经closed了。
+
+从上图的通信路径来看，修复的地方有如下可能
+1. 在图中标号为1的点修复，也就是**在kubelet中修复**，比如做端到端的探测，如果发现异常则重建连接。
+2. 在图中标号为2的点修复，也就是**在Go的http库中修复**，确保pool中的connection都是有效的。
+
+如果采用方案1，涉及到升级kubernetes版本，或者重新编译kubelet并替换这个组件，成本和风险都比较高。
+
+如果采用方案2，在Go修复bug后，kubernetes项目要使用新的http库，改动会应用在在新版本，或者backport到旧版本等，同样涉及升级kubernetes。
+
+Go和Kubernetes都是相对底层且应用很广泛的基础设施，这种级别的工程一旦有bug，影响都比较光且修复成本非常高。
