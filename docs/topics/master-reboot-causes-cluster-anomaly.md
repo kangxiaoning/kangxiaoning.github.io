@@ -165,4 +165,6 @@
 
 如果采用方案2，在Go修复bug后，kubernetes项目要使用新的http库，改动会应用在在新版本，或者backport到旧版本等，同样涉及升级kubernetes。
 
+修改F5参数，只能影响到图中标号为3的点，也就是Linux Kernel，通过F5感知Master异常，然后发送reset包给kubelet所在的Linux Kernel，这样Kernel就会立刻close这个异常的连接并重建连接，而不像之前等30分钟收到Master发送的reset才重建连接，但是这个行为不会传播给上层的connection pool，因此无法解决NotReady的问题。
+
 Go和Kubernetes都是相对底层且应用很广泛的基础设施，这种级别的工程一旦有bug，影响都比较光且修复成本非常高。
