@@ -23,5 +23,6 @@
     <toc-element toc-title="Kubernetes">
         <toc-element topic="master-reboot-causes-cluster-anomaly.md"/>
         <toc-element topic="the-lifecycle-of-empty-dir.md"/>
+        <toc-element topic="analysis-of-kubernetes-upgrades.md"/>
     </toc-element>
 </instance-profile>
