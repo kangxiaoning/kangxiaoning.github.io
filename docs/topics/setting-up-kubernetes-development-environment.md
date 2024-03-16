@@ -85,7 +85,23 @@ go env -w GOPROXY="https://goproxy.cn,direct"
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
-### 2.5 Etcd
+### 2.5 clone kubernetes
+
+clone代码后切换到对应分支，后面需要使用对应版本的脚本。
+
+```Shell
+mkdir $GOPATH/src/k8s.io  && cd $GOPATH/src/k8s.io
+git clone https://github.com/kubernetes/kubernetes.git 
+
+cd $GOPATH/src/k8s.io/kubernetes
+
+# 切换到v1.24.17
+git tag | grep 1.24
+git checkout -b debug-1.24.17 v1.24.17
+
+```
+
+### 2.6 Etcd
 
 ```Shell
 cd $GOPATH/src/k8s.io/kubernetes
@@ -95,7 +111,7 @@ echo 'export PATH=$GOPATH/src/k8s.io/kubernetes/third_party/etcd:${PATH}' >> ~/.
 source ~/.bashrc
 ```
 
-### 2.6 sudo配置
+### 2.7 sudo配置
 
 执行sudo命令时，Ubuntu为了确保安全，会将环境变量重置为安全的环境变量，导致`sudo hack/local-up-cluster.sh`找不到etcd命令，进而启动失败。
 
@@ -106,12 +122,6 @@ sudo visudo
 Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/go/bin:/home/kangxiaoning/go/bin:/home/kangxiaoning/go/src/k8s.io/kubernetes/third_party/etcd"
 ```
 
-### 2.7 clone kubernetes
-
-```Shell
-mkdir $GOPATH/src/k8s.io  && cd $GOPATH/src/k8s.io
-git clone https://github.com/kubernetes/kubernetes.git 
-```
 
 ## 3. 启动集群
 
@@ -158,11 +168,9 @@ sudo vi ./hack/lib/golang.sh
 切换到指定版本编译启动，这里使用v1.24.17。
 
 ```Shell
+# 确保已切换到v1.24.17
 cd $GOPATH/src/k8s.io/kubernetes
-
-# 切换到v1.24.17
-git tag | grep 1.24
-git checkout -b debug-1.24.17 v1.24.17
+git status
 
 # 编译并启动单机集群
 sudo hack/local-up-cluster.sh
