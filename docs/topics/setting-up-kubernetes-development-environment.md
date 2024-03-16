@@ -79,13 +79,13 @@ go env -w GO111MODULE="on"
 go env -w GOPROXY="https://goproxy.cn,direct"  
 ```
 
-### 2.4 delve
+### 2.4 Delve
 
 ```Shell
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
-### 2.5 clone kubernetes
+### 2.5 Clone kubernetes
 
 clone代码后切换到对应分支，后面需要使用对应版本的脚本。
 
@@ -111,7 +111,7 @@ echo 'export PATH=$GOPATH/src/k8s.io/kubernetes/third_party/etcd:${PATH}' >> ~/.
 source ~/.bashrc
 ```
 
-### 2.7 sudo配置
+### 2.7 Sudo配置
 
 执行sudo命令时，Ubuntu为了确保安全，会将环境变量重置为安全的环境变量，导致`sudo hack/local-up-cluster.sh`找不到etcd命令，进而启动失败。
 
@@ -125,9 +125,9 @@ Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/b
 
 ## 3. 启动集群
 
-### 3.1 配置默认debug编译
+### 3.1 默认debug编译
 
-`build_binaries()`中的内容进行修改。
+默认的编译选项生成的二进制文件不包含debug需要的symbol信息，因此这里需要修改编译选项支持debug，具体是对`hack/lib/golang.sh`文件中的`build_binaries()`函数进行修改。
 
 ```Shell
 cd $GOPATH/src/k8s.io/kubernetes
@@ -165,7 +165,9 @@ sudo vi ./hack/lib/golang.sh
     # fi
 ```
 
-切换到指定版本编译启动，这里使用v1.24.17。
+### 3.2 启动单机集群
+
+切换到指定版本，然后运行脚本执行编译及启动，这里使用v1.24.17版本。
 
 ```Shell
 # 确保已切换到v1.24.17
@@ -192,16 +194,18 @@ kangxiaoning@localhost:~$ ps -a|egrep 'kube|etcd'
 kangxiaoning@localhost:~$ 
 ```
 
-### 3.2 配置启动命令
+### 3.3 配置启动命令
 
-为了后续使用方便，将上述启动命令简化为`kstart`，后面只需要执行`kstart`就可以启动集群了。
+由于要经常启动集群，这里将上述启动命令简化为`kstart`，后面只需要执行`kstart`就可以启动集群了。
 
 ```Shell
 echo 'alias kstart="sudo /home/kangxiaoning/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 3.3 配置kubectl
+### 3.4 配置kubectl
+
+根据启动结果做下面设置。
 
 ```Shell
 echo 'export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig' >> ~/.bashrc
@@ -218,9 +222,9 @@ NAME        STATUS   ROLES    AGE   VERSION
 kangxiaoning@localhost:~$
 ```
 
-### 3.4 dlv启动kube-apiserver
+### 3.5 dlv启动kube-apiserver
 
-如果要debug apiserver，则先kill掉正在运行中的apiserver，使用dlv启动kube-apiserver。
+如果要debug kube-apiserver，需要先kill掉正在运行中的kube-apiserver，再使用dlv重启启动一个带有debug信息的kube-apiserver，命令如下，其中` -- `后的参数是直接copy的旧kube-apiserver的参数。
 
 ```Shell
 sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/local/bin/linux/arm64/kube-apiserver --listen=:12306 --api-version=2 -- --authorization-mode=Node,RBAC  --cloud-provider= --cloud-config=   --v=3 --vmodule= --audit-policy-file=/tmp/kube-audit-policy-file --audit-log-path=/tmp/kube-apiserver-audit.log --authorization-webhook-config-file= --authentication-token-webhook-config-file= --cert-dir=/var/run/kubernetes --egress-selector-config-file=/tmp/kube_egress_selector_configuration.yaml --client-ca-file=/var/run/kubernetes/client-ca.crt --kubelet-client-certificate=/var/run/kubernetes/client-kube-apiserver.crt --kubelet-client-key=/var/run/kubernetes/client-kube-apiserver.key --service-account-key-file=/tmp/kube-serviceaccount.key --service-account-lookup=true --service-account-issuer=https://kubernetes.default.svc --service-account-jwks-uri=https://kubernetes.default.svc/openid/v1/jwks --service-account-signing-key-file=/tmp/kube-serviceaccount.key --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,Priority,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction --disable-admission-plugins= --admission-control-config-file= --bind-address=0.0.0.0 --secure-port=6443 --tls-cert-file=/var/run/kubernetes/serving-kube-apiserver.crt --tls-private-key-file=/var/run/kubernetes/serving-kube-apiserver.key --storage-backend=etcd3 --storage-media-type=application/vnd.kubernetes.protobuf --etcd-servers=http://127.0.0.1:2379 --service-cluster-ip-range=10.0.0.0/24 --feature-gates=AllAlpha=false --external-hostname=localhost --requestheader-username-headers=X-Remote-User --requestheader-group-headers=X-Remote-Group --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-client-ca-file=/var/run/kubernetes/request-header-ca.crt --requestheader-allowed-names=system:auth-proxy --proxy-client-cert-file=/var/run/kubernetes/client-auth-proxy.crt --proxy-client-key-file=/var/run/kubernetes/client-auth-proxy.key
