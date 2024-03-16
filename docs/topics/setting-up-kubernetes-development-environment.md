@@ -4,7 +4,9 @@
 
 最终目标是实现**MacOS上的GoLand对Ubuntu中的Kubernetes进行远程Debug**，这里记录下在Ubuntu搭建Kubernetes的过程，最终效果如下图。
 
-![example](debug-example.png)
+<procedure>
+<img src="debug-example.png" alt="etcd service" thumbnail="true"/>
+</procedure>
 
 ## 1. Ubuntu配置
 
@@ -234,13 +236,17 @@ Edit Configurations -> Add New Configuration -> Go Remote
 
 下图只需要输入Host输入框的192.168.166.133，端口在dlv启动了使用了默认的2345，不需要修改。
 
-![](debug-configuration.png)
+<procedure>
+<img src="debug-configuration.png" alt="etcd service" thumbnail="true"/>
+</procedure>
 
 ### 4.2 debug kube-apiserver
 
 假设现在对`kubernetes/cmd/kube-apiserver/apiserver.go`的`command := app.NewAPIServerCommand()`这一行进行debug，需要了解`command`结构体的具体内容，在这一行打个断点，然后点击debug图标，即得到如下debug内容。
 
-![](debug-kube-apiserver.png)
+<procedure>
+<img src="debug-kube-apiserver.png" alt="etcd service" thumbnail="true"/>
+</procedure>
 
 如果需要debug其它Kubernetes组件，使用dlv启动对应进程，然后在GoLand做相应配置即可。
 
