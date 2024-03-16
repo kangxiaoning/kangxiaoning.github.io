@@ -2,7 +2,7 @@
 
 <show-structure depth="3"/>
 
-最终目标是实现**MacOS上的GoLand对Ubuntu中的Kubernetes进行远程Debug**，这里记录下在Ubuntu搭建Kubernetes的过程，最终效果如下图。
+目的是**在MacOS上通过GoLand对Ubuntu中运行的Kubernetes执行Debug**，这里记录下在Ubuntu搭建Kubernetes开发环境的过程，效果如下图所示。
 
 <procedure>
 <img src="debug-example.png" alt="etcd service" thumbnail="true"/>
