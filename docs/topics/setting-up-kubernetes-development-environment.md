@@ -8,6 +8,10 @@
 <img src="debug-example.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+<procedure>
+<img src="debug-example-02.png" alt="etcd service" thumbnail="true"/>
+</procedure>
+
 ## 1. Ubuntu配置
 
 ### 1.1 硬件要求
