@@ -227,7 +227,47 @@ kangxiaoning@localhost:~$
 如果要debug kube-apiserver，需要先kill掉正在运行中的kube-apiserver，再使用dlv重启启动一个带有debug信息的kube-apiserver，命令如下，其中` -- `后的参数是直接copy的旧kube-apiserver的参数。
 
 ```Shell
-sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/local/bin/linux/arm64/kube-apiserver --listen=:12306 --api-version=2 -- --authorization-mode=Node,RBAC  --cloud-provider= --cloud-config=   --v=3 --vmodule= --audit-policy-file=/tmp/kube-audit-policy-file --audit-log-path=/tmp/kube-apiserver-audit.log --authorization-webhook-config-file= --authentication-token-webhook-config-file= --cert-dir=/var/run/kubernetes --egress-selector-config-file=/tmp/kube_egress_selector_configuration.yaml --client-ca-file=/var/run/kubernetes/client-ca.crt --kubelet-client-certificate=/var/run/kubernetes/client-kube-apiserver.crt --kubelet-client-key=/var/run/kubernetes/client-kube-apiserver.key --service-account-key-file=/tmp/kube-serviceaccount.key --service-account-lookup=true --service-account-issuer=https://kubernetes.default.svc --service-account-jwks-uri=https://kubernetes.default.svc/openid/v1/jwks --service-account-signing-key-file=/tmp/kube-serviceaccount.key --enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,Priority,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction --disable-admission-plugins= --admission-control-config-file= --bind-address=0.0.0.0 --secure-port=6443 --tls-cert-file=/var/run/kubernetes/serving-kube-apiserver.crt --tls-private-key-file=/var/run/kubernetes/serving-kube-apiserver.key --storage-backend=etcd3 --storage-media-type=application/vnd.kubernetes.protobuf --etcd-servers=http://127.0.0.1:2379 --service-cluster-ip-range=10.0.0.0/24 --feature-gates=AllAlpha=false --external-hostname=localhost --requestheader-username-headers=X-Remote-User --requestheader-group-headers=X-Remote-Group --requestheader-extra-headers-prefix=X-Remote-Extra- --requestheader-client-ca-file=/var/run/kubernetes/request-header-ca.crt --requestheader-allowed-names=system:auth-proxy --proxy-client-cert-file=/var/run/kubernetes/client-auth-proxy.crt --proxy-client-key-file=/var/run/kubernetes/client-auth-proxy.key
+sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/local/bin/linux/arm64/kube-apiserver \
+--listen=:12306 --api-version=2 -- \
+--authorization-mode=Node,RBAC \
+--cloud-provider= \
+--cloud-config= \
+--v=3 \
+--vmodule= \
+--audit-policy-file=/tmp/kube-audit-policy-file \
+--audit-log-path=/tmp/kube-apiserver-audit.log \
+--authorization-webhook-config-file= \
+--authentication-token-webhook-config-file= \
+--cert-dir=/var/run/kubernetes \
+--egress-selector-config-file=/tmp/kube_egress_selector_configuration.yaml \
+--client-ca-file=/var/run/kubernetes/client-ca.crt \
+--kubelet-client-certificate=/var/run/kubernetes/client-kube-apiserver.crt \
+--kubelet-client-key=/var/run/kubernetes/client-kube-apiserver.key \
+--service-account-key-file=/tmp/kube-serviceaccount.key \
+--service-account-lookup=true \
+--service-account-issuer=https://kubernetes.default.svc \
+--service-account-jwks-uri=https://kubernetes.default.svc/openid/v1/jwks \
+--service-account-signing-key-file=/tmp/kube-serviceaccount.key \
+--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,Priority,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,NodeRestriction \
+--disable-admission-plugins= \
+--admission-control-config-file= \
+--bind-address=0.0.0.0 \
+--secure-port=6443 \
+--tls-cert-file=/var/run/kubernetes/serving-kube-apiserver.crt \
+--tls-private-key-file=/var/run/kubernetes/serving-kube-apiserver.key \
+--storage-backend=etcd3 \
+--storage-media-type=application/vnd.kubernetes.protobuf \
+--etcd-servers=http://127.0.0.1:2379 \
+--service-cluster-ip-range=10.0.0.0/24 \
+--feature-gates=AllAlpha=false \
+--external-hostname=localhost \
+--requestheader-username-headers=X-Remote-User \
+--requestheader-group-headers=X-Remote-Group \
+--requestheader-extra-headers-prefix=X-Remote-Extra- \
+--requestheader-client-ca-file=/var/run/kubernetes/request-header-ca.crt \
+--requestheader-allowed-names=system:auth-proxy \
+--proxy-client-cert-file=/var/run/kubernetes/client-auth-proxy.crt \
+--proxy-client-key-file=/var/run/kubernetes/client-auth-proxy.key
 ```
 
 启动成功的信息如下。
