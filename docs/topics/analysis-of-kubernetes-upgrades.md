@@ -85,7 +85,7 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 3. OS依赖，检查应用是否依赖OS，比如日志清理脚本，特殊内核参数等。
 4. 成本，大集群的升级成本将会非常高。
 
-## 3. 思考
+## 3. 升级策略
 
 升级这件事上，成本和风险要做取舍。
 
@@ -93,3 +93,12 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 - 要**成本**，考虑原地升级，风险较大，万一升级过程遇到预期外的异常，可能必须等到问题解决才能拉起服务，除非回退方案做的足够好。但是毕竟原来的运行环境已经变化了，回退方案也是一个新的变更，也有风险。
 
 成本与应用强相关，如果应用能容忍按节点驱逐，即使替换迁移，成本也不会增加很多，比如旧集群下线的节点加入新集群使用；如果无法容忍按节点驱逐，意味着节点上的Pod迁移完成前，这个节点不能被新集群使用，因为无法按节点驱逐，导致清空一个节点的周期将会很长，具体取决于上面的应用什么时候迁移走。
+
+## 4. 参考
+
+记录下升级分析需要的一些信息。
+
+- [Deprecated API Migration Guide](https://kubernetes.io/docs/reference/using-api/deprecation-guide/)
+- [CVE-2021-25741](https://github.com/Betep0k/CVE-2021-25741)
+- [Exploring Container Security: A Storage Vulnerability Deep Dive](https://security.googleblog.com/2021/12/exploring-container-security-storage.html)
+  
