@@ -185,6 +185,17 @@ sudo hack/local-up-cluster.sh
 ps -a|egrep 'kube|etcd'
 ```
 
+如果希望运行在后台，编写如下脚本，后续执行`./start-cluster.sh`即可。
+
+```Shell
+kangxiaoning@localhost:~/cmd$ more start-cluster.sh 
+#!/bin/bash
+
+nohup sudo -b $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh -O
+
+kangxiaoning@localhost:~/cmd$
+```
+
 正常启动的结果如下。
 
 ```Shell
@@ -274,12 +285,38 @@ sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/loc
 --proxy-client-key-file=/var/run/kubernetes/client-auth-proxy.key
 ```
 
+如果希望运行在后台，将上述命令保存成`apiserver/start.sh`，后续执行`nohup sudo -b ./start.sh`即可。
+
+```Shell
+kangxiaoning@localhost:~/cmd$ ls -l
+total 20
+drwxrwxr-x 2 kangxiaoning kangxiaoning  4096 Mar 19 14:49 apiserver
+-rw------- 1 kangxiaoning kangxiaoning 11591 Mar 28 21:45 nohup.out
+-rwxrwxr-x 1 kangxiaoning kangxiaoning    86 Mar 19 14:46 start-cluster.sh
+kangxiaoning@localhost:~/cmd$ ls -l apiserver/
+total 152108
+-rw------- 1 kangxiaoning kangxiaoning 155744972 Apr  1 18:19 nohup.out
+-rwxrwxr-x 1 kangxiaoning kangxiaoning      2059 Mar 19 14:49 start.sh
+-rwxrwxr-x 1 kangxiaoning kangxiaoning        84 Mar 16 18:13 stop.sh
+kangxiaoning@localhost:~/cmd$
+```
+
 启动成功的信息如下。
 
 ```Shell
 kangxiaoning@localhost:~/cmd$ ./apiserver-dlv-start.sh 
 API server listening at: [::]:2345
 2024-03-16T16:23:47+08:00 warning layer=rpc Listening for remote connections (connections are not authenticated nor encrypted)
+```
+
+`apiserver/stop.sh`是为了停止kube-apiserver进程用的。
+
+```Shell
+kangxiaoning@localhost:~/cmd$ more apiserver/stop.sh 
+#!/bin/bash
+
+ps -ef|grep apiserver|grep -v grep|awk '{print $2}'|xargs sudo kill -9
+kangxiaoning@localhost:~/cmd$
 ```
 
 ## 4. GoLand debug
