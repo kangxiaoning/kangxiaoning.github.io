@@ -12,6 +12,10 @@
 <img src="debug-example-02.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+<procedure>
+<img src="debug-kubelet.png" alt="etcd service" thumbnail="true"/>
+</procedure>
+
 ## 1. Ubuntu配置
 
 ### 1.1 硬件要求
@@ -129,47 +133,22 @@ Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/b
 
 ## 3. 启动集群
 
-### 3.1 默认debug编译
+### 3.1 debug编译
 
-默认的编译选项生成的二进制文件不包含debug需要的symbol信息，因此这里需要修改编译选项支持debug，具体是对`hack/lib/golang.sh`文件中的`build_binaries()`函数进行修改。
+默认的编译选项生成的二进制文件不包含debug需要的symbol信息，
 
 ```Shell
 cd $GOPATH/src/k8s.io/kubernetes
-sudo vi ./hack/lib/golang.sh
+
+# 查看编译选项
+make help
+
+# 执行Debug编译
+sudo make all DBG=1
 ```
 
-- 修改前
-```Shell
-    if [[ "${DBG:-}" == 1 ]]; then
-        # Debugging - disable optimizations and inlining.
-        gogcflags="${gogcflags} -N -l"
-    fi
 
-    goldflags="all=$(kube::version::ldflags) ${GOLDFLAGS:-}"
-    if [[ "${DBG:-}" != 1 ]]; then
-        # Not debugging - disable symbols and DWARF.
-        goldflags="${goldflags} -s -w"
-    fi
-```
-
-- 修改后
-
-```Shell
-    # if [[ "${DBG:-}" == 1 ]]; then
-    #     # Debugging - disable optimizations and inlining.
-    #     gogcflags="${gogcflags} -N -l"
-    # fi
-    
-    gogcflags="${gogcflags} -N -l"
-
-    goldflags="all=$(kube::version::ldflags) ${GOLDFLAGS:-}"
-    # if [[ "${DBG:-}" != 1 ]]; then
-    #     # Not debugging - disable symbols and DWARF.
-    #     goldflags="${goldflags} -s -w"
-    # fi
-```
-
-### 3.2 启动单机集群
+### 3.2 启动集群
 
 切换到指定版本，然后运行脚本执行编译及启动，这里使用v1.24.17版本。
 
@@ -209,16 +188,7 @@ kangxiaoning@localhost:~$ ps -a|egrep 'kube|etcd'
 kangxiaoning@localhost:~$ 
 ```
 
-### 3.3 配置启动命令
-
-由于要经常启动集群，这里将上述启动命令简化为`kstart`，后面只需要执行`kstart`就可以启动集群了。
-
-```Shell
-echo 'alias kstart="sudo /home/kangxiaoning/go/src/k8s.io/kubernetes/hack/local-up-cluster.sh"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### 3.4 配置kubectl
+### 3.3 配置kubectl
 
 根据启动结果做下面设置。
 
@@ -237,12 +207,74 @@ NAME        STATUS   ROLES    AGE   VERSION
 kangxiaoning@localhost:~$
 ```
 
-### 3.5 dlv启动kube-apiserver
 
-如果要debug kube-apiserver，需要先kill掉正在运行中的kube-apiserver，再使用dlv重启启动一个带有debug信息的kube-apiserver，命令如下，其中` -- `后的参数是直接copy的旧kube-apiserver的参数。
+## 4. 简化使用
+
+### 4.1 启停集群
+
+使用如下对倒对集群执行启动、停止操作。
+
+- 启动集群： `kstart`
+- 停止集群： `kstop`
+
+通过如下命令配置`alias`。
 
 ```Shell
-sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/local/bin/linux/arm64/kube-apiserver \
+echo 'alias kstart="/home/kangxiaoning/cmd/start-cluster.sh"' >> ~/.bashrc
+echo 'alias kstop="/home/kangxiaoning/cmd/stop-cluster.sh"' >> ~/.bashrc
+source ~/.bashrc
+```
+对应的脚本分别如下。
+
+#### 4.1.1 start-cluster.sh
+
+启动集群的脚本。
+
+```Shell
+#!/bin/bash
+
+PWD=/home/kangxiaoning/cmd
+sudo -b $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh -O > ${PWD}/log/start-cluster.log 2>&1
+```
+
+#### 4.1.2 stop-cluster.sh
+
+停止集群的脚本。
+
+```Shell
+#!/bin/bash
+
+sudo pkill -f $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh
+```
+
+### 4.2 重启apiserver
+
+使用dlv启动kube-apiserver，以支持debug。
+
+**使用方法：** 运行`./debug-apiserver.sh`脚本，如果kube-apiserver已经在运行会先执行kill，然后再通过dlv启动kube-apiserver。
+
+#### 4.2.1 debug-apiserver.sh
+```Shell
+#!/bin/bash
+
+PWD=/home/kangxiaoning/cmd
+
+if ps -ef | grep -v grep | grep -q kube-apiserver; then
+    echo "kube-apiserver is running under dlv"
+    ${PWD}/lib/stop-apiserver.sh
+else
+    echo "kube-apiserver is not running under dlv"
+fi
+
+sleep 1
+
+sudo nohup ${PWD}/lib/start-apiserver.sh > /dev/null 2>&1 &
+```
+
+#### 4.2.2 start-apiserver.sh
+
+```Shell
+dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/local/bin/linux/arm64/kube-apiserver \
 --listen=:12306 --api-version=2 -- \
 --authorization-mode=Node,RBAC \
 --cloud-provider= \
@@ -285,43 +317,79 @@ sudo dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/loc
 --proxy-client-key-file=/var/run/kubernetes/client-auth-proxy.key
 ```
 
-如果希望运行在后台，将上述命令保存成`apiserver/start.sh`，后续执行`nohup sudo -b ./start.sh`即可。
+#### 4.2.3 stop-apiserver.sh
 
 ```Shell
-kangxiaoning@localhost:~/cmd$ ls -l
-total 20
-drwxrwxr-x 2 kangxiaoning kangxiaoning  4096 Mar 19 14:49 apiserver
--rw------- 1 kangxiaoning kangxiaoning 11591 Mar 28 21:45 nohup.out
--rwxrwxr-x 1 kangxiaoning kangxiaoning    86 Mar 19 14:46 start-cluster.sh
-kangxiaoning@localhost:~/cmd$ ls -l apiserver/
-total 152108
--rw------- 1 kangxiaoning kangxiaoning 155744972 Apr  1 18:19 nohup.out
--rwxrwxr-x 1 kangxiaoning kangxiaoning      2059 Mar 19 14:49 start.sh
--rwxrwxr-x 1 kangxiaoning kangxiaoning        84 Mar 16 18:13 stop.sh
-kangxiaoning@localhost:~/cmd$
-```
-
-启动成功的信息如下。
-
-```Shell
-kangxiaoning@localhost:~/cmd$ ./apiserver-dlv-start.sh 
-API server listening at: [::]:2345
-2024-03-16T16:23:47+08:00 warning layer=rpc Listening for remote connections (connections are not authenticated nor encrypted)
-```
-
-`apiserver/stop.sh`是为了停止kube-apiserver进程用的。
-
-```Shell
-kangxiaoning@localhost:~/cmd$ more apiserver/stop.sh 
 #!/bin/bash
 
-ps -ef|grep apiserver|grep -v grep|awk '{print $2}'|xargs sudo kill -9
-kangxiaoning@localhost:~/cmd$
+ps -ef|grep kube-apiserver|grep -v grep|awk '{print $2}'|xargs sudo kill -9
 ```
 
-## 4. GoLand debug
+### 4.3 重启kubelet
 
-### 4.1 GoLand debug配置
+>
+> GoLand中打断点报错 **cannot find debugger path for ...**
+>
+> **问题原因：** [Remote debugging results in can not find debugger path for xxx/xxx/fobar.go](https://youtrack.jetbrains.com/issue/GO-12999)
+>
+> **解决方法一： 删除`_output/local/go/`目录**
+> 
+> **解决方法二： 在GoLand中选中`_output`目录，右击->Mark Directory as->Excluded**
+> 
+{style="warning"}
+
+使用dlv启动kubelet，以支持debug。
+
+使用方法： 运行`./debug-kubelet.sh`脚本，如果kubelet已经在运行会先执行kill，然后再通过dlv启动kubelet。
+
+#### 4.3.1 保存kubelet配置
+
+在集群运行的情况下执行如下命令，保存kubelet配置，后面dlv启动脚本需要使用。
+
+```Shell
+sudo cp /tmp/kubelet.yaml /var/lib/kubelet/config.yaml
+```
+
+配置下面脚本。
+
+#### 4.3.2 debug-kubelet.sh
+
+```Shell
+#!/bin/bash
+
+PWD=/home/kangxiaoning/cmd
+
+if ps -ef | grep -v grep | grep -q bin/kubelet; then
+    echo "kubelet is running under dlv"
+    ${PWD}/lib/stop-kubelet.sh
+else
+    echo "kubelet is not running under dlv"
+fi
+
+sleep 1
+
+sudo nohup ${PWD}/lib/start-kubelet.sh > /dev/null 2>&1 &
+```
+
+#### 4.3.3 start-kubelet.sh
+
+```Shell
+#!/bin/bash
+
+dlv --headless exec /home/kangxiaoning/go/src/k8s.io/kubernetes/_output/bin/kubelet --listen=:2355 --api-version=2 -- --v=3 --vmodule= --container-runtime=remote --hostname-override=127.0.0.1 --cloud-provider= --cloud-config= --bootstrap-kubeconfig=/var/run/kubernetes/kubelet.kubeconfig --kubeconfig=/var/run/kubernetes/kubelet-rotated.kubeconfig --container-runtime-endpoint=unix:///run/containerd/containerd.sock --config=/var/lib/kubelet/config.yaml
+```
+
+#### 4.3.4 stop-kubelet.sh
+
+```Shell
+#!/bin/bash
+
+ps -ef|grep bin/kubelet|grep -v grep|awk '{print $2}'|xargs sudo kill -9
+```
+
+## 5. GoLand debug
+
+### 5.1 GoLand debug配置
 
 接下来配置GoLand的debug，步骤如下。
 
@@ -333,7 +401,7 @@ Edit Configurations -> Add New Configuration -> Go Remote
 <img src="debug-configuration.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
-### 4.2 debug kube-apiserver
+### 5.2 debug kube-apiserver
 
 假设现在对`kubernetes/cmd/kube-apiserver/apiserver.go`的`command := app.NewAPIServerCommand()`这一行进行debug，需要了解`command`结构体的具体内容，在这一行打个断点，然后点击debug图标，即得到如下debug内容。
 
@@ -341,8 +409,16 @@ Edit Configurations -> Add New Configuration -> Go Remote
 <img src="debug-kube-apiserver.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+### 5.2 debug kubelet
+
+<procedure>
+<img src="debug-kubelet.png" alt="etcd service" thumbnail="true"/>
+</procedure>
+
+
 如果需要debug其它Kubernetes组件，使用dlv启动对应进程，然后在GoLand做相应配置即可。
 
 ## 参考
 - [](https://github.com/kubernetes/community/blob/master/contributors/devel/development.md)
 - [](https://github.com/kubernetes/community/blob/master/contributors/devel/running-locally.md)
+- [Remote debugging results in can not find debugger path for xxx/xxx/fobar.go](https://youtrack.jetbrains.com/issue/GO-12999)
