@@ -2,16 +2,24 @@
 
 <show-structure depth="3"/>
 
-目的是**在MacOS上通过GoLand对Ubuntu中运行的Kubernetes执行Debug**，这里记录下在Ubuntu搭建Kubernetes开发环境的过程，效果如下图所示。
+**目的：** 通过GoLand对Kubernetes组件执行Debug，学习Kubernetes工作原理。
+
+**效果：** 如下图所示，在MacOS的GoLand上对Ubuntu中的`kube-apiserver`、`kubelet`组件执行debug。
+
+- **debug kube-apiserver启动过程**
 
 <procedure>
 <img src="debug-example.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+- **debug kube-apiserver运行过程**
+ 
 <procedure>
 <img src="debug-example-02.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+- **debug kubelet运行过程**
+ 
 <procedure>
 <img src="debug-kubelet.png" alt="etcd service" thumbnail="true"/>
 </procedure>
@@ -42,7 +50,7 @@ timedatectl set-timezone Asia/Shanghai
 echo "LC_TIME=en_DK.UTF-8" >> /etc/default/locale && cat /etc/default/locale
 ```
 
-## 2 依赖安装
+## 2. 依赖安装
 
 ### 2.1 GNU Development Tools
 
