@@ -135,7 +135,7 @@ Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/b
 
 ### 3.1 debug编译
 
-默认的编译选项生成的二进制文件不包含debug需要的symbol信息，
+直接运行`make all`生成的可执行文件不包含debug需要的symbol信息，需要带上`DBG=1`选项，更多选项可查看`make help`。
 
 ```Shell
 cd $GOPATH/src/k8s.io/kubernetes
@@ -164,17 +164,6 @@ sudo hack/local-up-cluster.sh
 ps -a|egrep 'kube|etcd'
 ```
 
-如果希望运行在后台，编写如下脚本，后续执行`./start-cluster.sh`即可。
-
-```Shell
-kangxiaoning@localhost:~/cmd$ more start-cluster.sh 
-#!/bin/bash
-
-nohup sudo -b $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh -O
-
-kangxiaoning@localhost:~/cmd$
-```
-
 正常启动的结果如下。
 
 ```Shell
@@ -190,7 +179,7 @@ kangxiaoning@localhost:~$
 
 ### 3.3 配置kubectl
 
-根据启动结果做下面设置。
+根据`sudo hack/local-up-cluster.sh`的输出，需要对`kubectl`做下面设置。
 
 ```Shell
 echo 'export KUBECONFIG=/var/run/kubernetes/admin.kubeconfig' >> ~/.bashrc
@@ -212,23 +201,22 @@ kangxiaoning@localhost:~$
 
 ### 4.1 启停集群
 
-使用如下对倒对集群执行启动、停止操作。
+**使用方法：**
 
 - 启动集群： `kstart`
 - 停止集群： `kstop`
 
-通过如下命令配置`alias`。
+具体实现是配置下面的`alias`。
 
 ```Shell
 echo 'alias kstart="/home/kangxiaoning/cmd/start-cluster.sh"' >> ~/.bashrc
 echo 'alias kstop="/home/kangxiaoning/cmd/stop-cluster.sh"' >> ~/.bashrc
 source ~/.bashrc
 ```
+
 对应的脚本分别如下。
 
 #### 4.1.1 start-cluster.sh
-
-启动集群的脚本。
 
 ```Shell
 #!/bin/bash
@@ -239,21 +227,39 @@ sudo -b $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh -O > ${PWD}/log/s
 
 #### 4.1.2 stop-cluster.sh
 
-停止集群的脚本。
-
 ```Shell
 #!/bin/bash
 
-sudo pkill -f $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh
+PWD=/home/kangxiaoning/cmd
+
+if ps -a | grep -v grep | grep -q kube; then
+    sudo pkill -f $GOPATH/src/k8s.io/kubernetes/hack/local-up-cluster.sh
+fi
+
+if ps -ef | grep -v grep | grep -q kubelet; then
+    ${PWD}/lib/stop-kubelet.sh
+    echo "kubelet stopped"
+fi
+
+if ps -ef | grep -v grep | grep -q kube-apiserver; then
+    ${PWD}/lib/stop-apiserver.sh
+    echo "kube-apiserver stopped"
+fi
 ```
 
 ### 4.2 重启apiserver
 
-使用dlv启动kube-apiserver，以支持debug。
+在集群运行起来的情况下，使用**dlv重启`kube-apiserver`**，完成`kube-apiserver`的debug环境准备。
 
-**使用方法：** 运行`./debug-apiserver.sh`脚本，如果kube-apiserver已经在运行会先执行kill，然后再通过dlv启动kube-apiserver。
+**使用方法：** 
+1. 启动集群：`kstart`
+2. 启动dlv：`./debug-apiserver.sh`
+3. 在`GoLand`配置并启动debug
 
 #### 4.2.1 debug-apiserver.sh
+
+如果kube-apiserver已经在运行会先执行kill，然后再通过dlv启动kube-apiserver。
+
 ```Shell
 #!/bin/bash
 
@@ -338,9 +344,14 @@ ps -ef|grep kube-apiserver|grep -v grep|awk '{print $2}'|xargs sudo kill -9
 > 
 {style="warning"}
 
-使用dlv启动kubelet，以支持debug。
+在集群运行起来的情况下，使用**dlv重启`kubelet`**，完成`kubelet`的debug环境准备。
 
 使用方法： 运行`./debug-kubelet.sh`脚本，如果kubelet已经在运行会先执行kill，然后再通过dlv启动kubelet。
+
+**使用方法：**
+1. 启动集群：`kstart`
+2. 启动dlv：`./debug-kubelet.sh`
+3. 在`GoLand`配置并启动debug
 
 #### 4.3.1 保存kubelet配置
 
@@ -353,6 +364,8 @@ sudo cp /tmp/kubelet.yaml /var/lib/kubelet/config.yaml
 配置下面脚本。
 
 #### 4.3.2 debug-kubelet.sh
+
+如果kubelet已经在运行，脚本会先执行kill，然后再通过dlv启动kubelet。
 
 ```Shell
 #!/bin/bash
@@ -403,13 +416,15 @@ Edit Configurations -> Add New Configuration -> Go Remote
 
 ### 5.2 debug kube-apiserver
 
-假设现在对`kubernetes/cmd/kube-apiserver/apiserver.go`的`command := app.NewAPIServerCommand()`这一行进行debug，需要了解`command`结构体的具体内容，在这一行打个断点，然后点击debug图标，即得到如下debug内容。
+如下示例在`kubernetes/cmd/kube-apiserver/apiserver.go`的`command := app.NewAPIServerCommand()`这一行打断点，然后点击debug图标，接下来就可以执行debug相关操作了。
 
 <procedure>
 <img src="debug-kube-apiserver.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
 ### 5.2 debug kubelet
+
+如下示例对kubelet的心跳上报逻辑进行debug。
 
 <procedure>
 <img src="debug-kubelet.png" alt="etcd service" thumbnail="true"/>
