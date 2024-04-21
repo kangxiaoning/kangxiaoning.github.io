@@ -118,11 +118,11 @@ Operators are advised to monitor all time sources that are in use. If time sourc
 ### 2.2 参考
 - [Best practices for NTP](https://access.redhat.com/solutions/778603)
 
-## 3. 获取RedHat 7 内核源码
+## 3. 获取RedHat内核源码
 
-工作中使用的版本，根据源码方便学习及问题排查。
+下载内核源码学习及排查问题。
 
-### RHEL/Centos 7.9 的内核
+### 3.1 RHEL/Centos 7.9 kernel source code
 
 在[CentOS Vault Mirror](https://vault.centos.org/7.9.2009/updates/Source/SPackages/)下载对应的版本。
 
@@ -134,16 +134,25 @@ wget https://vault.centos.org/7.9.2009/updates/Source/SPackages/kernel-3.10.0-11
 rpm2cpio ./kernel-3.10.0-1160.108.1.el7.src.rpm | cpio -idmv --directory ./kernel-3.10.0-1160
 ```
 
-`kernel-3.10.0-1160/`目录下会生成`linux-3.10.0-1160.108.1.el7.tar.xz`，copy到指定位置解压即可。
+`kernel-3.10.0-1160/`目录下会生成`linux-3.10.0-1160.108.1.el7.tar.xz`，移动到指定位置解压即可。
 
-> 解压后删除`redhat/configs`
+> 解压后要删除`redhat/configs`文件，因为是个不存在的软件链接。
 > 
-> `tar xf linux-3.10.0-1160.108.1.el7.tar.xz`
-> 
-> `mv linux-3.10.0-1160.108.1.el7 linux-3.10.0-1160`
-> 
-> `cd linux-3.10.0-1160/`
-> 
-> `rm -f configs`
-> 
+
+```Shell
+tar xf linux-3.10.0-1160.108.1.el7.tar.xz
+mv linux-3.10.0-1160.108.1.el7 linux-3.10.0-1160
+cd linux-3.10.0-1160/
+rm -f configs
+```
+
+### 3.2 RHEL 8.8 kernel source code
+
+在[Red Hat Packages](https://access.redhat.com/downloads/content/package-browser)搜索并下载。
+
+比如以`kernel-4.18.0-477.27.1.el8_8.src.rpm`关键字搜索，点击查询结果会中转到如下页面，也可以在这个页面选择搜索。
+
+[](https://access.redhat.com/downloads/content/kernel/4.18.0-477.27.1.el8_8/x86_64/fd431d51/package)
+
+内核源码文件提取与7.9一致。
 
