@@ -1,8 +1,12 @@
-# Fedora扩容磁盘
+# Linux碎片知识与问题拾遗
+
+<show-structure depth="3"/>
+
+## 1. Fedora扩容磁盘
 
 Fedora虚拟机在创建的时候明明分配了40G，但是OS中看到的却只有20G，直到空间不够用了才发现，如下对扩容做个记录，以便后续查阅。
 
-## 1. 查看可用空间
+### 1.1 查看可用空间
 ```Shell
 [root@localhost .cache]# df -h
 Filesystem                   Size  Used Avail Use% Mounted on
@@ -28,7 +32,7 @@ tmpfs                        390M   12K  390M   1% /run/user/0
 [root@localhost .cache]#
 ```
 
-## 2. pv扩容
+### 1.2. pv扩容
 ```Shell
 # 可用空间全部分配给root
 [root@localhost .cache]# lvextend -L+23.41g /dev/mapper/fedora_192-root
@@ -55,7 +59,7 @@ tmpfs                        390M   12K  390M   1% /run/user/0
 [root@localhost .cache]#
 ```
 
-## 3. xfs容
+### 1.3. xfs容
 ```
 [root@localhost .cache]# xfs_growfs /dev/mapper/fedora_192-root 
 meta-data=/dev/mapper/fedora_192-root isize=512    agcount=4, agsize=983040 blks
@@ -85,3 +89,61 @@ tmpfs                        2.0G  4.0K  2.0G   1% /tmp
 tmpfs                        390M   12K  390M   1% /run/user/0
 [root@localhost .cache]#
 ```
+
+## 2. NTP Server数量
+
+NTP Server应该配置几台？
+
+答：至少配置4台NTP Server，详情如下。
+
+### 2.1 Using Enough Time Sources
+
+An NTP implementation that is compliant with [RFC5905](https://www.rfc-editor.org/rfc/rfc5905.html) takes the available sources of time and submits this timing data to sophisticated intersection, clustering, and combining algorithms to get the best estimate of the correct time.  The description of these algorithms is beyond the scope of this document.  Interested readers should read [RFC5905](https://www.rfc-editor.org/rfc/rfc5905.html) or the detailed description of NTP in [MILLS2006].
+
+- If there is only one source of time, the answer is obvious.  It may not be a good source of time, but it's the only source that can be considered.  Any issue with the time at the source will be passed on to the client.
+
+- If there are two sources of time and they align well enough, then the best time can be calculated easily.  But if one source fails, then the solution degrades to the single-source solution outlined above.  And if the two sources don't agree, it will be difficult to know which one is correct without making use of information from outside of the protocol.
+
+- If there are three sources of time, there is more data available to converge on the best calculated time, and this time is more likely to be accurate.  And the loss of one of the sources (by becoming unreachable or unusable) can be tolerated.  But at that point, the solution degrades to the two-source solution.
+
+- Having four or more sources of time is better as long as the sources are diverse (Section 3.3).  If one of these sources
+  develops a problem, there are still at least three other time sources.
+
+This analysis assumes that a majority of the servers used in the solution are honest, even if some may be inaccurate.  Operators should be aware of the possibility that if an attacker is in control of the network, the time coming from all servers could be compromised.
+
+Operators who are concerned with maintaining accurate time **SHOULD use at least four independent, diverse sources of time**.  Four sources will provide sufficient backup in case one source goes down.  If four sources are not available, operators MAY use fewer sources, which is subject to the risks outlined above.
+
+Operators are advised to monitor all time sources that are in use. If time sources do not generally align, operators are encouraged to investigate the cause and either correct the problems or stop using defective servers.
+
+### 2.2 参考
+- [Best practices for NTP](https://access.redhat.com/solutions/778603)
+
+## 3. 获取RedHat 7 内核源码
+
+工作中使用的版本，根据源码方便学习及问题排查。
+
+### RHEL/Centos 7.9 的内核
+
+在[CentOS Vault Mirror](https://vault.centos.org/7.9.2009/updates/Source/SPackages/)下载对应的版本。
+
+```Shell
+# 下载
+wget https://vault.centos.org/7.9.2009/updates/Source/SPackages/kernel-3.10.0-1160.108.1.el7.src.rpm
+
+# 提取rpm包文件
+rpm2cpio ./kernel-3.10.0-1160.108.1.el7.src.rpm | cpio -idmv --directory ./kernel-3.10.0-1160
+```
+
+`kernel-3.10.0-1160/`目录下会生成`linux-3.10.0-1160.108.1.el7.tar.xz`，copy到指定位置解压即可。
+
+> 解压后删除`redhat/configs`
+> 
+> `tar xf linux-3.10.0-1160.108.1.el7.tar.xz`
+> 
+> `mv linux-3.10.0-1160.108.1.el7 linux-3.10.0-1160`
+> 
+> `cd linux-3.10.0-1160/`
+> 
+> `rm -f configs`
+> 
+

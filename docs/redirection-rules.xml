@@ -6,4 +6,8 @@
         <accepts>page.html</accepts>
     </rule>
     -->
+    <rule id="5531c128">
+        <description>Created after removal of "应该配置几台NTP Server" from 南寨小子</description>
+        <accepts>how-many-ntp-servers-should-be-configured.html</accepts>
+    </rule>
 </rules>
