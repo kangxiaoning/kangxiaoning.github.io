@@ -156,3 +156,8 @@ rm -f configs
 
 内核源码文件提取与7.9一致。
 
+## 4. Introduction to eBPF in Red Hat Enterprise Linux 7
+
+[Introduction to eBPF in Red Hat Enterprise Linux 7](https://www.redhat.com/en/blog/introduction-ebpf-red-hat-enterprise-linux-7)
+
+> The eBPF in Red Hat Enterprise Linux 7.6 is provided as Tech Preview and thus doesn't come with full support and is not suitable for deployment in production.
