@@ -64,14 +64,14 @@ func (kl *Kubelet) Run(updates <-chan kubetypes.PodUpdate) {
 {collapsible="true" collapsed-title="Kubelet.Run()" default-state="collapsed"}
 
 <procedure>
-<img src="kubelet-pleg-start.png" alt="etcd service" thumbnail="true"/>
+<img src="kubelet-pleg-start.png" thumbnail="true"/>
 </procedure>
 
 Step into到`Start()`函数，可以看到具体执行的是`GenericPLEG.Start()`。
 
 - Debug信息显示`relistPeriod`为1秒，也就是**间隔1秒**执行一次`relist`操作。
 <procedure>
-<img src="generic-pleg-start.png" alt="etcd service" thumbnail="true"/>
+<img src="generic-pleg-start.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -326,13 +326,13 @@ func (g *GenericPLEG) relist() {
 Debug过程及相关代码参考如下。
 
 <procedure>
-<img src="generic-pleg-relist.png" alt="etcd service" thumbnail="true"/>
+<img src="generic-pleg-relist.png" thumbnail="true"/>
 </procedure>
 
 在`GetPods()`这一行打断点并Step into，具体实现是`kubeGenericRuntimeManager.GetPods()`。
 
 <procedure>
-<img src="kube-generic-runtime-manager-getpods.png" alt="etcd service" thumbnail="true"/>
+<img src="kube-generic-runtime-manager-getpods.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -439,11 +439,11 @@ func (m *kubeGenericRuntimeManager) getKubeletSandboxes(all bool) ([]*runtimeapi
 打断点Step into到`ListPodSandbox()`的具体实现 - `instrumentedRuntimeService.ListPodSandbox()`。
 
 <procedure>
-<img src="get-kubelet-sandboxes.png" alt="etcd service" thumbnail="true"/>
+<img src="get-kubelet-sandboxes.png" thumbnail="true"/>
 </procedure>
 
 <procedure>
-<img src="instrumented-runtime-service-list-pod-sandbox.png" alt="etcd service" thumbnail="true"/>
+<img src="instrumented-runtime-service-list-pod-sandbox.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -461,7 +461,7 @@ func (in instrumentedRuntimeService) ListPodSandbox(filter *runtimeapi.PodSandbo
 打断点Step into到`ListPodSandbox()`的具体实现 - `remoteRuntimeService.ListPodSandbox()`。
 
 <procedure>
-<img src="remote-runtime-service-list-pod-sandbox.png" alt="etcd service" thumbnail="true"/>
+<img src="remote-runtime-service-list-pod-sandbox.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -480,8 +480,10 @@ func (r *remoteRuntimeService) ListPodSandbox(filter *runtimeapi.PodSandboxFilte
 ```
 {collapsible="true" collapsed-title="remoteRuntimeService.ListPodSandbox()" default-state="collapsed"}
 
+打断点Step into到`ListPodSandbox()`的具体实现 - `remoteRuntimeService.ListPodSandboxV1()`。
+
 <procedure>
-<img src="remote-runtime-service-list-pod-sandbox-v1.png" alt="etcd service" thumbnail="true"/>
+<img src="remote-runtime-service-list-pod-sandbox-v1.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -504,7 +506,7 @@ func (r *remoteRuntimeService) listPodSandboxV1(ctx context.Context, filter *run
 打断点Step into到`ListPodSandbox()`的具体实现 - `runtimeServiceClient.ListPodSandbox()`。
 
 <procedure>
-<img src="runtime-service-client-list-pod-sandbox.png" alt="etcd service" thumbnail="true"/>
+<img src="runtime-service-client-list-pod-sandbox.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -522,7 +524,7 @@ func (c *runtimeServiceClient) ListPodSandbox(ctx context.Context, in *ListPodSa
 最终来到grpc调用。
 
 <procedure>
-<img src="grpc-invoke.png" alt="etcd service" thumbnail="true"/>
+<img src="grpc-invoke.png" thumbnail="true"/>
 </procedure>
 
 ```Go
@@ -549,12 +551,12 @@ func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply int
 
 - GetPods()涉及的grpc远程调用
 <procedure>
-<img src="pleg-getpods.png" alt="etcd service" thumbnail="true"/>
+<img src="pleg-getpods.png" thumbnail="true"/>
 </procedure>
 
 - UpdateCache()涉及的grpc远程调用
 <procedure>
-<img src="pleg-updatecache.png" alt="etcd service" thumbnail="true"/>
+<img src="pleg-updatecache.png" thumbnail="true"/>
 </procedure>
 
 ## 3. PLEG is not healthy是如何发生的？
@@ -639,11 +641,11 @@ func (s *runtimeState) runtimeErrors() error {
 - Debug可定位到`hc.fn()`的具体实现是`GenericPLEG.Healthy()`
 
 <procedure>
-<img src="runtime-state-runtime-errors.png" alt="etcd service" thumbnail="true"/>
+<img src="runtime-state-runtime-errors.png" thumbnail="true"/>
 </procedure>
 
 <procedure>
-<img src="generic-pleg-healthy.png" alt="etcd service" thumbnail="true"/>
+<img src="generic-pleg-healthy.png" thumbnail="true"/>
 </procedure>
 
 - `GenericPLEG.Healthy()`会判断上次`relist`记录时间到现在是否已经超过3分钟，如果超过3分钟则返回`false`及报错信息。

@@ -6,6 +6,7 @@
         <algolia-id>BWFP34BGVA</algolia-id>
         <algolia-index>kangxiaoning.github.io</algolia-index>
         <algolia-api-key>2cd95384e04d2e20fe45bcfaacebdf26</algolia-api-key>
+        <web-root>https://kangxiaoning.github.io</web-root>
     </variables>
     <build-profile instance="k">
         <variables>
