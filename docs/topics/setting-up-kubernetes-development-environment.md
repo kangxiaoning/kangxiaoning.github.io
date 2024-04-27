@@ -24,6 +24,12 @@
 <img src="debug-kubelet.png" alt="etcd service" thumbnail="true"/>
 </procedure>
 
+- **debug containerd运行过程**
+- 
+<procedure>
+<img src="debug-containerd.png" alt="etcd service" thumbnail="true"/>
+</procedure>
+
 ## 1. Ubuntu配置
 
 ### 1.1 硬件要求
