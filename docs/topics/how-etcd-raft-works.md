@@ -735,24 +735,22 @@ type Raft interface {
 	ReportSnapshot(id uint64, status raft.SnapshotStatus)
 }
 ```
-{collapsible="true" collapsed-title="rafthttp.Raft interface" default-state="collapsed"}
 
 ```Go
 func (s *EtcdServer) RaftHandler() http.Handler { return s.r.transport.Handler() }
+```
 
+```Go
 // Process takes a raft message and applies it to the server's raft state
 // machine, respecting any timeout of the given context.
 func (s *EtcdServer) Process(ctx context.Context, m raftpb.Message) error {
+	lg := s.Logger()
 	if s.cluster.IsIDRemoved(types.ID(m.From)) {
-		if lg := s.getLogger(); lg != nil {
-			lg.Warn(
-				"rejected Raft message from removed member",
-				zap.String("local-member-id", s.ID().String()),
-				zap.String("removed-member-id", types.ID(m.From).String()),
-			)
-		} else {
-			plog.Warningf("reject message from removed member %s", types.ID(m.From).String())
-		}
+		lg.Warn(
+			"rejected Raft message from removed member",
+			zap.String("local-member-id", s.ID().String()),
+			zap.String("removed-member-id", types.ID(m.From).String()),
+		)
 		return httptypes.NewHTTPError(http.StatusForbidden, "cannot process message from removed member")
 	}
 	if m.Type == raftpb.MsgApp {
@@ -760,18 +758,25 @@ func (s *EtcdServer) Process(ctx context.Context, m raftpb.Message) error {
 	}
 	return s.r.Step(ctx, m)
 }
+```
 
+```Go
 func (s *EtcdServer) IsIDRemoved(id uint64) bool { return s.cluster.IsIDRemoved(types.ID(id)) }
+```
 
+
+```Go
 func (s *EtcdServer) ReportUnreachable(id uint64) { s.r.ReportUnreachable(id) }
+}
+```
 
+```Go
 // ReportSnapshot reports snapshot sent status to the raft state machine,
 // and clears the used snapshot from the snapshot store.
 func (s *EtcdServer) ReportSnapshot(id uint64, status raft.SnapshotStatus) {
 	s.r.ReportSnapshot(id, status)
 }
 ```
-{collapsible="true" collapsed-title="Etcdserver.Raft" default-state="collapsed"}
 
 ### 3.2 启动transport
 
@@ -806,6 +811,103 @@ func (t *Transport) Start() error {
 
 这个函数主要通过`http.transport`对这个`Transport`进行了初始化，包括`Timeout`、`MaxIdleConnsPerHost`、`KeepAlive`等。
 
+<procedure>
+<img src="debug-etcd-transport-start.png" thumbnail="true"/>
+</procedure>
+
+```Go
+// newStreamRoundTripper returns a roundTripper used to send stream requests
+// to rafthttp listener of remote peers.
+// Read/write timeout is set for stream roundTripper to promptly
+// find out broken status, which minimizes the number of messages
+// sent on broken connection.
+func newStreamRoundTripper(tlsInfo transport.TLSInfo, dialTimeout time.Duration) (http.RoundTripper, error) {
+	return transport.NewTimeoutTransport(tlsInfo, dialTimeout, ConnReadTimeout, ConnWriteTimeout)
+}
+```
+{collapsible="true" collapsed-title="newStreamRoundTripper()" default-state="collapsed"}
+
+```Go
+// NewTimeoutTransport returns a transport created using the given TLS info.
+// If read/write on the created connection blocks longer than its time limit,
+// it will return timeout error.
+// If read/write timeout is set, transport will not be able to reuse connection.
+func NewTimeoutTransport(info TLSInfo, dialtimeoutd, rdtimeoutd, wtimeoutd time.Duration) (*http.Transport, error) {
+	tr, err := NewTransport(info, dialtimeoutd)
+	if err != nil {
+		return nil, err
+	}
+
+	if rdtimeoutd != 0 || wtimeoutd != 0 {
+		// the timed out connection will timeout soon after it is idle.
+		// it should not be put back to http transport as an idle connection for future usage.
+		tr.MaxIdleConnsPerHost = -1
+	} else {
+		// allow more idle connections between peers to avoid unnecessary port allocation.
+		tr.MaxIdleConnsPerHost = 1024
+	}
+
+	tr.Dial = (&rwTimeoutDialer{
+		Dialer: net.Dialer{
+			Timeout:   dialtimeoutd,
+			KeepAlive: 30 * time.Second,
+		},
+		rdtimeoutd: rdtimeoutd,
+		wtimeoutd:  wtimeoutd,
+	}).Dial
+	return tr, nil
+}
+```
+{collapsible="true" collapsed-title="NewTimeoutTransport()" default-state="collapsed"}
+
+```Go
+func NewTransport(info TLSInfo, dialtimeoutd time.Duration) (*http.Transport, error) {
+	cfg, err := info.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	t := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout: dialtimeoutd,
+			// value taken from http.DefaultTransport
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		// value taken from http.DefaultTransport
+		TLSHandshakeTimeout: 10 * time.Second,
+		TLSClientConfig:     cfg,
+	}
+
+	dialer := &net.Dialer{
+		Timeout:   dialtimeoutd,
+		KeepAlive: 30 * time.Second,
+	}
+
+	dialContext := func(ctx context.Context, net, addr string) (net.Conn, error) {
+		return dialer.DialContext(ctx, "unix", addr)
+	}
+	tu := &http.Transport{
+		Proxy:               http.ProxyFromEnvironment,
+		DialContext:         dialContext,
+		TLSHandshakeTimeout: 10 * time.Second,
+		TLSClientConfig:     cfg,
+		// Cost of reopening connection on sockets is low, and they are mostly used in testing.
+		// Long living unix-transport connections were leading to 'leak' test flakes.
+		// Alternativly the returned Transport (t) should override CloseIdleConnections to
+		// forward it to 'tu' as well.
+		IdleConnTimeout: time.Microsecond,
+	}
+	ut := &unixTransport{tu}
+
+	t.RegisterProtocol("unix", ut)
+	t.RegisterProtocol("unixs", ut)
+
+	return t, nil
+}
+```
+{collapsible="true" collapsed-title="NewTransport()" default-state="collapsed"}
+
 真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
 
 ```mermaid
@@ -839,8 +941,6 @@ func (t *Transport) AddPeer(id types.ID, us []string) {
 	if err != nil {
 		if t.Logger != nil {
 			t.Logger.Panic("failed NewURLs", zap.Strings("urls", us), zap.Error(err))
-		} else {
-			plog.Panicf("newURLs %+v should never fail: %+v", us, err)
 		}
 	}
 	fs := t.LeaderStats.Follower(id.String())
@@ -855,8 +955,6 @@ func (t *Transport) AddPeer(id types.ID, us []string) {
 			zap.String("remote-peer-id", id.String()),
 			zap.Strings("remote-peer-urls", us),
 		)
-	} else {
-		plog.Infof("added peer %s", id)
 	}
 }
 ```
@@ -864,18 +962,22 @@ func (t *Transport) AddPeer(id types.ID, us []string) {
 
 1. 在`startPeer()`中启动了两个goroutine分别处理来自`recvc`和`propc` channel的数据。
 
+<procedure>
+<img src="debug-etcd-rafthttp-startpeer-1.png" thumbnail="true"/>
+</procedure>
+
+<procedure>
+<img src="debug-etcd-rafthttp-startpeer-2.png" thumbnail="true"/>
+</procedure>
+
 ```Go
 func startPeer(t *Transport, urls types.URLs, peerID types.ID, fs *stats.FollowerStats) *peer {
 	if t.Logger != nil {
 		t.Logger.Info("starting remote peer", zap.String("remote-peer-id", peerID.String()))
-	} else {
-		plog.Infof("starting peer %s...", peerID)
 	}
 	defer func() {
 		if t.Logger != nil {
 			t.Logger.Info("started remote peer", zap.String("remote-peer-id", peerID.String()))
-		} else {
-			plog.Infof("started peer %s", peerID)
 		}
 	}()
 
@@ -919,8 +1021,6 @@ func startPeer(t *Transport, urls types.URLs, peerID types.ID, fs *stats.Followe
 				if err := r.Process(ctx, mm); err != nil {
 					if t.Logger != nil {
 						t.Logger.Warn("failed to process Raft message", zap.Error(err))
-					} else {
-						plog.Warningf("failed to process raft message (%v)", err)
 					}
 				}
 			case <-p.stopc:
@@ -937,7 +1037,9 @@ func startPeer(t *Transport, urls types.URLs, peerID types.ID, fs *stats.Followe
 			select {
 			case mm := <-p.propc:
 				if err := r.Process(ctx, mm); err != nil {
-					plog.Warningf("failed to process raft message (%v)", err)
+					if t.Logger != nil {
+						t.Logger.Warn("failed to process Raft message", zap.Error(err))
+					}
 				}
 			case <-p.stopc:
 				return
@@ -974,7 +1076,7 @@ func startPeer(t *Transport, urls types.URLs, peerID types.ID, fs *stats.Followe
 	return p
 }
 ```
-{collapsible="true" collapsed-title="Transport.startPeer()" default-state="collapsed"}
+{collapsible="true" collapsed-title="rafthttp.startPeer()" default-state="collapsed"}
 
 ```Go
 func (p *pipeline) start() {
@@ -991,8 +1093,6 @@ func (p *pipeline) start() {
 			zap.String("local-member-id", p.tr.ID.String()),
 			zap.String("remote-peer-id", p.peerID.String()),
 		)
-	} else {
-		plog.Infof("started HTTP pipelining with peer %s", p.peerID)
 	}
 }
 ```
@@ -1007,7 +1107,15 @@ func (p *pipeline) start() {
 		}
 ```
 
+<procedure>
+<img src="debug-etcd-rafthttp-stream-decode.png" thumbnail="true"/>
+</procedure>
+
 3. `msgAppV2Reader`负责从远程节点读取数据并写入`recvc`及`propc`，然后`Transport`启动goroutine从这两个channel读取数据并进行处理，这样`recvc`和`propc`的两端就连起来了。
+
+<procedure>
+<img src="debug-etcd-rafthttp-stream-1.png" thumbnail="true"/>
+</procedure>
 
 ```mermaid
 flowchart TB
@@ -1037,8 +1145,6 @@ func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
 	default:
 		if cr.lg != nil {
 			cr.lg.Panic("unknown stream type", zap.String("type", t.String()))
-		} else {
-			plog.Panicf("unhandled stream type %s", t)
 		}
 	}
 	select {
@@ -1100,8 +1206,6 @@ func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
 						zap.String("remote-peer-id", types.ID(m.To).String()),
 						zap.Bool("remote-peer-active", cr.status.isActive()),
 					)
-				} else {
-					plog.MergeWarningf("dropped internal raft message from %s since receiving buffer is full (overloaded network)", types.ID(m.From))
 				}
 			} else {
 				if cr.lg != nil {
@@ -1113,14 +1217,13 @@ func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
 						zap.String("remote-peer-id", types.ID(m.To).String()),
 						zap.Bool("remote-peer-active", cr.status.isActive()),
 					)
-				} else {
-					plog.Debugf("dropped %s from %s since receiving buffer is full", m.Type, types.ID(m.From))
 				}
 			}
 			recvFailures.WithLabelValues(types.ID(m.From).String()).Inc()
 		}
 	}
 }
+
 ```
 {collapsible="true" collapsed-title="streamReader.decodeLoop()" default-state="collapsed"}
 
