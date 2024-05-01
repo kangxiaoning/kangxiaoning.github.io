@@ -1,14 +1,14 @@
-# Etcd的Raft使用分析
+# Etcd的Raft运行原理分析
 
 <show-structure depth="2"/>
+
+> 本文基于**Etcd v3.5.6**版本源码进行分析，对于异步逻辑导致代码跳转难以跟踪的情况，采用debugging方式进行解释。
+>
+{style="note"}
 
 看了raft论文，以为可以理解Etcd，实际并不是这么回事，原因是Etcd中的raft库只实现了raft协议的核心内容，**没有实现网络传输、存储的功能**，因此在etcd的`raft`库里，有一个**Application**的概念，网络传输和存储功能是**Application**的职责，而**Application**和**raft**的协作又是通过一系列**channel**完成的，导致代码逻辑断点较多，理解较为困难。
 
 本文在理解raft库使用的基础上，分析Etcd中是如何使用raft的，进而掌握Etcd中一个请求是如何通过raft完成持久化的。
-
->因为生产环境用了**Etcd v3.4.3**版本，所以本文以该版本的源码进行分析。
->
-{style="note"}
 
 关于raft的原理可以参考如下动画和论文。
 
@@ -95,7 +95,7 @@ n.ProposeConfChange(ctx, cc)
 
 ### 2.1 创建raftNode
 
-在etcd启动过程中，有一步是`etcdserver.NewServer(srvcfg)`，在这个函数中创建了raft节点。
+Etcd启动过程中，在`embed.StartEtcd()`里执行了`etcdserver.NewServer(srvcfg)`，这个函数中创建了raft节点。
 
 ```Go
 	srv = &EtcdServer{
@@ -106,8 +106,6 @@ n.ProposeConfChange(ctx, cc)
 		errorc:      make(chan error, 1),
 		v2store:     st,
 		snapshotter: ss,
-		
-		// 创建raft节点
 		r: *newRaftNode(
 			raftNodeConfig{
 				lg:          cfg.Logger,
@@ -118,16 +116,17 @@ n.ProposeConfChange(ctx, cc)
 				storage:     NewStorage(w, ss),
 			},
 		),
-		id:               id,
-		attributes:       membership.Attributes{Name: cfg.Name, ClientURLs: cfg.ClientURLs.StringSlice()},
-		cluster:          cl,
-		stats:            sstats,
-		lstats:           lstats,
-		SyncTicker:       time.NewTicker(500 * time.Millisecond),
-		peerRt:           prt,
-		reqIDGen:         idutil.NewGenerator(uint16(id), time.Now()),
-		forceVersionC:    make(chan struct{}),
-		AccessController: &AccessController{CORS: cfg.CORS, HostWhitelist: cfg.HostWhitelist},
+		id:                 id,
+		attributes:         membership.Attributes{Name: cfg.Name, ClientURLs: cfg.ClientURLs.StringSlice()},
+		cluster:            cl,
+		stats:              sstats,
+		lstats:             lstats,
+		SyncTicker:         time.NewTicker(500 * time.Millisecond),
+		peerRt:             prt,
+		reqIDGen:           idutil.NewGenerator(uint16(id), time.Now()),
+		AccessController:   &AccessController{CORS: cfg.CORS, HostWhitelist: cfg.HostWhitelist},
+		consistIndex:       ci,
+		firstCommitInTermC: make(chan struct{}),
 	}
 ```
 {collapsible="true" collapsed-title="etcdserver.NewServer()" default-state="collapsed"}
@@ -203,8 +202,35 @@ flowchart TB
     C-->D
 ```
 
-1. 执行`s.r.start(rh)`启动`raftNode`，该函数创建了一个goroutine在后台运行。
+1. 执行`EtcdServer.run()`中启动`raftNode`，作为一个goroutine在后台运行。
 ```Go
+
+func (s *EtcdServer) run() {
+	lg := s.Logger()
+
+	sn, err := s.r.raftStorage.Snapshot()
+	if err != nil {
+		lg.Panic("failed to get snapshot from Raft storage", zap.Error(err))
+	}
+
+	// asynchronously accept apply packets, dispatch progress in-order
+	sched := schedule.NewFIFOScheduler()
+
+	var (
+		smu   sync.RWMutex
+		syncC <-chan time.Time
+	)
+	setSyncC := func(ch <-chan time.Time) {
+		smu.Lock()
+		syncC = ch
+		smu.Unlock()
+	}
+	getSyncC := func() (ch <-chan time.Time) {
+		smu.RLock()
+		ch = syncC
+		smu.RUnlock()
+		return
+	}
 	rh := &raftReadyHandler{
 		getLead:    func() (lead uint64) { return s.getLead() },
 		updateLead: func(lead uint64) { s.setLead(lead) },
@@ -250,11 +276,77 @@ flowchart TB
 		},
 	}
 	s.r.start(rh)
+
+	ep := etcdProgress{
+		confState: sn.Metadata.ConfState,
+		snapi:     sn.Metadata.Index,
+		appliedt:  sn.Metadata.Term,
+		appliedi:  sn.Metadata.Index,
+	}
+
+	defer func() {
+		s.wgMu.Lock() // block concurrent waitgroup adds in GoAttach while stopping
+		close(s.stopping)
+		s.wgMu.Unlock()
+		s.cancel()
+		sched.Stop()
+
+		// wait for gouroutines before closing raft so wal stays open
+		s.wg.Wait()
+
+		s.SyncTicker.Stop()
+
+		// must stop raft after scheduler-- etcdserver can leak rafthttp pipelines
+		// by adding a peer after raft stops the transport
+		s.r.stop()
+
+		s.Cleanup()
+
+		close(s.done)
+	}()
+
+	var expiredLeaseC <-chan []*lease.Lease
+	if s.lessor != nil {
+		expiredLeaseC = s.lessor.ExpiredLeasesC()
+	}
+
+	for {
+		select {
+		case ap := <-s.r.apply():
+			f := func(context.Context) { s.applyAll(&ep, &ap) }
+			sched.Schedule(f)
+		case leases := <-expiredLeaseC:
+			s.revokeExpiredLeases(leases)
+		case err := <-s.errorc:
+			lg.Warn("server error", zap.Error(err))
+			lg.Warn("data-dir used by this member must be removed")
+			return
+		case <-getSyncC():
+			if s.v2store.HasTTLKeys() {
+				s.sync(s.Cfg.ReqTimeout())
+			}
+		case <-s.stop:
+			return
+		}
+	}
+}
 ```
-{collapsible="true" collapsed-title="Etcdserver.run().s.r.start(rh)" default-state="collapsed"}
+{collapsible="true" collapsed-title="Etcdserver.run()" default-state="collapsed"}
+
+
 
 2. 在`raftNode.start()`执行`rd := <-r.Ready()`从raft模块获取数据，对数据进行处理后，接着执行`r.applyc <- ap`将处理结果发往`raftNode.applyc` channel。
+
+<procedure>
+<img src="debug-etcd-raft-ready.png" thumbnail="true"/>
+</procedure>
+
+<procedure>
+<img src="debug-etcd-raft-applyc.png" thumbnail="true"/>
+</procedure>
+
 ```Go
+
 // start prepares and starts raftNode in a new goroutine. It is no longer safe
 // to modify the fields after it has been started.
 func (r *raftNode) start(rh *raftReadyHandler) {
@@ -268,9 +360,41 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 			select {
 			case <-r.ticker.C:
 				r.tick()
-			// 折叠`case rd := <-r.Ready()`代码块
-			case rd := <-r.Ready():...
-			   // ...
+			case rd := <-r.Ready():
+				if rd.SoftState != nil {
+					newLeader := rd.SoftState.Lead != raft.None && rh.getLead() != rd.SoftState.Lead
+					if newLeader {
+						leaderChanges.Inc()
+					}
+
+					if rd.SoftState.Lead == raft.None {
+						hasLeader.Set(0)
+					} else {
+						hasLeader.Set(1)
+					}
+
+					rh.updateLead(rd.SoftState.Lead)
+					islead = rd.RaftState == raft.StateLeader
+					if islead {
+						isLeader.Set(1)
+					} else {
+						isLeader.Set(0)
+					}
+					rh.updateLeadership(newLeader)
+					r.td.Reset()
+				}
+
+				if len(rd.ReadStates) != 0 {
+					select {
+					case r.readStateC <- rd.ReadStates[len(rd.ReadStates)-1]:
+					case <-time.After(internalTimeout):
+						r.lg.Warn("timed out sending read state", zap.Duration("timeout", internalTimeout))
+					case <-r.stopped:
+						return
+					}
+				}
+
+				notifyc := make(chan struct{}, 1)
 				ap := apply{
 					entries:  rd.CommittedEntries,
 					snapshot: rd.Snapshot,
@@ -279,15 +403,117 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 
 				updateCommittedIndex(&ap, rh)
 
+				waitWALSync := shouldWaitWALSync(rd)
+				if waitWALSync {
+					// gofail: var raftBeforeSaveWaitWalSync struct{}
+					if err := r.storage.Save(rd.HardState, rd.Entries); err != nil {
+						r.lg.Fatal("failed to save Raft hard state and entries", zap.Error(err))
+					}
+				}
+
 				select {
 				case r.applyc <- ap:
 				case <-r.stopped:
 					return
 				}
+
+				// the leader can write to its disk in parallel with replicating to the followers and them
+				// writing to their disks.
+				// For more details, check raft thesis 10.2.1
+				if islead {
+					// gofail: var raftBeforeLeaderSend struct{}
+					r.transport.Send(r.processMessages(rd.Messages))
+				}
+
+				// Must save the snapshot file and WAL snapshot entry before saving any other entries or hardstate to
+				// ensure that recovery after a snapshot restore is possible.
+				if !raft.IsEmptySnap(rd.Snapshot) {
+					// gofail: var raftBeforeSaveSnap struct{}
+					if err := r.storage.SaveSnap(rd.Snapshot); err != nil {
+						r.lg.Fatal("failed to save Raft snapshot", zap.Error(err))
+					}
+					// gofail: var raftAfterSaveSnap struct{}
+				}
+
+				if !waitWALSync {
+					// gofail: var raftBeforeSave struct{}
+					if err := r.storage.Save(rd.HardState, rd.Entries); err != nil {
+						r.lg.Fatal("failed to save Raft hard state and entries", zap.Error(err))
+					}
+				}
+				if !raft.IsEmptyHardState(rd.HardState) {
+					proposalsCommitted.Set(float64(rd.HardState.Commit))
+				}
+				// gofail: var raftAfterSave struct{}
+
+				if !raft.IsEmptySnap(rd.Snapshot) {
+					// Force WAL to fsync its hard state before Release() releases
+					// old data from the WAL. Otherwise could get an error like:
+					// panic: tocommit(107) is out of range [lastIndex(84)]. Was the raft log corrupted, truncated, or lost?
+					// See https://github.com/etcd-io/etcd/issues/10219 for more details.
+					if err := r.storage.Sync(); err != nil {
+						r.lg.Fatal("failed to sync Raft snapshot", zap.Error(err))
+					}
+
+					// etcdserver now claim the snapshot has been persisted onto the disk
+					notifyc <- struct{}{}
+
+					// gofail: var raftBeforeApplySnap struct{}
+					r.raftStorage.ApplySnapshot(rd.Snapshot)
+					r.lg.Info("applied incoming Raft snapshot", zap.Uint64("snapshot-index", rd.Snapshot.Metadata.Index))
+					// gofail: var raftAfterApplySnap struct{}
+
+					if err := r.storage.Release(rd.Snapshot); err != nil {
+						r.lg.Fatal("failed to release Raft wal", zap.Error(err))
+					}
+					// gofail: var raftAfterWALRelease struct{}
+				}
+
+				r.raftStorage.Append(rd.Entries)
+
+				if !islead {
+					// finish processing incoming messages before we signal raftdone chan
+					msgs := r.processMessages(rd.Messages)
+
+					// now unblocks 'applyAll' that waits on Raft log disk writes before triggering snapshots
+					notifyc <- struct{}{}
+
+					// Candidate or follower needs to wait for all pending configuration
+					// changes to be applied before sending messages.
+					// Otherwise we might incorrectly count votes (e.g. votes from removed members).
+					// Also slow machine's follower raft-layer could proceed to become the leader
+					// on its own single-node cluster, before apply-layer applies the config change.
+					// We simply wait for ALL pending entries to be applied for now.
+					// We might improve this later on if it causes unnecessary long blocking issues.
+					waitApply := false
+					for _, ent := range rd.CommittedEntries {
+						if ent.Type == raftpb.EntryConfChange {
+							waitApply = true
+							break
+						}
+					}
+					if waitApply {
+						// blocks until 'applyAll' calls 'applyWait.Trigger'
+						// to be in sync with scheduled config-change job
+						// (assume notifyc has cap of 1)
+						select {
+						case notifyc <- struct{}{}:
+						case <-r.stopped:
+							return
+						}
+					}
+
+					// gofail: var raftBeforeFollowerSend struct{}
+					r.transport.Send(msgs)
+				} else {
+					// leader already processed 'MsgSnap' and signaled
+					notifyc <- struct{}{}
+				}
+
+				r.Advance()
 			case <-r.stopped:
 				return
 			}
-			// ...
 		}
 	}()
 }
@@ -295,52 +521,23 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 {collapsible="true" collapsed-title="raftNode.start()" default-state="collapsed"}
 
 3. 在`Etcdserver.run()`中执行`ap := <-s.r.apply()`，从`raftNode.applyc`获取第2步的处理结果，最终会调用到apply模块完成持久化。
+
+<procedure>
+<img src="debug-etcd-raft-apply.png" thumbnail="true"/>
+</procedure>
+
 ```Go
+
 	for {
 		select {
 		case ap := <-s.r.apply():
 			f := func(context.Context) { s.applyAll(&ep, &ap) }
 			sched.Schedule(f)
 		case leases := <-expiredLeaseC:
-			s.goAttach(func() {
-				// Increases throughput of expired leases deletion process through parallelization
-				c := make(chan struct{}, maxPendingRevokes)
-				for _, lease := range leases {
-					select {
-					case c <- struct{}{}:
-					case <-s.stopping:
-						return
-					}
-					lid := lease.ID
-					s.goAttach(func() {
-						ctx := s.authStore.WithRoot(s.ctx)
-						_, lerr := s.LeaseRevoke(ctx, &pb.LeaseRevokeRequest{ID: int64(lid)})
-						if lerr == nil {
-							leaseExpired.Inc()
-						} else {
-							if lg != nil {
-								lg.Warn(
-									"failed to revoke lease",
-									zap.String("lease-id", fmt.Sprintf("%016x", lid)),
-									zap.Error(lerr),
-								)
-							} else {
-								plog.Warningf("failed to revoke %016x (%q)", lid, lerr.Error())
-							}
-						}
-
-						<-c
-					})
-				}
-			})
+			s.revokeExpiredLeases(leases)
 		case err := <-s.errorc:
-			if lg != nil {
-				lg.Warn("server error", zap.Error(err))
-				lg.Warn("data-dir used by this member must be removed")
-			} else {
-				plog.Errorf("%s", err)
-				plog.Infof("the data-dir used by this member must be removed.")
-			}
+			lg.Warn("server error", zap.Error(err))
+			lg.Warn("data-dir used by this member must be removed")
 			return
 		case <-getSyncC():
 			if s.v2store.HasTTLKeys() {
@@ -351,7 +548,7 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 		}
 	}
 ```
-{collapsible="true" collapsed-title="Etcdserver.run().for{...}" default-state="collapsed"}
+{collapsible="true" collapsed-title="Etcdserver.run().for{select}" default-state="collapsed"}
 
 ### 2.3 总结
 
@@ -362,6 +559,7 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 <procedure>
 <img src="etcd-raft-raftnode.svg" alt="raftNode"/>
 </procedure>
+
 
 ## 3. 创建和启动transport
 
