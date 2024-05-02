@@ -908,7 +908,9 @@ func NewTransport(info TLSInfo, dialtimeoutd time.Duration) (*http.Transport, er
 ```
 {collapsible="true" collapsed-title="NewTransport()" default-state="collapsed"}
 
-真正启动服务的是在下面这几个函数，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
+### 3.3 Transport.AddPeer()
+
+集群节点间真正通过网络连接起来是通过下面的流程完成的，最终启动了几个goroutine在后台运行，分别处理不同channel的数据。
 
 ```mermaid
 flowchart TD
@@ -925,6 +927,22 @@ flowchart TD
     C-->F
     C-->D
 ```
+
+> `AddPeer()`会在多个地方被调用，在重启一个instance的场景下会触发哪个位置的调用呢？
+>
+{style="note"}
+
+- 找出被调用的位置，在这几个位置都打上断点
+<procedure>
+<img src="debug-etcd-add-peer-1.png" thumbnail="true"/>
+</procedure>
+
+- 重启1个instance，验证会停在哪个断点
+<procedure>
+<img src="debug-etcd-add-peer-2.png" thumbnail="true"/>
+</procedure>
+
+如上验证说明重启节点时，会有应用配置变更的逻辑中执行`AddPeer()`。
 
 ```Go
 func (t *Transport) AddPeer(id types.ID, us []string) {
@@ -1227,7 +1245,7 @@ func (cr *streamReader) decodeLoop(rc io.ReadCloser, t streamType) error {
 ```
 {collapsible="true" collapsed-title="streamReader.decodeLoop()" default-state="collapsed"}
 
-### 3.3 总结
+### 3.4 总结
 
 至此，对节点间通信的流程有了大概的了解，也解释了`recvc`和`propc`数据的来源和去向，可以通过下图对节点间通信做个总结。
 
