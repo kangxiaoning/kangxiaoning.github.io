@@ -94,7 +94,12 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 
 成本与应用强相关，如果应用能容忍按节点驱逐，即使替换迁移，成本也不会增加很多，比如旧集群下线的节点加入新集群使用；如果无法容忍按节点驱逐，意味着节点上的Pod迁移完成前，这个节点不能被新集群使用，因为无法按节点驱逐，导致清空一个节点的周期将会很长，具体取决于上面的应用什么时候迁移走。
 
-## 4. 参考
+## 4. LTS
+
+- [KLTS release cycle](https://klts.io/docs/intro/#maint-cycle)
+- [Azure Kubernetes upgrades and Long Term Support](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-kubernetes-upgrades-and-long-term-support/ba-p/3782789)
+
+## 5. 参考
 
 记录下升级分析需要的一些信息。
 
