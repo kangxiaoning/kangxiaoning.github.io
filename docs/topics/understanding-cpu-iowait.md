@@ -185,10 +185,9 @@ void account_process_tick(struct task_struct *p, int user_tick)
 `account_idle_time()`的主要功能是更新当前CPU的**空闲时间**或**等待I/O的时间**。
 
 这里也可以看出来**等待I/O的时间**本身也属于**CPU idle**时间的一部分。
-- 如果CPU当前是空闲状态，并且没有任何工作要做，时间将计入**idle**。
-- 如果CPU当前是空闲状态，并且正在等待**I/O**，时间将计入**iowait**。
+- 如果CPU当前是**空闲状态**，并且**有进程正在等待I/O**，时间将计入**iowait**。
+- 如果CPU当前是**空闲状态**，并且**没有任何进程等待I/O**，时间将计入**idle**。
 
-但是如果进程正在等待I/O，但是其它进程被调度到了CPU上，此时CPU不是空闲状态，因此等待I/O的时间不会计入**iowait**，也就是**CPU繁忙的情况下，即使有进程等待I/O，也不会体现在iowait** 指标上。
 
 ```C
 /*
@@ -206,6 +205,13 @@ void account_idle_time(cputime_t cputime)
 		cpustat[CPUTIME_IDLE] += (__force u64) cputime;
 }
 ```
+
+如果有进程正在等待I/O，但是其它进程被调度到了当前CPU上，此时该CPU在执行其它进程的指令，处于繁忙状态，代码逻辑就执行不到统计iowait的部分，所以**CPU繁忙时iowait反映不了进程等待I/O的事实**。
+
+考虑这么一个场景：A程在等待I/O，B进程在CPU上执行，此时CPU并不是空闲状态，而是被B进程使用，这种情况下CPU时间会统计到B进程的us/sy指标上，不会统计到A进程的iowait指标，也就是当**系统中有CPU密集型任务时，即使有进程在等待I/O，iowait指标也体现不出来**。
+
+**结论：CPU繁忙的情况下，即使有进程等待I/O，也不会体现在iowait指标上。**
+
 ## 3. CPU iowait不可靠
 
 从上面分析可以看出来，`CPU iowait`并不是一个可靠的监控指标，`iowait`高不代表一定有I/O瓶颈，`iowait`低也不代表没有I/O瓶颈。
