@@ -67,7 +67,7 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 如下Bug在升级过程中可能引发coreDNS不可用，导致集群应用大面积异常。
 - [client wait forever if kube-apiserver restart in slb environment #107266](https://github.com/kubernetes/kubernetes/issues/107266)
 
-### 2.2 替换升级
+### 2.2 迁移升级
 
 新建一个高版本集群，将应用迁移应用到新集群，下线旧版本集群完成升级。
 
@@ -75,15 +75,17 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 |---------------|-----------------------------------------------------------------------------------------------------|
 | Alibaba Cloud | [How To Migrate Kubernetes Cluster With Zero Downtime](https://www.youtube.com/watch?v=wxh8Sv_WqEk) |
 
-网上相关案例较少，猜测有如下原因。
-1. 新为是新建集群，没有太多技术挑战。
-2. 方案与应用强相关，不具备通用性。
+官方/公司案例较少，在Medium、Reddit等站点能看到一些个人总结、讨论。
+- [Move workload to new cluster (instead of upgrading)](https://www.reddit.com/r/kubernetes/comments/13lpv90/move_workload_to_new_cluster_instead_of_upgrading/)
+- [Migrating applications between Kubernetes clusters](https://medium.com/google-cloud/migrating-applications-between-kubernetes-clusters-8455cf1bfccd)
 
 根据应用运行环境，如下要考虑。
 1. 防火墙，迁移可能会导致应用对外暴露的IP变化。
 2. Chart，版本跨度大可能导致API变化，涉及Chart修改。
 3. OS依赖，检查应用是否依赖OS，比如日志清理脚本，特殊内核参数等。
 4. 成本，大集群的升级成本将会非常高。
+
+- 
 
 ## 3. 升级策略
 
@@ -99,7 +101,14 @@ Google云的升级文档描述了升级过程需要[**移除节点上的Pod**](h
 - [KLTS release cycle](https://klts.io/docs/intro/#maint-cycle)
 - [Azure Kubernetes upgrades and Long Term Support](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/azure-kubernetes-upgrades-and-long-term-support/ba-p/3782789)
 
-## 5. 参考
+## 5. 工具
+
+- [silver-surfer](https://github.com/devtron-labs/silver-surfer)
+  - Kubernetes objects api-version compatibility checker and provides migration path for K8s objects and prepare it for cluster upgrades
+- [kubepug](https://github.com/kubepug/kubepug)
+  - Kubernetes PreUpGrade (Checker)
+
+## 6. 参考
 
 记录下升级分析需要的一些信息。
 
