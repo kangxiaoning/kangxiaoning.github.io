@@ -32,9 +32,9 @@ static int softnet_seq_show(struct seq_file *seq, void *v)
 有含义的字段解释，部分字段直接打印0。
 
 ```Shell
-Column-01: packet_process: Packet processed by each CPU.
-Column-02: packet_drop: Packets dropped.
-Column-03: time_squeeze: net_rx_action.
+Column-01: packet_process: the number of frames received by the interrupt handler.
+Column-02: packet_drop: the number of frames dropped due to netdev_max_backlog being exceeded.
+Column-03: time_squeeze: the number of times ksoftirqd ran out of netdev_budget or CPU time when there was still work to be done.
 Column-09: cpu_collision: collision occur while obtaining device lock while transmitting.
 Column-10: received_rps: number of times cpu woken up received_rps.
 ```
