@@ -15,7 +15,7 @@
         <toc-element topic="write-ebpf-program-in-rust.md"/>
     </toc-element>
     <toc-element toc-title="Linux">
-        <toc-element topic="linux-performance-tuning.md"/>
+        <toc-element topic="time_squeeze_and_netdev_budget.md"/>
         <toc-element topic="understanding-cpu-iowait.md"/>
         <toc-element topic="linux-conntrack.md"/>
         <toc-element topic="linux-neighbor.md"/>
