@@ -129,15 +129,19 @@ out:
 }
 ```
 
-## 3. Mellanox驱动poll方法
+## 3. Mellanox驱动处理逻辑
 
-在Mellanox驱动代码中搜索`netif_napi_add`关键字即可找到，如下是搜索结果。
+这里主要分析`net_rx_action()`中`budget -= napi_poll(n, &repoll);`这一行涉及到的代码，也就是网卡驱动注册到内核的`poll()`方法的逻辑。
+
+### 3.1 网卡驱动的`poll()`方法
+
+在网卡驱动代码中搜索`netif_napi_add`关键字即可找到`poll()`方法的具体实现，如下是Mellanox网卡驱动的搜索结果。
 
 ```C
 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll, 64);
 ```
 
-`netif_napi_add()`函数定义如下。
+`netif_napi_add()`函数定义如下，方便了解每个输入参数的含义。
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/net/core/dev.c
 
@@ -167,9 +171,13 @@ EXPORT_SYMBOL(netif_napi_add);
 ```
 {collapsible="true" collapsed-title="netif_napi_add(struct net_device *dev, struct napi_struct *napi, int (*poll)(struct napi_struct *, int), int weight)" default-state="collapsed"}
 
-在`net_rx_action()`函数中，`budget -= napi_poll(n, &repoll);`最终会执行到网卡驱动的`poll()`方法。
+### 3.2 mlx5e_napi_poll()
 
-如下是Mellanox驱动对应的`poll()`方法，可以看到不光执行了**rx**方向的收包操作，还执行了**tx**方向的发包操作，因此如果time_squeeze持续增长，说明收包和发包都可能出现堆积或者丢包。
+在`net_rx_action()`函数中，`budget -= napi_poll(n, &repoll);`最终会执行到网卡驱动的`poll()`方法，上面分析可知具体是`mlx5e_napi_poll()`方法。
+
+通过下面代码及注释，可以看到主要执行了如下操作。
+1. 清理发送队列的ring buffer
+2. 处理接收队列的数据包
 
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
@@ -186,7 +194,7 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	ch_stats->poll++;
 
 	for (i = 0; i < c->num_tc; i++)
-		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
+		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget); // 清理发送队列的ring buffer
 
 	busy |= mlx5e_poll_xdpsq_cq(&c->xdpsq.cq);
 
@@ -194,7 +202,7 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 		busy |= mlx5e_poll_xdpsq_cq(&c->rq.xdpsq.cq);
 
 	if (likely(budget)) { /* budget=0 means: don't poll rx rings */
-		work_done = mlx5e_poll_rx_cq(&c->rq.cq, budget);
+		work_done = mlx5e_poll_rx_cq(&c->rq.cq, budget); // 处理接收队列的数据包
 		busy |= work_done == budget;
 	}
 
@@ -228,11 +236,296 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 }
 ```
 
+### 3.3 mlx5e_poll_tx_cq()
+
+`mlx5e_poll_tx_cq()`的主要作用是清理ring buffer，在循环中持续运行，直到满足如下条件才退出执行。
+1. 超过MLX5E_TX_CQ_POLL_BUDGET预算，默认是128
+2. 或者没有更多的CQE(Completion Queue Entry)可用
+
+**注意**：有可能一次`mlx5e_poll_tx_cq()`运行超出预算，但是ring buffer未清理完。如果发送包的速率大于清理ring buffer的速率，可能出现ring buffer溢出。
+
+```C
+#define MLX5E_TX_CQ_POLL_BUDGET        128
+```
+
+```C
+// /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+
+bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
+{
+    struct mlx5e_sq_stats *stats; // 发送队列统计信息
+    struct mlx5e_txqsq *sq;       // 发送队列结构体
+    struct mlx5_cqe64 *cqe;       // 完成队列事件
+    u32 dma_fifo_cc;              // DMA FIFO计数器
+    u32 nbytes;                   // 处理的总字节数
+    u16 npkts;                    // 处理的数据包数量
+    u16 sqcc;                     // 发送队列计数器
+    int i;                        // 循环计数
+
+    // 获取发送队列结构体
+    sq = container_of(cq, struct mlx5e_txqsq, cq);
+
+    // 确保发送队列处于启用状态
+    if (unlikely(!test_bit(MLX5E_SQ_STATE_ENABLED, &sq->state)))
+        return false;
+
+    // 获取完成队列中的完成事件
+    cqe = mlx5_cqwq_get_cqe(&cq->wq);
+    if (!cqe)
+        return false;
+
+    // 初始化统计信息
+    stats = sq->stats;
+
+    npkts = 0;
+    nbytes = 0;
+
+    // 更新发送队列计数器
+    sqcc = sq->cc;
+
+    // 避免频繁更新缓存线
+    dma_fifo_cc = sq->dma_fifo_cc;
+
+    // 循环处理完成事件
+    i = 0;
+    do {
+        u16 wqe_counter;           // 工作队列元素计数
+        bool last_wqe;             // 是否为最后一个WQE
+
+        // 移除完成事件
+        mlx5_cqwq_pop(&cq->wq);
+
+        // 获取工作队列元素计数
+        wqe_counter = be16_to_cpu(cqe->wqe_counter);
+
+        // 处理错误事件
+        if (unlikely(cqe->op_own >> 4 == MLX5_CQE_REQ_ERR)) {
+            if (!test_and_set_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state)) {
+                // 处理错误事件并安排恢复工作
+                mlx5e_dump_error_cqe(sq, (struct mlx5_err_cqe *)cqe);
+                queue_work(cq->channel->priv->wq, &sq->recover.recover_work);
+            }
+            stats->cqe_err++;      // 统计错误事件数量
+        }
+
+        // 遍历WQE中的所有DMA映射
+        do {
+            struct mlx5e_tx_wqe_info *wi; // WQE信息
+            struct sk_buff *skb;          // 数据包
+            u16 ci;                       // WQE索引
+            int j;                        // 内部循环计数
+
+            // 获取最后一个WQE标志
+            last_wqe = (sqcc == wqe_counter);
+
+            // 获取WQE索引
+            ci = mlx5_wq_cyc_ctr2ix(&sq->wq, sqcc);
+            wi = &sq->db.wqe_info[ci];
+            skb = wi->skb;
+
+            // 如果是NOP，则跳过
+            if (unlikely(!skb)) {
+                sqcc++;
+                continue;
+            }
+
+            // 如果设置了硬件时间戳，则更新数据包的时间戳
+            if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+                struct skb_shared_hwtstamps hwts = {};
+                hwts.hwtstamp = mlx5_timecounter_cyc2time(sq->clock, get_cqe_ts(cqe));
+                skb_tstamp_tx(skb, &hwts);
+            }
+
+            // 解映射DMA缓冲区，也就是清理ring buffer
+            for (j = 0; j < wi->num_dma; j++) {
+                struct mlx5e_sq_dma *dma = mlx5e_dma_get(sq, dma_fifo_cc++);
+                mlx5e_tx_dma_unmap(sq->pdev, dma);
+            }
+
+            // 更新统计信息
+            npkts++;
+            nbytes += wi->num_bytes;
+            sqcc += wi->num_wqebbs;
+            napi_consume_skb(skb, napi_budget);
+        } while (!last_wqe); // 直到最后一个wqe完成才结束循环
+    } while ((++i < MLX5E_TX_CQ_POLL_BUDGET) && (cqe = mlx5_cqwq_get_cqe(&cq->wq))); // 超过MLX5E_TX_CQ_POLL_BUDGET预算，或者没有更多的cqe则结束循环
+
+    // 更新处理的事件数量
+    stats->cqes += i;
+
+    // 更新数据库记录以释放完成队列的空间
+    mlx5_cqwq_update_db_record(&cq->wq);
+
+    // 确保完成队列空间被释放
+    wmb();
+
+    // 更新DMA FIFO计数器和发送队列计数器
+    sq->dma_fifo_cc = dma_fifo_cc;
+    sq->cc = sqcc;
+
+    // 唤醒发送队列
+    netdev_tx_completed_queue(sq->txq, npkts, nbytes);
+
+    // 如果发送队列被停止且有足够的空间，则唤醒队列
+    if (netif_tx_queue_stopped(sq->txq) &&
+        mlx5e_wqc_has_room_for(&sq->wq, sq->cc, sq->pc, MLX5E_SQ_STOP_ROOM) &&
+        !test_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state)) {
+        netif_tx_wake_queue(sq->txq);
+        stats->wake++;
+    }
+
+    // 返回是否达到处理预算
+    return (i == MLX5E_TX_CQ_POLL_BUDGET);
+}
+```
+
+### 3.4 mlx5e_poll_rx_cq()
+
+`mlx5e_poll_rx_cq()`负责处理接收队列（Receive Queue，简称RQ）中的完成事件（Completion Queue Event，简称CQE），确保数据包被正确接收并处理。
+
+```C
+// /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+
+int mlx5e_poll_rx_cq(struct mlx5e_cq *cq, int budget)
+{
+    struct mlx5e_rq *rq = container_of(cq, struct mlx5e_rq, cq); // 获取与CQ关联的接收队列
+    struct mlx5e_xdpsq *xdpsq = &rq->xdpsq;
+    struct mlx5_cqe64 *cqe; // 定义CQE指针
+    int work_done = 0; // 初始化已处理的工作量
+
+    // 如果接收队列未启用，则直接返回0
+    if (unlikely(!test_bit(MLX5E_RQ_STATE_ENABLED, &rq->state)))
+        return 0;
+
+    // 如果存在待解压缩的CQ条目
+    if (cq->decmprs_left) {
+        // 处理解压缩的CQ条目，并更新已处理的工作量
+        work_done += mlx5e_decompress_cqes_cont(rq, cq, 0, budget);
+        // 如果还有待解压缩的CQ条目或已达到预算限制，则结束处理
+        if (cq->decmprs_left || work_done >= budget)
+            goto out;
+    }
+
+    // 获取CQ中的下一个CQE
+    cqe = mlx5_cqwq_get_cqe(&cq->wq);
+    // 如果没有CQE，则根据已处理的工作量情况决定是否返回
+    if (!cqe) {
+        if (unlikely(work_done))
+            goto out;
+        return 0;
+    }
+
+    // 循环处理CQ条目
+    do {
+        // 如果CQE是压缩格式，则开始解压缩并更新已处理的工作量
+        if (mlx5_get_cqe_format(cqe) == MLX5_COMPRESSED) {
+            work_done += mlx5e_decompress_cqes_start(rq, cq, budget - work_done);
+            continue;
+        }
+
+        // 从CQ中移除当前CQE
+        mlx5_cqwq_pop(&cq->wq);
+
+        // 调用处理函数处理当前CQE，最终调用的是`mlx5e_handle_rx_cqe()`
+        rq->handle_rx_cqe(rq, cqe);
+    } while ((++work_done < budget) && (cqe = mlx5_cqwq_get_cqe(&cq->wq))); // 有预算并且有CQE的情况下循环处理
+
+out:
+    if (xdpsq->doorbell) {
+        mlx5e_xmit_xdp_doorbell(xdpsq);
+        xdpsq->doorbell = false;
+    }
+
+    if (xdpsq->redirect_flush) {
+        xdp_do_flush_map();
+        xdpsq->redirect_flush = false;
+    }
+
+    mlx5_cqwq_update_db_record(&cq->wq);
+
+    // 确保在释放CQ空间之前更新已完成的工作量
+    wmb();
+
+    // 返回已处理的工作量
+    return work_done;
+}
+```
+
+在`mlx5e_alloc_rq()`初始化了`rq->handle_rx_cqe`。
+
+```C
+			rq->handle_rx_cqe = c->priv->profile->rx_handlers.handle_rx_cqe;
+```
+
+根据`mlx5e_profile`初始化可知，`rq->handle_rx_cqe`最终被初始化为`mlx5e_handle_rx_cqe`。
+
+```C
+static const struct mlx5e_profile mlx5e_nic_profile = {
+	.init		   = mlx5e_nic_init,
+	.cleanup	   = mlx5e_nic_cleanup,
+	.init_rx	   = mlx5e_init_nic_rx,
+	.cleanup_rx	   = mlx5e_cleanup_nic_rx,
+	.init_tx	   = mlx5e_init_nic_tx,
+	.cleanup_tx	   = mlx5e_cleanup_nic_tx,
+	.enable		   = mlx5e_nic_enable,
+	.disable	   = mlx5e_nic_disable,
+	.update_stats	   = mlx5e_update_ndo_stats,
+	.max_nch	   = mlx5e_get_max_num_channels,
+	.update_carrier	   = mlx5e_update_carrier,
+	.rx_handlers.handle_rx_cqe       = mlx5e_handle_rx_cqe,
+	.rx_handlers.handle_rx_cqe_mpwqe = mlx5e_handle_rx_cqe_mpwrq,
+	.max_tc		   = MLX5E_MAX_NUM_TC,
+};
+```
+
+### 3.5 mlx5e_handle_rx_cqe()
+
+`mlx5e_handle_rx_cqe()`主要作用是处理网络数据包的接收和完成队列的管理，会生成`skb`并送往协议栈进一步处理。
+
+```C
+// /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+
+void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+{
+    struct mlx5_wq_cyc *wq = &rq->wqe.wq; // 获取请求队列中的循环工作队列结构
+    struct mlx5e_wqe_frag_info *wi;        // 定义工作队列元素片段信息指针
+    struct sk_buff *skb;                   // 定义网络缓冲区结构指针
+    u32 cqe_bcnt;                          // 定义CQE字节计数值
+    u16 ci;                                // 定义工作队列元素计数器索引
+
+    // 从CQE中获取工作队列元素计数器索引
+    ci       = mlx5_wq_cyc_ctr2ix(wq, be16_to_cpu(cqe->wqe_counter));
+    wi       = get_frag(rq, ci);           // 根据索引获取对应的工作队列元素片段信息
+    cqe_bcnt = be32_to_cpu(cqe->byte_cnt); // 从CQE中获取字节计数值
+
+    // 从工作队列元素中重构网络缓冲区skb
+    skb = rq->wqe.skb_from_cqe(rq, cqe, wi, cqe_bcnt);
+    if (!skb) {                            // 如果skb为空
+        /* 处理可能的XDP情况 */
+        if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+            /* 不释放页面，等待XDP_TX完成后释放 */
+            goto wq_cyc_pop;
+        }
+        goto free_wqe;                     // 直接跳转到释放WQE
+    }
+
+    // 完成接收CQE的处理，并准备接收skb
+    mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
+    napi_gro_receive(rq->cq.napi, skb);    // 注册接收skb，后续就一步一步送到协议栈了
+
+free_wqe:                                 // 释放接收WQE
+    mlx5e_free_rx_wqe(rq, wi, true);
+
+wq_cyc_pop:                               // 从工作队列中移除已处理的元素
+    mlx5_wq_cyc_pop(wq);
+}
+```
+
 参考：[](https://arthurchiao.art/blog/linux-net-stack-implementation-rx-zh/)
 
 ## 4. 参数优化
 
-可以调整如下参数，然后继续观察time_squeeze变化情况。
+如果遇到`time_squeeze`持续增长，可以尝试调整如下参数，然后继续观察`time_squeeze`变化情况。
 
 ```C
 net.core.netdev_budget = 300
