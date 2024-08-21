@@ -131,6 +131,42 @@ out:
 
 ## 3. Mellanox驱动poll方法
 
+在Mellanox驱动代码中搜索`netif_napi_add`关键字即可找到，如下是搜索结果。
+
+```C
+	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll, 64);
+```
+
+`netif_napi_add()`函数定义如下。
+```C
+// /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/net/core/dev.c
+
+void netif_napi_add(struct net_device *dev, struct napi_struct *napi,
+		    int (*poll)(struct napi_struct *, int), int weight)
+{
+	INIT_LIST_HEAD(&napi->poll_list);
+	hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+	napi->timer.function = napi_watchdog;
+	init_gro_hash(napi);
+	napi->skb = NULL;
+	napi->poll = poll;
+	if (weight > NAPI_POLL_WEIGHT)
+		pr_err_once("netif_napi_add() called with weight %d on device %s\n",
+			    weight, dev->name);
+	napi->weight = weight;
+	napi->dev = dev;
+#ifdef CONFIG_NETPOLL
+	napi->poll_owner = -1;
+#endif
+	set_bit(NAPI_STATE_SCHED, &napi->state);
+	set_bit(NAPI_STATE_NPSVC, &napi->state);
+	list_add_rcu(&napi->dev_list, &dev->napi_list);
+	napi_hash_add(napi);
+}
+EXPORT_SYMBOL(netif_napi_add);
+```
+{collapsible="true" collapsed-title="netif_napi_add(struct net_device *dev, struct napi_struct *napi, int (*poll)(struct napi_struct *, int), int weight)" default-state="collapsed"}
+
 在`net_rx_action()`函数中，`budget -= napi_poll(n, &repoll);`最终会执行到网卡驱动的`poll()`方法。
 
 如下是Mellanox驱动对应的`poll()`方法，可以看到不光执行了**rx**方向的收包操作，还执行了**tx**方向的发包操作，因此如果time_squeeze持续增长，说明收包和发包都可能出现堆积或者丢包。
