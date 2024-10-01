@@ -532,9 +532,10 @@ net.core.netdev_budget = 300
 net.core.netdev_budget_usecs = 8000
 ```
 
-## 5. Mellanox驱动学习
+## 5. 网络相关代码
 
-### 5.1 分配ring buffer
+### 5.1 mlx5分配ring buffer
+
 ```C
 /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/alloc.c
 
@@ -571,7 +572,7 @@ err_out:
 ```
 {collapsible="true" collapsed-title="mlx5_buf_alloc_node" default-state="collapsed"}
 
-### 5.2 初始化tasklet
+### 5.2 mlx5初始化tasklet
 
 ```C
 int mlx5_create_map_eq(struct mlx5_core_dev *dev, struct mlx5_eq *eq, u8 vecidx,
@@ -689,9 +690,9 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-### 5.3 
+### 5.3 mlx5的net_device_ops
 
-```C mlx5的net_device_ops
+```C
 
 const struct net_device_ops mlx5e_netdev_ops = {
 	.ndo_open                = mlx5e_open,
@@ -731,5 +732,29 @@ const struct net_device_ops mlx5e_netdev_ops = {
 	.ndo_has_offload_stats	 = mlx5e_has_offload_stats,
 	.ndo_get_offload_stats	 = mlx5e_get_offload_stats,
 #endif
+};
+```
+
+### 5.4 ipv4_specific
+
+```C
+
+const struct inet_connection_sock_af_ops ipv4_specific = {
+	.queue_xmit	   = ip_queue_xmit,
+	.send_check	   = tcp_v4_send_check,
+	.rebuild_header	   = inet_sk_rebuild_header,
+	.sk_rx_dst_set	   = inet_sk_rx_dst_set,
+	.conn_request	   = tcp_v4_conn_request,
+	.syn_recv_sock	   = tcp_v4_syn_recv_sock,
+	.net_header_len	   = sizeof(struct iphdr),
+	.setsockopt	   = ip_setsockopt,
+	.getsockopt	   = ip_getsockopt,
+	.addr2sockaddr	   = inet_csk_addr2sockaddr,
+	.sockaddr_len	   = sizeof(struct sockaddr_in),
+#ifdef CONFIG_COMPAT
+	.compat_setsockopt = compat_ip_setsockopt,
+	.compat_getsockopt = compat_ip_getsockopt,
+#endif
+	.mtu_reduced	   = tcp_v4_mtu_reduced,
 };
 ```
