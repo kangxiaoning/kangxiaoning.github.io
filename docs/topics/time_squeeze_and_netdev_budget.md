@@ -531,3 +531,160 @@ wq_cyc_pop:                               // 从工作队列中移除已处理�
 net.core.netdev_budget = 300
 net.core.netdev_budget_usecs = 8000
 ```
+
+## 5. Mellanox驱动学习
+
+### 5.1 分配ring buffer
+```C
+/home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/alloc.c
+
+int mlx5_buf_alloc_node(struct mlx5_core_dev *dev, int size,
+			struct mlx5_frag_buf *buf, int node)
+{
+	dma_addr_t t;
+
+	buf->size = size;
+	buf->npages       = 1;
+	buf->page_shift   = (u8)get_order(size) + PAGE_SHIFT;
+
+	buf->frags = kzalloc(sizeof(*buf->frags), GFP_KERNEL);
+	if (!buf->frags)
+		return -ENOMEM;
+
+	buf->frags->buf   = mlx5_dma_zalloc_coherent_node(dev, size,
+							  &t, node);
+	if (!buf->frags->buf)
+		goto err_out;
+
+	buf->frags->map = t;
+
+	while (t & ((1 << buf->page_shift) - 1)) {
+		--buf->page_shift;
+		buf->npages *= 2;
+	}
+
+	return 0;
+err_out:
+	kfree(buf->frags);
+	return -ENOMEM;
+}
+```
+{collapsible="true" collapsed-title="mlx5_buf_alloc_node" default-state="collapsed"}
+
+### 5.2 初始化tasklet
+
+```C
+int mlx5_create_map_eq(struct mlx5_core_dev *dev, struct mlx5_eq *eq, u8 vecidx,
+		       int nent, u64 mask, const char *name,
+		       enum mlx5_eq_type type)
+{
+	struct mlx5_cq_table *cq_table = &eq->cq_table;
+	u32 out[MLX5_ST_SZ_DW(create_eq_out)] = {0};
+	struct mlx5_priv *priv = &dev->priv;
+	irq_handler_t handler;
+	__be64 *pas;
+	void *eqc;
+	int inlen;
+	u32 *in;
+	int err;
+
+	/* Init CQ table */
+	memset(cq_table, 0, sizeof(*cq_table));
+	spin_lock_init(&cq_table->lock);
+	INIT_RADIX_TREE(&cq_table->tree, GFP_ATOMIC);
+
+	eq->type = type;
+	eq->nent = roundup_pow_of_two(nent + MLX5_NUM_SPARE_EQE);
+	eq->cons_index = 0;
+	err = mlx5_buf_alloc(dev, eq->nent * MLX5_EQE_SIZE, &eq->buf);
+	if (err)
+		return err;
+
+#ifdef CONFIG_INFINIBAND_ON_DEMAND_PAGING
+	if (type == MLX5_EQ_TYPE_PF)
+		handler = mlx5_eq_pf_int;
+	else
+#endif
+		handler = mlx5_eq_int;
+
+	init_eq_buf(eq);
+
+	inlen = MLX5_ST_SZ_BYTES(create_eq_in) +
+		MLX5_FLD_SZ_BYTES(create_eq_in, pas[0]) * eq->buf.npages;
+
+	in = kvzalloc(inlen, GFP_KERNEL);
+	if (!in) {
+		err = -ENOMEM;
+		goto err_buf;
+	}
+
+	pas = (__be64 *)MLX5_ADDR_OF(create_eq_in, in, pas);
+	mlx5_fill_page_array(&eq->buf, pas);
+
+	MLX5_SET(create_eq_in, in, opcode, MLX5_CMD_OP_CREATE_EQ);
+	MLX5_SET64(create_eq_in, in, event_bitmask, mask);
+
+	eqc = MLX5_ADDR_OF(create_eq_in, in, eq_context_entry);
+	MLX5_SET(eqc, eqc, log_eq_size, ilog2(eq->nent));
+	MLX5_SET(eqc, eqc, uar_page, priv->uar->index);
+	MLX5_SET(eqc, eqc, intr, vecidx);
+	MLX5_SET(eqc, eqc, log_page_size,
+		 eq->buf.page_shift - MLX5_ADAPTER_PAGE_SHIFT);
+
+	err = mlx5_cmd_exec(dev, in, inlen, out, sizeof(out));
+	if (err)
+		goto err_in;
+
+	snprintf(priv->irq_info[vecidx].name, MLX5_MAX_IRQ_NAME, "%s@pci:%s",
+		 name, pci_name(dev->pdev));
+
+	eq->eqn = MLX5_GET(create_eq_out, out, eq_number);
+	eq->irqn = pci_irq_vector(dev->pdev, vecidx);
+	eq->dev = dev;
+	eq->doorbell = priv->uar->map + MLX5_EQ_DOORBEL_OFFSET;
+	err = request_irq(eq->irqn, handler, 0,
+			  priv->irq_info[vecidx].name, eq);
+	if (err)
+		goto err_eq;
+
+	err = mlx5_debug_eq_add(dev, eq);
+	if (err)
+		goto err_irq;
+
+#ifdef CONFIG_INFINIBAND_ON_DEMAND_PAGING
+	if (type == MLX5_EQ_TYPE_PF) {
+		err = init_pf_ctx(&eq->pf_ctx, name);
+		if (err)
+			goto err_irq;
+	} else
+#endif
+	{
+		INIT_LIST_HEAD(&eq->tasklet_ctx.list);
+		INIT_LIST_HEAD(&eq->tasklet_ctx.process_list);
+		spin_lock_init(&eq->tasklet_ctx.lock);
+		tasklet_init(&eq->tasklet_ctx.task, mlx5_cq_tasklet_cb,
+			     (unsigned long)&eq->tasklet_ctx);
+	}
+
+	/* EQs are created in ARMED state
+	 */
+	eq_update_ci(eq, 1);
+
+	kvfree(in);
+	return 0;
+
+err_irq:
+	free_irq(eq->irqn, eq);
+
+err_eq:
+	mlx5_cmd_destroy_eq(dev, eq->eqn);
+
+err_in:
+	kvfree(in);
+
+err_buf:
+	mlx5_buf_free(dev, &eq->buf);
+	return err;
+}
+```
+{collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
