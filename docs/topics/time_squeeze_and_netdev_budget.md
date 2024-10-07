@@ -566,8 +566,8 @@ split
 split again
  :mlx5_dma_zalloc_coherent_node();
  note right
-  在指定的NUMA节点上为给定的设备分
-  配一致内存，并返回分配的内存指针
+  分配DMA内存
+  即ring buffer
  end note
  :dma_zalloc_coherent;
 end split
