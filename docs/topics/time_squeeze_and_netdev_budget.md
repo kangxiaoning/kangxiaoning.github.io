@@ -534,10 +534,111 @@ net.core.netdev_budget_usecs = 8000
 
 ## 5. 网络相关代码
 
-### 5.1 mlx5分配ring buffer
+Mellanox网络PCI驱动相关的回调函数，当系统检测到一个匹配该驱动程序的PCI设备时，会调用`probe`函数来进行设备的初始化，可以从这里入手分析网卡初始化过程，**ring buffer**就是在这个过程中初始化的。
 
 ```C
-/home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/alloc.c
+static struct pci_driver mlx5_core_driver = {
+	.name           = DRIVER_NAME,
+	.id_table       = mlx5_core_pci_table,
+	.probe          = init_one,
+	.remove         = remove_one,
+	.shutdown	= shutdown,
+	.err_handler	= &mlx5_err_handler,
+	.sriov_configure   = mlx5_core_sriov_configure,
+};
+```
+
+### 5.1 mlx5分配ring buffer
+
+```plantuml
+@startuml
+:init_one();
+:mlx5_load_one();
+:alloc_comp_eqs();
+:mlx5_create_map_eq();
+:mlx5_buf_alloc();
+:mlx5_buf_alloc_node();
+split
+ :kzalloc();
+ note left
+  `mlx5_buf_list`指针
+ end note
+split again
+ :mlx5_dma_zalloc_coherent_node();
+ note right
+  在指定的NUMA节点
+  上为给定的设备分配
+  一致内存，并返回分
+  配的内存指针
+ end note
+ :dma_zalloc_coherent;
+end split
+@enduml
+```
+
+
+分配**ring buffer**的核心逻辑主要在`alloc_comp_eqs()`中。
+
+1. 为每个完成队列分配一个CPU中断映射表
+2. 将中断向量添加到CPU中断映射中
+3. 使用snprintf生成完成队列的名称，并调用mlx5_create_map_eq函数创建完成队列
+```C
+
+static int alloc_comp_eqs(struct mlx5_core_dev *dev)
+{
+	struct mlx5_eq_table *table = &dev->priv.eq_table;
+	char name[MLX5_MAX_IRQ_NAME];
+	struct mlx5_eq *eq;
+	int ncomp_vec;
+	int nent;
+	int err;
+	int i;
+
+	INIT_LIST_HEAD(&table->comp_eqs_list);
+	ncomp_vec = table->num_comp_vectors;
+	nent = MLX5_COMP_EQ_SIZE;
+#ifdef CONFIG_RFS_ACCEL
+	dev->rmap = alloc_irq_cpu_rmap(ncomp_vec);
+	if (!dev->rmap)
+		return -ENOMEM;
+#endif
+	for (i = 0; i < ncomp_vec; i++) {
+		eq = kzalloc(sizeof(*eq), GFP_KERNEL);
+		if (!eq) {
+			err = -ENOMEM;
+			goto clean;
+		}
+
+#ifdef CONFIG_RFS_ACCEL
+		irq_cpu_rmap_add(dev->rmap, pci_irq_vector(dev->pdev,
+				 MLX5_EQ_VEC_COMP_BASE + i));
+#endif
+		snprintf(name, MLX5_MAX_IRQ_NAME, "mlx5_comp%d", i);
+		err = mlx5_create_map_eq(dev, eq,
+					 i + MLX5_EQ_VEC_COMP_BASE, nent, 0,
+					 name, MLX5_EQ_TYPE_COMP);
+		if (err) {
+			kfree(eq);
+			goto clean;
+		}
+		mlx5_core_dbg(dev, "allocated completion EQN %d\n", eq->eqn);
+		eq->index = i;
+		spin_lock(&table->lock);
+		list_add_tail(&eq->list, &table->comp_eqs_list);
+		spin_unlock(&table->lock);
+	}
+
+	return 0;
+
+clean:
+	free_comp_eqs(dev);
+	return err;
+}
+```
+{collapsible="true" collapsed-title="alloc_comp_eqs" default-state="collapsed"}
+
+```C
+// /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/alloc.c
 
 int mlx5_buf_alloc_node(struct mlx5_core_dev *dev, int size,
 			struct mlx5_frag_buf *buf, int node)
