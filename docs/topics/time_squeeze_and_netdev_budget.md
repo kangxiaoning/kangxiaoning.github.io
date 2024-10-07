@@ -1,4 +1,4 @@
-# time_squeeze和netdev_budget
+# Time_squeeze和Netdev_budget
 
 <show-structure depth="3"/>
 
@@ -135,13 +135,77 @@ out:
 
 ### 3.1 网卡驱动的`poll()`方法
 
-在网卡驱动代码中搜索`netif_napi_add`关键字即可找到`poll()`方法的具体实现，如下是Mellanox网卡驱动的搜索结果。
+根据网卡驱动定义的`net_device_ops`可知，在Mellanox中`ndo_open`的实现是`mlx5e_open`，up网卡时会调用这个函数，最终会注册`poll()`方法。
+
+```C
+const struct net_device_ops mlx5e_netdev_ops = {
+	.ndo_open                = mlx5e_open,
+	.ndo_stop                = mlx5e_close,
+	.ndo_start_xmit          = mlx5e_xmit,
+	.ndo_setup_tc            = mlx5e_setup_tc,
+	.ndo_select_queue        = mlx5e_select_queue,
+	.ndo_get_stats64         = mlx5e_get_stats,
+	.ndo_set_rx_mode         = mlx5e_set_rx_mode,
+	.ndo_set_mac_address     = mlx5e_set_mac,
+	.ndo_vlan_rx_add_vid     = mlx5e_vlan_rx_add_vid,
+	.ndo_vlan_rx_kill_vid    = mlx5e_vlan_rx_kill_vid,
+	.ndo_set_features        = mlx5e_set_features,
+	.ndo_fix_features        = mlx5e_fix_features,
+	.ndo_change_mtu          = mlx5e_change_nic_mtu,
+	.ndo_do_ioctl            = mlx5e_ioctl,
+	.ndo_set_tx_maxrate      = mlx5e_set_tx_maxrate,
+	.ndo_udp_tunnel_add      = mlx5e_add_vxlan_port,
+	.ndo_udp_tunnel_del      = mlx5e_del_vxlan_port,
+	.ndo_features_check      = mlx5e_features_check,
+	.ndo_tx_timeout          = mlx5e_tx_timeout,
+	.ndo_bpf		 = mlx5e_xdp,
+	.ndo_xdp_xmit            = mlx5e_xdp_xmit,
+#ifdef CONFIG_MLX5_EN_ARFS
+	.ndo_rx_flow_steer	 = mlx5e_rx_flow_steer,
+#endif
+#ifdef CONFIG_MLX5_ESWITCH
+	/* SRIOV E-Switch NDOs */
+	.ndo_set_vf_mac          = mlx5e_set_vf_mac,
+	.ndo_set_vf_vlan         = mlx5e_set_vf_vlan,
+	.ndo_set_vf_spoofchk     = mlx5e_set_vf_spoofchk,
+	.ndo_set_vf_trust        = mlx5e_set_vf_trust,
+	.ndo_set_vf_rate         = mlx5e_set_vf_rate,
+	.ndo_get_vf_config       = mlx5e_get_vf_config,
+	.ndo_set_vf_link_state   = mlx5e_set_vf_link_state,
+	.ndo_get_vf_stats        = mlx5e_get_vf_stats,
+	.ndo_has_offload_stats	 = mlx5e_has_offload_stats,
+	.ndo_get_offload_stats	 = mlx5e_get_offload_stats,
+#endif
+};
+```
+{collapsible="true" collapsed-title="mlx5e_netdev_ops" default-state="collapsed"}
+
+注册`poll()`的调用过程如下。
+
+```plantuml
+@startuml
+:mlx5e_open();
+:mlx5e_open_locked();
+:mlx5e_open_channels();
+:mlx5e_open_channel();
+split
+ :netif_napi_add();
+  note right
+   注册`mlx5e_napi_poll()`;
+  end note
+split again
+ :napi_enable();
+end split
+@enduml
+```
+
+注：更简单的方法是在在网卡驱动代码中搜索`netif_napi_add`关键字，即可找到`poll()`方法的具体实现，如下是Mellanox网卡驱动的搜索结果。
 
 ```C
 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll, 64);
 ```
 
-`netif_napi_add()`函数定义如下，方便了解每个输入参数的含义。
+`netif_napi_add()`函数定义如下，查看函数实现了解每个输入参数的含义。
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/net/core/dev.c
 
@@ -523,16 +587,20 @@ wq_cyc_pop:                               // 从工作队列中移除已处理�
 
 参考：[](https://arthurchiao.art/blog/linux-net-stack-implementation-rx-zh/)
 
-## 4. 参数优化
+## 4. 性能参数优化
 
-如果遇到`time_squeeze`持续增长，可以尝试调整如下参数，然后继续观察`time_squeeze`变化情况。
+如果遇到`time_squeeze`持续增长，说明存在性能瓶颈，可以尝试调大如下参数，给中断更多的预算来处理网络包，然后继续观察`time_squeeze`变化情况，判断问题是否得以解决。
 
 ```C
 net.core.netdev_budget = 300
 net.core.netdev_budget_usecs = 8000
 ```
 
-## 5. 深入内核网络
+我通过调大上述参数，解决了一个生产环境丢包问题。当然完整的丢包分析，需要覆盖驱动层到协议层的整个链路，找到丢包点再进行优化。
+
+## 5. 内核网络学习
+
+暂时用于记录内核网络其它内容，后续根据脉络再进行整理。
 
 `pci_driver`定义了PCI设备驱动程序所需的所有关键组件和回调函数，以便内核通过驱动程序与硬件设备交互。当内核检测到网卡设备时，会调用`probe`函数进行设备的初始化，在Mellanox驱动中即`init_noe`函数，从这个函数入手可以了解网卡初始化过程，**ring buffer**就是在这个过程中创建的。
 
@@ -788,52 +856,7 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-### 5.3 mlx5的net_device_ops
-
-```C
-
-const struct net_device_ops mlx5e_netdev_ops = {
-	.ndo_open                = mlx5e_open,
-	.ndo_stop                = mlx5e_close,
-	.ndo_start_xmit          = mlx5e_xmit,
-	.ndo_setup_tc            = mlx5e_setup_tc,
-	.ndo_select_queue        = mlx5e_select_queue,
-	.ndo_get_stats64         = mlx5e_get_stats,
-	.ndo_set_rx_mode         = mlx5e_set_rx_mode,
-	.ndo_set_mac_address     = mlx5e_set_mac,
-	.ndo_vlan_rx_add_vid     = mlx5e_vlan_rx_add_vid,
-	.ndo_vlan_rx_kill_vid    = mlx5e_vlan_rx_kill_vid,
-	.ndo_set_features        = mlx5e_set_features,
-	.ndo_fix_features        = mlx5e_fix_features,
-	.ndo_change_mtu          = mlx5e_change_nic_mtu,
-	.ndo_do_ioctl            = mlx5e_ioctl,
-	.ndo_set_tx_maxrate      = mlx5e_set_tx_maxrate,
-	.ndo_udp_tunnel_add      = mlx5e_add_vxlan_port,
-	.ndo_udp_tunnel_del      = mlx5e_del_vxlan_port,
-	.ndo_features_check      = mlx5e_features_check,
-	.ndo_tx_timeout          = mlx5e_tx_timeout,
-	.ndo_bpf		 = mlx5e_xdp,
-	.ndo_xdp_xmit            = mlx5e_xdp_xmit,
-#ifdef CONFIG_MLX5_EN_ARFS
-	.ndo_rx_flow_steer	 = mlx5e_rx_flow_steer,
-#endif
-#ifdef CONFIG_MLX5_ESWITCH
-	/* SRIOV E-Switch NDOs */
-	.ndo_set_vf_mac          = mlx5e_set_vf_mac,
-	.ndo_set_vf_vlan         = mlx5e_set_vf_vlan,
-	.ndo_set_vf_spoofchk     = mlx5e_set_vf_spoofchk,
-	.ndo_set_vf_trust        = mlx5e_set_vf_trust,
-	.ndo_set_vf_rate         = mlx5e_set_vf_rate,
-	.ndo_get_vf_config       = mlx5e_get_vf_config,
-	.ndo_set_vf_link_state   = mlx5e_set_vf_link_state,
-	.ndo_get_vf_stats        = mlx5e_get_vf_stats,
-	.ndo_has_offload_stats	 = mlx5e_has_offload_stats,
-	.ndo_get_offload_stats	 = mlx5e_get_offload_stats,
-#endif
-};
-```
-
-### 5.4 ipv4_specific
+### 5.3 ipv4_specific
 
 ```C
 
