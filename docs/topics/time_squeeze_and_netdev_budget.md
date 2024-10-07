@@ -636,7 +636,8 @@ split again
  note right
   分配DMA内存，即ring buffer
  end note
- :dma_zalloc_coherent;
+ :dma_zalloc_coherent();
+ :dma_alloc_coherent();
 end split
 @enduml
 ```
