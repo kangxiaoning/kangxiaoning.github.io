@@ -648,6 +648,13 @@ end split
 1. 为每个完成队列分配一个CPU中断映射表
 2. 将中断向量添加到CPU中断映射中
 3. 使用snprintf生成完成队列的名称，并调用mlx5_create_map_eq函数创建完成队列
+
+```C
+enum {
+	MLX5_COMP_EQ_SIZE = 1024,
+};
+```
+
 ```C
 
 static int alloc_comp_eqs(struct mlx5_core_dev *dev)
@@ -702,6 +709,200 @@ clean:
 }
 ```
 {collapsible="true" collapsed-title="alloc_comp_eqs" default-state="collapsed"}
+
+在`alloc_comp_eqs()`中执行了如下代码分配内存，决定了后续函数分配内存的大小。
+```C
+	nent = MLX5_COMP_EQ_SIZE;
+	// 省略
+		err = mlx5_create_map_eq(dev, eq,
+					 i + MLX5_EQ_VEC_COMP_BASE, nent, 0,
+					 name, MLX5_EQ_TYPE_COMP);
+```
+
+```C
+enum {
+	MLX5_NUM_SPARE_EQE	= 0x80, // 十进制为128
+	MLX5_NUM_ASYNC_EQE	= 0x1000,
+	MLX5_NUM_CMD_EQE	= 32,
+	MLX5_NUM_PF_DRAIN	= 64,
+};
+```
+
+```C
+enum {
+	MLX5_EQE_SIZE		= sizeof(struct mlx5_eqe), // 64字节？
+	MLX5_EQE_OWNER_INIT_VAL	= 0x1,
+};
+```
+
+```C
+union ev_data {
+	__be32				raw[7];
+	struct mlx5_eqe_cmd		cmd;
+	struct mlx5_eqe_comp		comp;
+	struct mlx5_eqe_qp_srq		qp_srq;
+	struct mlx5_eqe_cq_err		cq_err;
+	struct mlx5_eqe_port_state	port;
+	struct mlx5_eqe_gpio		gpio;
+	struct mlx5_eqe_congestion	cong;
+	struct mlx5_eqe_stall_vl	stall_vl;
+	struct mlx5_eqe_page_req	req_pages;
+	struct mlx5_eqe_page_fault	page_fault;
+	struct mlx5_eqe_vport_change	vport_change;
+	struct mlx5_eqe_port_module	port_module;
+	struct mlx5_eqe_pps		pps;
+	struct mlx5_eqe_dct             dct;
+	struct mlx5_eqe_temp_warning	temp_warning;
+} __packed;
+```
+{collapsible="true" collapsed-title="ev_data" default-state="collapsed"}
+
+```C
+struct mlx5_eqe {
+	u8		rsvd0;
+	u8		type;
+	u8		rsvd1;
+	u8		sub_type;
+	__be32		rsvd2[7];
+	union ev_data	data;
+	__be16		rsvd3;
+	u8		signature;
+	u8		owner;
+} __packed;
+```
+{collapsible="true" collapsed-title="mlx5_eqe" default-state="collapsed"}
+
+```C
+
+int mlx5_create_map_eq(struct mlx5_core_dev *dev, struct mlx5_eq *eq, u8 vecidx,
+		       int nent, u64 mask, const char *name,
+		       enum mlx5_eq_type type)
+{
+	struct mlx5_cq_table *cq_table = &eq->cq_table;
+	u32 out[MLX5_ST_SZ_DW(create_eq_out)] = {0};
+	struct mlx5_priv *priv = &dev->priv;
+	irq_handler_t handler;
+	__be64 *pas;
+	void *eqc;
+	int inlen;
+	u32 *in;
+	int err;
+
+	/* Init CQ table */
+	memset(cq_table, 0, sizeof(*cq_table));
+	spin_lock_init(&cq_table->lock);
+	INIT_RADIX_TREE(&cq_table->tree, GFP_ATOMIC);
+
+	eq->type = type;
+	// 1024+128再roundup_pow_of_two后得到2048
+	eq->nent = roundup_pow_of_two(nent + MLX5_NUM_SPARE_EQE);
+	eq->cons_index = 0;
+	// 2048*64=131072字节
+	err = mlx5_buf_alloc(dev, eq->nent * MLX5_EQE_SIZE, &eq->buf);
+	if (err)
+		return err;
+
+#ifdef CONFIG_INFINIBAND_ON_DEMAND_PAGING
+	if (type == MLX5_EQ_TYPE_PF)
+		handler = mlx5_eq_pf_int;
+	else
+#endif
+		handler = mlx5_eq_int;
+
+	init_eq_buf(eq);
+
+	inlen = MLX5_ST_SZ_BYTES(create_eq_in) +
+		MLX5_FLD_SZ_BYTES(create_eq_in, pas[0]) * eq->buf.npages;
+
+	in = kvzalloc(inlen, GFP_KERNEL);
+	if (!in) {
+		err = -ENOMEM;
+		goto err_buf;
+	}
+
+	pas = (__be64 *)MLX5_ADDR_OF(create_eq_in, in, pas);
+	mlx5_fill_page_array(&eq->buf, pas);
+
+	MLX5_SET(create_eq_in, in, opcode, MLX5_CMD_OP_CREATE_EQ);
+	MLX5_SET64(create_eq_in, in, event_bitmask, mask);
+
+	eqc = MLX5_ADDR_OF(create_eq_in, in, eq_context_entry);
+	MLX5_SET(eqc, eqc, log_eq_size, ilog2(eq->nent));
+	MLX5_SET(eqc, eqc, uar_page, priv->uar->index);
+	MLX5_SET(eqc, eqc, intr, vecidx);
+	MLX5_SET(eqc, eqc, log_page_size,
+		 eq->buf.page_shift - MLX5_ADAPTER_PAGE_SHIFT);
+
+	err = mlx5_cmd_exec(dev, in, inlen, out, sizeof(out));
+	if (err)
+		goto err_in;
+
+	snprintf(priv->irq_info[vecidx].name, MLX5_MAX_IRQ_NAME, "%s@pci:%s",
+		 name, pci_name(dev->pdev));
+
+	eq->eqn = MLX5_GET(create_eq_out, out, eq_number);
+	eq->irqn = pci_irq_vector(dev->pdev, vecidx);
+	eq->dev = dev;
+	eq->doorbell = priv->uar->map + MLX5_EQ_DOORBEL_OFFSET;
+	err = request_irq(eq->irqn, handler, 0,
+			  priv->irq_info[vecidx].name, eq);
+	if (err)
+		goto err_eq;
+
+	err = mlx5_debug_eq_add(dev, eq);
+	if (err)
+		goto err_irq;
+
+#ifdef CONFIG_INFINIBAND_ON_DEMAND_PAGING
+	if (type == MLX5_EQ_TYPE_PF) {
+		err = init_pf_ctx(&eq->pf_ctx, name);
+		if (err)
+			goto err_irq;
+	} else
+#endif
+	{
+		INIT_LIST_HEAD(&eq->tasklet_ctx.list);
+		INIT_LIST_HEAD(&eq->tasklet_ctx.process_list);
+		spin_lock_init(&eq->tasklet_ctx.lock);
+		tasklet_init(&eq->tasklet_ctx.task, mlx5_cq_tasklet_cb,
+			     (unsigned long)&eq->tasklet_ctx);
+	}
+
+	/* EQs are created in ARMED state
+	 */
+	eq_update_ci(eq, 1);
+
+	kvfree(in);
+	return 0;
+
+err_irq:
+	free_irq(eq->irqn, eq);
+
+err_eq:
+	mlx5_cmd_destroy_eq(dev, eq->eqn);
+
+err_in:
+	kvfree(in);
+
+err_buf:
+	mlx5_buf_free(dev, &eq->buf);
+	return err;
+}
+```
+{collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
+
+分配内存主要是给一些元数据使用，大小大概如下，最后会根据page来计算分配多少个page，因此不会非常占内存。
+
+```C
+	eq->type = type;
+	// 1024+128再roundup_pow_of_two后得到2048
+	eq->nent = roundup_pow_of_two(nent + MLX5_NUM_SPARE_EQE);
+	eq->cons_index = 0;
+	// 2048*64=131072字节
+	err = mlx5_buf_alloc(dev, eq->nent * MLX5_EQE_SIZE, &eq->buf);
+	if (err)
+		return err;
+```
 
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/alloc.c
