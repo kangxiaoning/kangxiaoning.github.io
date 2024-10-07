@@ -532,9 +532,9 @@ net.core.netdev_budget = 300
 net.core.netdev_budget_usecs = 8000
 ```
 
-## 5. 网络相关代码
+## 5. 深入内核网络
 
-Mellanox网络PCI驱动相关的回调函数，当系统检测到一个匹配该驱动程序的PCI设备时，会调用`probe`函数来进行设备的初始化，可以从这里入手分析网卡初始化过程，**ring buffer**就是在这个过程中初始化的。
+`pci_driver`定义了PCI设备驱动程序所需的所有关键组件和回调函数，以便内核通过驱动程序与硬件设备交互。当内核检测到网卡设备时，会调用`probe`函数进行设备的初始化，在Mellanox驱动中即`init_noe`函数，从这个函数入手可以了解网卡初始化过程，**ring buffer**就是在这个过程中创建的。
 
 ```C
 static struct pci_driver mlx5_core_driver = {
