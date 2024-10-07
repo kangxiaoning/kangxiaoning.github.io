@@ -566,8 +566,7 @@ split
 split again
  :mlx5_dma_zalloc_coherent_node();
  note right
-  分配DMA内存
-  即ring buffer
+  分配DMA内存，即ring buffer
  end note
  :dma_zalloc_coherent;
 end split
