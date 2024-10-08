@@ -891,7 +891,11 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-分配内存主要是给一些元数据使用，大小大概如下，最后会根据page来计算分配多少个page，因此不会非常占内存。
+**注意**：经过实际测试，发现调整ring buffer会增加内存开销，具体取决于每个驱动的实现。
+
+场景：128核CPU，512G内存，mlx5_core 5.8-3.0.7驱动。
+
+结论：将一个网卡的ring buffer从1024调整到8192大约增加6G内存，2个网卡增加12G内存。
 
 ```C
 	eq->type = type;
