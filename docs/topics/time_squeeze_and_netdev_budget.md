@@ -730,7 +730,7 @@ enum {
 
 ```C
 enum {
-	MLX5_EQE_SIZE		= sizeof(struct mlx5_eqe), // 64字节？
+	MLX5_EQE_SIZE		= sizeof(struct mlx5_eqe),
 	MLX5_EQE_OWNER_INIT_VAL	= 0x1,
 };
 ```
