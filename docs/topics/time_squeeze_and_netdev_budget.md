@@ -642,6 +642,18 @@ end split
 @enduml
 ```
 
+**注意**：经过实际测试，发现调整ring buffer会增加内存开销，具体取决于每个驱动的实现、PAGESIZE、MTU。
+
+**场景**：128核CPU，512G内存，mlx5_core 5.8-3.0.7驱动，MTU 9000，PAGESIZE 4096，queue数量63。
+
+**结论**：将一个网卡的ring buffer从1024调整到8192大约增加6G内存，2个网卡增加12G内存。
+
+**评估公式**：`PAGESIZE*page_count*buffer_count*queue_count`。PAGESIZE影响最小分配内存，MTU影响page个数。
+
+如下以4k的PAGESIZE和9000MTU为例，ring buffer从1024调整到8192进行计算。
+- 4*3*(8192-1024)*63/1024.0=5292M
+- 4*4*(8192-1024)*63/1024.0=7056M
+
 
 分配**ring buffer**的核心逻辑主要在`alloc_comp_eqs()`中。
 
@@ -891,11 +903,6 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-**注意**：经过实际测试，发现调整ring buffer会增加内存开销，具体取决于每个驱动的实现。
-
-场景：128核CPU，512G内存，mlx5_core 5.8-3.0.7驱动。
-
-结论：将一个网卡的ring buffer从1024调整到8192大约增加6G内存，2个网卡增加12G内存。
 
 ```C
 	eq->type = type;
@@ -943,6 +950,44 @@ err_out:
 }
 ```
 {collapsible="true" collapsed-title="mlx5_buf_alloc_node" default-state="collapsed"}
+
+从下面的收包逻辑可以判断，分配ring buffer过程中把RX的skb空间也分配了，收到包以后就从队列中取一个skb进行处理。
+
+```C
+void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+{
+	struct mlx5_wq_cyc *wq = &rq->wqe.wq;
+	struct mlx5e_wqe_frag_info *wi;
+	struct sk_buff *skb;
+	u32 cqe_bcnt;
+	u16 ci;
+
+	ci       = mlx5_wq_cyc_ctr2ix(wq, be16_to_cpu(cqe->wqe_counter));
+	wi       = get_frag(rq, ci);
+	cqe_bcnt = be32_to_cpu(cqe->byte_cnt);
+
+	skb = rq->wqe.skb_from_cqe(rq, cqe, wi, cqe_bcnt);
+	if (!skb) {
+		/* probably for XDP */
+		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+			/* do not return page to cache,
+			 * it will be returned on XDP_TX completion.
+			 */
+			goto wq_cyc_pop;
+		}
+		goto free_wqe;
+	}
+
+	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
+	napi_gro_receive(rq->cq.napi, skb);
+
+free_wqe:
+	mlx5e_free_rx_wqe(rq, wi, true);
+wq_cyc_pop:
+	mlx5_wq_cyc_pop(wq);
+}
+```
+{collapsible="true" collapsed-title="mlx5e_handle_rx_cqe" default-state="collapsed"}
 
 ### 5.2 mlx5初始化tasklet
 
