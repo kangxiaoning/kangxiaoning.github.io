@@ -651,8 +651,8 @@ end split
 **评估公式**：`PAGESIZE*page_count*buffer_count*queue_count`。PAGESIZE影响最小分配内存，MTU影响page个数。
 
 如下以4k的PAGESIZE和9000MTU为例，ring buffer从1024调整到8192进行计算。
-- 4*3*(8192-1024)*63/1024.0=5292M
-- 4*4*(8192-1024)*63/1024.0=7056M
+- `4*3*(8192-1024)*63/1024.0=5292M`
+- `4*4*(8192-1024)*63/1024.0=7056M`
 
 
 分配**ring buffer**的核心逻辑主要在`alloc_comp_eqs()`中。
