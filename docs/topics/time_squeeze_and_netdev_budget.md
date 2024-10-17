@@ -1107,7 +1107,223 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-### 5.3 ipv4_specific
+### 5.3 socket相关回调
+
+```C
+static struct inet_protosw inetsw_array[] =
+{
+	{
+		.type =       SOCK_STREAM,
+		.protocol =   IPPROTO_TCP,
+		.prot =       &tcp_prot,
+		.ops =        &inet_stream_ops,
+		.flags =      INET_PROTOSW_PERMANENT |
+			      INET_PROTOSW_ICSK,
+	},
+
+	{
+		.type =       SOCK_DGRAM,
+		.protocol =   IPPROTO_UDP,
+		.prot =       &udp_prot,
+		.ops =        &inet_dgram_ops,
+		.flags =      INET_PROTOSW_PERMANENT,
+       },
+
+       {
+		.type =       SOCK_DGRAM,
+		.protocol =   IPPROTO_ICMP,
+		.prot =       &ping_prot,
+		.ops =        &inet_sockraw_ops,
+		.flags =      INET_PROTOSW_REUSE,
+       },
+
+       {
+	       .type =       SOCK_RAW,
+	       .protocol =   IPPROTO_IP,	/* wild card */
+	       .prot =       &raw_prot,
+	       .ops =        &inet_sockraw_ops,
+	       .flags =      INET_PROTOSW_REUSE,
+       }
+};
+```
+{collapsible="true" collapsed-title="inetsw_array[]" default-state="collapsed"}
+
+```C
+struct proto {
+	void			(*close)(struct sock *sk,
+					long timeout);
+	int			(*pre_connect)(struct sock *sk,
+					struct sockaddr *uaddr,
+					int addr_len);
+	int			(*connect)(struct sock *sk,
+					struct sockaddr *uaddr,
+					int addr_len);
+	int			(*disconnect)(struct sock *sk, int flags);
+
+	struct sock *		(*accept)(struct sock *sk, int flags, int *err,
+					  bool kern);
+
+	int			(*ioctl)(struct sock *sk, int cmd,
+					 unsigned long arg);
+	int			(*init)(struct sock *sk);
+	void			(*destroy)(struct sock *sk);
+	void			(*shutdown)(struct sock *sk, int how);
+	int			(*setsockopt)(struct sock *sk, int level,
+					int optname, char __user *optval,
+					unsigned int optlen);
+	int			(*getsockopt)(struct sock *sk, int level,
+					int optname, char __user *optval,
+					int __user *option);
+	void			(*keepalive)(struct sock *sk, int valbool);
+#ifdef CONFIG_COMPAT
+	int			(*compat_setsockopt)(struct sock *sk,
+					int level,
+					int optname, char __user *optval,
+					unsigned int optlen);
+	int			(*compat_getsockopt)(struct sock *sk,
+					int level,
+					int optname, char __user *optval,
+					int __user *option);
+	int			(*compat_ioctl)(struct sock *sk,
+					unsigned int cmd, unsigned long arg);
+#endif
+	int			(*sendmsg)(struct sock *sk, struct msghdr *msg,
+					   size_t len);
+	int			(*recvmsg)(struct sock *sk, struct msghdr *msg,
+					   size_t len, int noblock, int flags,
+					   int *addr_len);
+	int			(*sendpage)(struct sock *sk, struct page *page,
+					int offset, size_t size, int flags);
+	int			(*bind)(struct sock *sk,
+					struct sockaddr *uaddr, int addr_len);
+
+	int			(*backlog_rcv) (struct sock *sk,
+						struct sk_buff *skb);
+
+	void		(*release_cb)(struct sock *sk);
+
+	/* Keeping track of sk's, looking them up, and port selection methods. */
+	int			(*hash)(struct sock *sk);
+	void			(*unhash)(struct sock *sk);
+	void			(*rehash)(struct sock *sk);
+	int			(*get_port)(struct sock *sk, unsigned short snum);
+
+	/* Keeping track of sockets in use */
+#ifdef CONFIG_PROC_FS
+	unsigned int		inuse_idx;
+#endif
+
+	bool			(*stream_memory_free)(const struct sock *sk);
+	bool			(*stream_memory_read)(const struct sock *sk);
+	/* Memory pressure */
+	void			(*enter_memory_pressure)(struct sock *sk);
+	void			(*leave_memory_pressure)(struct sock *sk);
+	atomic_long_t		*memory_allocated;	/* Current allocated memory. */
+	struct percpu_counter	*sockets_allocated;	/* Current number of sockets. */
+	/*
+	 * Pressure flag: try to collapse.
+	 * Technical note: it is used by multiple contexts non atomically.
+	 * Make sure to use READ_ONCE()/WRITE_ONCE() for all reads/writes.
+	 * All the __sk_mem_schedule() is of this nature: accounting
+	 * is strict, actions are advisory and have some latency.
+	 */
+	unsigned long		*memory_pressure;
+	long			*sysctl_mem;
+
+	int			*sysctl_wmem;
+	int			*sysctl_rmem;
+	u32			sysctl_wmem_offset;
+	u32			sysctl_rmem_offset;
+
+	int			max_header;
+	bool			no_autobind;
+
+	struct kmem_cache	*slab;
+	unsigned int		obj_size;
+	slab_flags_t		slab_flags;
+	unsigned int		useroffset;	/* Usercopy region offset */
+	unsigned int		usersize;	/* Usercopy region size */
+
+	struct percpu_counter	*orphan_count;
+
+	struct request_sock_ops	*rsk_prot;
+	struct timewait_sock_ops *twsk_prot;
+
+	union {
+		struct inet_hashinfo	*hashinfo;
+		struct udp_table	*udp_table;
+		struct raw_hashinfo	*raw_hash;
+		struct smc_hashinfo	*smc_hash;
+	} h;
+
+	struct module		*owner;
+
+	char			name[32];
+
+	struct list_head	node;
+#ifdef SOCK_REFCNT_DEBUG
+	atomic_t		socks;
+#endif
+	int			(*diag_destroy)(struct sock *sk, int err);
+
+	KABI_RESERVE(1)
+	KABI_RESERVE(2)
+	KABI_RESERVE(3)
+	KABI_RESERVE(4)
+	KABI_RESERVE(5)
+	KABI_RESERVE(6)
+	KABI_RESERVE(7)
+	KABI_RESERVE(8)
+	KABI_RESERVE(9)
+	KABI_RESERVE(10)
+	KABI_RESERVE(11)
+	KABI_RESERVE(12)
+	KABI_RESERVE(13)
+	KABI_RESERVE(14)
+	KABI_RESERVE(15)
+	KABI_RESERVE(16)
+} __randomize_layout;
+```
+{collapsible="true" collapsed-title="tcp_prot" default-state="collapsed"}
+
+```C
+const struct proto_ops inet_stream_ops = {
+	.family		   = PF_INET,
+	.owner		   = THIS_MODULE,
+	.release	   = inet_release,
+	.bind		   = inet_bind,
+	.connect	   = inet_stream_connect,
+	.socketpair	   = sock_no_socketpair,
+	.accept		   = inet_accept,
+	.getname	   = inet_getname,
+	.poll		   = tcp_poll,
+	.ioctl		   = inet_ioctl,
+	.listen		   = inet_listen,
+	.shutdown	   = inet_shutdown,
+	.setsockopt	   = sock_common_setsockopt,
+	.getsockopt	   = sock_common_getsockopt,
+	.sendmsg	   = inet_sendmsg,
+	.recvmsg	   = inet_recvmsg,
+#ifdef CONFIG_MMU
+	.mmap		   = tcp_mmap,
+#endif
+	.sendpage	   = inet_sendpage,
+	.splice_read	   = tcp_splice_read,
+	.read_sock	   = tcp_read_sock,
+	.sendmsg_locked    = tcp_sendmsg_locked,
+	.sendpage_locked   = tcp_sendpage_locked,
+	.peek_len	   = tcp_peek_len,
+#ifdef CONFIG_COMPAT
+	.compat_setsockopt = compat_sock_common_setsockopt,
+	.compat_getsockopt = compat_sock_common_getsockopt,
+	.compat_ioctl	   = inet_compat_ioctl,
+#endif
+	.set_rcvlowat	   = tcp_set_rcvlowat,
+};
+```
+{collapsible="true" collapsed-title="inet_stream_ops" default-state="collapsed"}
+
+### 5.4 ipv4_specific
 
 ```C
 
