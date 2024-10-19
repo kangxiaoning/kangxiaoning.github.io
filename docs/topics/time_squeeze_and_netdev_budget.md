@@ -598,9 +598,9 @@ net.core.netdev_budget_usecs = 8000
 
 我通过调大上述参数，解决了一个生产环境丢包问题。当然完整的丢包分析，需要覆盖驱动层到协议层的整个链路，找到丢包点再进行优化。
 
-## 5. 内核网络学习
+**注：如下是Linux内核网络学习记录，后续根据脉络再进行整理。**
 
-暂时用于记录内核网络其它内容，后续根据脉络再进行整理。
+## 5. Mellanox驱动
 
 `pci_driver`定义了PCI设备驱动程序所需的所有关键组件和回调函数，以便内核通过驱动程序与硬件设备交互。当内核检测到网卡设备时，会调用`probe`函数进行设备的初始化，在Mellanox驱动中即`init_noe`函数，从这个函数入手可以了解网卡初始化过程，**ring buffer**就是在这个过程中创建的。
 
@@ -1107,7 +1107,9 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
-### 5.3 socket相关回调
+## 6. Linux kernel
+
+### 6.1 socket相关回调
 
 ```C
 static struct inet_protosw inetsw_array[] =
@@ -1149,140 +1151,52 @@ static struct inet_protosw inetsw_array[] =
 {collapsible="true" collapsed-title="inetsw_array[]" default-state="collapsed"}
 
 ```C
-struct proto {
-	void			(*close)(struct sock *sk,
-					long timeout);
-	int			(*pre_connect)(struct sock *sk,
-					struct sockaddr *uaddr,
-					int addr_len);
-	int			(*connect)(struct sock *sk,
-					struct sockaddr *uaddr,
-					int addr_len);
-	int			(*disconnect)(struct sock *sk, int flags);
-
-	struct sock *		(*accept)(struct sock *sk, int flags, int *err,
-					  bool kern);
-
-	int			(*ioctl)(struct sock *sk, int cmd,
-					 unsigned long arg);
-	int			(*init)(struct sock *sk);
-	void			(*destroy)(struct sock *sk);
-	void			(*shutdown)(struct sock *sk, int how);
-	int			(*setsockopt)(struct sock *sk, int level,
-					int optname, char __user *optval,
-					unsigned int optlen);
-	int			(*getsockopt)(struct sock *sk, int level,
-					int optname, char __user *optval,
-					int __user *option);
-	void			(*keepalive)(struct sock *sk, int valbool);
+struct proto tcp_prot = {
+	.name			= "TCP",
+	.owner			= THIS_MODULE,
+	.close			= tcp_close,
+	.pre_connect		= tcp_v4_pre_connect,
+	.connect		= tcp_v4_connect,
+	.disconnect		= tcp_disconnect,
+	.accept			= inet_csk_accept,
+	.ioctl			= tcp_ioctl,
+	.init			= tcp_v4_init_sock,
+	.destroy		= tcp_v4_destroy_sock,
+	.shutdown		= tcp_shutdown,
+	.setsockopt		= tcp_setsockopt,
+	.getsockopt		= tcp_getsockopt,
+	.keepalive		= tcp_set_keepalive,
+	.recvmsg		= tcp_recvmsg,
+	.sendmsg		= tcp_sendmsg,
+	.sendpage		= tcp_sendpage,
+	.backlog_rcv		= tcp_v4_do_rcv,
+	.release_cb		= tcp_release_cb,
+	.hash			= inet_hash,
+	.unhash			= inet_unhash,
+	.get_port		= inet_csk_get_port,
+	.enter_memory_pressure	= tcp_enter_memory_pressure,
+	.leave_memory_pressure	= tcp_leave_memory_pressure,
+	.stream_memory_free	= tcp_stream_memory_free,
+	.sockets_allocated	= &tcp_sockets_allocated,
+	.orphan_count		= &tcp_orphan_count,
+	.memory_allocated	= &tcp_memory_allocated,
+	.memory_pressure	= &tcp_memory_pressure,
+	.sysctl_mem		= sysctl_tcp_mem,
+	.sysctl_wmem_offset	= offsetof(struct net, ipv4.sysctl_tcp_wmem),
+	.sysctl_rmem_offset	= offsetof(struct net, ipv4.sysctl_tcp_rmem),
+	.max_header		= MAX_TCP_HEADER,
+	.obj_size		= sizeof(struct tcp_sock),
+	.slab_flags		= SLAB_TYPESAFE_BY_RCU,
+	.twsk_prot		= &tcp_timewait_sock_ops,
+	.rsk_prot		= &tcp_request_sock_ops,
+	.h.hashinfo		= &tcp_hashinfo,
+	.no_autobind		= true,
 #ifdef CONFIG_COMPAT
-	int			(*compat_setsockopt)(struct sock *sk,
-					int level,
-					int optname, char __user *optval,
-					unsigned int optlen);
-	int			(*compat_getsockopt)(struct sock *sk,
-					int level,
-					int optname, char __user *optval,
-					int __user *option);
-	int			(*compat_ioctl)(struct sock *sk,
-					unsigned int cmd, unsigned long arg);
+	.compat_setsockopt	= compat_tcp_setsockopt,
+	.compat_getsockopt	= compat_tcp_getsockopt,
 #endif
-	int			(*sendmsg)(struct sock *sk, struct msghdr *msg,
-					   size_t len);
-	int			(*recvmsg)(struct sock *sk, struct msghdr *msg,
-					   size_t len, int noblock, int flags,
-					   int *addr_len);
-	int			(*sendpage)(struct sock *sk, struct page *page,
-					int offset, size_t size, int flags);
-	int			(*bind)(struct sock *sk,
-					struct sockaddr *uaddr, int addr_len);
-
-	int			(*backlog_rcv) (struct sock *sk,
-						struct sk_buff *skb);
-
-	void		(*release_cb)(struct sock *sk);
-
-	/* Keeping track of sk's, looking them up, and port selection methods. */
-	int			(*hash)(struct sock *sk);
-	void			(*unhash)(struct sock *sk);
-	void			(*rehash)(struct sock *sk);
-	int			(*get_port)(struct sock *sk, unsigned short snum);
-
-	/* Keeping track of sockets in use */
-#ifdef CONFIG_PROC_FS
-	unsigned int		inuse_idx;
-#endif
-
-	bool			(*stream_memory_free)(const struct sock *sk);
-	bool			(*stream_memory_read)(const struct sock *sk);
-	/* Memory pressure */
-	void			(*enter_memory_pressure)(struct sock *sk);
-	void			(*leave_memory_pressure)(struct sock *sk);
-	atomic_long_t		*memory_allocated;	/* Current allocated memory. */
-	struct percpu_counter	*sockets_allocated;	/* Current number of sockets. */
-	/*
-	 * Pressure flag: try to collapse.
-	 * Technical note: it is used by multiple contexts non atomically.
-	 * Make sure to use READ_ONCE()/WRITE_ONCE() for all reads/writes.
-	 * All the __sk_mem_schedule() is of this nature: accounting
-	 * is strict, actions are advisory and have some latency.
-	 */
-	unsigned long		*memory_pressure;
-	long			*sysctl_mem;
-
-	int			*sysctl_wmem;
-	int			*sysctl_rmem;
-	u32			sysctl_wmem_offset;
-	u32			sysctl_rmem_offset;
-
-	int			max_header;
-	bool			no_autobind;
-
-	struct kmem_cache	*slab;
-	unsigned int		obj_size;
-	slab_flags_t		slab_flags;
-	unsigned int		useroffset;	/* Usercopy region offset */
-	unsigned int		usersize;	/* Usercopy region size */
-
-	struct percpu_counter	*orphan_count;
-
-	struct request_sock_ops	*rsk_prot;
-	struct timewait_sock_ops *twsk_prot;
-
-	union {
-		struct inet_hashinfo	*hashinfo;
-		struct udp_table	*udp_table;
-		struct raw_hashinfo	*raw_hash;
-		struct smc_hashinfo	*smc_hash;
-	} h;
-
-	struct module		*owner;
-
-	char			name[32];
-
-	struct list_head	node;
-#ifdef SOCK_REFCNT_DEBUG
-	atomic_t		socks;
-#endif
-	int			(*diag_destroy)(struct sock *sk, int err);
-
-	KABI_RESERVE(1)
-	KABI_RESERVE(2)
-	KABI_RESERVE(3)
-	KABI_RESERVE(4)
-	KABI_RESERVE(5)
-	KABI_RESERVE(6)
-	KABI_RESERVE(7)
-	KABI_RESERVE(8)
-	KABI_RESERVE(9)
-	KABI_RESERVE(10)
-	KABI_RESERVE(11)
-	KABI_RESERVE(12)
-	KABI_RESERVE(13)
-	KABI_RESERVE(14)
-	KABI_RESERVE(15)
-	KABI_RESERVE(16)
-} __randomize_layout;
+	.diag_destroy		= tcp_abort,
+};
 ```
 {collapsible="true" collapsed-title="tcp_prot" default-state="collapsed"}
 
@@ -1323,7 +1237,7 @@ const struct proto_ops inet_stream_ops = {
 ```
 {collapsible="true" collapsed-title="inet_stream_ops" default-state="collapsed"}
 
-### 5.4 ipv4_specific
+### 6.2 ipv4_specific
 
 ```C
 
