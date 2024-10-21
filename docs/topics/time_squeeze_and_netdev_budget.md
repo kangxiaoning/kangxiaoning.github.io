@@ -2,6 +2,10 @@
 
 <show-structure depth="3"/>
 
+> 本文参考代码版本为：[openeuler 4.19.90-2404.2.0](https://gitee.com/openeuler/kernel/tree/4.19.90-2404.2.0/)，不同kernel版本可能会有差异。
+> 
+{style="note"}
+
 time_squeeze持续增长，说明`softirq`的收包预算用完时`TX/RX queue`中仍然有包等待处理。
 
 只要**TX/RX queue**在下次`softirq`处理之前没有**overflow**，那就不会因为`time_squeeze`增加而导致丢包，但如果`time_squeeze`持续增加，就有`TX/RX queue`溢出导致丢包的可能，需要结合**packet_drop**指标来看。
@@ -1109,7 +1113,7 @@ err_buf:
 
 ## 6. Linux kernel
 
-### 6.1 socket相关回调
+### 6.1 Socket相关回调
 
 ```C
 static struct inet_protosw inetsw_array[] =
@@ -1237,10 +1241,82 @@ const struct proto_ops inet_stream_ops = {
 ```
 {collapsible="true" collapsed-title="inet_stream_ops" default-state="collapsed"}
 
-### 6.2 ipv4_specific
+```C
+static const struct file_operations socket_file_ops = {
+	.owner =	THIS_MODULE,
+	.llseek =	no_llseek,
+	.read_iter =	sock_read_iter,
+	.write_iter =	sock_write_iter,
+	.poll =		sock_poll,
+	.unlocked_ioctl = sock_ioctl,
+#ifdef CONFIG_COMPAT
+	.compat_ioctl = compat_sock_ioctl,
+#endif
+	.mmap =		sock_mmap,
+	.release =	sock_close,
+	.fasync =	sock_fasync,
+	.sendpage =	sock_sendpage,
+	.splice_write = generic_splice_sendpage,
+	.splice_read =	sock_splice_read,
+};
+```
+{collapsible="true" collapsed-title="socket_file_ops" default-state="collapsed"}
+
+### 6.2 TCP相关回调
 
 ```C
+struct request_sock_ops tcp_request_sock_ops __read_mostly = {
+	.family		=	PF_INET,
+	.obj_size	=	sizeof(struct tcp_request_sock),
+	.rtx_syn_ack	=	tcp_rtx_synack,
+	.send_ack	=	tcp_v4_reqsk_send_ack,
+	.destructor	=	tcp_v4_reqsk_destructor,
+	.send_reset	=	tcp_v4_send_reset,
+	.syn_ack_timeout =	tcp_syn_ack_timeout,
+};
+```
+{collapsible="true" collapsed-title="tcp_request_sock_ops" default-state="collapsed"}
 
+```C
+const struct tcp_request_sock_ops tcp_request_sock_ipv4_ops = {
+	.mss_clamp	=	TCP_MSS_DEFAULT,
+#ifdef CONFIG_TCP_MD5SIG
+	.req_md5_lookup	=	tcp_v4_md5_lookup,
+	.calc_md5_hash	=	tcp_v4_md5_hash_skb,
+#endif
+	.init_req	=	tcp_v4_init_req,
+#ifdef CONFIG_SYN_COOKIES
+	.cookie_init_seq =	cookie_v4_init_sequence,
+#endif
+	.route_req	=	tcp_v4_route_req,
+	.init_seq	=	tcp_v4_init_seq,
+	.init_ts_off	=	tcp_v4_init_ts_off,
+	.send_synack	=	tcp_v4_send_synack,
+};
+```
+{collapsible="true" collapsed-title="tcp_request_sock_ipv4_ops" default-state="collapsed"}
+
+### 6.3 IP相关回调
+
+```C
+static int tcp_v4_init_sock(struct sock *sk)
+{
+	struct inet_connection_sock *icsk = inet_csk(sk);
+
+	tcp_init_sock(sk);
+
+	icsk->icsk_af_ops = &ipv4_specific;
+
+#ifdef CONFIG_TCP_MD5SIG
+	tcp_sk(sk)->af_specific = &tcp_sock_ipv4_specific;
+#endif
+
+	return 0;
+}
+```
+{collapsible="true" collapsed-title="tcp_v4_init_sock" default-state="collapsed"}
+
+```C
 const struct inet_connection_sock_af_ops ipv4_specific = {
 	.queue_xmit	   = ip_queue_xmit,
 	.send_check	   = tcp_v4_send_check,
@@ -1260,3 +1336,5 @@ const struct inet_connection_sock_af_ops ipv4_specific = {
 	.mtu_reduced	   = tcp_v4_mtu_reduced,
 };
 ```
+{collapsible="true" collapsed-title="ipv4_specific" default-state="collapsed"}
+

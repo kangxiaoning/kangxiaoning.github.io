@@ -328,3 +328,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
 3. 解决
 
 将gc相关的3个参数调整为原来的2倍，持续观察未出现异常，问题解决。
+
+```Shell
+# 上限
+cat /proc/sys/net/ipv4/neigh/default/gc_thresh3
+
+# 当前数量
+cat /proc/net/stat/arp_cache | head -2 | tail -1 | awk '{print "0x " $1}' | xargs printf "%d\n"
+```
