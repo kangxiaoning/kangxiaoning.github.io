@@ -1338,3 +1338,65 @@ const struct inet_connection_sock_af_ops ipv4_specific = {
 ```
 {collapsible="true" collapsed-title="ipv4_specific" default-state="collapsed"}
 
+### 6.4 Neighbour相关回调
+
+```C
+static const struct neigh_ops arp_generic_ops = {
+	.family =		AF_INET,
+	.solicit =		arp_solicit,
+	.error_report =		arp_error_report,
+	.output =		neigh_resolve_output,
+	.connected_output =	neigh_connected_output,
+};
+
+static const struct neigh_ops arp_hh_ops = {
+	.family =		AF_INET,
+	.solicit =		arp_solicit,
+	.error_report =		arp_error_report,
+	.output =		neigh_resolve_output,
+	.connected_output =	neigh_resolve_output,
+};
+
+static const struct neigh_ops arp_direct_ops = {
+	.family =		AF_INET,
+	.output =		neigh_direct_output,
+	.connected_output =	neigh_direct_output,
+};
+```
+
+
+```C
+struct neigh_table arp_tbl = {
+	.family		= AF_INET,
+	.key_len	= 4,
+	.protocol	= cpu_to_be16(ETH_P_IP),
+	.hash		= arp_hash,
+	.key_eq		= arp_key_eq,
+	.constructor	= arp_constructor,
+	.proxy_redo	= parp_redo,
+	.id		= "arp_cache",
+	.parms		= {
+		.tbl			= &arp_tbl,
+		.reachable_time		= 30 * HZ,
+		.data	= {
+			[NEIGH_VAR_MCAST_PROBES] = 3,
+			[NEIGH_VAR_UCAST_PROBES] = 3,
+			[NEIGH_VAR_RETRANS_TIME] = 1 * HZ,
+			[NEIGH_VAR_BASE_REACHABLE_TIME] = 30 * HZ,
+			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
+			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
+			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_MAX,
+			[NEIGH_VAR_PROXY_QLEN] = 64,
+			[NEIGH_VAR_ANYCAST_DELAY] = 1 * HZ,
+			[NEIGH_VAR_PROXY_DELAY]	= (8 * HZ) / 10,
+			[NEIGH_VAR_LOCKTIME] = 1 * HZ,
+		},
+	},
+	.gc_interval	= 30 * HZ,
+	.gc_thresh1	= 128,
+	.gc_thresh2	= 512,
+	.gc_thresh3	= 1024,
+};
+EXPORT_SYMBOL(arp_tbl);
+```
+{collapsible="true" collapsed-title="arp_tbl" default-state="collapsed"}
