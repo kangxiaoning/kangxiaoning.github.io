@@ -483,3 +483,26 @@ root@localhost:~# exit
 logout
 kangxiaoning@localhost:~$
 ```
+
+## 6. Ubuntu debugging相关
+
+### 6.1 获取Ubuntu源码
+
+```bash
+apt source linux-image-unsigned-$(uname -r)
+```
+
+### 6.2 Debug symbol packages
+
+```bash
+sudo apt install ubuntu-dbgsym-keyring
+
+echo "deb http://ddebs.ubuntu.com $(lsb_release -cs) main restricted universe multiverse
+deb http://ddebs.ubuntu.com $(lsb_release -cs)-updates main restricted universe multiverse
+deb http://ddebs.ubuntu.com $(lsb_release -cs)-proposed main restricted universe multiverse" | \
+sudo tee -a /etc/apt/sources.list.d/ddebs.list
+
+sudo apt-get update
+
+sudo apt -y install linux-image-$(uname -r)-dbgsym --allow-unauthenticated
+```
