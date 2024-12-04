@@ -11,10 +11,10 @@
 insmod spfs.ko
 
 # 获取地址
-sudo grep -e spfs /proc/modules
+cd /sys/module/spfs/sections && sudo cat .text .rodata .data .bss
 
 # 添加symbol
-add-symbol-file /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/spfs.ko 0xffff80007c093000
+add-symbol-file /lib/modules/6.8.0-49-generic/updates/spfs.ko 0xffff80007c093000 -s .rodata 0xffff80007c09b028 -s .data 0xffff80007c097180 -s .bss 0xffff80007c098240
 ```
 
 ## 2. 同名symbol处理
