@@ -17,6 +17,103 @@ cd /sys/module/spfs/sections && sudo cat .text .rodata .data .bss
 add-symbol-file /lib/modules/6.8.0-49-generic/updates/spfs.ko 0xffff80007c093000 -s .rodata 0xffff80007c09b028 -s .data 0xffff80007c097180 -s .bss 0xffff80007c098240
 ```
 
+```Bash
+(gdb) info b
+No breakpoints, watchpoints, tracepoints, or catchpoints.
+(gdb) br spfs_mount
+Breakpoint 1 at 0xffff80007c094d58: file /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c, line 424.
+(gdb) br spfs_fill_super
+Breakpoint 2 at 0xffff80007c095550: file /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c, line 332.
+(gdb) info b
+Num     Type           Disp Enb Address            What
+1       breakpoint     keep y   0xffff80007c094d58 in spfs_mount at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+2       breakpoint     keep y   0xffff80007c095550 in spfs_fill_super at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:332
+(gdb) c
+Continuing.
+
+Breakpoint 1, spfs_mount (fs_type=0xffff80007c0979e0 <spfs_fs_type>, flags=0, dev_name=0xffff00008aa47320 "/dev/loop0", data=0x0 <exit_spfs_fs>)
+    at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+424	{
+(gdb) bt
+#0  spfs_mount (fs_type=0xffff80007c0979e0 <spfs_fs_type>, flags=0, dev_name=0xffff00008aa47320 "/dev/loop0", data=0x0 <exit_spfs_fs>) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+#1  0xffff80008057ea3c in legacy_get_tree (fc=0xffff00008a2943c0) at /build/linux-goHVUM/linux-6.8.0/fs/fs_context.c:662
+#2  0x48c480008051e344 in ?? ()
+#3  0x00000000ffffffff in ?? ()
+Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+(gdb) delete 1
+(gdb) c
+Continuing.
+
+Breakpoint 2, spfs_fill_super (sb=0xffff00008a3a5000, data=0x0 <exit_spfs_fs>, silent=0) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:332
+332	{
+(gdb) bt
+#0  spfs_fill_super (sb=0xffff00008a3a5000, data=0x0 <exit_spfs_fs>, silent=0) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:332
+#1  0xffff80008052166c in mount_bdev (fs_type=<optimized out>, flags=268435456, dev_name=<optimized out>, data=0x0 <exit_spfs_fs>, fill_super=0xffff80007c095550 <spfs_fill_super>)
+    at /build/linux-goHVUM/linux-6.8.0/fs/super.c:1667
+#2  0x24a780007c094db0 in ?? ()
+#3  0xffff00008a2943c0 in ?? ()
+Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+(gdb) p super_blocks
+$4 = {
+  next = 0xffff000080277800,
+  prev = 0xffff00008a3a5000
+}
+(gdb) delete 2
+(gdb) c
+Continuing.
+^C
+Program received signal SIGINT, Interrupt.
+cpu_do_idle () at /build/linux-goHVUM/linux-6.8.0/arch/arm64/kernel/idle.c:32
+32		arm_cpuidle_restore_irq_context(&context);
+(gdb) p super_blocks
+$9 = {
+  next = 0xffff000080277800,
+  prev = 0xffff00008a3a5000
+}
+(gdb) pipe p *(struct super_block *)0xffff00008a3a5000 | grep fs_info
+  s_fs_info = 0xffff00008522e000,
+(gdb) p *(struct spfs_sb_info *)0xffff00008522e000
+$11 = {
+  s_nifree = 123,
+  s_inode = {1, 1, 1, 1, 1, 0 <repeats 123 times>},
+  s_nbfree = 626,
+  s_block = {1, 1, 1, 1, 1, 0 <repeats 755 times>},
+  s_lock = {
+    owner = {
+      counter = 0
+    },
+    wait_lock = {
+      raw_lock = {
+        {
+          val = {
+            counter = 0
+          },
+          {
+            locked = 0 '\000',
+            pending = 0 '\000'
+          },
+          {
+            locked_pending = 0,
+            tail = 0
+          }
+        }
+      }
+    },
+    osq = {
+      tail = {
+        counter = 0
+      }
+    },
+    wait_list = {
+      next = 0xffff00008522fbe0,
+      prev = 0xffff00008522fbe0
+    }
+  }
+}
+(gdb) 
+```
+{collapsible="true" collapsed-title="debuging filesystem" default-state="collapsed"}
+
 ## 2. 同名symbol处理
 
 `disable`掉不需要的`breakpoint`。
