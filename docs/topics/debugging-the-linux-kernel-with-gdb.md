@@ -4,18 +4,60 @@
 
 `gdb`调试Linux kernel的一些记录。
 
-## 1. debugging the kernel module
+## 1. .gdbinit配置
+
+通过如下设置，每次只需要执行`gdb`就可以使用了，省去一些重复操作。
 
 ```Bash
-# 加载模块
-insmod spfs.ko
+kangxiaoning@localhost:~$ more .gdb/spfs-symbols.sh 
+#!/bin/bash
 
-# 获取地址
-cd /sys/module/spfs/sections && sudo cat .text .rodata .data .bss
+MOD=/lib/modules/6.8.0-49-generic/updates/spfs.ko
+SECTIONS_DIR=/sys/module/spfs/sections
+USR=kangxiaoning@192.168.166.35
 
-# 添加symbol
-add-symbol-file /lib/modules/6.8.0-49-generic/updates/spfs.ko 0xffff80007c093000 -s .rodata 0xffff80007c09b028 -s .data 0xffff80007c097180 -s .bss 0xffff80007c098240
+ssh $USR sudo modprobe $MOD
+
+text=$(ssh $USR sudo cat $SECTIONS_DIR/.text)
+rodata=$(ssh $USR sudo cat $SECTIONS_DIR/.rodata)
+data=$(ssh $USR sudo cat $SECTIONS_DIR/.data)
+bss=$(ssh $USR sudo cat $SECTIONS_DIR/.bss)
+
+echo "add-symbol-file $MOD $text -s .rodata $rodata -s .data $data -s .bss $bss"
 ```
+{collapsible="true" collapsed-title=".gdb/spfs-symbols.sh" default-state="collapsed"}
+
+```Bash
+kangxiaoning@localhost:~$ more .gdbinit 
+# connect to target
+define connect_to_target
+    target remote tcp:192.168.166.1:8865
+end
+
+# add spfs symbols
+define add_spfs
+    shell ~/.gdb/spfs-symbols.sh
+end
+
+# add symbol file
+add-symbol-file /usr/lib/debug/boot/vmlinux-6.8.0-49-generic
+
+# pretty print
+set print pretty on
+
+# linux kernel helper function
+add-auto-load-safe-path /home/kangxiaoning/workspace/linux-6.8.0/scripts/gdb/vmlinux-gdb.py
+
+# replace directory
+set substitute-path /build/linux-goHVUM /home/kangxiaoning/workspace
+
+add_spfs
+connect_to_target
+kangxiaoning@localhost:~$ 
+```
+{collapsible="true" collapsed-title=".gdbinit" default-state="collapsed"}
+
+如下是debugging过程示例。
 
 ```Bash
 (gdb) info b
