@@ -16,7 +16,7 @@ MOD=/lib/modules/6.8.0-49-generic/updates/spfs.ko
 SECTIONS_DIR=/sys/module/spfs/sections
 USR=kangxiaoning@192.168.166.35
 
-ssh $USR sudo modprobe $MOD
+ssh $USR sudo insmod $MOD 2>/dev/null
 
 text=$(ssh $USR sudo cat $SECTIONS_DIR/.text)
 rodata=$(ssh $USR sudo cat $SECTIONS_DIR/.rodata)
@@ -24,6 +24,8 @@ data=$(ssh $USR sudo cat $SECTIONS_DIR/.data)
 bss=$(ssh $USR sudo cat $SECTIONS_DIR/.bss)
 
 echo "add-symbol-file $MOD $text -s .rodata $rodata -s .data $data -s .bss $bss"
+
+kangxiaoning@localhost:~$
 ```
 {collapsible="true" collapsed-title=".gdb/spfs-symbols.sh" default-state="collapsed"}
 
@@ -35,8 +37,11 @@ define connect_to_target
 end
 
 # add spfs symbols
-define add_spfs
-    shell ~/.gdb/spfs-symbols.sh
+define add_spfs_symbol
+    set confirm off
+    shell ~/.gdb/spfs-symbols.sh > /tmp/spfs-symbols.gdb
+    source /tmp/spfs-symbols.gdb
+    set confirm on
 end
 
 # add symbol file
@@ -51,7 +56,7 @@ add-auto-load-safe-path /home/kangxiaoning/workspace/linux-6.8.0/scripts/gdb/vml
 # replace directory
 set substitute-path /build/linux-goHVUM /home/kangxiaoning/workspace
 
-add_spfs
+add_spfs_symbol
 connect_to_target
 kangxiaoning@localhost:~$ 
 ```
