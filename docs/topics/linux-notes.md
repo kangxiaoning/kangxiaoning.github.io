@@ -506,3 +506,9 @@ sudo apt-get update
 
 sudo apt -y install linux-image-$(uname -r)-dbgsym --allow-unauthenticated
 ```
+
+### 6.3 install build-essential
+
+```Bash
+sudo apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison gcc g++ make
+```
