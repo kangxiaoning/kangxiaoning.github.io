@@ -30,6 +30,14 @@ kangxiaoning@localhost:~$
 {collapsible="true" collapsed-title=".gdb/spfs-symbols.sh" default-state="collapsed"}
 
 ```Bash
+sudo EDITOR=vim visudo
+
+# 最后一行添加如下内容
+kangxiaoning ALL=(ALL) NOPASSWD: ALL
+```
+{collapsible="true" collapsed-title="sudo EDITOR=vim visudo" default-state="collapsed"}
+
+```Bash
 kangxiaoning@localhost:~$ more .gdbinit 
 # connect to target
 define connect_to_target
@@ -62,7 +70,7 @@ kangxiaoning@localhost:~$
 ```
 {collapsible="true" collapsed-title=".gdbinit" default-state="collapsed"}
 
-如下是debugging过程示例。
+如下是debugging过程示例，在ARM平台的`call stack`不完整，x86-64的`call stack`是完整的。
 
 ```Bash
 (gdb) info b
@@ -159,7 +167,189 @@ $11 = {
 }
 (gdb) 
 ```
-{collapsible="true" collapsed-title="debuging filesystem" default-state="collapsed"}
+{collapsible="true" collapsed-title="debuging filesystem on arm64" default-state="collapsed"}
+
+```Bash
+kangxiaoning@localhost:~$ gdb
+GNU gdb (Ubuntu 15.0.50.20240403-0ubuntu1) 15.0.50.20240403-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+add symbol table from file "/usr/lib/debug/boot/vmlinux-6.8.0-49-generic"
+add symbol table from file "/lib/modules/6.8.0-49-generic/updates/spfs.ko" at
+	.text_addr = 0xc0982000
+	.rodata_addr = 0xc098a058
+	.data_addr = 0xc0986180
+	.bss_addr = 0xc0987300
+
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+vsnprintf (buf=0xffffc90000243d4d "", buf@entry=0xffffc90000243cfd "0\031\005@=$", size=<optimized out>, size@entry=11, fmt=fmt@entry=0xffffffff82c110e7 "%u", args=args@entry=0xffffc90000243ce0)
+    at /build/linux-uoESLx/linux-6.8.0/lib/vsprintf.c:2778
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+
+warning: 2778	/build/linux-uoESLx/linux-6.8.0/lib/vsprintf.c: No such file or directory
+(gdb) br spfs_mount
+Breakpoint 1 at 0xffffffffc0983940: file /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c, line 424.
+(gdb) c
+Continuing.
+
+Breakpoint 1, spfs_mount (fs_type=0xffffffffc0986ca0 <spfs_fs_type>, flags=0, dev_name=0xffff88810573ab30 "/dev/loop0", data=0x0 <fixed_percpu_data>)
+    at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+(gdb) bt 5
+#0  spfs_mount (fs_type=0xffffffffc0986ca0 <spfs_fs_type>, flags=0, dev_name=0xffff88810573ab30 "/dev/loop0", data=0x0 <fixed_percpu_data>) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+#1  0xffffffff8153bebb in legacy_get_tree (fc=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/fs_context.c:662
+#2  0xffffffff814e790a in vfs_get_tree (fc=fc@entry=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/super.c:1788
+#3  0xffffffff8151c6d0 in do_new_mount (path=path@entry=0xffffc90000a13b60, fstype=fstype@entry=0xffff8881001c0900 "spfs", sb_flags=sb_flags@entry=0, mnt_flags=<optimized out>, 
+    name=name@entry=0xffff8881000544c0 "/dev/loop0", data=data@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3352
+#4  0xffffffff8151d5c0 in path_mount (dev_name=dev_name@entry=0xffff8881000544c0 "/dev/loop0", path=path@entry=0xffffc90000a13b60, type_page=type_page@entry=0xffff8881001c0900 "spfs", flags=<optimized out>, 
+    flags@entry=0, data_page=data_page@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3679
+(More stack frames follow...)
+(gdb) bt
+#0  spfs_mount (fs_type=0xffffffffc0986ca0 <spfs_fs_type>, flags=0, dev_name=0xffff88810573ab30 "/dev/loop0", data=0x0 <fixed_percpu_data>) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:424
+#1  0xffffffff8153bebb in legacy_get_tree (fc=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/fs_context.c:662
+#2  0xffffffff814e790a in vfs_get_tree (fc=fc@entry=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/super.c:1788
+#3  0xffffffff8151c6d0 in do_new_mount (path=path@entry=0xffffc90000a13b60, fstype=fstype@entry=0xffff8881001c0900 "spfs", sb_flags=sb_flags@entry=0, mnt_flags=<optimized out>, 
+    name=name@entry=0xffff8881000544c0 "/dev/loop0", data=data@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3352
+#4  0xffffffff8151d5c0 in path_mount (dev_name=dev_name@entry=0xffff8881000544c0 "/dev/loop0", path=path@entry=0xffffc90000a13b60, type_page=type_page@entry=0xffff8881001c0900 "spfs", flags=<optimized out>, 
+    flags@entry=0, data_page=data_page@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3679
+#5  0xffffffff8151dd47 in do_mount (data_page=0x0 <fixed_percpu_data>, flags=0, type_page=0xffff8881001c0900 "spfs", dir_name=<optimized out>, dev_name=0xffff8881000544c0 "/dev/loop0")
+    at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3692
+#6  __do_sys_mount (data=<optimized out>, flags=0, type=<optimized out>, dir_name=<optimized out>, dev_name=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3898
+#7  __se_sys_mount (data=<optimized out>, flags=0, type=<optimized out>, dir_name=<optimized out>, dev_name=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3875
+#8  __x64_sys_mount (regs=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3875
+#9  0xffffffff810072b5 in x64_sys_call (regs=regs@entry=0xffffc90000a13f58, nr=nr@entry=165) at ./arch/x86/include/generated/asm/syscalls_64.h:166
+#10 0xffffffff8222601f in do_syscall_x64 (nr=165, regs=0xffffc90000a13f58) at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/common.c:52
+#11 do_syscall_64 (regs=0xffffc90000a13f58, nr=165) at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/common.c:83
+#12 0xffffffff82400130 in entry_SYSCALL_64 () at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/entry_64.S:121
+#13 0x000065252c49cc60 in ?? ()
+#14 0x000065252c49cf10 in ?? ()
+#15 0x000065252c49cf50 in ?? ()
+#16 0x000065252c49cf30 in ?? ()
+#17 0x00007ffdf950b190 in ?? ()
+#18 0x000065252c49cb00 in ?? ()
+#19 0x0000000000000246 in ?? ()
+#20 0x0000000000000000 in ?? ()
+(gdb) br spfs_fill_super
+Breakpoint 2 at 0xffffffffc09840b0: file /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c, line 332.
+(gdb) c
+Continuing.
+
+Breakpoint 2, spfs_fill_super (sb=0xffff888102851800, data=0x0 <fixed_percpu_data>, silent=0) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:332
+(gdb) bt
+#0  spfs_fill_super (sb=0xffff888102851800, data=0x0 <fixed_percpu_data>, silent=0) at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:332
+#1  0xffffffff814ea126 in mount_bdev (fs_type=fs_type@entry=0xffffffffc0986ca0 <spfs_fs_type>, flags=268435456, flags@entry=0, dev_name=dev_name@entry=0xffff88810573ab30 "/dev/loop0", 
+    data=data@entry=0x0 <fixed_percpu_data>, fill_super=fill_super@entry=0xffffffffc09840b0 <spfs_fill_super>) at /build/linux-uoESLx/linux-6.8.0/fs/super.c:1667
+#2  0xffffffffc0983980 in spfs_mount (fs_type=0xffffffffc0986ca0 <spfs_fs_type>, flags=0, dev_name=0xffff88810573ab30 "/dev/loop0", data=0x0 <fixed_percpu_data>)
+    at /home/kangxiaoning/workspace/spfs/ubuntu/24.04/kern/sp_inode.c:426
+#3  0xffffffff8153bebb in legacy_get_tree (fc=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/fs_context.c:662
+#4  0xffffffff814e790a in vfs_get_tree (fc=fc@entry=0xffff8881090969c0) at /build/linux-uoESLx/linux-6.8.0/fs/super.c:1788
+#5  0xffffffff8151c6d0 in do_new_mount (path=path@entry=0xffffc90000a13b60, fstype=fstype@entry=0xffff8881001c0900 "spfs", sb_flags=sb_flags@entry=0, mnt_flags=<optimized out>, 
+    name=name@entry=0xffff8881000544c0 "/dev/loop0", data=data@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3352
+#6  0xffffffff8151d5c0 in path_mount (dev_name=dev_name@entry=0xffff8881000544c0 "/dev/loop0", path=path@entry=0xffffc90000a13b60, type_page=type_page@entry=0xffff8881001c0900 "spfs", flags=<optimized out>, 
+    flags@entry=0, data_page=data_page@entry=0x0 <fixed_percpu_data>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3679
+#7  0xffffffff8151dd47 in do_mount (data_page=0x0 <fixed_percpu_data>, flags=0, type_page=0xffff8881001c0900 "spfs", dir_name=<optimized out>, dev_name=0xffff8881000544c0 "/dev/loop0")
+    at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3692
+#8  __do_sys_mount (data=<optimized out>, flags=0, type=<optimized out>, dir_name=<optimized out>, dev_name=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3898
+#9  __se_sys_mount (data=<optimized out>, flags=0, type=<optimized out>, dir_name=<optimized out>, dev_name=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3875
+#10 __x64_sys_mount (regs=<optimized out>) at /build/linux-uoESLx/linux-6.8.0/fs/namespace.c:3875
+#11 0xffffffff810072b5 in x64_sys_call (regs=regs@entry=0xffffc90000a13f58, nr=nr@entry=165) at ./arch/x86/include/generated/asm/syscalls_64.h:166
+#12 0xffffffff8222601f in do_syscall_x64 (nr=165, regs=0xffffc90000a13f58) at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/common.c:52
+#13 do_syscall_64 (regs=0xffffc90000a13f58, nr=165) at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/common.c:83
+#14 0xffffffff82400130 in entry_SYSCALL_64 () at /build/linux-uoESLx/linux-6.8.0/arch/x86/entry/entry_64.S:121
+#15 0x000065252c49cc60 in ?? ()
+#16 0x000065252c49cf10 in ?? ()
+#17 0x000065252c49cf50 in ?? ()
+#18 0x000065252c49cf30 in ?? ()
+#19 0x00007ffdf950b190 in ?? ()
+#20 0x000065252c49cb00 in ?? ()
+#21 0x0000000000000246 in ?? ()
+#22 0x0000000000000000 in ?? ()
+(gdb) 
+(gdb) p file_systems
+$1 = (struct file_system_type *) 0xffffffff83675b20 <sysfs_fs_type>
+(gdb) p file_systems.name
+$2 = 0xffffffff82c0d0b9 "sysfs"
+(gdb) p file_systems->next.name
+$3 = 0xffffffff82c1cd62 "tmpfs"
+(gdb) p file_systems->next->next.name
+$4 = 0xffffffff82c2a446 "bdev"
+(gdb) p super_blocks
+$5 = {
+  next = 0xffff8881002f6000,
+  prev = 0xffff888102851800
+}
+(gdb) c
+Continuing.
+^C
+Program received signal SIGINT, Interrupt.
+0xffffffff8222ce5b in pv_native_safe_halt () at /build/linux-uoESLx/linux-6.8.0/arch/x86/kernel/paravirt.c:128
+warning: 128	/build/linux-uoESLx/linux-6.8.0/arch/x86/kernel/paravirt.c: No such file or directory
+(gdb) p super_blocks
+$6 = {
+  next = 0xffff8881002f6000,
+  prev = 0xffff888102851800
+}
+(gdb) pipe p *(struct super_block *)0xffff888102851800 | grep fs_info
+  s_fs_info = 0xffff888103888000,
+(gdb) p *(struct spfs_sb_info *)0xffff888103888000
+$8 = {
+  s_nifree = 124,
+  s_inode = {1, 1, 1, 1, 0 <repeats 124 times>},
+  s_nbfree = 629,
+  s_block = {1, 1, 0 <repeats 758 times>},
+  s_lock = {
+    owner = {
+      counter = 0
+    },
+    wait_lock = {
+      raw_lock = {
+        {
+          val = {
+            counter = 0
+          },
+          {
+            locked = 0 '\000',
+            pending = 0 '\000'
+          },
+          {
+            locked_pending = 0,
+            tail = 0
+          }
+        }
+      }
+    },
+    osq = {
+      tail = {
+        counter = 0
+      }
+    },
+    wait_list = {
+      next = 0xffff888103889be0,
+      prev = 0xffff888103889be0
+    }
+  }
+}
+(gdb)
+```
+{collapsible="true" collapsed-title="debuging filesystem on x86-64" default-state="collapsed"}
+
 
 ## 2. 同名symbol处理
 
