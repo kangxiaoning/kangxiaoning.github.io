@@ -7,6 +7,7 @@
                   start-page="how-etcd-watch-works.md">
 
     <toc-element toc-title="Etcd">
+        <toc-element topic="cases-of-incorrect-usage-of-etcd.md"/>
         <toc-element topic="setting-up-etcd-development-environment.md"/>
         <toc-element topic="how-etcd-raft-works.md"/>
         <toc-element topic="how-etcd-watch-works.md"/>
