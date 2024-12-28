@@ -16,7 +16,7 @@
 git clone https://github.com/etcd-io/etcd.git
 cd etcd
 git checkout -b debug-v3.5.6 v3.5.6
-make build
+make build GO_BUILD_FLAGS="-gcflags=all=-N -l"
 ```
 
 ### 1.2 报错解决
