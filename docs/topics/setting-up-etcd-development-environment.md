@@ -12,11 +12,81 @@
 
 ### 1.1 编译命令
 
+修改build.sh以支持debuginfo。
+```Bash
+kangxiaoning@localhost:~/workspace/etcd$ git diff build.sh
+diff --git a/build.sh b/build.sh
+index 05d916ea3..1d14ea5ca 100755
+--- a/build.sh
++++ b/build.sh
+@@ -20,7 +20,8 @@ CGO_ENABLED="${CGO_ENABLED:-0}"
+ # Set GO_LDFLAGS="-s" for building without symbols for debugging.
+ # shellcheck disable=SC2206
+ GO_LDFLAGS=(${GO_LDFLAGS:-} "-X=${VERSION_SYMBOL}=${GIT_SHA}")
+-GO_BUILD_ENV=("CGO_ENABLED=${CGO_ENABLED}" "GO_BUILD_FLAGS=${GO_BUILD_FLAGS:-}" "GOOS=${GOOS}" "GOARCH=${GOARCH}")
++# GO_BUILD_ENV=("CGO_ENABLED=${CGO_ENABLED}" "GO_BUILD_FLAGS=${GO_BUILD_FLAGS:-}" "GOOS=${GOOS}" "GOARCH=${GOARCH}")
++GO_BUILD_ENV=("CGO_ENABLED=${CGO_ENABLED}" "GO_BUILD_FLAGS=${GO_BUILD_FLAGS:--gcflags=\"all=-N -l\"}" "GOOS=${GOOS}" "GOARCH=${GOARCH}")
+ 
+ GOFAIL_VERSION=$(cd tools/mod && go list -m -f '{{.Version}}' go.etcd.io/gofail)
+ # enable/disable failpoints
+@@ -65,8 +66,7 @@ etcd_build() {
+     cd ./server
+     # Static compilation is useful when etcd is run in a container. $GO_BUILD_FLAGS is OK
+     # shellcheck disable=SC2086
+-    run env "${GO_BUILD_ENV[@]}" go build ${GO_BUILD_FLAGS:-} \
+-      -trimpath \
++    run env "${GO_BUILD_ENV[@]}" go build -v ${GO_BUILD_FLAGS:-} \
+       -installsuffix=cgo \
+       "-ldflags=${GO_LDFLAGS[*]}" \
+       -o="../${out}/etcd" . || return 2
+@@ -76,8 +76,7 @@ etcd_build() {
+   # shellcheck disable=SC2086
+   (
+     cd ./etcdutl
+-    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" "${GO_BUILD_ENV[@]}" go build ${GO_BUILD_FLAGS:-} \
+-      -trimpath \
++    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" "${GO_BUILD_ENV[@]}" go build -v ${GO_BUILD_FLAGS:-} \
+       -installsuffix=cgo \
+       "-ldflags=${GO_LDFLAGS[*]}" \
+       -o="../${out}/etcdutl" . || return 2
+@@ -87,8 +86,7 @@ etcd_build() {
+   # shellcheck disable=SC2086
+   (
+     cd ./etcdctl
+-    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" "${GO_BUILD_ENV[@]}" go build ${GO_BUILD_FLAGS:-} \
+-      -trimpath \
++    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" "${GO_BUILD_ENV[@]}" go build -v ${GO_BUILD_FLAGS:-} \
+       -installsuffix=cgo \
+       "-ldflags=${GO_LDFLAGS[*]}" \
+       -o="../${out}/etcdctl" . || return 2
+@@ -118,8 +116,7 @@ tools_build() {
+     echo "Building" "'${tool}'"...
+     run rm -f "${out}/${tool}"
+     # shellcheck disable=SC2086
+-    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" CGO_ENABLED=${CGO_ENABLED} go build ${GO_BUILD_FLAGS:-} \
+-      -trimpath \
++    run env GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" CGO_ENABLED=${CGO_ENABLED} go build -v ${GO_BUILD_FLAGS:-} \
+       -installsuffix=cgo \
+       "-ldflags=${GO_LDFLAGS[*]}" \
+       -o="${out}/${tool}" "./${tool}" || return 2
+@@ -142,7 +139,7 @@ tests_build() {
+       run rm -f "../${out}/${tool}"
+ 
+       # shellcheck disable=SC2086
+-      run env CGO_ENABLED=${CGO_ENABLED} GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" go build ${GO_BUILD_FLAGS:-} \
++      run env CGO_ENABLED=${CGO_ENABLED} GO_BUILD_FLAGS="${GO_BUILD_FLAGS:-}" go build -v ${GO_BUILD_FLAGS:-} \
+         -installsuffix=cgo \
+         "-ldflags=${GO_LDFLAGS[*]}" \
+         -o="../${out}/${tool}" "./${tool}" || return 2
+kangxiaoning@localhost:~/workspace/etcd$
+```
+{collapsible="true" collapsed-title="build.sh" default-state="collapsed"}
+
 ```Shell
 git clone https://github.com/etcd-io/etcd.git
 cd etcd
 git checkout -b debug-v3.5.6 v3.5.6
-make build GO_BUILD_FLAGS="-gcflags=all=-N -l"
+./build.sh
 ```
 
 ### 1.2 报错解决
