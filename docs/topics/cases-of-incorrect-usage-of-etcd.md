@@ -238,7 +238,7 @@ func (r *raftNode) start(rh *raftReadyHandler) {
 <img src="etcd-put-message-1.png"  thumbnail="true"/>
 </procedure>
 2. 如果本次的Ready中有数据需要持久化，则在`start()`函数中调用`r.storage.Save(rd.HardState, rd.Entries)`执行WAL持久化操作（注：并不是本次Put的数据）
-3. 因为该节点是Follower角色，因此调用`r.transport.Send(msgs)`将这个Message发Leader处理
+3. 因为该节点是Follower角色，因此调用`r.transport.Send(msgs)`将这个Message发Leader处理（条件断点：ms[i].Type = MsgProp）
 <procedure>
 <img src="etcd-put-message-2.png"  thumbnail="true"/>
 </procedure>
