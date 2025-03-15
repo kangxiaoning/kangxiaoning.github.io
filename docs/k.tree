@@ -6,6 +6,9 @@
                  name="南寨小子"
                   start-page="how-etcd-watch-works.md">
 
+    <toc-element toc-title="AI">
+        <toc-element topic="how-llm-work.md"/>
+    </toc-element>
     <toc-element toc-title="Etcd">
         <toc-element topic="cases-of-incorrect-usage-of-etcd.md"/>
         <toc-element topic="setting-up-etcd-development-environment.md"/>
