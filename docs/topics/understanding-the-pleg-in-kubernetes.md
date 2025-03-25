@@ -1413,6 +1413,11 @@ func ReadyCondition(
 - 运行时性能瓶颈，比如响应慢、Pod挂载的NAS无响应
 - BUG，比如[Deadlock in PLEG relist() for health check and Kubelet syncLoop()](https://github.com/kubernetes/kubernetes/issues/72482)
 
+社区也在考虑改变PLEG的机制，1.26开始引入，体现在[Switching from Polling to CRI Event-based Updates to Container Status](https://kubernetes.io/docs/tasks/administer-cluster/switch-to-evented-pleg/)。
+
 ## 参考
 
 - [Pod Lifecycle Event Generator: Understanding the "PLEG is not healthy" issue in Kubernetes](https://developers.redhat.com/blog/2019/11/13/pod-lifecycle-event-generator-understanding-the-pleg-is-not-healthy-issue-in-kubernetes)
+- [Understanding PLEG with source code - Part 1](https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-1/)
+- [Understanding PLEG with source code - Part 2](https://blog.nishipy.com/p/understanding-pleg-with-source-code-part-2/)
+- [Switching from Polling to CRI Event-based Updates to Container Status](https://kubernetes.io/docs/tasks/administer-cluster/switch-to-evented-pleg/)
