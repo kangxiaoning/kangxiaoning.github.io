@@ -4,6 +4,12 @@
 
 **PLEG**的全称是**Pod Lifecycle Event Generator**，顾名思义，是Pod生命周期中产生事件的模块。kubelet (Kubernetes) 中的**PLEG**模块会根据每个匹配的pod事件调整容器运行时状态，并通过应用更改来保持pod缓存的最新状态。
 
+下图展示了pleg从初始化到运行过程中涉及的关键调用，可以参考代码逻辑了解全貌。
+
+<procedure>
+<img src="pleg-lifecycle.svg" thumbnail="true"/>
+</procedure>
+
 ## 1. PLEG启动过程
 
 在`Kubelet.Run()`会启动`pleg`，这里的`pleg`是个interface，无法直接跳转到源码，因此下面通过Debug追踪执行pleg的具体代码。
