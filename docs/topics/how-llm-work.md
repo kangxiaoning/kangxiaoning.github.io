@@ -8,3 +8,4 @@
 
 [The Transformer Model Behind ChatGPT: Understanding ‘Attention Is All You Need’ with Illustrative Python Examples](https://medium.com/@dahami/the-transformer-model-behind-chatgpt-understanding-attention-is-all-you-need-with-illustrative-37b8f5705289)
 
+[Transformers from scratch](https://peterbloem.nl/blog/transformers)
