@@ -486,7 +486,7 @@ ECS访问NAS，`message`日志中出现`nfs: server xxx not responding, timed ou
 
   - 1. 修改内核参数`sunrpc.tcp_max_slot_table_entries`为256，经过验证TCP重传仍然较多，但是不再出现`nsf: server xxx not respondint, timed out`报错。
   - 2. 使用`nconnect`挂载选项，要求**linux kernel versions >= 5.3**
-```sh
+```SHELL
 mount -t nfs -o ro,nconnect=16 198.18.0.100:/datasets /mnt/datasets
 ```
 
