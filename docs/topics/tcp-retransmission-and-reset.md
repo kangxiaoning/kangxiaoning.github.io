@@ -1,5 +1,7 @@
 # TCP重传导致连接Reset
 
+<show-structure depth="2"/>
+
 TCP**重传8次**还未收到ACK，会发送**RST**中断连接，如下结合技术原理及案例进行分析。
 
 ## 1. timer初始化
