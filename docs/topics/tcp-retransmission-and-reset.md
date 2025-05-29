@@ -481,3 +481,13 @@ ECS访问NAS，`message`日志中出现`nfs: server xxx not responding, timed ou
 1. NAS端频繁发送`zero window`包，导致ECS端重传很严重
 2. ECS在某个包重传了8次后发送了RST中断连接，随后继续发送SYN包建立连接，SYN包多次重传但是没有等到NAS端SYN+ACK包
 3. 在message日志中出现not responding报错
+
+- 解决方案
+
+  - 1. 修改内核参数`sunrpc.tcp_max_slot_table_entries`为256，经过验证TCP重传仍然较多，但是不再出现`nsf: server xxx not respondint, timed out`报错。
+  - 2. 使用`nconnect`挂载选项，要求**linux kernel versions >= 5.3**
+```sh
+mount -t nfs -o ro,nconnect=16 198.18.0.100:/datasets /mnt/datasets
+```
+
+  - 原理参考[Linux concurrency best practices for Azure NetApp Files - Session slots and slot table entries](https://learn.microsoft.com/en-us/azure/azure-netapp-files/performance-linux-concurrency-session-slots)
