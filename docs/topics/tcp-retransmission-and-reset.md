@@ -475,19 +475,42 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority)
 
 ## 5. 案例
 
-ECS访问NAS，`message`日志中出现`nfs: server xxx not responding, timed out`报错。
+### 5.1 问题现象
 
-通过重现问题及抓包，发现异常过程大概如下：
-1. NAS端频繁发送`zero window`包，导致ECS端重传很严重
-2. ECS在某个包重传了8次后发送了RST中断连接，随后继续发送SYN包建立连接，SYN包多次重传但是没有等到NAS端SYN+ACK包
-3. 在message日志中出现not responding报错
+1. ECS访问NAS，`message`日志中出现`nfs: server xxx not responding, timed out`报错。
+2. 监控显示ECS的TCP每分钟重传高达200-1000
 
-- 解决方案
+### 5.2 问题分析
 
-  - 1. 修改内核参数`sunrpc.tcp_max_slot_table_entries`为256，经过验证TCP重传仍然较多，但是不再出现`nsf: server xxx not respondint, timed out`报错。
-  - 2. 使用`nconnect`挂载选项，要求**linux kernel versions >= 5.3**
+通过重现问题及抓包，根据时间先后整理，异常过程大概如下：
+1. NAS端频繁发送`zero window`包
+2. ECS在某个包**重传了8次后发送了RST**中断连接，随后向NAS发起了TCP三次握手
+3. 在message日志中出现not responding报错，用户进入NAS目录执行`ls`命令卡住
+4. ECS尝试发送SYN包建立连接，重传6次没有收到NAS端SYN+ACK包，该过程持续了3次均失败
+5. 第4次连接建立成功，NAS访问恢复
+
+> 问题本质是生产者生产能力大于消费者处理能力，解决的办法有两个方向
+> - 1. 增加消费者处理能力，即提升NAS处理能力
+> - 2. 降低生产者生产能力，也就是应用产生1/O的负载
+>
+> 应用负载要低于NAS处理能力才行，等于或者大于NAS处理能力会产生反压作用，反压作用有2个影响。
+> - 1. 发送`TCP ZeroWindow`让主机停止数据发送，会降低I/O处理效率
+> - 2. 产生大量TCP重传，有连接断开导致NAS不可用的风险
+>
+{style="note"}
+
+### 5.3 解决方案
+
+1. **降低应用并发减少I/O负载可解决问题，通过时间换取可靠性**。
+2. 使用`nconnect`挂载选项，通过多个连接提升NAS处理能力，要求**linux kernel versions >= 5.3**。
 ```SHELL
 mount -t nfs -o ro,nconnect=16 198.18.0.100:/datasets /mnt/datasets
 ```
+3. 缓解方案，修改内核参数`sunrpc.tcp_max_slot_table_entries`为256。
 
-  - 原理参考[Linux concurrency best practices for Azure NetApp Files - Session slots and slot table entries](https://learn.microsoft.com/en-us/azure/azure-netapp-files/performance-linux-concurrency-session-slots)
+   - **验证**：TCP重传仍然较多，但是出现`nsf: server xxx not respondint, timed out`报错机率降低。
+
+   - **分析**：调整的参数并没有降低生产者生产能力，只是在生产者和消费者中间链路的OS上限制了并发，在OS缓冲了一下，把瓶颈点转移到OS了。应用负载没变，NAS处理能力没变，整个链路瓶颈还在，问题没彻底解决，至少一方变化才有可能解决。如果要提高可靠性，确保应用处于健康状态，应用负载要再降低，**牺牲时间换取可靠性**。
+
+
+- 原理可参考[Linux concurrency best practices for Azure NetApp Files - Session slots and slot table entries](https://learn.microsoft.com/en-us/azure/azure-netapp-files/performance-linux-concurrency-session-slots)
