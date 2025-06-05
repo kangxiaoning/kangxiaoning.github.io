@@ -299,7 +299,7 @@ out:;
 
 在`tcp_retransmit_timer(sk)`中调用到`tcp_write_timeout()`，`tcp_write_timeout()`实现了**重传8次和发送RST包**的逻辑。
 
-`tcp_write_timeout`是判断连接是否应该被终止的关键函数。对于孤儿socket（SOCK_DEAD标志位被设置，表示应用层已经关闭），会调用`tcp_orphan_retries`获取最大重传次数。如果重传次数达到上限，会调用`tcp_out_of_resources`检查是否需要发送**RST**包。这个机制防止孤儿socket无限占用系统资源。
+`tcp_write_timeout`是判断连接是否应该被终止的关键函数。对于orphaned socket（SOCK_DEAD标志位被设置，表示应用层已经关闭），会调用`tcp_orphan_retries`获取最大重传次数。如果重传次数达到上限，会调用`tcp_out_of_resources`检查是否需要发送**RST**包。这个机制防止orphaned socket无限占用系统资源。
 
 ```C
 static int tcp_write_timeout(struct sock *sk)
@@ -364,7 +364,7 @@ static int tcp_write_timeout(struct sock *sk)
 
 在`retry_until = tcp_orphan_retries(sk, alive);`中获取`retry_until`为**8**，即**重传8次**。
 
-`tcp_orphan_retries`函数的设计体现了TCP的防御性编程思想。对于"活跃"的孤儿socket（alive参数为true，表示RTO还未达到最大值），即使`sysctl_tcp_orphan_retries`为0，也会返回**8**作为重传次数。这个魔数8的选择基于这样的计算：以最小RTO 200ms开始，经过8次指数退避重传，总时间超过100秒，满足RFC 1122的最低要求，同时避免过长时间占用资源。
+`tcp_orphan_retries`函数的设计体现了TCP的防御性编程思想。对于"活跃"的orphaned socket（alive参数为true，表示RTO还未达到最大值），即使`sysctl_tcp_orphan_retries`为0，也会返回**8**作为重传次数。这个魔数8的选择基于这样的计算：以最小RTO 200ms开始，经过8次指数退避重传，总时间超过100秒，满足RFC 1122的最低要求，同时避免过长时间占用资源。
 
 ```C
 /**
@@ -391,7 +391,7 @@ static int tcp_orphan_retries(struct sock *sk, bool alive)
 
 ## 4. Reset发送逻辑
 
-`tcp_out_of_resources`函数实现了TCP的资源保护机制。当孤儿socket达到重传上限时，该函数会评估是否需要发送RST包来强制关闭连接。发送RST的条件包括：最近发送过数据（防止长时间静默的连接）或接收窗口为0（对端可能已经崩溃）。这种机制虽然违反了TCP规范的某些要求，但对于防止DoS攻击和资源耗尽是必要的。
+`tcp_out_of_resources`函数实现了TCP的资源保护机制。当orphaned socket达到重传上限时，该函数会评估是否需要发送RST包来强制关闭连接。发送RST的条件包括：最近发送过数据（防止长时间静默的连接）或接收窗口为0（对端可能已经崩溃）。这种机制虽然违反了TCP规范的某些要求，但对于防止DoS攻击和资源耗尽是必要的。
 
 ```C
 /**
@@ -536,3 +536,4 @@ mount -t nfs -o ro,nconnect=16 198.18.0.100:/datasets /mnt/datasets
 
 
 - 原理可参考[Linux concurrency best practices for Azure NetApp Files - Session slots and slot table entries](https://learn.microsoft.com/en-us/azure/azure-netapp-files/performance-linux-concurrency-session-slots)
+- [Orphaned Sockets in Linux Kernel Networking](https://claude.ai/public/artifacts/a8d05b17-224c-4175-be5a-fed9247f304f)
