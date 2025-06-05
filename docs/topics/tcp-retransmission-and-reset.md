@@ -53,6 +53,8 @@ void inet_csk_init_xmit_timers(struct sock *sk,
 
 内核文档中对`tcp_retries2`的描述如下，其中提到RFC 1122建议超时时间最少为100秒，结合**TCP_RTO_MIN**、**TCP_RTO_MAX**以及**exponential backoff**机制，得出相应的重传次数为**8**。
 
+TCP重传机制采用指数退避（**exponential backoff**）算法来计算重传间隔。初始RTO（Retransmission Timeout）为TCP_RTO_MIN（200ms），每次重传失败后RTO翻倍，直到达到TCP_RTO_MAX（120秒）。通过这种方式，前8次重传的累计时间约为：`200ms + 400ms + 800ms + 1.6s + 3.2s + 6.4s + 12.8s + 25.6s ≈ 51秒`，第9次重传要间隔`51.2s`，如果重传9次总时间将超过100秒，不满足RFC 1122规定的100秒最低要求，因此在Linux实现中重传**8**次后发送**RST**中断连接。
+
 ```C
 #define TCP_RTO_MAX	((unsigned)(120*HZ))
 #define TCP_RTO_MIN	((unsigned)(HZ/5))
@@ -82,6 +84,8 @@ tcp_retries2 - INTEGER
 
 根据第1步了解到每个TCP socket在创建阶段都设置了定时器，沿着定时器调用逻辑分析处理过程。
 
+TCP使用定时器机制来触发重传。当数据包发送后没有收到确认时，重传定时器会触发`tcp_write_timer`函数。该函数会检查socket的锁状态，如果socket未被用户占用，则直接调用`tcp_write_timer_handler`处理；否则通过设置`TCP_WRITE_TIMER_DEFERRED`标志位延迟处理，避免锁竞争。
+
 ```C
 static void tcp_write_timer(struct timer_list *t)
 {
@@ -104,6 +108,9 @@ static void tcp_write_timer(struct timer_list *t)
 {collapsible="true" collapsed-title="tcp_write_timer()" default-state="collapsed"}
 
 如下是TCP不同定时器的处理函数，重传对应的是`tcp_retransmit_timer(sk)`。
+
+`tcp_write_timer_handler`根据`icsk_pending`字段区分不同类型的定时器事件。`ICSK_TIME_RETRANS`表示重传定时器到期，此时会调用`tcp_retransmit_timer`执行实际的重传逻辑。其他定时器类型包括：REO_TIMEOUT（重排序超时）、LOSS_PROBE（丢包探测）和PROBE0（零窗口探测）。
+
 ```C
 void tcp_write_timer_handler(struct sock *sk)
 {
@@ -143,6 +150,8 @@ out:
 	sk_mem_reclaim(sk);
 }
 ```
+
+`tcp_retransmit_timer`是重传机制的核心函数。它首先处理特殊情况（如Fast Open、ZeroWindow），然后调用`tcp_write_timeout`检查是否达到重传次数上限。如果未超时，则进入丢包状态（tcp_enter_loss），尝试重传队列头部的数据包，并根据指数退避算法更新下次重传时间（icsk_rto翻倍，最大不超过TCP_RTO_MAX）。icsk_backoff和icsk_retransmits分别记录退避次数和重传次数。
 
 ```C
 void tcp_retransmit_timer(struct sock *sk)
@@ -289,6 +298,9 @@ out:;
 {collapsible="true" collapsed-title="tcp_retransmit_timer()" default-state="collapsed"}
 
 在`tcp_retransmit_timer(sk)`中调用到`tcp_write_timeout()`，`tcp_write_timeout()`实现了**重传8次和发送RST包**的逻辑。
+
+`tcp_write_timeout`是判断连接是否应该被终止的关键函数。对于孤儿socket（SOCK_DEAD标志位被设置，表示应用层已经关闭），会调用`tcp_orphan_retries`获取最大重传次数。如果重传次数达到上限，会调用`tcp_out_of_resources`检查是否需要发送**RST**包。这个机制防止孤儿socket无限占用系统资源。
+
 ```C
 static int tcp_write_timeout(struct sock *sk)
 {
@@ -352,6 +364,8 @@ static int tcp_write_timeout(struct sock *sk)
 
 在`retry_until = tcp_orphan_retries(sk, alive);`中获取`retry_until`为**8**，即**重传8次**。
 
+`tcp_orphan_retries`函数的设计体现了TCP的防御性编程思想。对于"活跃"的孤儿socket（alive参数为true，表示RTO还未达到最大值），即使`sysctl_tcp_orphan_retries`为0，也会返回**8**作为重传次数。这个魔数8的选择基于这样的计算：以最小RTO 200ms开始，经过8次指数退避重传，总时间超过100秒，满足RFC 1122的最低要求，同时避免过长时间占用资源。
+
 ```C
 /**
  *  tcp_orphan_retries() - Returns maximal number of retries on an orphaned socket
@@ -376,6 +390,8 @@ static int tcp_orphan_retries(struct sock *sk, bool alive)
 ```
 
 ## 4. Reset发送逻辑
+
+`tcp_out_of_resources`函数实现了TCP的资源保护机制。当孤儿socket达到重传上限时，该函数会评估是否需要发送RST包来强制关闭连接。发送RST的条件包括：最近发送过数据（防止长时间静默的连接）或接收窗口为0（对端可能已经崩溃）。这种机制虽然违反了TCP规范的某些要求，但对于防止DoS攻击和资源耗尽是必要的。
 
 ```C
 /**
@@ -440,6 +456,8 @@ static int tcp_out_of_resources(struct sock *sk, bool do_reset)
 }
 ```
 {collapsible="true" collapsed-title="tcp_out_of_resources()" default-state="collapsed"}
+
+`tcp_send_active_reset`构造并发送RST包。该函数分配一个最小的skb（只包含TCP头部），设置RST和ACK标志位，使用当前**可接受的序列号**，然后通过`tcp_transmit_skb`发送。这个RST包不会被重传，是单向通知对端连接已经被强制关闭。这遵循了RFC 2525的建议，用于处理异常情况下的连接清理。
 
 ```C
 /* We get here when a process closes a file descriptor (either due to
