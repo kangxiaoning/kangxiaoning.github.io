@@ -10,4 +10,9 @@
         <description>Created after removal of "应该配置几台NTP Server" from 南寨小子</description>
         <accepts>how-many-ntp-servers-should-be-configured.html</accepts>
     </rule>
+    <rule id="7ab3f4be">
+        <description>Created after removal of "NFSv3 Flow Control and Performance Optimization" from 南寨小子
+        </description>
+        <accepts>nfsv3-flow-control-and-performance-optimization.html</accepts>
+    </rule>
 </rules>

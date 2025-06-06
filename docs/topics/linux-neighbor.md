@@ -2,9 +2,12 @@
 
 <show-structure depth="2"/>
 
+本文基于Linux内核3.10源码分析IP层数据包处理、邻居表管理。
+
+
 ## 1. 什么时候需要创建Neighbor条目
 
-在Linux内核中，当网络数据包需要通过ARP（地址解析协议）或其他对应的协议（如IPv6下的NDP，Neighbor Discovery Protocol）来解析目标主机的硬件地址时，会创建neighbour条目(也就是ARP条目)，比如下列情况。
+在Linux内核中，邻居表（Neighbor Table）是网络子系统中的一个核心组件，它维护着IP地址到MAC地址的映射关系，类似于ARP缓存的功能。当网络数据包需要通过ARP（地址解析协议）或其他对应的协议（如IPv6下的NDP，Neighbor Discovery Protocol）来解析目标主机的硬件地址时，会创建neighbour条目(也就是ARP条目)，比如下列情况。
 
 1. 发送数据包至本地网络上的未知MAC地址时，当IP层需要将一个IP数据包发送到同一链路上的一个目的IP地址，但不知道该目的IP对应的MAC地址时，内核会触发ARP请求以获取目标MAC地址，并且在这个过程中创建或更新neighbour条目。
 2. 接收ARP/NDP响应时，当收到ARP应答或者NDP中的Neighbor Advertisement消息，其中包含了其他主机的IP与MAC地址对应关系时，内核会根据这些信息创建或更新neighbour条目。
@@ -15,6 +18,16 @@
 一句话总结，每当Linux需要或者从网络上获得到本地链路上的IP与MAC地址映射关系时，都会在neighbour cache（即ARP缓存或NDP缓存）中创建或更新相应条目。
 
 ## 2. IP层查找路由时更新neighbor条目
+
+在Linux网络协议栈中，当一个IP数据包准备从网络层传递到数据链路层时，需要完成两个关键任务：
+1. **确定下一跳地址**：根据路由表查找数据包应该发往哪个下一跳。
+2. **解析物理地址**：将下一跳的IP地址转换为对应的MAC地址。
+
+`ip_finish_output2()`函数是IP层输出路径上的关键函数，它负责完成数据包发送前的最后准备工作。这个函数的核心任务是确保数据包具有正确的链路层头部信息，并通过邻居子系统查找或创建必要的ARP条目，核心流程如下。
+
+- **按需创建**：只有在实际需要发送数据包时才创建ARP条目，避免不必要的内存占用。
+- **缓存机制**：通过邻居表缓存已知的IP-MAC映射，提高后续数据包的发送效率。
+- **错误处理**：对各种异常情况（如内存不足、ARP解析失败）进行妥善处理。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/ipv4/ip_output.c
@@ -96,6 +109,15 @@ static inline int ip_finish_output2(struct sk_buff *skb)
 
 ### 3.1 强制GC
 
+邻居表作为内核中的一个重要数据结构，需要在内存中维护大量的IP-MAC映射关系。为了防止邻居表无限制增长导致内存耗尽，Linux内核实现了一套垃圾回收机制。强制GC（Garbage Collection）是其中的一种机制，它在创建新条目时触发。
+
+内核设置了三个阈值来控制邻居表的大小：
+- **gc_thresh1**：邻居表条目数量的最小阈值，低于此值时不进行垃圾回收。
+- **gc_thresh2**：软限制阈值，超过此值且距离上次清理超过5秒时会尝试垃圾回收。
+- **gc_thresh3**：硬限制阈值，超过此值时必须进行垃圾回收，如果回收失败则拒绝创建新条目。
+
+这种三级阈值设计既保证了系统的稳定性，又在正常情况下避免了频繁的垃圾回收操作，实现了性能和资源使用的平衡。
+
 在创建neighbour条目时会判断是否要强制回收，代码如下。
 
 ```C
@@ -142,11 +164,11 @@ out_entries:
 	goto out;
 }
 ```
-{collapsible="true" collapsed-title="neigh_alloc()" default-state="expanded"}
+{collapsible="true" collapsed-title="neigh_alloc()" default-state="collapsed"}
 
 Neighbour是个结构体，有个table来存储Neighbour条目，保存在内存中，因此它会有大小限制，在创建过程中会检查并做一些GC以确保不会无限制增长。具体逻辑实现在`neigh_alloc()`函数中。
 
-1. 通过原子操作增加邻居表（struct neigh_table *tbl）中的条目计数，并获取当前条目数量。
+1. 通过原子操作增加邻居表`struct neigh_table *tbl`中的条目计数，并获取当前条目数量。
 2. 满足如下任一条件则尝试进行垃圾回收。
    - 条目数超过gc_thresh3
    - 条目数超过gc_thresh2但距离上一次刷新已经超过5秒
@@ -159,6 +181,16 @@ Neighbour是个结构体，有个table来存储Neighbour条目，保存在内存
     - 设置引用计数。
 
 ### 3.2 周期性GC
+
+除了在创建新条目时的强制GC，Linux内核还实现了周期性的垃圾回收机制。这种机制通过定时任务（delayed work）的方式实现，确保即使在网络流量较少的情况下，过期的邻居条目也能被及时清理。
+
+周期性GC包括以下几个方面：
+- **自适应的检查间隔**：根据`base_reachable_time`参数动态调整检查频率，通常为`base_reachable_time`的一半。
+- **状态机管理**：基于邻居条目的状态（如NUD_FAILED、NUD_STALE等）来决定是否回收。
+- **引用计数检查**：只有引用计数为1（即只有邻居表本身引用）的条目才会被回收。
+- **老化时间控制**：通过`gc_staletime`参数控制条目的最大存活时间。
+
+通过上面的设计既能及时清理无用条目，又避免了误删仍在使用的条目，保证了网络通信的稳定性。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/neighbour.c
@@ -243,6 +275,9 @@ out:
 	write_unlock_bh(&tbl->lock);
 }
 ```
+{collapsible="true" collapsed-title="neigh_periodic_work()" default-state="collapsed"}
+
+`neigh_periodic_work()`的核心逻辑如下：
 
 1. 如果小于第一个阈值gc_thresh1，则直接跳出垃圾回收过程
 2. 定期重新计算ReachableTime，如果距离上次随机计算超过5分钟（300秒），则根据base_reachable_time和随机函数更新所有`neigh_parms`结构体中的base_reachable_time，后续就会根据用户配置的时间定期GC。
@@ -252,6 +287,14 @@ out:
    - 如果引用计数是否为1，并且状态为NUD_FAILED或者已经超过其对应的gc_staletime，则从链表中移除该条目，标记为dead，并调用`neigh_cleanup_and_release()`释放资源。
 
 ## 4. Neighbour条目GC逻辑
+
+强制垃圾回收（`neigh_forced_gc`）是邻居表管理中的关键机制，它在系统资源紧张时被调用，用于快速释放不再使用的邻居条目。这个函数实现了一种简单而有效的回收策略：遍历整个哈希表，删除所有可以安全删除的条目。
+
+核心实现逻辑如下：
+- **引用计数保护**：只删除引用计数为1的条目，这意味着除了邻居表本身，没有其他地方正在使用该条目。
+- **永久条目保护**：标记为NUD_PERMANENT的条目不会被删除，这些通常是管理员手动配置的静态ARP条目。
+- **原子操作**：使用RCU（Read-Copy-Update）机制确保在多核环境下的并发安全。
+- **快速响应**：通过一次遍历尽可能多地回收内存，减少系统压力。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/neighbour.c

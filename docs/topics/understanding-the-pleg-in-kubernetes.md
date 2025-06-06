@@ -2,7 +2,7 @@
 
 <show-structure depth="3"/>
 
-**PLEG**的全称是**Pod Lifecycle Event Generator**，顾名思义，是Pod生命周期中产生事件的模块。kubelet (Kubernetes) 中的**PLEG**模块会根据每个匹配的pod事件调整容器运行时状态，并通过应用更改来保持pod缓存的最新状态。
+**PLEG**的全称是**Pod Lifecycle Event Generator**，顾名思义，是 kubelet 中的核心组件，负责监控和管理 Pod 生命周期事件。本文将深入分析 PLEG 的工作原理、运行机制以及与 "PLEG is not healthy" 错误的关系，全面理解这一重要组件的技术细节。
 
 下图展示了pleg从初始化到运行过程中涉及的关键调用，可以参考代码逻辑了解全貌。
 
@@ -12,7 +12,11 @@
 
 ## 1. PLEG启动过程
 
-在`Kubelet.Run()`会启动`pleg`，这里的`pleg`是个interface，无法直接跳转到源码，因此下面通过Debug追踪执行pleg的具体代码。
+### 1.1 Kubelet 主入口启动机制
+
+Kubelet 的`Run()`方法是整个容器运行时管理的入口点。该方法采用`goroutine`并发模式启动多个关键组件，包括 volume manager、node status updater、component sync loops 等。PLEG 作为核心组件之一，在这个阶段被启动来监控 Pod 生命周期事件。整个启动过程遵循"先初始化后启动"的原则，确保所有依赖组件就绪后再开始事件监听。
+
+在`Kubelet.Run()`中会启动`pleg`，这里的`pleg`是个interface，无法直接跳转到源码，因此下面通过Debug追踪执行pleg的具体代码。
 
 ```Go
 func (kl *Kubelet) Run(updates <-chan kubetypes.PodUpdate) {
@@ -73,7 +77,11 @@ func (kl *Kubelet) Run(updates <-chan kubetypes.PodUpdate) {
 <img src="kubelet-pleg-start.png" thumbnail="true"/>
 </procedure>
 
+### 1.2 GenericPLEG 定时任务启动机制
+
 Step into到`Start()`函数，可以看到具体执行的是`GenericPLEG.Start()`。
+
+`GenericPLEG`的`Start()`方法实现了基于定时器的周期性任务调度。它使用`wait.Until()`函数创建一个无限循环的定时任务，每隔`relistPeriod`（默认1秒）执行一次`relist`操作。这种设计模式确保了 Pod 状态变化能够被及时发现，同时避免了过于频繁的查询对系统性能造成影响。
 
 - Debug信息显示`relistPeriod`为1秒，也就是**间隔1秒**执行一次`relist`操作。
 <procedure>
@@ -86,6 +94,10 @@ func (g *GenericPLEG) Start() {
 }
 ```
 {collapsible="true" collapsed-title="GenericPLEG.Start()" default-state="collapsed"}
+
+### 1.3 定时任务执行控制机制
+
+`wait.Until()`及其相关函数实现了 Kubernetes 中常用的退避重试和定时执行机制。`sliding`参数为 true 表示采用"滑动窗口"模式，即在函数执行完成后再计算下一次执行时间，这确保了两次`relist`操作之间有固定的间隔，避免了因为单次执行时间过长而导致的任务堆积。`BackoffManager`提供了灵活的退避策略，支持指数退避和抖动，提高了系统的健壮性。
 
 **问题：** 如果`relist()`完成时长大于1秒，会不会导致多个`relist()`同时在运行？
 
@@ -103,6 +115,8 @@ func JitterUntil(f func(), period time.Duration, jitterFactor float64, sliding b
 	BackoffUntil(f, NewJitteredBackoffManager(period, jitterFactor, &clock.RealClock{}), sliding, stopCh)
 }
 ```
+
+`BackoffUntil()`是定时任务执行的核心逻辑实现。它通过`select`语句实现非阻塞的定时器控制，支持优雅的停止机制。`sliding`参数决定了定时器的计算方式：为 true 时在函数执行后重置定时器，为 false 时在函数执行前重置。这种设计允许根据不同的业务需求选择合适的定时策略，同时通过`defer`和`runtime.HandleCrash()`确保异常情况下的稳定性。
 
 - 核心逻辑在`BackoffUntil()`中，每次`f()`执行完成后进入`select`，等待`t.C()`触发下一次执行，而`t.C()`是在函数`f()`执行完成后，再根据`period`计算的时间。
 ```Go
@@ -150,6 +164,8 @@ func BackoffUntil(f func(), backoff BackoffManager, sliding bool, stopCh <-chan 
 ```
 {collapsible="true" collapsed-title="BackoffUntil()" default-state="collapsed"}
 
+`jitteredBackoffManagerImpl`支持抖动（jitter）功能，通过在固定周期基础上添加随机偏移，避免多个节点同时执行相同操作导致的"惊群效应"。Timer 的重用机制减少了对象创建开销，提高了性能。
+
 ```Go
 func (j *jitteredBackoffManagerImpl) Backoff() clock.Timer {
 	backoff := j.getNextBackoff()
@@ -162,6 +178,8 @@ func (j *jitteredBackoffManagerImpl) Backoff() clock.Timer {
 }
 ```
 {collapsible="true" collapsed-title="jitteredBackoffManagerImpl.Backoff()" default-state="collapsed"}
+
+`getNextBackoff()`方法实现了基于抖动的时间间隔计算。当`jitter`大于 0 时，会在基础周期上添加随机偏移，这是分布式系统中常用的避免同步问题的技术。通过引入随机性，可以有效防止大量 kubelet 节点在相同时间点执行`relist`操作，从而减少对容器运行时和`API Server`的压力。
 
 ```Go
 func (j *jitteredBackoffManagerImpl) getNextBackoff() time.Duration {
@@ -177,6 +195,10 @@ func (j *jitteredBackoffManagerImpl) getNextBackoff() time.Duration {
 下面进入`relist()`继续追踪。
 
 ## 2. relist的作用及实现
+
+### 2.1 relist 核心处理逻辑
+
+`relist()`方法是 PLEG 的核心逻辑，实现了完整的 Pod 状态同步流程。它采用"查询-比较-计算-更新"的四阶段处理模式：首先通过 gRPC 调用从容器运行时获取最新的 Pod 列表，然后与内存中的历史状态进行比较，计算出状态变化事件，最后更新本地缓存并将事件发送到事件通道。这种设计确保了 Pod 状态变化的及时感知和处理，同时通过批量处理提高了效率。
 
 `relist()`通过`grpc`远程调用`runtime`查询容器列表，执行`for`循环遍历每个Pod，比较Pod对象的旧版本与当前版本，调用`computeEvents()`计算容器事件并添加到`eventsByPodID`中，最后`for`循环遍历所有事件并进行处理，包括更新Pod缓存，将事件发送至`g.eventChannel`，处理之前更新缓存失败的Pod列表，维护`podsToReinspect`等。
 
@@ -327,7 +349,7 @@ func (g *GenericPLEG) relist() {
 ```
 {collapsible="true" collapsed-title="GenericPLEG.relist()" default-state="collapsed"}
 
-### 2.1 Debug GetPods()
+### 2.2 Debug GetPods()
 
 Debug过程及相关代码参考如下。
 
@@ -335,7 +357,11 @@ Debug过程及相关代码参考如下。
 <img src="generic-pleg-relist.png" thumbnail="true"/>
 </procedure>
 
+### 2.3 容器运行时 Pod 列表获取机制
+
 在`GetPods()`这一行打断点并Step into，具体实现是`kubeGenericRuntimeManager.GetPods()`。
+
+`kubeGenericRuntimeManager.GetPods()`实现了从容器运行时获取 Pod 信息的核心逻辑。它分两个阶段工作：首先获取所有的 PodSandbox（Pod 沙箱），然后获取所有的容器。这种分离设计符合 CRI（Container Runtime Interface）的架构，其中 Sandbox 提供 Pod 级别的隔离环境，容器在 Sandbox 中运行。通过 UID 进行关联，确保容器能够正确归属到对应的 Pod。
 
 <procedure>
 <img src="kube-generic-runtime-manager-getpods.png" thumbnail="true"/>
@@ -416,7 +442,12 @@ func (m *kubeGenericRuntimeManager) GetPods(all bool) ([]*kubecontainer.Pod, err
 ```
 {collapsible="true" collapsed-title="kubeGenericRuntimeManager.GetPods()" default-state="collapsed"}
 
+### 2.4 沙箱列表获取与过滤机制
+
 代码跳转来到`getKubeletSandboxes()`。
+
+`getKubeletSandboxes()`方法实现了基于状态的沙箱过滤机制。当 all 参数为 false 时，只返回处于 SANDBOX_READY 状态的沙箱，这对于正常运行时的监控很重要。当为 true 时，返回所有沙箱，包括已停止的，这主要用于垃圾回收场景。这种设计允许根据不同的使用场景优化查询性能，减少不必要的数据传输。
+
 
 ```Go
 // getKubeletSandboxes lists all (or just the running) sandboxes managed by kubelet.
@@ -442,7 +473,11 @@ func (m *kubeGenericRuntimeManager) getKubeletSandboxes(all bool) ([]*runtimeapi
 ```
 {collapsible="true" collapsed-title="kubeGenericRuntimeManager.getKubeletSandboxes()" default-state="collapsed"}
 
+### 2.5 监控和度量增强机制
+
 打断点Step into到`ListPodSandbox()`的具体实现 - `instrumentedRuntimeService.ListPodSandbox()`。
+
+`instrumentedRuntimeService`实现了运行时服务的监控包装器模式。它在原有服务的基础上添加了性能监控功能，包括操作耗时统计和错误计数。recordOperation() 记录每个操作的执行时间，recordError() 统计错误频率。这种装饰器模式的实现不侵入原有业务逻辑，为系统监控和故障诊断提供了重要的观察性数据。
 
 <procedure>
 <img src="get-kubelet-sandboxes.png" thumbnail="true"/>
@@ -464,7 +499,11 @@ func (in instrumentedRuntimeService) ListPodSandbox(filter *runtimeapi.PodSandbo
 ```
 {collapsible="true" collapsed-title="instrumentedRuntimeService.ListPodSandbox()" default-state="collapsed"}
 
+### 2.6 远程运行时服务抽象层
+
 打断点Step into到`ListPodSandbox()`的具体实现 - `remoteRuntimeService.ListPodSandbox()`。
+
+`remoteRuntimeService`实现了与容器运行时的远程通信抽象。它封装了 gRPC 通信的复杂性，提供了统一的接口给上层调用。超时机制和上下文管理确保了网络调用的可控性。版本检测机制（useV1API()）支持不同版本的 CRI API，保证了向前兼容性。这种分层设计使得 kubelet 可以与不同的容器运行时（如 containerd、CRI-O）无缝对接。
 
 <procedure>
 <img src="remote-runtime-service-list-pod-sandbox.png" thumbnail="true"/>
@@ -486,7 +525,11 @@ func (r *remoteRuntimeService) ListPodSandbox(filter *runtimeapi.PodSandboxFilte
 ```
 {collapsible="true" collapsed-title="remoteRuntimeService.ListPodSandbox()" default-state="collapsed"}
 
+### 2.7 CRI V1 API 实现机制
+
 打断点Step into到`ListPodSandbox()`的具体实现 - `remoteRuntimeService.ListPodSandboxV1()`。
+
+`listPodSandboxV1()`方法实现了符合 CRI V1 规范的 Pod 沙箱列表查询。它构造标准的 gRPC 请求，包含过滤条件，向容器运行时发起调用。错误处理机制确保了异常情况的正确传播，详细的日志记录便于问题诊断。响应数据的直接返回体现了该层的职责单一性，专注于协议转换而不进行额外的业务处理。
 
 <procedure>
 <img src="remote-runtime-service-list-pod-sandbox-v1.png" thumbnail="true"/>
@@ -509,7 +552,11 @@ func (r *remoteRuntimeService) listPodSandboxV1(ctx context.Context, filter *run
 ```
 {collapsible="true" collapsed-title="remoteRuntimeService.ListPodSandboxV1()" default-state="collapsed"}
 
+### 2.8 gRPC 客户端调用机制
+
 打断点Step into到`ListPodSandbox()`的具体实现 - `runtimeServiceClient.ListPodSandbox()`。
+
+`runtimeServiceClient.ListPodSandbox()`是 gRPC 自动生成的客户端代码，实现了底层的网络通信。它将高级的 Go 对象序列化为 protobuf 格式，通过 HTTP/2 传输到容器运行时服务，然后将响应反序列化回 Go 对象。这个过程对上层调用者完全透明，体现了 gRPC 框架的强大抽象能力。
 
 <procedure>
 <img src="runtime-service-client-list-pod-sandbox.png" thumbnail="true"/>
@@ -527,7 +574,10 @@ func (c *runtimeServiceClient) ListPodSandbox(ctx context.Context, in *ListPodSa
 ```
 {collapsible="true" collapsed-title="runtimeServiceClient.ListPodSandboxV1()" default-state="collapsed"}
 
-最终来到grpc调用。
+### 2.9 gRPC 核心调用机制
+
+最终来到grpc调用，`ClientConn.Invoke()`是 gRPC 的核心调用方法，实现了完整的 RPC 调用流程。它支持拦截器机制，允许在调用前后插入自定义逻辑（如日志记录、监控、认证等）。连接池管理、负载均衡、重试机制都在这个层面实现。CallOption 机制提供了细粒度的调用控制，如超时设置、压缩选项等。这种设计使得 gRPC 既强大又灵活，满足了企业级应用的各种需求。
+
 
 <procedure>
 <img src="grpc-invoke.png" thumbnail="true"/>
@@ -551,7 +601,7 @@ func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply int
 ```
 {collapsible="true" collapsed-title="ClientConn.Invoke()" default-state="collapsed"}
 
-### 2.2 PLEG的瓶颈分析
+### 2.10 PLEG的瓶颈分析
 
 前面通过Debug方式了解`relist`部分逻辑，这个过程涉及大量grpc远程调用(I/O密集)，对比新、旧版本计算事件(CPU密集)、更新缓存等操作，整体还是非常消耗主机资源的，参考文章对此做了较完整的总结，如下图所示。
 
@@ -566,6 +616,10 @@ func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply int
 </procedure>
 
 ## 3. PLEG is not healthy是如何发生的？
+
+### 3.1 Kubelet 同步循环和运行时状态检查机制
+
+`syncLoop()`是 kubelet 的主循环，实现了事件驱动的 Pod 同步机制。它监听多个事件源（文件、API server、HTTP），并将这些事件合并处理。指数退避算法用于处理运行时错误，当连续出现错误时，等待时间会逐渐增加，避免了无意义的重试对系统造成额外负载。PLEG 事件通道（plegCh）的监听确保了 Pod 生命周期事件能够及时响应。
 
 从`Kubelet.Run()`中可以看到这个函数还执行了`kl.syncLoop(updates, kl)`，这个函数会持续执行`kl.runtimeState.runtimeErrors()`检查运行时状态。
 
@@ -619,6 +673,10 @@ func (kl *Kubelet) syncLoop(updates <-chan kubetypes.PodUpdate, handler SyncHand
 ```
 {collapsible="true" collapsed-title="Kubelet.syncloop()" default-state="collapsed"}
 
+### 3.2 运行时状态聚合错误检查机制
+
+`runtimeState.runtimeErrors()`实现了多维度的运行时健康检查机制。它采用聚合模式，将不同类型的错误（基础运行时同步、健康检查、运行时错误）统一收集。基础运行时同步检查确保容器运行时服务可用，健康检查（包括 PLEG）验证各个组件的工作状态，阈值机制防止了临时性问题导致的误报。错误聚合器提供了统一的错误处理接口，简化了上层调用逻辑。
+
 - 在`runtimeState.runtimeErrors()`会执行`health check`，如果健康检查失败(`hc.fn()`返回`false`)，则会记录**PLEG is not healthy**。
 ```Go
 func (s *runtimeState) runtimeErrors() error {
@@ -654,6 +712,9 @@ func (s *runtimeState) runtimeErrors() error {
 <img src="generic-pleg-healthy.png" thumbnail="true"/>
 </procedure>
 
+### 3.3 PLEG 健康状态检查机制
+
+`GenericPLEG.Healthy()`实现了基于时间窗口的健康检查机制。它通过检查最后一次成功`relist`的时间来判断 PLEG 是否正常工作。3分钟的阈值（relistThreshold）是经过实践验证的合理值，既能及时发现问题，又避免了因临时性延迟导致的误报。度量指标的暴露（PLEGLastSeen）为监控系统提供了实时的可观察性数据，便于提前发现潜在问题。
 - `GenericPLEG.Healthy()`会判断上次`relist`记录时间到现在是否已经超过3分钟，如果超过3分钟则返回`false`及报错信息。
 ```Go
 // Healthy check if PLEG work properly.
@@ -677,6 +738,10 @@ func (g *GenericPLEG) Healthy() (bool, error) {
 综上可知，Kubelet启动后会持续执行健康检查，如果`relist`超时3分钟会导致健康检查失败，进而报错**PLEG is not healthy**。
 
 ## 4. PLEG is not healthy和NotReady有什么关系？
+
+### 4.1 Kubelet 主对象构建和状态函数设置机制
+
+`NewMainKubelet()`是 kubelet 对象的工厂方法，实现了复杂的依赖注入和组件初始化。它采用构造器模式，分阶段初始化各个组件：配置验证、信息收集器创建、运行时管理器构建、PLEG 初始化等。最后设置`setNodeStatusFuncs`将所有状态设置函数绑定到 kubelet 对象，这种延迟绑定的设计确保了所有依赖组件都已正确初始化。健康检查的注册（`addHealthCheck`）将 PLEG 纳入运行时状态监控体系。
 
 在创建kubelet对象时，通过`klet.setNodeStatusFuncs = klet.defaultNodeStatusFuncs()`将`defaultNodeStatusFuncs()`赋值给了`klet.setNodeStatusFuncs`，后续在上报状态时通过这个函数设置节点状态。
 ```Go
@@ -1183,6 +1248,10 @@ func NewMainKubelet(kubeCfg *kubeletconfiginternal.KubeletConfiguration,
 ```
 {collapsible="true" collapsed-title="NewMainKubelet()" default-state="collapsed"}
 
+### 4.2 节点状态设置函数组合机制
+
+`defaultNodeStatusFuncs()`实现了节点状态设置的策略模式，将不同维度的状态检查封装为独立的函数。每个函数负责特定的状态方面：网络地址、机器信息、版本信息、存储卷限制、各种压力条件等。ReadyCondition 作为最重要的状态检查，被放在后面，它综合所有运行时错误来决定节点的整体健康状态。这种模块化设计使得状态检查逻辑清晰，易于维护和扩展。
+
 `defaultNodeStatusFuncs()`中调用了`ReadyCondition()`，这个函数会检查并设置Node的状态。
 ```Go
 func (kl *Kubelet) defaultNodeStatusFuncs() []func(*v1.Node) error {
@@ -1224,6 +1293,10 @@ func (kl *Kubelet) defaultNodeStatusFuncs() []func(*v1.Node) error {
 }
 ```
 {collapsible="true" collapsed-title="defaultNodeStatusFuncs()" default-state="collapsed"}
+
+### 4.3 节点状态更新和同步机制
+
+`tryUpdateNodeStatus()`实现了节点状态的增量更新机制。它采用"获取-修改-提交"的模式，先从 API server 获取当前节点对象，然后应用所有状态设置函数，最后通过 PATCH 操作提交更改。为了减少 etcd 负载，GET 操作默认从 API server 缓存读取，只有在冲突时才直接查询 etcd。PodCIDR 变更检测和卷使用状态标记确保了网络和存储相关状态的正确性。
 
 在`tryUpdateNodeStatus()`中通过`kl.setNodeStatus(node)`设置节点状态，实现是遍历`klet.setNodeStatusFuncs`并调用每个函数，最终会调用到`ReadyCondition()`。
 ```Go
@@ -1299,6 +1372,10 @@ func (kl *Kubelet) tryUpdateNodeStatus(tryNumber int) error {
 }
 ```
 {collapsible="true" collapsed-title="tryUpdateNodeStatus()" default-state="collapsed"}
+
+### 4.4 节点就绪状态条件设置机制
+
+`ReadyCondition()`实现了 Kubernetes 节点就绪状态的核心判断逻辑。它采用多重错误聚合模式，综合检查运行时错误、网络错误、存储错误和节点关闭管理器错误。资源容量验证确保节点具备运行 Pod 的基本条件。条件转换时间的记录支持状态变更历史追踪，事件记录机制为故障诊断提供了重要信息。当任何关键组件（包括 PLEG）出现问题时，节点状态会立即变为 NotReady，这是 Kubernetes 自我保护机制的体现。
 
 而`ReadyCondition()`会通过`errs := []error{runtimeErrorsFunc(), networkErrorsFunc(), storageErrorsFunc(), nodeShutdownManagerErrorsFunc()}`检查节点状态，其中就包括PLEG异常产生的错误，如果对比发现有PLEG错误就会将节点状态设置为`v1.ConditionFalse`，也就是NotReady。
 ```go
@@ -1395,6 +1472,10 @@ func ReadyCondition(
 ```
 {collapsible="true" collapsed-title="ReadyCondition()" default-state="collapsed"}
 
+### 4.5 PLEG 配置参数分析
+
+PLEG 的配置参数体现了性能与可靠性之间的平衡考虑。`plegChannelCapacity`(1000) 设置了事件通道的缓冲区大小，防止在大量事件产生时出现阻塞。`plegRelistPeriod`(1秒) 决定了状态检查的频率，这个值是在及时性和系统负载之间的权衡结果。频率过高会导致过多的 gRPC 调用和 CPU 占用，频率过低则会延迟事件感知，影响 Pod 调度和管理的响应性。
+
 如下是PLEG相关的两个参数，可见事件多少也会影响PLEG是否健康。
 ```Go
 	// Capacity of the channel for receiving pod lifecycle events. This number
@@ -1412,14 +1493,42 @@ func ReadyCondition(
 	plegRelistPeriod = time.Second * 1
 ```
 
+## 5. 问题原因分析与解决方案
+
 从前面分析可知，当出现**PLEG is not healthy**时，kubelet会主动将节点设置为NotReady并上报给控制面。出现这种情况可能有如下原因。
+
+### 5.1 常见问题原因
 
 - 主机负载高，比如CPU、IO瓶颈，导致主机整体变慢
 - 大量事件的场景，比如发版会导致大量POD产生事件
 - 运行时性能瓶颈，比如响应慢、Pod挂载的NAS无响应
 - BUG，比如[Deadlock in PLEG relist() for health check and Kubelet syncLoop()](https://github.com/kubernetes/kubernetes/issues/72482)
 
+### 5.2 技术演进方向
+
 社区也在考虑改变PLEG的机制，1.26开始引入，体现在[Switching from Polling to CRI Event-based Updates to Container Status](https://kubernetes.io/docs/tasks/administer-cluster/switch-to-evented-pleg/)。
+
+## 总结
+
+PLEG (Pod Lifecycle Event Generator) 是 Kubernetes kubelet 中负责监控 Pod 生命周期事件的核心组件。通过深入分析其工作原理，有如下了解：
+
+**核心机制**：
+- PLEG 采用定时轮询的方式，每秒通过 gRPC 调用容器运行时获取 Pod 状态
+- 通过比较新旧状态生成生命周期事件，并更新本地缓存
+- 实现了完整的错误处理和重试机制
+
+**健康检查机制**：
+- PLEG 通过检查最后一次成功 relist 的时间来判断自身健康状态
+- 当超过 3 分钟未成功执行 relist 时，会被标记为不健康
+- 这直接影响节点的 Ready 状态，导致节点被标记为 NotReady
+
+**性能瓶颈**：
+- relist 过程涉及大量 gRPC 远程调用，属于 I/O 密集型操作
+- 事件计算和缓存更新增加了 CPU 负载
+- 在高负载场景下容易成为性能瓶颈
+
+**技术演进**：
+社区正在推进基于事件的 PLEG 机制，从轮询模式转向事件驱动模式，以提高性能和响应性。
 
 ## 参考
 
