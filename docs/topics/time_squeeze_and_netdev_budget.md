@@ -2,6 +2,8 @@
 
 <show-structure depth="3"/>
 
+在一次网络丢包案例分析中，深入到Linux内核及网卡驱动的代码实现才找到根因。因此这里总结下Linux内核网络栈中`time_squeeze`指标的含义、触发机制以及相关的性能优化方法。`time_squeeze`作为网络性能监控的重要指标，反映了内核在处理网络数据包时的效率和潜在瓶颈。通过对内核源码的详细分析，特别是Mellanox网卡驱动的实现细节，展示了从硬件中断到软中断处理的完整数据包处理流程，结合实际案例给出了性能调优建议。
+
 > 本文参考代码版本为：[openeuler 4.19.90-2404.2.0](https://gitee.com/openeuler/kernel/tree/4.19.90-2404.2.0/)，不同kernel版本可能会有差异。
 > 
 {style="note"}
@@ -12,7 +14,7 @@ time_squeeze持续增长，说明`softirq`的收包预算用完时`TX/RX queue`�
 
 ## 1. /proc/net/softnet_stat
 
-通过如下代码可知对应列的含义。
+`/proc/net/softnet_stat`文件提供了每个CPU核心的网络软中断处理统计信息。该文件中的每一行代表一个CPU核心的网络处理统计数据，每列数据都反映了网络栈不同层面的处理情况，通过如下代码可知对应列的含义。
 
 - Column-01: **packet_process**: the number of frames received by the interrupt handler.
 - Column-02: **packet_drop**: the number of frames dropped due to netdev_max_backlog being exceeded.
@@ -20,6 +22,9 @@ time_squeeze持续增长，说明`softirq`的收包预算用完时`TX/RX queue`�
 - Column-09: **cpu_collision**: collision occur while obtaining device lock while transmitting.
 - Column-10: **received_rps**: number of times cpu woken up received_rps.
 - Column-11: **flow_limit_count**: number of times reached flow limit count.
+
+
+`softnet_seq_show`函数负责将内核中的`softnet_data`结构体数据格式化输出到`/proc/net/softnet_stat`文件。该函数通过`seq_printf`将各项统计数据以十六进制格式输出，方便用户空间程序读取和分析网络性能数据。其中的`flow_limit_count`需要在启用`CONFIG_NET_FLOW_LIMIT`配置时才会有实际数值。
 
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/net/core/net-procfs.c
@@ -48,6 +53,7 @@ static int softnet_seq_show(struct seq_file *seq, void *v)
 	return 0;
 }
 ```
+{collapsible="true" collapsed-title="softnet_seq_show" default-state="collapsed"}
 
 - Each line of `softnet_stat` represents the packets a CPU core has received.
 - Upon traffic coming into the NIC, a hard interrupt is generated. An IRQ handler acknowledges the hard interrupt.
@@ -75,6 +81,8 @@ net.core.netdev_budget = 300
 参考： **[Red Hat Enterprise Linux Network Performance Tuning Guide](https://access.redhat.com/articles/1391433)**
 
 ### 2.2 time_squeeze触发代码
+
+`net_rx_action`函数是`NET_RX_SOFTIRQ`软中断的处理函数，负责处理网络接收的核心逻辑。该函数实现了NAPI（New API）机制，通过轮询的方式批量处理网络数据包，提高了网络处理效率。函数使用两个关键参数控制处理时长：`netdev_budget`（处理数据包数量预算）和`netdev_budget_usecs`（处理时间预算）。当任一预算耗尽时，函数会停止处理并更新`time_squeeze`计数器。
 
 通过全局搜索可以发现**time_squeeze**只在`net_rx_action()`这个函数被修改，而这个函数是`NET_RX_SOFTIRQ`中断的处理函数，所以`time_squeeze`的变化可以反映内核处理`NET_RX_SOFTIRQ`中断的效率。
 
@@ -132,12 +140,15 @@ out:
 	__kfree_skb_flush();
 }
 ```
+{collapsible="true" collapsed-title="net_rx_action" default-state="collapsed"}
 
 ## 3. Mellanox驱动处理逻辑
 
 这里主要分析`net_rx_action()`中`budget -= napi_poll(n, &repoll);`这一行涉及到的代码，也就是网卡驱动注册到内核的`poll()`方法的逻辑。
 
 ### 3.1 网卡驱动的`poll()`方法
+
+Mellanox网卡驱动通过`net_device_ops`结构体向内核注册各种网络操作函数。当网卡启动时（通过`ifconfig up`或`ip link set up`），内核会调用`ndo_open`函数，在Mellanox驱动中对应`mlx5e_open`函数。该函数会完成网卡的初始化工作，包括分配资源、创建队列、注册中断处理函数等。其中最重要的是注册NAPI poll函数，这是实现高效网络数据包处理的关键。
 
 根据网卡驱动定义的`net_device_ops`可知，在Mellanox中`ndo_open`的实现是`mlx5e_open`，up网卡时会调用这个函数，最终会注册`poll()`方法。
 
@@ -209,6 +220,8 @@ end split
 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll, 64);
 ```
 
+`netif_napi_add`函数是NAPI机制的核心注册函数，它将网卡驱动的poll函数注册到内核的NAPI框架中。该函数初始化NAPI结构体，设置poll回调函数和权重值（weight），并将NAPI实例添加到网络设备的NAPI列表中。权重值决定了每次poll调用最多可以处理的数据包数量，这是防止单个网卡垄断CPU资源的重要机制。函数还会初始化GRO（Generic Receive Offload）哈希表，用于后续的数据包聚合处理。
+
 `netif_napi_add()`函数定义如下，查看函数实现了解每个输入参数的含义。
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/net/core/dev.c
@@ -240,6 +253,8 @@ EXPORT_SYMBOL(netif_napi_add);
 {collapsible="true" collapsed-title="netif_napi_add(struct net_device *dev, struct napi_struct *napi, int (*poll)(struct napi_struct *, int), int weight)" default-state="collapsed"}
 
 ### 3.2 mlx5e_napi_poll()
+
+`mlx5e_napi_poll`是Mellanox网卡驱动的NAPI poll处理函数，它在软中断上下文中执行，负责批量处理网络数据包。该函数采用了发送优先的策略，首先清理发送队列中已完成的数据包，释放相关资源，然后再处理接收队列中的新数据包。这种设计可以及时释放发送缓冲区，避免发送队列满导致的网络拥塞。函数还实现了动态中断调节（DIM），根据网络负载自动调整中断聚合参数，在低延迟和高吞吐量之间取得平衡。
 
 在`net_rx_action()`函数中，`budget -= napi_poll(n, &repoll);`最终会执行到网卡驱动的`poll()`方法，上面分析可知具体是`mlx5e_napi_poll()`方法。
 
@@ -303,8 +318,12 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	return work_done;
 }
 ```
+{collapsible="true" collapsed-title="mlx5e_napi_poll" default-state="collapsed"}
+
 
 ### 3.3 mlx5e_poll_tx_cq()
+
+`mlx5e_poll_tx_cq`函数负责处理发送完成队列（TX CQ），清理已经成功发送的数据包。该函数通过遍历完成队列中的完成事件（CQE），释放相关的DMA映射和socket buffer。函数使用了独立的TX处理预算（MLX5E_TX_CQ_POLL_BUDGET=128），这个预算独立于NAPI的总预算，确保发送清理不会过度占用CPU资源。当检测到硬件错误时，函数会触发错误恢复机制。处理完成后，如果发送队列之前因为满而停止，函数会检查是否有足够空间并唤醒队列。
 
 `mlx5e_poll_tx_cq()`的主要作用是清理ring buffer，在循环中持续运行，直到满足如下条件才退出执行。
 1. 超过MLX5E_TX_CQ_POLL_BUDGET预算，默认是128
@@ -449,7 +468,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 
 ### 3.4 mlx5e_poll_rx_cq()
 
-`mlx5e_poll_rx_cq()`负责处理接收队列（Receive Queue，简称RQ）中的完成事件（Completion Queue Event，简称CQE），确保数据包被正确接收并处理。
+`mlx5e_poll_rx_cq`函数是接收路径的核心处理函数，负责从接收完成队列中提取数据包并交给上层协议栈处理。该函数支持压缩CQE（Compressed CQE）特性，可以在单个CQE中包含多个数据包的信息，提高了PCIe带宽利用率。函数通过预算机制控制每次处理的数据包数量，确保系统的公平性和响应性。处理过程中还集成了XDP（eXpress Data Path）支持，可以在驱动层直接处理某些数据包，大幅提升特定场景下的性能。
 
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
@@ -519,6 +538,8 @@ out:
 }
 ```
 
+接收处理函数的初始化过程涉及多个层次的函数指针设置。在创建接收队列时，驱动会根据配置选择合适的接收处理函数。对于标准的单包接收模式，使用`mlx5e_handle_rx_cqe`函数；对于多包接收模式（Multi-Packet WQE），则使用`mlx5e_handle_rx_cqe_mpwrq`函数。这种设计允许驱动在运行时根据不同的硬件特性和配置选择最优的处理路径。
+
 在`mlx5e_alloc_rq()`初始化了`rq->handle_rx_cqe`。
 
 ```C
@@ -548,7 +569,7 @@ static const struct mlx5e_profile mlx5e_nic_profile = {
 
 ### 3.5 mlx5e_handle_rx_cqe()
 
-`mlx5e_handle_rx_cqe()`主要作用是处理网络数据包的接收和完成队列的管理，会生成`skb`并送往协议栈进一步处理。
+`mlx5e_handle_rx_cqe`函数是数据包接收的最后一步，负责将硬件接收的数据构建成内核可以处理的socket buffer（skb）。该函数首先从CQE中提取数据包信息，包括数据长度、校验和状态等，然后调用相应的函数重构skb。如果启用了XDP，函数会先尝试XDP处理路径。构建好的skb会通过`napi_gro_receive`提交给网络栈，利用GRO机制聚合小包，提高协议栈处理效率。处理完成后，函数会释放使用过的接收缓冲区，为后续接收准备空间。
 
 ```C
 // /home/kangxiaoning/workspace/kernel-4.19.90-2404.2.0/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
@@ -593,7 +614,7 @@ wq_cyc_pop:                               // 从工作队列中移除已处理�
 
 ## 4. 性能参数优化
 
-如果遇到`time_squeeze`持续增长，说明存在性能瓶颈，可以尝试调大如下参数，给中断更多的预算来处理网络包，然后继续观察`time_squeeze`变化情况，判断问题是否得以解决。
+当系统出现`time_squeeze`持续增长时，表明软中断处理存在性能瓶颈。这通常意味着在分配的时间或预算内，内核无法处理完所有待处理的网络数据包。解决这个问题的关键是增加软中断的处理能力，主要通过调整`netdev_budget`和`netdev_budget_usecs`两个参数来实现。这两个参数分别控制了每次软中断可以处理的最大数据包数量和最长处理时间。合理调整这些参数可以在不影响系统整体响应性的前提下，提高网络处理能力。
 
 ```C
 net.core.netdev_budget = 300
@@ -606,7 +627,7 @@ net.core.netdev_budget_usecs = 8000
 
 ## 5. Mellanox驱动
 
-`pci_driver`定义了PCI设备驱动程序所需的所有关键组件和回调函数，以便内核通过驱动程序与硬件设备交互。当内核检测到网卡设备时，会调用`probe`函数进行设备的初始化，在Mellanox驱动中即`init_noe`函数，从这个函数入手可以了解网卡初始化过程，**ring buffer**就是在这个过程中创建的。
+Mellanox网卡驱动作为PCIe设备驱动，通过`pci_driver`结构体定义了与内核PCI子系统的接口。当系统检测到Mellanox网卡时，PCI子系统会调用驱动的`probe`函数（`init_one`）进行设备初始化。这个初始化过程包括硬件资源分配、DMA映射建立、中断注册、队列创建等关键步骤。其中，ring buffer的分配是保证高性能网络传输的基础，它为网卡和内核之间的数据交换提供了高效的缓冲机制。
 
 ```C
 static struct pci_driver mlx5_core_driver = {
@@ -621,6 +642,8 @@ static struct pci_driver mlx5_core_driver = {
 ```
 
 ### 5.1 mlx5分配ring buffer
+
+Ring buffer的分配过程展示了Mellanox驱动如何为高性能网络传输准备内存资源。整个过程从设备初始化开始，通过创建Event Queue（EQ）来处理各种硬件事件。EQ的大小经过精心计算，考虑了基本大小和额外缓冲，并通过`roundup_pow_of_two`确保大小是2的幂次，这有利于硬件优化。最终通过DMA一致性内存分配函数获取物理连续的内存区域，这种内存可以被网卡硬件直接访问，避免了数据复制的开销。
 
 ```plantuml
 @startuml
@@ -788,8 +811,9 @@ struct mlx5_eqe {
 ```
 {collapsible="true" collapsed-title="mlx5_eqe" default-state="collapsed"}
 
-```C
+`mlx5_create_map_eq`函数是创建和映射Event Queue的核心函数。它不仅负责分配内存，还要完成硬件配置、中断注册和软件初始化等多项工作。函数首先计算EQ的实际大小（基础大小加上备用空间），然后分配DMA内存。接着通过固件命令创建硬件EQ，并注册中断处理函数。最后，根据EQ类型初始化相应的处理机制，如tasklet用于普通完成事件处理。
 
+```C
 int mlx5_create_map_eq(struct mlx5_core_dev *dev, struct mlx5_eq *eq, u8 vecidx,
 		       int nent, u64 mask, const char *name,
 		       enum mlx5_eq_type type)
@@ -907,6 +931,7 @@ err_buf:
 ```
 {collapsible="true" collapsed-title="mlx5_create_map_eq" default-state="collapsed"}
 
+内存分配的精确计算体现在以下代码片段中。通过将基础EQ大小（1024）加上备用空间（128），再进行2的幂次对齐，最终得到2048个条目。每个条目64字节，总共需要131072字节（128KB）的DMA内存。这种对齐策略不仅有利于硬件访问优化，还简化了索引计算。
 
 ```C
 	eq->type = type;
@@ -1113,7 +1138,11 @@ err_buf:
 
 ## 6. Linux kernel
 
+Linux内核网络栈通过回调函数体系实现了协议的模块化和可扩展性。这些回调函数覆盖了从套接字操作到协议处理的各个层面，使得不同的网络协议可以共享通用的框架代码，同时保持各自的特定实现。
+
 ### 6.1 Socket相关回调
+
+套接字层回调函数定义了用户空间程序与内核网络栈的接口。`inetsw_array`数组注册了不同类型套接字（TCP、UDP、RAW等）的处理函数。每种套接字类型都有对应的`proto`结构（协议处理）和`proto_ops`结构（套接字操作），分别处理协议相关逻辑和用户接口操作。`socket_file_ops`则将套接字抽象为文件，使得网络编程可以使用统一的文件操作接口。
 
 ```C
 static struct inet_protosw inetsw_array[] =
@@ -1153,6 +1182,8 @@ static struct inet_protosw inetsw_array[] =
 };
 ```
 {collapsible="true" collapsed-title="inetsw_array[]" default-state="collapsed"}
+
+`tcp_prot`结构体定义了TCP协议的核心操作函数，包括连接建立、数据收发、连接关闭等。这些函数实现了TCP的可靠传输机制，包括序列号管理、确认机制、流量控制和拥塞控制。通过内存压力回调和孤儿套接字管理，TCP协议栈可以在系统资源紧张时采取适当的措施，保证系统稳定性。
 
 ```C
 struct proto tcp_prot = {
@@ -1204,6 +1235,8 @@ struct proto tcp_prot = {
 ```
 {collapsible="true" collapsed-title="tcp_prot" default-state="collapsed"}
 
+`inet_stream_ops`提供了面向流套接字的操作接口，这些函数直接对应到用户空间的系统调用。通过`tcp_poll`实现了高效的I/O多路复用，`tcp_mmap`支持零拷贝优化，`tcp_splice_read`实现了高效的数据转发。
+
 ```C
 const struct proto_ops inet_stream_ops = {
 	.family		   = PF_INET,
@@ -1241,6 +1274,8 @@ const struct proto_ops inet_stream_ops = {
 ```
 {collapsible="true" collapsed-title="inet_stream_ops" default-state="collapsed"}
 
+套接字文件操作接口使得网络编程可以像操作普通文件一样操作网络连接。通过VFS层的抽象，应用程序可以使用read/write、poll/select等标准接口进行网络通信，大大简化了网络编程的复杂性。
+
 ```C
 static const struct file_operations socket_file_ops = {
 	.owner =	THIS_MODULE,
@@ -1264,6 +1299,8 @@ static const struct file_operations socket_file_ops = {
 
 ### 6.2 TCP相关回调
 
+TCP请求处理回调函数管理TCP连接建立过程中的各种状态。`tcp_request_sock_ops`处理SYN包的接收、SYN+ACK的发送和重传逻辑。这些函数实现了TCP的三次握手机制，包括SYN cookie等防御机制，保护服务器免受SYN flood攻击。
+
 ```C
 struct request_sock_ops tcp_request_sock_ops __read_mostly = {
 	.family		=	PF_INET,
@@ -1276,6 +1313,8 @@ struct request_sock_ops tcp_request_sock_ops __read_mostly = {
 };
 ```
 {collapsible="true" collapsed-title="tcp_request_sock_ops" default-state="collapsed"}
+
+IPv4特定的TCP请求处理函数提供了更细粒度的控制。包括MSS（Maximum Segment Size）计算、初始序列号生成、时间戳偏移初始化等。MD5签名支持增强了TCP连接的安全性，常用于BGP等关键协议。
 
 ```C
 const struct tcp_request_sock_ops tcp_request_sock_ipv4_ops = {
@@ -1298,6 +1337,8 @@ const struct tcp_request_sock_ops tcp_request_sock_ipv4_ops = {
 
 ### 6.3 IP相关回调
 
+TCP套接字初始化函数设置了IPv4特定的操作函数。这种分层设计使得TCP协议栈可以同时支持IPv4和IPv6，通过不同的`af_ops`实现协议特定的功能，如路由查找、校验和计算等。
+
 ```C
 static int tcp_v4_init_sock(struct sock *sk)
 {
@@ -1315,6 +1356,8 @@ static int tcp_v4_init_sock(struct sock *sk)
 }
 ```
 {collapsible="true" collapsed-title="tcp_v4_init_sock" default-state="collapsed"}
+
+`ipv4_specific`结构体包含了IPv4协议族特定的连接操作。这些函数处理IP层的各种功能，包括IP包的排队发送、TCP校验和计算、路由缓存管理等。通过这种抽象，TCP协议栈可以透明地支持不同的网络层协议。
 
 ```C
 const struct inet_connection_sock_af_ops ipv4_specific = {
@@ -1340,6 +1383,8 @@ const struct inet_connection_sock_af_ops ipv4_specific = {
 
 ### 6.4 Neighbour相关回调
 
+邻居子系统（Neighbour Subsystem）负责管理链路层地址解析，在IPv4中主要是ARP协议。不同的邻居操作结构对应不同的使用场景：`arp_generic_ops`用于需要地址解析的普通情况，`arp_hh_ops`优化了硬件头部缓存的情况，`arp_direct_ops`用于点对点链路等不需要地址解析的场景。
+
 ```C
 static const struct neigh_ops arp_generic_ops = {
 	.family =		AF_INET,
@@ -1364,7 +1409,7 @@ static const struct neigh_ops arp_direct_ops = {
 };
 ```
 
-
+ARP表结构定义了ARP协议的各种参数和行为。包括ARP表项的老化时间、重传间隔、队列长度等。这些参数经过精心调优，在地址解析的及时性和网络资源消耗之间取得平衡。通过垃圾回收机制，系统可以自动清理过期的ARP表项，防止内存泄漏。
 ```C
 struct neigh_table arp_tbl = {
 	.family		= AF_INET,
@@ -1400,3 +1445,21 @@ struct neigh_table arp_tbl = {
 EXPORT_SYMBOL(arp_tbl);
 ```
 {collapsible="true" collapsed-title="arp_tbl" default-state="collapsed"}
+
+## 总结
+
+`time_squeeze`作为一个重要的性能指标，直接反映了软中断处理网络数据包的效率。当这个指标持续增长时，表明系统在分配的预算内无法及时处理所有网络数据包，存在潜在的性能瓶颈。通过调整`netdev_budget`和`netdev_budget_usecs`参数，可以有效缓解这一问题，提高网络处理能力。
+
+内容写的比较杂，主要发现包括：
+
+1. **软中断处理机制**：Linux内核通过NAPI机制实现了高效的批量数据包处理，通过预算控制避免单个网卡垄断CPU资源，保证了系统的公平性和响应性。
+
+2. **驱动实现细节**：Mellanox驱动展示了现代高性能网卡驱动的设计模式，包括多队列支持、动态中断调节、预分配缓冲区等优化技术。
+
+3. **内存管理策略**：Ring buffer的分配需要考虑多个因素，包括队列数量、MTU大小、页面大小等。合理的内存规划对系统性能至关重要。
+
+4. **性能优化方向**：除了调整内核参数外，还可以通过CPU亲和性设置、中断分配优化、队列数量调整等手段进一步提升网络性能。
+
+5. **监控和诊断**：`/proc/net/softnet_stat`提供了丰富的性能监控数据，结合其他工具可以全面了解系统的网络处理状态。
+
+在实际生产环境中，网络性能优化需要综合考虑硬件能力、软件配置和业务特征。通过持续监控关键指标，及时发现并解决性能瓶颈，才能确保系统在高负载下稳定运行。本文提供的分析方法和优化建议，可以作为网络性能调优的参考，更好地理解和优化Linux网络栈的性能表现。
