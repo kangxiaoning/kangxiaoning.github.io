@@ -2,9 +2,21 @@
 
 <show-structure depth="3"/>
 
+Linux Bridge是Linux内核中实现的二层虚拟网络设备，它工作在数据链路层，可以连接多个网络接口，实现类似物理交换机的功能。在容器网络、虚拟化等场景中，Linux Bridge扮演着重要角色，为虚拟网络提供了基础的二层转发能力。
+
+本文将从源码层面深入分析Linux Bridge的实现原理，包括Bridge的创建、网络接口的添加、数据帧的接收和转发等核心流程。通过对内核源码的剖析，理解Linux Bridge的工作机制和实现细节。
+
 > 本文基于Linux kernel v3.10对Bridge工作原理进行分析。
 
 ## 1. 创建Bridge
+
+Linux Bridge在内核中是以`net_device`结构体表示的，这体现了Linux内核的设计理念：将所有网络设备抽象为统一的`net_device`结构。创建Bridge的过程实际上是分配并初始化一个特殊的网络设备，这个设备除了通用的`net_device`信息外，还包含了Bridge特有的`net_bridge`结构体信息。
+
+Bridge设备的初始化过程包括：
+1. 分配内存空间（同时包含`net_device`和`net_bridge`两部分）
+2. 设置Bridge的基本属性（如MAC地址、网络命名空间等）
+3. 注册Bridge特定的操作函数集（通过`br_netdev_ops`实现）
+4. 将设备注册到内核网络子系统
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/bridge/br_if.c
@@ -36,6 +48,9 @@ int br_add_bridge(struct net *net, const char *name)
 
 创建Bridge的代码在`br_add_bridge()`函数中，通过`alloc_netdev()`为Bridge分配了内存并通过`br_dev_setup()`对Bridge做了初始化，返回值是一个`net_device`结构体，可见Bridge在Linux中是用`net_device`表示的。实际上这里分配了两个对象，分别是`net_device`和`net_bridge`，相当于通用的device信息加上特殊的bridge信息组合成一个bridge device。
 
+
+`alloc_netdev()`宏通过调用`alloc_netdev_mqs()`函数来实现具体的内存分配和初始化工作。这个函数不仅分配了设备结构体的内存，还初始化了设备的各种队列、列表和基本属性。
+
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/include/linux/netdevice.h
 
@@ -43,7 +58,7 @@ int br_add_bridge(struct net *net, const char *name)
 	alloc_netdev_mqs(sizeof_priv, name, setup, 1, 1)
 ```
 
-`alloc_netdev()`是个宏，它是通过调用`alloc_netdev_mqs()`函数实现的。
+`alloc_netdev_mqs()`函数执行了完整的设备初始化流程，包括内存对齐、per-CPU引用计数分配、各种链表初始化、队列分配等关键步骤。该函数确保了新创建的网络设备具有完整的数据结构和必要的资源。
 
 ```C
 // /Users/kangxiaoning/workspace/linux-3.10/net/core/dev.c
