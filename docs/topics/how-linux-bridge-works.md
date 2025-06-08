@@ -831,6 +831,8 @@ EXPORT_SYMBOL_GPL(smpboot_register_percpu_thread);
 
 #### 3.2.2 初始化网络设备
 
+网络设备初始化过程中会创建per-CPU的数据结构，注册软中断处理函数，初始化协议类型哈希表等。这些准备工作为后续的网络数据处理奠定了基础。
+
 通过`subsys_initcall(net_dev_init)`执行网络设备初始化。
 - 初始化`softnet_data`等per cpu数据结构，网卡驱动的`pool()`函数后面会注册到`softnet_data`结构体中的`poll_list`字段。
 - 调用`open_softirq()`注册**RX_SOFTIRQ**和**TX_SOFTIRQ**对应的中断处理函数。
