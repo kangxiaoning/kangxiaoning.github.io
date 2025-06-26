@@ -218,6 +218,167 @@ void account_idle_time(cputime_t cputime)
 
 判断是否有进程在等待I/O，可以通过`vmstat`的`b`列来判断。
 
+## 4. cpu.busy和cpu.iowait同时100%
+
+**结论：监控计算逻辑错误，导出出现`cpu.busy`与`cpu.iowait`同时100%的矛盾现象。**
+
+### 4.1 现象
+
+在一次异常处理中，观察到`cpu.busy`与`cpu.iowait`同时100%，与预期不符。
+
+### 4.2 矛盾
+
+根据前面分析，`cpu.iowait`是CPU空闲时间的一部分，所以`cpu.iowait`100%表示CPU完全是空闲的，也就是`cpu.idle`是100%，那为什么`cpu.busy`也是100%呢？
+
+### 4.3 分析
+
+#### 4.3.1 `/proc/stat`含义
+
+**Position 1 - user**: Time executing processes in user mode, excluding nice time. This represents normal application workload processing.
+
+**Position 2 - nice**: Time executing niced processes (positive nice values indicating lower priority). This time is separate from regular user time.
+
+**Position 3 - system**: Time executing in kernel/system mode, including system calls, kernel functions, and device drivers serving user processes.
+
+**Position 4 - idle**: Time spent in idle state when the CPU has no work to perform. This is the primary metric for calculating utilization.
+
+**Position 5 - iowait** (Linux 2.5.41+): Time waiting for I/O operations to complete. **Critical note**: This measurement is unreliable on multi-core systems because the CPU doesn't actually wait for I/O - only individual processes wait while other processes can continue running.
+
+**Position 6 - irq** (Linux 2.6.0+): Time servicing hardware interrupts with high priority response to hardware events.
+
+**Position 7 - softirq** (Linux 2.6.0+): Time servicing software interrupts that handle work queued by hardware interrupts at lower priority.
+
+**Position 8 - steal** (Linux 2.6.11+): Time stolen by the hypervisor in virtualized environments, indicating CPU resources allocated to other virtual machines.
+
+**Position 9 - guest** (Linux 2.6.24+): Time spent running virtual CPU for guest operating systems. **Critical implementation detail**: This time is also included in user time, requiring adjustment to avoid double-counting.
+
+**Position 10 - guest_nice** (Linux 2.6.33+): Time spent running niced guest processes. **Also included in nice time**, requiring similar adjustment.
+
+#### 4.3.2 正确计算逻辑
+
+CPU使用率是个采样指标，根据每个周期变量化计算出使用率。
+
+1. `cpu.busy`正确计算逻辑如下：
+
+```Shell
+# Step 1: Read initial CPU statistics
+prev_values = read_cpu_stats()
+
+# Step 2: Wait for measurement interval (typically 1 second)
+sleep(interval)
+
+# Step 3: Read current CPU statistics  
+curr_values = read_cpu_stats()
+
+# Step 4: Calculate deltas
+prev_idle = prev_idle + prev_iowait
+curr_idle = curr_idle + curr_iowait
+prev_non_idle = prev_user + prev_nice + prev_system + prev_irq + prev_softirq + prev_steal
+curr_non_idle = curr_user + curr_nice + curr_system + curr_irq + curr_softirq + curr_steal
+
+prev_total = prev_idle + prev_non_idle
+curr_total = curr_idle + curr_non_idle
+
+# Step 5: Calculate CPU usage percentage
+total_delta = curr_total - prev_total
+idle_delta = curr_idle - prev_idle
+
+if total_delta == 0:
+    cpu_usage = 0
+else:
+    cpu_usage = (total_delta - idle_delta) / total_delta * 100
+```
+
+当时ECS依赖的存储异常，I/O完全hang死，因此可以认为所有线程都在等待I/O，线程基本都处于uninterruptible sleep状态（即D状态），`user` `nice` `system` `idle` `irq` `softirq` `steal` `guest` 列的变化量基本为0，但是`iowait`变化较大，代入上述逻辑计算如下。
+
+```Shell
+# 假设上次idle列统计值为x
+prev_idle = x
+
+# 假设上次iowait列统计值为y
+prev_iowait = y 
+
+# 因为I/O不可用，所有进程处于uninterruptible sleep状态（即D状态），所有空闲时间会计入iowait中，idle列变化基本为0
+curr_idle = x + 0
+
+# 因为I/O不可用，所有进程处于uninterruptible sleep状态（即D状态），所有空闲时间会计入iowait中，假设iowait列变化为z
+prev_iowait = y + z
+
+
+prev_idle = prev_idle + prev_iowait = x + y
+curr_idle = curr_idle + curr_iowait = x + y + z
+
+# 假设上次采集的user nice system irq softirq steal数值分别为a b c d e f
+prev_non_idle = prev_user + prev_nice + prev_system + prev_irq + prev_softirq + prev_steal
+              = a + b + c + d + e + f
+# user nice system irq softirq steal变化量基本为0
+curr_non_idle = curr_user + curr_nice + curr_system + curr_irq + curr_softirq + curr_steal
+              = (a+0) + (b+0) + (c+0) + (d+0) + (e+0) + (f+0)
+              = a + b + c + d + e + f
+              
+prev_total = prev_idle + prev_non_idle = (x + y) + (a + b + c + d + e + f)
+curr_total = curr_idle + curr_non_idle = (x + y + z) + (a + b + c + d + e + f)          
+
+total_delta = curr_total - prev_total
+            = ((x + y + z) + (a + b + c + d + e + f)) - ((x + y) + (a + b + c + d + e + f)) 
+            = z
+            
+idle_delta = curr_idle - prev_idle
+           = (x + y + z) - (x + y)
+           = z
+
+# cpu.busy
+cpu_usage = (total_delta - idle_delta) / total_delta * 100
+          = (z - z)/z * 100
+          = 0
+```
+
+根据正确的逻辑，`cpu.busy` 的计算结果应该是0%，符合预期。
+
+2. `cpu.iowait`正确计算逻辑如下：
+
+```Shell
+iowait_delta = z
+
+total_delta = curr_total - prev_total
+            = ((x + y + z) + (a + b + c + d + e + f)) - ((x + y) + (a + b + c + d + e + f)) 
+            = z
+
+# cpu.iowait
+iowait_delta = iowait_delta / total_delta * 100
+             = z / z * 100
+             = 100
+```
+
+根据正确的逻辑，`cpu.iowait` 的计算结果应该是100%，符合预期。
+
+#### 4.3.3 错误计算逻辑
+
+查看监控指标说明，看到如下描述：
+- `cpu.busy`: 100.0减去`cpu.idle`
+- `cpu.idle`: `/proc/stat`中第5列的数值在采集周期内某一秒的增量与总量(2至10列之和)的百分比。
+- `cpu.iowait`: `/proc/stat`中第6列的数值在采集周期内某一秒的增量与总量(2至10列之和)的百分比。
+
+1. `cpu.idle`: 根据4.3.2的分析，第5列的增量基本为0，因此无论分母是多少，结果都是0，也就是`cpu.idle`的值基本是0%，与监控观察的结果一致。
+2. `cpu.busy`: 100.0减去`cpu.idle`，可以得出`cpu.busy`的结果是100%，与观察到的结果一致。
+3. `cpu.iowait`计算逻辑如下，得出结果为100%，与观察到的结果一致。。
+
+根据4.3.2的分析， 第6列的增量为z，即分子为z，计算逻辑如下：
+
+```Shell
+# 分母
+total_delta = 2至10列增量之和
+            = 0 + 0 + 0 + 0 + z + 0 + 0 + 0 + 0
+            = z
+
+#  第6列的增量为z
+cpu.iowait = `/proc/stat`中第6列的数值在采集周期内某一秒的增量与总量(2至10列之和)的百分比
+           = z / z
+           = 100%
+```
+
+根据上述分析，错误逻辑主要会影响`cpu.idle`和`cpu.busy`，而`cpu.iowait`不受影响。在`cpu.iowait`较高的场景下，`cpu.busy`计算结果比实际高，可能会提前触发告警(实际影响基本可以忽略)，而CPU真正的idle需要将`cpu.idle`和`cpu.iowait`加起来。
+
 ## 参考
 
 [Linux's iowait statistic and multi-CPU machines](https://utcc.utoronto.ca/~cks/space/blog/linux/LinuxMultiCPUIowait)
