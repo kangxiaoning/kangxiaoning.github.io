@@ -256,6 +256,8 @@ void account_idle_time(cputime_t cputime)
 
 #### 4.3.2 正确计算逻辑
 
+参考[USE Method: Linux Performance Checklist](https://www.brendangregg.com/USEmethod/use-linux.html)计算CPU Utilization。
+
 CPU使用率是个采样指标，根据每个周期变量化计算出使用率。
 
 1. `cpu.busy`正确计算逻辑如下：
