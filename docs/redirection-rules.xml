@@ -15,4 +15,8 @@
         </description>
         <accepts>nfsv3-flow-control-and-performance-optimization.html</accepts>
     </rule>
+    <rule id="2d0f7105">
+        <description>Created after removal of "Fault Tolerant" from 南寨小子</description>
+        <accepts>fault-tolerant.html</accepts>
+    </rule>
 </rules>
