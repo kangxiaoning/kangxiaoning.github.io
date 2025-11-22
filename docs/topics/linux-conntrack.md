@@ -953,6 +953,8 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
  
 ## 5. 案例分析
 
+### 5.1 案例一
+
 在kubernetes环境中，使用UDP协议解析域名，`coreDNS`异常重启，出现如下情况。
 1. 应用POD的`resolv.conf`文件中的nameserver配置相同的VIP，因此`nf_conntrack_tuple`中的`dip/dport/proto`都相同。
 2. 如果应用IP和端口号不变，也就是`nf_conntrack_tuple`中的`sip/sport`也相同，那发送方向的`nf_conntrack_tuple`的所有元素都相同了。
@@ -964,3 +966,29 @@ unsigned int nf_nat_setup_info(struct nf_conn *ct,
 
 答：根据上述分析，此时会导致DNAT出错，比如将数据包的目标地址修改为POD重启前的IP。
 
+### 5.2 案例二
+
+**问题现象**
+
+部署在Kubernetes-1集群中的A应用，访问Kubernetes-2集群中的B应用，出现如下情况。
+1. 上班高峰期偶发出现慢请求，应用A的多个实例整体变慢，响应时长从300ms左右变为5s、10s、15s等
+2. 该应用变慢时，并不是该应用业务高峰期
+3. 慢请求没有集中在某些实例或某些节点上
+
+
+**分析过程**
+
+1. 上班高峰期变慢，初步判断是性能问题
+2. 同时影响A应用多个实例，推测是共享资源导致的，比如服务端，网络，Coredns等
+
+- 同时在Kubernetes-1和Kubernetes-3集群访问B应用，Kubernetes-1出现慢请求时，Kubernetes-3未出现慢请求，排除了服务端B应用的问题；
+- 根据5s、10s、15s的响应时长，猜测和DNS解析超时有关；
+- 模拟用户请求重现异常，联合网络抓包，发现异常时DNS请求未发送到NameServer，但是未收到其它应用反馈域名解析异常，NameServer异常的概率较低；
+- 检查CoreDNS所在主机的messages日志，发现如下错误信息；
+
+```bash
+nf_conntrack: table full, dropping packet.
+```
+- 检查CoreDNS所在主机的监控，发现`tunl0`有out方向的丢包；
+
+至此，判断异常原因是`conntrack table`满导致的，修改kube-pxoxy配置，将`--conntrack-max-per-core`参数调为原来的2倍，重启后观察到问题解决。

@@ -33,9 +33,13 @@
 
 ### 3.2 LLM推理特征及优化
 
+[Characterizing Communication Patterns in Distributed Large Language Model Inference](https://www.arxiv.org/abs/2507.14392)
+
 [P/D-Serve- Serving Disaggregated Large Language Model at Scale](https://arxiv.org/abs/2408.08147)
 
-[Characterizing Communication Patterns in Distributed Large Language Model Inference](https://www.arxiv.org/abs/2507.14392)
+[Mastering LLM Techniques: Inference Optimization](https://developer.nvidia.com/blog/mastering-llm-techniques-inference-optimization/)
+
+[Inference optimization](https://bentoml.com/llm/inference-optimization)
 
 ## 4. LLM集合通信
 
