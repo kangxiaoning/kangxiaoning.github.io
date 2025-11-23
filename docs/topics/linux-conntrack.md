@@ -991,6 +991,11 @@ nf_conntrack: table full, dropping packet.
 ```
 - 检查CoreDNS所在主机的监控，发现`tunl0`有out方向的丢包；
 
-至此，判断异常原因是`conntrack table`满导致的，修改kube-pxoxy配置，将`--conntrack-max-per-core`参数调为原来的2倍，重启后观察到问题解决。
+至此，判断异常原因是`conntrack table`满导致的。
 
-还可以考虑调整`nf_conntrack_udp_timeout`，`nf_conntrack_buckets`等。
+**解决方法**
+
+1. 修改kube-pxoxy配置，将`--conntrack-max-per-core`参数调大，**本案例采用这种方法**将值调大为原来的2倍，重启后观察到问题解决，出于性能考虑建议同时调整`nf_conntrack_buckets`。
+2. 调小`nf_conntrack_udp_timeout`，可以降低连接数量。
+3. 采用NodeLocal DNS Cache架构，通过本地缓存减少coreDNS的压力。
+4. 调整Pod的`dnsConfig`配置，降低`ndots`数量，减少无效DNS请求。
