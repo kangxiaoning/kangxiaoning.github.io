@@ -999,3 +999,7 @@ nf_conntrack: table full, dropping packet.
 2. 调小`nf_conntrack_udp_timeout`，可以降低连接数量。
 3. 采用NodeLocal DNS Cache架构，通过本地缓存减少coreDNS的压力。
 4. 调整Pod的`dnsConfig`配置，降低`ndots`数量，减少无效DNS请求。
+
+## 6. 参考
+
+- [Connection tracking (conntrack) - Part 1: Modules and Hooks](https://thermalcircle.de/doku.php?id=blog:linux:connection_tracking_1_modules_and_hooks)
