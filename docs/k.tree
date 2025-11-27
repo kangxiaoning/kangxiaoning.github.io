@@ -25,6 +25,7 @@
         <toc-element topic="write-ebpf-program-in-rust.md"/>
     </toc-element>
     <toc-element toc-title="Linux">
+        <toc-element topic="exploring-the-linux-kernel-network-stack.md"/>
         <toc-element topic="tcp-retransmission-and-reset.md"/>
         <toc-element topic="debugging-the-linux-kernel-with-gdb.md"/>
         <toc-element topic="tcp_tw_recycle_cause_syn_drop.md"/>
