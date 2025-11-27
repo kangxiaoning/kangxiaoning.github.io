@@ -148,7 +148,7 @@ static struct inet_protosw inetsw_array[] =
 
 至此，`socket`创建完成，对应的协议层也做了相应初始化，`socket`与`protocol`的关系如下。
 
-```plain text
+```bash
 User Space Application
         ↓
    socket(2) syscall
