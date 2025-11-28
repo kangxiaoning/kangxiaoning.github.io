@@ -37,9 +37,9 @@ static const struct net_proto_family inet_family_ops = {
 
 `inet_init`执行后，`net_families[PF_INET]`就指向了`inet_family_ops`结构体。
 
-## 2. 创建`socket`
+## 2. 创建`Socket`
 
-### 2.1 `inet_create`匹配过程
+### 2.1 `Family`匹配过程
 
 在C语言中通过`socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)`创建一个socket。
 
@@ -66,7 +66,7 @@ SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)
 
 至此，确定了family为`AF_INET`的socket应该调用`inet_create`函数创建。
 
-### 2.2 `UDP`匹配过程
+### 2.2 `Protocol`匹配过程
 
 1. 全局数组`inetsw`维护socket type和protocol的关系，通过socket type(`SOCK_STREAM, SOCK_DGRAM, SOCK_RAW`)索引protocol(`TCP, UDP, ICMP, RAW`)。
 ```C
@@ -146,7 +146,7 @@ static struct inet_protosw inetsw_array[] =
 	sk = sk_alloc(net, pf_inet, gfp_kernel, answer_prot);
 ```
 
-至此，`socket`创建完成，对应的协议层也做了相应初始化，`socket`与`protocol`的关系如下。
+至此，`socket`创建完成，协议栈层级结构中不同的层都完成了创始化，`socket`层与`protocol`层的关系如下。
 
 ```bash
 User Space Application
@@ -169,8 +169,9 @@ User Space Application
     IP Layer & Below
 ```
 
-### 2.3 `SOCK_DGRAM`操作函数
+### 2.3 `SOCK_DGRAM`操作集
 
+`inet_dgram_ops`定义了`socket`层中`SOCK_DGRAM`类型的操作集。
 ```C
 const struct proto_ops inet_dgram_ops = {
 	.family		   = PF_INET,
@@ -199,7 +200,9 @@ const struct proto_ops inet_dgram_ops = {
 };
 ```
 
-### 2.4 `UDP`操作函数
+### 2.4 `UDP`操作集
+
+`udp_prot`定义了`UDP`协议的操作集，是`SOCK_DGRAM`类型的一种具体实现。
 ```C
 struct proto udp_prot = {
 	.name		   = "UDP",
@@ -235,7 +238,9 @@ struct proto udp_prot = {
 };
 ```
 
-### 2.5 `SOCK_STREAM`操作函数
+### 2.5 `SOCK_STREAM`操作集
+
+`inet_stream_ops`定义了`socket`层中`SOCK_STREAM`类型的操作集。
 ```C
 const struct proto_ops inet_stream_ops = {
 	.family		   = PF_INET,
@@ -265,7 +270,9 @@ const struct proto_ops inet_stream_ops = {
 };
 ```
 
-### 2.6 `TCP`操作函数
+### 2.6 `TCP`操作集
+
+`tcp_prot`定义了`TCP`协议的操作集，是`SOCK_STREAM`类型的一种具体实现。
 ```C
 struct proto tcp_prot = {
 	.name			= "TCP",
@@ -313,4 +320,25 @@ struct proto tcp_prot = {
 	.proto_cgroup		= tcp_proto_cgroup,
 #endif
 };
+```
+
+### 2.7 协议栈调用路径
+
+以`TCP`的`connect`操作为例，在应用层发起一个`connect`操作，从应用层到协议实现层的调用路径如下。其它协议操作的路径也类似，了解前面的信息后，可以直接进入具体协议的函数探索实现细节和逻辑。
+```Bash
+Application: connect(fd, addr, len)
+     ↓
+System Call: sys_connect()
+     ↓
+Socket Layer: sock->ops->connect()
+     ↓ (inet_stream_ops.connect)
+inet_stream_connect()
+     ↓ [Generic stream connection setup]
+     ↓
+Protocol Layer: sk->sk_prot->connect()
+     ↓ (tcp_prot.connect)
+tcp_v4_connect()
+     ↓ [TCP three-way handshake]
+     ↓
+Network Layer
 ```
