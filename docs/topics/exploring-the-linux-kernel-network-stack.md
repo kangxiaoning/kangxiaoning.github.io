@@ -41,7 +41,7 @@ static const struct net_proto_family inet_family_ops = {
 
 ### 2.1 `Family`匹配过程
 
-在C语言中通过`socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)`创建一个socket。
+在C语言中通过`socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)`创建一个socket。
 
 1. 调用`socket`syscall。
 
@@ -125,24 +125,25 @@ static struct inet_protosw inetsw_array[] =
 
 4. 在`inet_create`中利用注册的信息完成socket创建。
 
-- 通过`inetsw[SOCK_DGRAM]`找到`IPPROTO_UDP`的协议结构体。
+- 通过`inetsw[SOCK_STREAM]`找到`IPPROTO_TCP`的协议结构体。
 ```C
 	{
-		.type =       SOCK_DGRAM,
-		.protocol =   IPPROTO_UDP,
-		.prot =       &udp_prot,
-		.ops =        &inet_dgram_ops,
-		.flags =      INET_PROTOSW_PERMANENT,
-    },
+		.type =       SOCK_STREAM,
+		.protocol =   IPPROTO_TCP,
+		.prot =       &tcp_prot,
+		.ops =        &inet_stream_ops,
+		.flags =      INET_PROTOSW_PERMANENT |
+			      INET_PROTOSW_ICSK,
+	},
 ```
-- 完成`sock`及`sk`的初始化，`sock->ops`赋值为`&inet_dgram_ops`，`sk->sk_prot`赋值为`&udp_prot`。
+- 完成`sock`及`sk`的初始化，`sock->ops`赋值为`&inet_stream_ops`，`sk->sk_prot`赋值为`&tcp_prot`。
 ```C
-    // `sock->ops`赋值为`&inet_dgram_ops`
+    // `sock->ops`赋值为`&inet_stream_ops`
 	sock->ops = answer->ops;
 	answer_prot = answer->prot;
 	answer_flags = answer->flags;
 	
-	// `sk->sk_prot`赋值为`&udp_prot`
+	// `sk->sk_prot`赋值为`&tcp_prot`
 	sk = sk_alloc(net, pf_inet, gfp_kernel, answer_prot);
 ```
 
@@ -169,76 +170,11 @@ User Space Application
     IP Layer & Below
 ```
 
-### 2.3 `SOCK_DGRAM`操作集
+## 3. 操作集
 
-`inet_dgram_ops`定义了`socket`层中`SOCK_DGRAM`类型的操作集。
-```C
-const struct proto_ops inet_dgram_ops = {
-	.family		   = PF_INET,
-	.owner		   = THIS_MODULE,
-	.release	   = inet_release,
-	.bind		   = inet_bind,
-	.connect	   = inet_dgram_connect,
-	.socketpair	   = sock_no_socketpair,
-	.accept		   = sock_no_accept,
-	.getname	   = inet_getname,
-	.poll		   = udp_poll,
-	.ioctl		   = inet_ioctl,
-	.listen		   = sock_no_listen,
-	.shutdown	   = inet_shutdown,
-	.setsockopt	   = sock_common_setsockopt,
-	.getsockopt	   = sock_common_getsockopt,
-	.sendmsg	   = inet_sendmsg,
-	.recvmsg	   = inet_recvmsg,
-	.mmap		   = sock_no_mmap,
-	.sendpage	   = inet_sendpage,
-#ifdef CONFIG_COMPAT
-	.compat_setsockopt = compat_sock_common_setsockopt,
-	.compat_getsockopt = compat_sock_common_getsockopt,
-	.compat_ioctl	   = inet_compat_ioctl,
-#endif
-};
-```
+如下列举了常见协议TCP/UDP的Socket操作集与Protocol操作集。
 
-### 2.4 `UDP`操作集
-
-`udp_prot`定义了`UDP`协议的操作集，是`SOCK_DGRAM`类型的一种具体实现。
-```C
-struct proto udp_prot = {
-	.name		   = "UDP",
-	.owner		   = THIS_MODULE,
-	.close		   = udp_lib_close,
-	.connect	   = ip4_datagram_connect,
-	.disconnect	   = udp_disconnect,
-	.ioctl		   = udp_ioctl,
-	.init		   = udp_init_sock,
-	.destroy	   = udp_destroy_sock,
-	.setsockopt	   = udp_setsockopt,
-	.getsockopt	   = udp_getsockopt,
-	.sendmsg	   = udp_sendmsg,
-	.recvmsg	   = udp_recvmsg,
-	.sendpage	   = udp_sendpage,
-	.release_cb	   = ip4_datagram_release_cb,
-	.hash		   = udp_lib_hash,
-	.unhash		   = udp_lib_unhash,
-	.rehash		   = udp_v4_rehash,
-	.get_port	   = udp_v4_get_port,
-	.memory_allocated  = &udp_memory_allocated,
-	.sysctl_mem	   = sysctl_udp_mem,
-	.sysctl_wmem	   = &sysctl_udp_wmem_min,
-	.sysctl_rmem	   = &sysctl_udp_rmem_min,
-	.obj_size	   = sizeof(struct udp_sock),
-	.slab_flags	   = SLAB_DESTROY_BY_RCU,
-	.h.udp_table	   = &udp_table,
-#ifdef CONFIG_COMPAT
-	.compat_setsockopt = compat_udp_setsockopt,
-	.compat_getsockopt = compat_udp_getsockopt,
-#endif
-	.clear_sk	   = sk_prot_clear_portaddr_nulls,
-};
-```
-
-### 2.5 `SOCK_STREAM`操作集
+### 3.1 `SOCK_STREAM`操作集
 
 `inet_stream_ops`定义了`socket`层中`SOCK_STREAM`类型的操作集。
 ```C
@@ -270,7 +206,7 @@ const struct proto_ops inet_stream_ops = {
 };
 ```
 
-### 2.6 `TCP`操作集
+### 3.2 `TCP`操作集
 
 `tcp_prot`定义了`TCP`协议的操作集，是`SOCK_STREAM`类型的一种具体实现。
 ```C
@@ -322,7 +258,76 @@ struct proto tcp_prot = {
 };
 ```
 
-### 2.7 协议栈调用路径
+### 3.3 `SOCK_DGRAM`操作集
+
+`inet_dgram_ops`定义了`socket`层中`SOCK_DGRAM`类型的操作集。
+```C
+const struct proto_ops inet_dgram_ops = {
+	.family		   = PF_INET,
+	.owner		   = THIS_MODULE,
+	.release	   = inet_release,
+	.bind		   = inet_bind,
+	.connect	   = inet_dgram_connect,
+	.socketpair	   = sock_no_socketpair,
+	.accept		   = sock_no_accept,
+	.getname	   = inet_getname,
+	.poll		   = udp_poll,
+	.ioctl		   = inet_ioctl,
+	.listen		   = sock_no_listen,
+	.shutdown	   = inet_shutdown,
+	.setsockopt	   = sock_common_setsockopt,
+	.getsockopt	   = sock_common_getsockopt,
+	.sendmsg	   = inet_sendmsg,
+	.recvmsg	   = inet_recvmsg,
+	.mmap		   = sock_no_mmap,
+	.sendpage	   = inet_sendpage,
+#ifdef CONFIG_COMPAT
+	.compat_setsockopt = compat_sock_common_setsockopt,
+	.compat_getsockopt = compat_sock_common_getsockopt,
+	.compat_ioctl	   = inet_compat_ioctl,
+#endif
+};
+```
+
+### 3.4 `UDP`操作集
+
+`udp_prot`定义了`UDP`协议的操作集，是`SOCK_DGRAM`类型的一种具体实现。
+```C
+struct proto udp_prot = {
+	.name		   = "UDP",
+	.owner		   = THIS_MODULE,
+	.close		   = udp_lib_close,
+	.connect	   = ip4_datagram_connect,
+	.disconnect	   = udp_disconnect,
+	.ioctl		   = udp_ioctl,
+	.init		   = udp_init_sock,
+	.destroy	   = udp_destroy_sock,
+	.setsockopt	   = udp_setsockopt,
+	.getsockopt	   = udp_getsockopt,
+	.sendmsg	   = udp_sendmsg,
+	.recvmsg	   = udp_recvmsg,
+	.sendpage	   = udp_sendpage,
+	.release_cb	   = ip4_datagram_release_cb,
+	.hash		   = udp_lib_hash,
+	.unhash		   = udp_lib_unhash,
+	.rehash		   = udp_v4_rehash,
+	.get_port	   = udp_v4_get_port,
+	.memory_allocated  = &udp_memory_allocated,
+	.sysctl_mem	   = sysctl_udp_mem,
+	.sysctl_wmem	   = &sysctl_udp_wmem_min,
+	.sysctl_rmem	   = &sysctl_udp_rmem_min,
+	.obj_size	   = sizeof(struct udp_sock),
+	.slab_flags	   = SLAB_DESTROY_BY_RCU,
+	.h.udp_table	   = &udp_table,
+#ifdef CONFIG_COMPAT
+	.compat_setsockopt = compat_udp_setsockopt,
+	.compat_getsockopt = compat_udp_getsockopt,
+#endif
+	.clear_sk	   = sk_prot_clear_portaddr_nulls,
+};
+```
+
+## 4. 协议栈调用路径
 
 以`TCP`的`connect`操作为例，在应用层发起一个`connect`操作，从应用层到协议实现层的调用路径如下。其它协议操作的路径也类似，了解前面的信息后，可以直接进入具体协议的函数探索实现细节和逻辑。
 ```Bash
