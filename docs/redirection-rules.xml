@@ -19,4 +19,12 @@
         <description>Created after removal of "Fault Tolerant" from 南寨小子</description>
         <accepts>fault-tolerant.html</accepts>
     </rule>
+    <rule id="3c352df9">
+        <description>Created after removal of "AI产生的内容" from 南寨小子</description>
+        <accepts>articles-generated-by-ai.html</accepts>
+    </rule>
+    <rule id="745e6e58">
+        <description>Created after removal of "AI产生的内容" from 南寨小子</description>
+        <accepts>articles-generated-by-ai.html</accepts>
+    </rule>
 </rules>

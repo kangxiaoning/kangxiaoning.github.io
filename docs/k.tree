@@ -6,13 +6,15 @@
                  name="南寨小子"
                   start-page="how-etcd-watch-works.md">
 
+    <toc-element toc-title="vLLM">
+        <toc-element topic="Understanding-vLLM-Initialization.md"/>
+    </toc-element>
     <toc-element toc-title="Tools">
         <toc-element topic="Spacemacs-tips.md"/>
     </toc-element>
     <toc-element toc-title="AI">
         <toc-element topic="llm-learning-framework.md"/>
         <toc-element topic="abbreviation.md"/>
-        <toc-element topic="articles-generated-by-ai.md"/>
         <toc-element topic="how-llm-work.md"/>
     </toc-element>
     <toc-element toc-title="Etcd">
