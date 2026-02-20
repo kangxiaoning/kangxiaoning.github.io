@@ -5,7 +5,7 @@
 vLLM的启动链路可以划分为三个核心阶段：**配置构建（Configuration）**、**引擎构建（Engine Construction）** 和 **服务启动（Serving）**。
 
 ## 一、宏观流程
-
+### 1. AsyncLLM代码调用 {id="1_1"}
 ```bash
 CLI 入口
  ├── api_server.main()                # 1. 入口层：接收外部信号
@@ -21,6 +21,55 @@ CLI 入口
          │              └── Scheduler         # 调度器管理
          ├── build_app(args)          # 3. 服务层：构建 FastAPI 应用
          └── serve_http()             # 启动 Uvicorn 服务
+```
+
+### 2. AsyncLLM 执行流程 {id="1_2"}
+
+```Mermaid
+sequenceDiagram
+    participant User as API Server
+    participant AsyncLLM as AsyncLLM
+    participant Handler as output_handler
+    participant Core as EngineCoreClient
+    
+    AsyncLLM->>Handler: asyncio.create_task() [后台任务]
+    
+    User->>AsyncLLM: generate() [async for]
+    AsyncLLM->>Core: add_request_async()
+    
+    loop 后台持续运行
+        Handler->>Core: get_output_async()
+        Core-->>Handler: outputs
+        Handler->>Handler: process_outputs()
+        Handler->>Handler: queue.put(output)
+    end
+    
+    loop 流式返回
+        AsyncLLM->>AsyncLLM: await queue.get()
+        AsyncLLM-->>User: yield output
+    end
+```
+
+### 3. LLM 执行流程 {id="1_3"}
+
+离线推理的入口是`LLM`，执行流程与在线推理不同，大概如下。
+
+```mermaid
+sequenceDiagram
+    participant User as 用户代码
+    participant LLM as LLM
+    participant Engine as LLMEngine
+    participant Core as EngineCoreClient
+    
+    User->>LLM: generate(prompts)
+    LLM->>Engine: _validate_and_add_requests()
+    loop until finished
+        LLM->>Engine: _run_engine() [阻塞]
+        Engine->>Core: step()
+        Core-->>Engine: outputs
+        Engine-->>LLM: step_outputs
+    end
+    LLM-->>User: list[RequestOutput]
 ```
 
 
